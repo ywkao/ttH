@@ -10,8 +10,8 @@ cd $CMSSW_BASE/src
 
 # flashgg does not build with most recent commit, so skipping using the fork that I made for now and instead using the original flashg, reverting to a commit that does build successfully, and then manually copying over scripts for creating flat ntuples
 
-cd flashgg
 git clone https://github.com/cms-analysis/flashgg flashgg
+cd flashgg
 git reset --hard 074d2fa8fbdde8e58e422f80d559d76bb699355b 
 cd ..
 source flashgg/setup_8_0_X.sh
