@@ -15,9 +15,13 @@
 
 // ttHLeptonic
 #include "ttHLeptonic.cc"
+#include "ttHLooper.h"
 
 using namespace std;
 using namespace tas;
+
+const int nBkgCats = 6;
+const double targetLumi = 1; // ? don't fully understand how weights work
 
 int ScanChain(TChain* chain, TString filename, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(filename, "RECREATE");
@@ -27,11 +31,8 @@ int ScanChain(TChain* chain, TString filename, bool fast = true, int nEvents = -
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
-  // Example Histograms
-  //TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
-  TH1D* hMass = new TH1D("hMass", "", 100, 0, 250);
-  //TH1F *samplehisto = new TH1F("samplehisto", "Example histogram", 200,0,200);
-  //samplehisto->SetDirectory(rootdir);
+  vector<TH1D*> hMass = generate_1Dhist_vector("hMass", nBkgCats+1, 100, 0, 250);
+  vector<TH1D*> hRapidity = generate_1Dhist_vector("hRapidity", nBkgCats+1, 50, -3, 3);
 
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;
@@ -45,11 +46,15 @@ int ScanChain(TChain* chain, TString filename, bool fast = true, int nEvents = -
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
     // Get File Content
-    TFile file(currentFile->GetTitle());
+    TString currentFileTitle = currentFile->GetTitle();
+    TFile file(currentFileTitle);
     TTree *tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all");
     if (fast) TTreeCache::SetLearnEntries(10);
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);
+
+    // Decide what type of sample this is
+    int processId = categorize_process(currentFileTitle);
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -66,7 +71,9 @@ int ScanChain(TChain* chain, TString filename, bool fast = true, int nEvents = -
       ttHLeptonic::progress( nEventsTotal, nEventsChain );
 
       // Analysis Code
-      hMass->Fill(mass(), weight());
+      double evt_weight = weight() * (targetLumi / 1000);
+      hMass[processId]->Fill(mass(), evt_weight);
+      hRapidity[processId]->Fill(dipho_rapidity(), evt_weight);
     }
   
     // Clean Up
