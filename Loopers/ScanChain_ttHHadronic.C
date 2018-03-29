@@ -87,7 +87,7 @@ int ScanChain(TChain* chain, TString filename, bool fast = true, int nEvents = -
 
       // Analysis Code
       //double evt_weight = weight() * (targetLumi / 1000);
-      double evt_weight = scale1fb(currentFileTitle) * targetLumi;
+      double evt_weight = scale1fb(currentFileTitle) * targetLumi * sgn(weight());
       hMass[processId]->Fill(mass(), evt_weight);
       hRapidity[processId]->Fill(dipho_rapidity(), evt_weight);
       hMaxBTag[processId]->Fill(bjet1_csv(), evt_weight);

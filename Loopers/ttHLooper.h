@@ -28,6 +28,15 @@ int categorize_process(TString currentFileTitle) {
   }
 }
 
+double sgn(double x) {
+  if (x < 0)
+    return -1;
+  else if (x > 0)
+    return 1;
+  else 
+    return 0;
+}
+
 void add_samples(TChain* ch) {
   ch->Add("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2__ttH_Babies_v1/merged_ntuple_*.root");
   ch->Add("/hadoop/cms/store/user/smay/ttH/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_v1/merged_ntuple*.root");
