@@ -18,7 +18,7 @@ for dir in dirs:
 
 scale1fb = {}
 for dataset in datasets:
-  scale1fb[dataset] = {"xs" : 1, "filter_eff": 1, "br" : 1, "kf" : 1, "nevents" : 1, "scale1fb" : 0}
+  scale1fb[dataset] = {"xs" : 1, "filter_eff": 1, "br" : 1, "kf" : 1, "nevents" : 1, "negative_weight_frac": 0, "scale1fb" : 0}
 
 # First check summer 16 json file
 with open("../../BabyMaker/CMSSW_8_0_28/src/flashgg/MetaData/work/campaigns/RunIISummer16-2_4_2-25ns_Moriond17.json") as json_file:
@@ -61,9 +61,11 @@ with open("cross_sections.json") as json_file:
       scale1fb[dataset]["br"] = cross_sections[ds]["br"]
       scale1fb[dataset]["kf"] = cross_sections[ds]["kf"]
 
+# Need to insert negative weight fractions here
+
 for key, info in scale1fb.iteritems():
   if scale1fb[key]["nevents"] > 1:
-    scale1fb[key]["scale1fb"] = (scale1fb[key]["xs"] * scale1fb[key]["filter_eff"] * scale1fb[key]["br"] * scale1fb[key]["kf"] * 1000) / scale1fb[key]["nevents"]
+    scale1fb[key]["scale1fb"] = (scale1fb[key]["xs"] * scale1fb[key]["filter_eff"] * scale1fb[key]["br"] * scale1fb[key]["kf"] * 1000) / (scale1fb[key]["nevents"] * ( 1 - 2*scale1fb[key]["negative_weight_frac"]))
   else:
     print("Did not match dataset %s in either flashgg catalog or on DAS" % key)
     print("Setting scale1fb to 0")
