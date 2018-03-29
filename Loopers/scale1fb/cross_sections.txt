@@ -1,0 +1,3 @@
+All cross-sections + related info (filter efficiencies, branching ratios, k-factors) taken from [1] for background samples and [2] for ttH samples. A few mass points were missing from [2] (70, 80, 90, 100, 110) were missing -- I've set these cross-sections to 0 for the time being.
+[1] https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns
+[2] https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV#ttH_Process
