@@ -16,6 +16,7 @@
 // ttHLeptonic
 #include "ttHLeptonic.cc"
 #include "ttHLooper.h"
+#include "scale1fb.h"
 
 using namespace std;
 using namespace tas;
@@ -71,7 +72,8 @@ int ScanChain(TChain* chain, TString filename, bool fast = true, int nEvents = -
       ttHLeptonic::progress( nEventsTotal, nEventsChain );
 
       // Analysis Code
-      double evt_weight = weight() * (targetLumi / 1000);
+      //double evt_weight = weight() * (targetLumi / 1000);
+      double evt_weight = scale1fb(currentFileTitle) * targetLumi;
       hMass[processId]->Fill(mass(), evt_weight);
       hRapidity[processId]->Fill(dipho_rapidity(), evt_weight);
     }
