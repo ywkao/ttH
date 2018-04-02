@@ -46,6 +46,7 @@ class Comparison
     void set_x_bin_range(vector<int> xBinRange) { mCustomXRange = true; mXBinRange = xBinRange; }
     void set_y_bin_range(vector<int> yBinRange) { mCustomX2Range = true; mX2BinRange = yBinRange; }
     void set_y_lim_range(vector<double> yLimRange) { mCustomYRange = true; mYLimRange = yLimRange; }
+    void set_rat_lim_range(vector<double> ratLimRange) { mCustomRatRange = true; mRatRange = ratLimRange; }
     void set_x_label(TString xLabel) {mXLabel = xLabel; }
     void set_y_label(TString yLabel) {mYLabel = yLabel; }
     void set_y_label(TString yLabel, double fontSize) { mYLabel = yLabel; mYLabelFontSize = fontSize; }
@@ -116,6 +117,8 @@ class Comparison
     vector<double> mYLimRange;
     bool mCustomX2Range;
     vector<int> mX2BinRange;
+    bool mCustomRatRange;
+    vector<double> mRatRange;
 
     vector<double> mVHLines;
     vector<double> mVVLines;
@@ -232,6 +235,7 @@ void Comparison::default_options(TCanvas* c1)
   mBothData = false;
   mCustomXRange = false;
   mCustomYRange = false;
+  mCustomRatRange = false;
   mXBinRange.reserve(2);
   mYLimRange.reserve(2);
   mScale = 1;
@@ -349,9 +353,9 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
     mXBinRange[0] = 1;
     mXBinRange[1] = nBins;
     double area = mVHData[0]->Integral(0, nBins+1);
-    for (int i=1; i<nBins; i++) {
+    for (int i=1; i<=nBins; i++) {
       double binContent = mVHData[0]->GetBinContent(i);
-      if (binContent < (area/(pow(10,9))) )
+      if (binContent < (area/(pow(10,6))) )
         continue;
       else {
         mXBinRange[0] = i;
@@ -360,7 +364,7 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
     } 
     for (int i=nBins; i>0; i--) {
       double binContent = mVHData[0]->GetBinContent(i);
-      if (binContent < (area/(pow(10,9))) )
+      if (binContent < (area/(pow(10,6))) )
         continue;
       else {
         mXBinRange[1] = i;
@@ -374,13 +378,13 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
     for (int i=mXBinRange[0]; i<=mXBinRange[1]; i++) {
       double binContent = mVHData[0]->GetBinContent(i);
       avgContent += binContent/float(mXBinRange[1] - mXBinRange[0]);
-      if ((binContent < minContent) && binContent > 0)  minContent = binContent;
+      if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
       if (binContent > maxContent) maxContent = binContent;
       binContent = (mHMC->GetBinContent(i))*mScale;
-      if ((binContent < minContent) && binContent > 0)  minContent = binContent;
+      if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
       if (binContent > maxContent) maxContent = binContent;
     }
-    if (minContent < avgContent/1000) minContent = avgContent/1000;
+    //if (minContent < avgContent/1000) minContent = avgContent/1000;
     double range;
     double tSpace = topSpace + (0.05*mVInfo.size());
     if (mLog) {
@@ -727,7 +731,10 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
   mVHRat.push_back((TH1D*)hData->Clone("mVHRat0"));
   mVHRat[0]->SetTitle("");
   mVHRat[0]->Divide(hMC);
-  mVHRat[0]->GetYaxis()->SetRangeUser(0.0,2.0);
+  if (mCustomRatRange)
+    mVHRat[0]->GetYaxis()->SetRangeUser(mRatRange[0],mRatRange[1]);
+  else
+    mVHRat[0]->GetYaxis()->SetRangeUser(0.0,2.0);
   mVHRat[0]->GetYaxis()->SetLabelSize(0.08);
   mVHRat[0]->GetXaxis()->SetLabelSize(0.08);
   mVHRat[0]->GetYaxis()->SetNdivisions(5);

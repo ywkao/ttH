@@ -7,5 +7,5 @@ TARGET = makePlots
 
 all: $(TARGET)
 
-makePlots: makePlots.cpp
+makePlots: makePlots.cpp PlotHelper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o makePlots makePlots.cpp $(ROOTLIBS)

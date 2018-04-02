@@ -7,8 +7,8 @@ TARGET = ttHHadronicLooper ttHLeptonicLooper
 
 all: $(TARGET)
 
-ttHHadronicLooper: ScanChain_ttHHadronic.C ttHHadronicLooper.cpp scale1fb/scale1fb.h
+ttHHadronicLooper: ScanChain_ttHHadronic.C ttHHadronicLooper.cpp scale1fb/scale1fb.h ttHLooper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o ttHHadronicLooper ttHHadronicLooper.cpp $(ROOTLIBS)
 
-ttHLeptonicLooper: ScanChain_ttHLeptonic.C ttHLeptonicLooper.cpp scale1fb/scale1fb.h
+ttHLeptonicLooper: ScanChain_ttHLeptonic.C ttHLeptonicLooper.cpp scale1fb/scale1fb.h ttHLooper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o ttHLeptonicLooper ttHLeptonicLooper.cpp $(ROOTLIBS)

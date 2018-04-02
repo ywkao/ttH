@@ -14,14 +14,18 @@ int categorize_process(TString currentFileTitle) {
     return 1;
   else if (currentFileTitle.Contains("DiPhoton"))
     return 2;
-  else if (currentFileTitle.Contains("GJet") && !currentFileTitle.Contains("TTG"))
+  else if (currentFileTitle.Contains("GJet_")) 
     return 3;
+  //else if (currentFileTitle.Contains("GGJet") && !currentFileTitle.Contains("TTG"))
+  //  return 4;
   else if (currentFileTitle.Contains("QCD"))
     return 4;
-  else if (currentFileTitle.Contains("TTG"))
+  else if (currentFileTitle.Contains("TTGG"))
     return 5;
-  else if (currentFileTitle.Contains("WG") || currentFileTitle.Contains("ZG"))
+  else if (currentFileTitle.Contains("TTGJets"))
     return 6;
+  else if (currentFileTitle.Contains("WG") || currentFileTitle.Contains("ZG"))
+    return 7;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
