@@ -17,9 +17,10 @@ void make_plot(TCanvas* c1, TFile* f1, string output_name, TString hist_name, TS
   c->set_y_label("Events");
   c->set_data_drawOpt("HIST");
   c->set_lumi(1);
-  c->set_rat_lim_range({0.0,0.1});
-
   TString output = output_name;
+  if (output.Contains("Hadronic"))	c->set_rat_lim_range({0.0,0.04});
+  else if (output.Contains("Leptonic"))	c->set_rat_lim_range({0.0,0.1});
+
   if (output.Contains("HadronicLoose"))
     c->give_info("ttH Hadronic Loose Tag");
   else if (output.Contains("Hadronic"))
@@ -29,6 +30,10 @@ void make_plot(TCanvas* c1, TFile* f1, string output_name, TString hist_name, TS
   else if (output.Contains("Leptonic"))
     c->give_info("ttH Leptonic Tag");
   c->set_scale(1);
+
+  // Manually set options for specific plots
+  if (hist_name.Contains("SigmaIEtaIEta"))	c->set_x_bin_range({1,50});
+     
   c->plot(idx);
   delete c;
 }
@@ -70,7 +75,7 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hDiphotonCosPhi", "|cos(#Delta #phi_{#gamma 1, #gamma 2})|", 1);
 
     make_plot(c1, vFiles[i], vNames[i], "hNJets", "N_{jets}", 1);
-    make_plot(c1, vFiles[i], vNames[i], "hNbJets", "N_{b-jets}", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hNbJets", "N_{b-jets} (medium)", 1);
     make_plot(c1, vFiles[i], vNames[i], "hJet1pT", "Jet1 p_{T} [GeV]", 1);
     make_plot(c1, vFiles[i], vNames[i], "hJet2pT", "Jet2 p_{T} [GeV]", 1);
     make_plot(c1, vFiles[i], vNames[i], "hJet3pT", "Jet3 p_{T} [GeV]", 1);
@@ -105,7 +110,8 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hJet1Eta", "Jet1 #eta", 1);
     make_plot(c1, vFiles[i], vNames[i], "hJet2Eta", "Jet2 #eta", 1);
     make_plot(c1, vFiles[i], vNames[i], "hJet3Eta", "Jet3 #eta", 1);
-    make_plot(c1, vFiles[i], vNames[i], "hJet4Eta", "Jet4 #eta", 2);
-  }
+    make_plot(c1, vFiles[i], vNames[i], "hJet4Eta", "Jet4 #eta", 1);
 
+    make_plot(c1, vFiles[i], vNames[i], "hHT", "HT [GeV]", 2);
+  }
 }

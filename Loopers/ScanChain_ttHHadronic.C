@@ -39,7 +39,7 @@ int ScanChain(TChain* chain, TString tag, bool fast = true, int nEvents = -1, st
   vector<TH1D*> hDiphotonCosPhi = generate_1Dhist_vector("hDiphotonCosPhi", nBkgCats+1, 25, -1, 1);
 
   // Jet kinematics
-  //vector<TH1D*> hHT = generate_1Dhist_vector("hHT", nBkgCats+1, 50, 0, 1000);
+  vector<TH1D*> hHT = generate_1Dhist_vector("hHT", nBkgCats+1, 50, 0, 2000);
   //vector<TH1D*> hMET = generate_1Dhist_vector("hHT", nBkgCats+1, 50, 0, 400);
 
   vector<TH1D*> hNJets = generate_1Dhist_vector("hNJets", nBkgCats+1, 16, -0.5, 15.5);
@@ -147,6 +147,24 @@ int ScanChain(TChain* chain, TString tag, bool fast = true, int nEvents = -1, st
       hDiphotonCosPhi[processId]->Fill(dipho_cosphi(), evt_weight);
 
       // Jet kinematics
+      double ht = 0;
+      ht += jet1_pt() > 0 ? jet1_pt() : 0;
+      ht += jet2_pt() > 0 ? jet2_pt() : 0;
+      ht += jet3_pt() > 0 ? jet3_pt() : 0;
+      ht += jet4_pt() > 0 ? jet4_pt() : 0;
+      ht += jet5_pt() > 0 ? jet5_pt() : 0;
+      ht += jet6_pt() > 0 ? jet6_pt() : 0;
+      ht += jet7_pt() > 0 ? jet7_pt() : 0;
+      ht += jet8_pt() > 0 ? jet8_pt() : 0;
+      ht += jet9_pt() > 0 ? jet9_pt() : 0;
+      ht += jet10_pt() > 0 ? jet10_pt() : 0;
+      ht += jet11_pt() > 0 ? jet11_pt() : 0;
+      ht += jet12_pt() > 0 ? jet12_pt() : 0;
+      ht += jet13_pt() > 0 ? jet13_pt() : 0;
+      ht += jet14_pt() > 0 ? jet14_pt() : 0;
+      ht += jet15_pt() > 0 ? jet15_pt() : 0;
+      hHT[processId]->Fill(ht, evt_weight);
+ 
       hNJets[processId]->Fill(n_jets(), evt_weight);
       hNbJets[processId]->Fill(n_bjets(), evt_weight); // medium id
       if (jet1_pt() != -1) 	hJet1pT[processId]->Fill(jet1_pt(), evt_weight);
@@ -187,8 +205,8 @@ int ScanChain(TChain* chain, TString tag, bool fast = true, int nEvents = -1, st
       hPhotonSubleadSigmaEOverE[processId]->Fill(sublead_sigmaEoE(), evt_weight);
 
       // ttH-Hadronic Specific
-      if (n_bjets() >= 1)	hMaxBTag[processId]->Fill(bjet1_csv(), evt_weight);
-      if (n_bjets() >= 2)	hSecondMaxBTag[processId]->Fill(bjet2_csv(), evt_weight);
+      hMaxBTag[processId]->Fill(bjet1_csv(), evt_weight);
+      hSecondMaxBTag[processId]->Fill(bjet2_csv(), evt_weight);
       htthMVA[processId]->Fill(tthMVA(), evt_weight);
 
     }

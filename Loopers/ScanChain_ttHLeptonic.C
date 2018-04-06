@@ -39,7 +39,7 @@ int ScanChain(TChain* chain, TString tag, bool fast = true, int nEvents = -1, st
   vector<TH1D*> hDiphotonCosPhi = generate_1Dhist_vector("hDiphotonCosPhi", nBkgCats+1, 25, -1, 1);
 
   // Jet kinematics
-  vector<TH1D*> hHT = generate_1Dhist_vector("hHT", nBkgCats+1, 50, 0, 1000);
+  vector<TH1D*> hHT = generate_1Dhist_vector("hHT", nBkgCats+1, 50, 0, 2000);
   //vector<TH1D*> hMET = generate_1Dhist_vector("hHT", nBkgCats+1, 50, 0, 400);
 
   vector<TH1D*> hNJets = generate_1Dhist_vector("hNJets", nBkgCats+1, 16, -0.5, 15.5);
@@ -143,6 +143,25 @@ int ScanChain(TChain* chain, TString tag, bool fast = true, int nEvents = -1, st
       hRapidity[processId]->Fill(dipho_rapidity(), evt_weight);
       hDiphotonSumPt[processId]->Fill(dipho_sumpt(), evt_weight);
       hDiphotonCosPhi[processId]->Fill(dipho_cosphi(), evt_weight);
+
+      double ht = 0;
+      ht += jet_pt1() > 0 ? jet_pt1() : 0;
+      ht += jet_pt2() > 0 ? jet_pt2() : 0;
+      ht += jet_pt3() > 0 ? jet_pt3() : 0;
+      ht += jet_pt4() > 0 ? jet_pt4() : 0;
+      ht += jet_pt5() > 0 ? jet_pt5() : 0;
+      ht += jet_pt6() > 0 ? jet_pt6() : 0;
+      ht += jet_pt7() > 0 ? jet_pt7() : 0;
+      ht += jet_pt8() > 0 ? jet_pt8() : 0;
+      ht += jet_pt9() > 0 ? jet_pt9() : 0;
+      ht += jet_pt10() > 0 ? jet_pt10() : 0;
+      ht += jet_pt11() > 0 ? jet_pt11() : 0;
+      ht += jet_pt12() > 0 ? jet_pt12() : 0;
+      ht += jet_pt13() > 0 ? jet_pt13() : 0;
+      ht += jet_pt14() > 0 ? jet_pt14() : 0;
+      ht += jet_pt15() > 0 ? jet_pt15() : 0;
+      hHT[processId]->Fill(ht, evt_weight);
+
 
       // Jet kinematics
       hNJets[processId]->Fill(n_jets(), evt_weight);

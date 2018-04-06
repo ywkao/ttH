@@ -25,6 +25,7 @@
 #include "TPad.h"
 #include "TLatex.h"
 #include "TFrame.h"
+#include "TGaxis.h"
 
 using namespace std;
 
@@ -64,6 +65,7 @@ class Comparison
     void set_no_lumi() {mLumi = -1;}
     void set_2DdrawOpt(TString drawOpt) {m2DDrawOpt = drawOpt;}
     void set_data_drawOpt(TString drawOpt) {mDataDrawOpt = drawOpt;}
+    void set_stack_order(vector<int> vOrder) {mCustomStackOrder = true; mVOrder = vOrder;}
 
     void give_hlines(vector<double> vHLines) {mVHLines = vHLines;}
     void give_vlines(vector<double> vVLines) {mVVLines = vVLines;}
@@ -119,6 +121,8 @@ class Comparison
     vector<int> mX2BinRange;
     bool mCustomRatRange;
     vector<double> mRatRange;
+    bool mCustomStackOrder;
+    vector<int> mVOrder;
 
     vector<double> mVHLines;
     vector<double> mVVLines;
@@ -236,6 +240,7 @@ void Comparison::default_options(TCanvas* c1)
   mCustomXRange = false;
   mCustomYRange = false;
   mCustomRatRange = false;
+  mCustomStackOrder = false;
   mXBinRange.reserve(2);
   mYLimRange.reserve(2);
   mScale = 1;
@@ -500,14 +505,22 @@ void Comparison::draw_main_histograms()
   if (!mScaled) {
     mHMC->Scale(mScale);
     std::vector<std::pair<int, float> > hist_ordering;
-    for (unsigned int i=0; i<mVHMC.size(); i++) {
-      mVHMC[i]->Scale(mScale);
-      hist_ordering.push_back(std::pair<int, float>(i, mVHMC[i]->Integral()));
+    if (!mCustomStackOrder) {
+      for (unsigned int i=0; i<mVHMC.size(); i++) {
+	mVHMC[i]->Scale(mScale);
+	hist_ordering.push_back(std::pair<int, float>(i, mVHMC[i]->Integral()));
+      }
+      // Sort MC histograms by area
+      std::sort(hist_ordering.begin(), hist_ordering.end(), sortByValue);
+      for (std::vector<std::pair<int, float> >::iterator it = hist_ordering.begin(); it != hist_ordering.end(); ++it)
+	mStack->Add(mVHMC[it->first]);
     }
-    // Sort MC histograms by area
-    std::sort(hist_ordering.begin(), hist_ordering.end(), sortByValue);
-    for (std::vector<std::pair<int, float> >::iterator it = hist_ordering.begin(); it != hist_ordering.end(); ++it)
-      mStack->Add(mVHMC[it->first]);
+    else {
+      for (unsigned int i=0; i<mVHMC.size(); i++) {
+        mVHMC[i]->Scale(mScale);
+        mStack->Add(mVHMC[mVOrder[i]]);
+      }
+    }
     mScaled = true;
   }
 
@@ -728,6 +741,7 @@ void Comparison::annotate_plot()
 inline
 void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
 {
+  TGaxis::SetMaxDigits(3);
   mVHRat.push_back((TH1D*)hData->Clone("mVHRat0"));
   mVHRat[0]->SetTitle("");
   mVHRat[0]->Divide(hMC);
@@ -759,7 +773,6 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
   mVHRat[0]->Draw("e1x0");
   mVHRat[0]->GetXaxis()->SetLabelOffset();
   mVHRat[0]->GetXaxis()->SetLabelSize(0.07);
-
 
   for (int i=1; i<mVHData.size(); i++) {
     TString idx = Form("%d", i);
