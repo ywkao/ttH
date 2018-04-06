@@ -17,11 +17,15 @@ void make_plot(TCanvas* c1, TFile* f1, string output_name, TString hist_name, TS
   c->set_y_label("Events");
   c->set_data_drawOpt("HIST");
   c->set_lumi(1);
-  c->set_rat_lim_range({0.0,0.01});
+  c->set_rat_lim_range({0.0,0.1});
 
   TString output = output_name;
-  if (output.Contains("Hadronic"))
+  if (output.Contains("HadronicLoose"))
+    c->give_info("ttH Hadronic Loose Tag");
+  else if (output.Contains("Hadronic"))
     c->give_info("ttH Hadronic Tag");
+  else if (output.Contains("LeptonicLoose"))
+    c->give_info("ttH Leptonic Loose Tag");
   else if (output.Contains("Leptonic"))
     c->give_info("ttH Leptonic Tag");
   c->set_scale(1);
@@ -50,42 +54,58 @@ int main(int argc, char* argv[])
   TFile* f2 = new TFile("../ttHLeptonic_histograms.root");
   string output_name_leptonic = "ttHLeptonic_plots.pdf";
 
+  TFile* f3 = new TFile("../ttHHadronicLoose_histograms.root");
+  string output_name_hadronic_loose = "ttHHadronicLoose_plots.pdf";
 
-  // Make ttH Hadronic plots //
-  make_plot(c1, f1, output_name_hadronic, "hMass", "m_{#gamma#gamma} [GeV]", 0);
-  make_plot(c1, f1, output_name_hadronic, "hRapidity", "Y_{#gamma#gamma} [GeV^{1/2}]", 1);
-  make_plot(c1, f1, output_name_hadronic, "hDiphotonSumPt", "p_{T}(#gamma_{1}) + p_{T}(#gamma_{2}) [GeV]", 1);
-  make_plot(c1, f1, output_name_hadronic, "hDiphotonCosPhi", "|cos(#Delta #phi_{#gamma 1, #gamma 2})|", 1);
+  TFile* f4 = new TFile("../ttHLeptonicLoose_histograms.root");
+  string output_name_leptonic_loose = "ttHLeptonicLoose_plots.pdf";
 
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadPt", "p_{T}(#gamma_{1}) [GeV]", 1);
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadEt", "E_{T}(#gamma_{1}) [GeV]", 1);  
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadEta", "#eta(#gamma_{1})", 1);  
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadPhi", "#phi(#gamma_{1})", 1);    
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadSigmaIEtaIEta", "#sigma_{i#eta,i#eta}(#gamma_{1})", 1); 
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadHOverE", "h/E(#gamma_{1})", 1);
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadR9", "R9(#gamma_{1})", 1);
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadIDMVA", "Photon ID MVA(#gamma_{1})", 1);
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadPToM", "p_{T}/m_{#gamma#gamma} (#gamma_{1})", 1);
-  make_plot(c1, f1, output_name_hadronic, "hPhotonLeadSigmaEOverE", "#sigma_{E}/E (#gamma_{1})", 1);
+  vector<TFile*> vFiles = {f1, f2, f3, f4};
+  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose};
 
-  make_plot(c1, f1, output_name_hadronic, "htthMVA", "tth MVA", 1);
-  make_plot(c1, f1, output_name_hadronic, "hMaxBTag", "max b-tag response", 1);
-  make_plot(c1, f1, output_name_hadronic, "hSecondMaxBTag", "2nd max b-tag response", 2);
+  for (int i = 0; i < vFiles.size(); i++) {
+    make_plot(c1, vFiles[i], vNames[i], "hMass", "m_{#gamma#gamma} [GeV]", 0);
+    make_plot(c1, vFiles[i], vNames[i], "hRapidity", "Y_{#gamma#gamma} [GeV^{1/2}]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hDiphotonSumPt", "p_{T}(#gamma_{1}) + p_{T}(#gamma_{2}) [GeV]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hDiphotonCosPhi", "|cos(#Delta #phi_{#gamma 1, #gamma 2})|", 1);
 
-  // Make ttH Leptonic plots //
-  make_plot(c1, f2, output_name_leptonic, "hMass", "m_{#gamma#gamma} [GeV]", 0);
-  make_plot(c1, f2, output_name_leptonic, "hRapidity", "Y_{#gamma#gamma} [GeV^{1/2}]", 1);
-  make_plot(c1, f2, output_name_leptonic, "hDiphotonSumPt", "p_{T}(#gamma_{1}) + p_{T}(#gamma_{2}) [GeV]", 1);
-  make_plot(c1, f2, output_name_leptonic, "hDiphotonCosPhi", "|cos(#Delta #phi_{#gamma 1, #gamma 2})|", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hNJets", "N_{jets}", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hNbJets", "N_{b-jets}", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hJet1pT", "Jet1 p_{T} [GeV]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hJet2pT", "Jet2 p_{T} [GeV]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hJet3pT", "Jet3 p_{T} [GeV]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hJet4pT", "Jet4 p_{T} [GeV]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hbJet1pT", "bJet1 p_{T} [GeV]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hbJet2pT", "bJet2 p_{T} [GeV]", 1);
 
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadPt", "p_{T}(#gamma_{1}) [GeV]", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadEt", "E_{T}(#gamma_{1}) [GeV]", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadEta", "#eta(#gamma_{1})", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadPhi", "#phi(#gamma_{1})", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadSigmaIEtaIEta", "#sigma_{i#eta,i#eta}(#gamma_{1})", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadHOverE", "h/E(#gamma_{1})", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadR9", "R9(#gamma_{1})", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadIDMVA", "Photon ID MVA(#gamma_{1})", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadPToM", "p_{T}/m_{#gamma#gamma} (#gamma_{1})", 1);
-  make_plot(c1, f2, output_name_leptonic, "hPhotonLeadSigmaEOverE", "#sigma_{E}/E (#gamma_{1})", 2);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPt", "p_{T}(#gamma_{1}) [GeV]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadEta", "#eta(#gamma_{1})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPhi", "#phi(#gamma_{1})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadSigmaIEtaIEta", "#sigma_{i#eta,i#eta}(#gamma_{1})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadHOverE", "h/E(#gamma_{1})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadR9", "R9(#gamma_{1})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadIDMVA", "Photon ID MVA(#gamma_{1})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPToM", "p_{T}/m_{#gamma#gamma} (#gamma_{1})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadSigmaEOverE", "#sigma_{E}/E (#gamma_{1})", 1);
+
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPt", "p_{T}(#gamma_{2}) [GeV]", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadEta", "#eta(#gamma_{2})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPhi", "#phi(#gamma_{2})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadSigmaIEtaIEta", "#sigma_{i#eta,i#eta}(#gamma_{2})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadHOverE", "h/E(#gamma_{2})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadR9", "R9(#gamma_{2})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadIDMVA", "Photon ID MVA(#gamma_{2})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPToM", "p_{T}/m_{#gamma#gamma} (#gamma_{2})", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadSigmaEOverE", "#sigma_{E}/E (#gamma_{2})", 1);
+
+    make_plot(c1, vFiles[i], vNames[i], "htthMVA", "tth MVA", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "max b-tag response", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd max b-tag response", 1);
+
+    make_plot(c1, vFiles[i], vNames[i], "hJet1Eta", "Jet1 #eta", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hJet2Eta", "Jet2 #eta", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hJet3Eta", "Jet3 #eta", 1);
+    make_plot(c1, vFiles[i], vNames[i], "hJet4Eta", "Jet4 #eta", 2);
+  }
+
 }

@@ -42,17 +42,17 @@ double sgn(double x) {
 }
 
 void add_samples(TChain* ch) {
-  ch->Add("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2__ttH_Babies_v1/merged_ntuple_*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_v1/merged_ntuple*.root");
-  ch->Add("/hadoop/cms/store/user/smay/ttH/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_v1/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2__ttH_Babies_v3/merged_ntuple_*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_v3/merged_ntuple*.root");
+  ch->Add("/hadoop/cms/store/user/smay/ttH/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_v3/merged_ntuple*.root");
 }

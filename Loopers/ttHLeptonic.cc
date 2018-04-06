@@ -77,6 +77,10 @@ void ttHLeptonic::Init(TTree *tree) {
   if (bjet1_pt_branch) bjet1_pt_branch->SetAddress(&bjet1_pt_);
   bjet2_pt_branch = tree->GetBranch("bjet2_pt");
   if (bjet2_pt_branch) bjet2_pt_branch->SetAddress(&bjet2_pt_);
+  bjet1_csv_branch = tree->GetBranch("bjet1_csv");
+  if (bjet1_csv_branch) bjet1_csv_branch->SetAddress(&bjet1_csv_);
+  bjet2_csv_branch = tree->GetBranch("bjet2_csv");
+  if (bjet2_csv_branch) bjet2_csv_branch->SetAddress(&bjet2_csv_);
   Mjj_branch = tree->GetBranch("Mjj");
   if (Mjj_branch) Mjj_branch->SetAddress(&Mjj_);
   jet_pt1_branch = tree->GetBranch("jet_pt1");
@@ -119,6 +123,86 @@ void ttHLeptonic::Init(TTree *tree) {
   if (jet_phi5_branch) jet_phi5_branch->SetAddress(&jet_phi5_);
   jet_bdiscriminant5_branch = tree->GetBranch("jet_bdiscriminant5");
   if (jet_bdiscriminant5_branch) jet_bdiscriminant5_branch->SetAddress(&jet_bdiscriminant5_);
+  jet_pt6_branch = tree->GetBranch("jet_pt6");
+  if (jet_pt6_branch) jet_pt6_branch->SetAddress(&jet_pt6_);
+  jet_eta6_branch = tree->GetBranch("jet_eta6");
+  if (jet_eta6_branch) jet_eta6_branch->SetAddress(&jet_eta6_);
+  jet_phi6_branch = tree->GetBranch("jet_phi6");
+  if (jet_phi6_branch) jet_phi6_branch->SetAddress(&jet_phi6_);
+  jet_bdiscriminant6_branch = tree->GetBranch("jet_bdiscriminant6");
+  if (jet_bdiscriminant6_branch) jet_bdiscriminant6_branch->SetAddress(&jet_bdiscriminant6_);
+  jet_pt7_branch = tree->GetBranch("jet_pt7");
+  if (jet_pt7_branch) jet_pt7_branch->SetAddress(&jet_pt7_);
+  jet_eta7_branch = tree->GetBranch("jet_eta7");
+  if (jet_eta7_branch) jet_eta7_branch->SetAddress(&jet_eta7_);
+  jet_phi7_branch = tree->GetBranch("jet_phi7");
+  if (jet_phi7_branch) jet_phi7_branch->SetAddress(&jet_phi7_);
+  jet_bdiscriminant7_branch = tree->GetBranch("jet_bdiscriminant7");
+  if (jet_bdiscriminant7_branch) jet_bdiscriminant7_branch->SetAddress(&jet_bdiscriminant7_);
+  jet_pt8_branch = tree->GetBranch("jet_pt8");
+  if (jet_pt8_branch) jet_pt8_branch->SetAddress(&jet_pt8_);
+  jet_eta8_branch = tree->GetBranch("jet_eta8");
+  if (jet_eta8_branch) jet_eta8_branch->SetAddress(&jet_eta8_);
+  jet_phi8_branch = tree->GetBranch("jet_phi8");
+  if (jet_phi8_branch) jet_phi8_branch->SetAddress(&jet_phi8_);
+  jet_bdiscriminant8_branch = tree->GetBranch("jet_bdiscriminant8");
+  if (jet_bdiscriminant8_branch) jet_bdiscriminant8_branch->SetAddress(&jet_bdiscriminant8_);
+  jet_pt9_branch = tree->GetBranch("jet_pt9");
+  if (jet_pt9_branch) jet_pt9_branch->SetAddress(&jet_pt9_);
+  jet_eta9_branch = tree->GetBranch("jet_eta9");
+  if (jet_eta9_branch) jet_eta9_branch->SetAddress(&jet_eta9_);
+  jet_phi9_branch = tree->GetBranch("jet_phi9");
+  if (jet_phi9_branch) jet_phi9_branch->SetAddress(&jet_phi9_);
+  jet_bdiscriminant9_branch = tree->GetBranch("jet_bdiscriminant9");
+  if (jet_bdiscriminant9_branch) jet_bdiscriminant9_branch->SetAddress(&jet_bdiscriminant9_);
+  jet_pt10_branch = tree->GetBranch("jet_pt10");
+  if (jet_pt10_branch) jet_pt10_branch->SetAddress(&jet_pt10_);
+  jet_eta10_branch = tree->GetBranch("jet_eta10");
+  if (jet_eta10_branch) jet_eta10_branch->SetAddress(&jet_eta10_);
+  jet_phi10_branch = tree->GetBranch("jet_phi10");
+  if (jet_phi10_branch) jet_phi10_branch->SetAddress(&jet_phi10_);
+  jet_bdiscriminant10_branch = tree->GetBranch("jet_bdiscriminant10");
+  if (jet_bdiscriminant10_branch) jet_bdiscriminant10_branch->SetAddress(&jet_bdiscriminant10_);
+  jet_pt11_branch = tree->GetBranch("jet_pt11");
+  if (jet_pt11_branch) jet_pt11_branch->SetAddress(&jet_pt11_);
+  jet_eta11_branch = tree->GetBranch("jet_eta11");
+  if (jet_eta11_branch) jet_eta11_branch->SetAddress(&jet_eta11_);
+  jet_phi11_branch = tree->GetBranch("jet_phi11");
+  if (jet_phi11_branch) jet_phi11_branch->SetAddress(&jet_phi11_);
+  jet_bdiscriminant11_branch = tree->GetBranch("jet_bdiscriminant11");
+  if (jet_bdiscriminant11_branch) jet_bdiscriminant11_branch->SetAddress(&jet_bdiscriminant11_);
+  jet_pt12_branch = tree->GetBranch("jet_pt12");
+  if (jet_pt12_branch) jet_pt12_branch->SetAddress(&jet_pt12_);
+  jet_eta12_branch = tree->GetBranch("jet_eta12");
+  if (jet_eta12_branch) jet_eta12_branch->SetAddress(&jet_eta12_);
+  jet_phi12_branch = tree->GetBranch("jet_phi12");
+  if (jet_phi12_branch) jet_phi12_branch->SetAddress(&jet_phi12_);
+  jet_bdiscriminant12_branch = tree->GetBranch("jet_bdiscriminant12");
+  if (jet_bdiscriminant12_branch) jet_bdiscriminant12_branch->SetAddress(&jet_bdiscriminant12_);
+  jet_pt13_branch = tree->GetBranch("jet_pt13");
+  if (jet_pt13_branch) jet_pt13_branch->SetAddress(&jet_pt13_);
+  jet_eta13_branch = tree->GetBranch("jet_eta13");
+  if (jet_eta13_branch) jet_eta13_branch->SetAddress(&jet_eta13_);
+  jet_phi13_branch = tree->GetBranch("jet_phi13");
+  if (jet_phi13_branch) jet_phi13_branch->SetAddress(&jet_phi13_);
+  jet_bdiscriminant13_branch = tree->GetBranch("jet_bdiscriminant13");
+  if (jet_bdiscriminant13_branch) jet_bdiscriminant13_branch->SetAddress(&jet_bdiscriminant13_);
+  jet_pt14_branch = tree->GetBranch("jet_pt14");
+  if (jet_pt14_branch) jet_pt14_branch->SetAddress(&jet_pt14_);
+  jet_eta14_branch = tree->GetBranch("jet_eta14");
+  if (jet_eta14_branch) jet_eta14_branch->SetAddress(&jet_eta14_);
+  jet_phi14_branch = tree->GetBranch("jet_phi14");
+  if (jet_phi14_branch) jet_phi14_branch->SetAddress(&jet_phi14_);
+  jet_bdiscriminant14_branch = tree->GetBranch("jet_bdiscriminant14");
+  if (jet_bdiscriminant14_branch) jet_bdiscriminant14_branch->SetAddress(&jet_bdiscriminant14_);
+  jet_pt15_branch = tree->GetBranch("jet_pt15");
+  if (jet_pt15_branch) jet_pt15_branch->SetAddress(&jet_pt15_);
+  jet_eta15_branch = tree->GetBranch("jet_eta15");
+  if (jet_eta15_branch) jet_eta15_branch->SetAddress(&jet_eta15_);
+  jet_phi15_branch = tree->GetBranch("jet_phi15");
+  if (jet_phi15_branch) jet_phi15_branch->SetAddress(&jet_phi15_);
+  jet_bdiscriminant15_branch = tree->GetBranch("jet_bdiscriminant15");
+  if (jet_bdiscriminant15_branch) jet_bdiscriminant15_branch->SetAddress(&jet_bdiscriminant15_);
   rho_branch = tree->GetBranch("rho");
   if (rho_branch) rho_branch->SetAddress(&rho_);
   nvtx_branch = tree->GetBranch("nvtx");
@@ -178,6 +262,8 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   n_jets_isLoaded = false;
   bjet1_pt_isLoaded = false;
   bjet2_pt_isLoaded = false;
+  bjet1_csv_isLoaded = false;
+  bjet2_csv_isLoaded = false;
   Mjj_isLoaded = false;
   jet_pt1_isLoaded = false;
   jet_eta1_isLoaded = false;
@@ -199,6 +285,46 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   jet_eta5_isLoaded = false;
   jet_phi5_isLoaded = false;
   jet_bdiscriminant5_isLoaded = false;
+  jet_pt6_isLoaded = false;
+  jet_eta6_isLoaded = false;
+  jet_phi6_isLoaded = false;
+  jet_bdiscriminant6_isLoaded = false;
+  jet_pt7_isLoaded = false;
+  jet_eta7_isLoaded = false;
+  jet_phi7_isLoaded = false;
+  jet_bdiscriminant7_isLoaded = false;
+  jet_pt8_isLoaded = false;
+  jet_eta8_isLoaded = false;
+  jet_phi8_isLoaded = false;
+  jet_bdiscriminant8_isLoaded = false;
+  jet_pt9_isLoaded = false;
+  jet_eta9_isLoaded = false;
+  jet_phi9_isLoaded = false;
+  jet_bdiscriminant9_isLoaded = false;
+  jet_pt10_isLoaded = false;
+  jet_eta10_isLoaded = false;
+  jet_phi10_isLoaded = false;
+  jet_bdiscriminant10_isLoaded = false;
+  jet_pt11_isLoaded = false;
+  jet_eta11_isLoaded = false;
+  jet_phi11_isLoaded = false;
+  jet_bdiscriminant11_isLoaded = false;
+  jet_pt12_isLoaded = false;
+  jet_eta12_isLoaded = false;
+  jet_phi12_isLoaded = false;
+  jet_bdiscriminant12_isLoaded = false;
+  jet_pt13_isLoaded = false;
+  jet_eta13_isLoaded = false;
+  jet_phi13_isLoaded = false;
+  jet_bdiscriminant13_isLoaded = false;
+  jet_pt14_isLoaded = false;
+  jet_eta14_isLoaded = false;
+  jet_phi14_isLoaded = false;
+  jet_bdiscriminant14_isLoaded = false;
+  jet_pt15_isLoaded = false;
+  jet_eta15_isLoaded = false;
+  jet_phi15_isLoaded = false;
+  jet_bdiscriminant15_isLoaded = false;
   rho_isLoaded = false;
   nvtx_isLoaded = false;
   event_isLoaded = false;
@@ -247,6 +373,8 @@ void ttHLeptonic::LoadAllBranches() {
   if (n_jets_branch != 0) n_jets();
   if (bjet1_pt_branch != 0) bjet1_pt();
   if (bjet2_pt_branch != 0) bjet2_pt();
+  if (bjet1_csv_branch != 0) bjet1_csv();
+  if (bjet2_csv_branch != 0) bjet2_csv();
   if (Mjj_branch != 0) Mjj();
   if (jet_pt1_branch != 0) jet_pt1();
   if (jet_eta1_branch != 0) jet_eta1();
@@ -268,6 +396,46 @@ void ttHLeptonic::LoadAllBranches() {
   if (jet_eta5_branch != 0) jet_eta5();
   if (jet_phi5_branch != 0) jet_phi5();
   if (jet_bdiscriminant5_branch != 0) jet_bdiscriminant5();
+  if (jet_pt6_branch != 0) jet_pt6();
+  if (jet_eta6_branch != 0) jet_eta6();
+  if (jet_phi6_branch != 0) jet_phi6();
+  if (jet_bdiscriminant6_branch != 0) jet_bdiscriminant6();
+  if (jet_pt7_branch != 0) jet_pt7();
+  if (jet_eta7_branch != 0) jet_eta7();
+  if (jet_phi7_branch != 0) jet_phi7();
+  if (jet_bdiscriminant7_branch != 0) jet_bdiscriminant7();
+  if (jet_pt8_branch != 0) jet_pt8();
+  if (jet_eta8_branch != 0) jet_eta8();
+  if (jet_phi8_branch != 0) jet_phi8();
+  if (jet_bdiscriminant8_branch != 0) jet_bdiscriminant8();
+  if (jet_pt9_branch != 0) jet_pt9();
+  if (jet_eta9_branch != 0) jet_eta9();
+  if (jet_phi9_branch != 0) jet_phi9();
+  if (jet_bdiscriminant9_branch != 0) jet_bdiscriminant9();
+  if (jet_pt10_branch != 0) jet_pt10();
+  if (jet_eta10_branch != 0) jet_eta10();
+  if (jet_phi10_branch != 0) jet_phi10();
+  if (jet_bdiscriminant10_branch != 0) jet_bdiscriminant10();
+  if (jet_pt11_branch != 0) jet_pt11();
+  if (jet_eta11_branch != 0) jet_eta11();
+  if (jet_phi11_branch != 0) jet_phi11();
+  if (jet_bdiscriminant11_branch != 0) jet_bdiscriminant11();
+  if (jet_pt12_branch != 0) jet_pt12();
+  if (jet_eta12_branch != 0) jet_eta12();
+  if (jet_phi12_branch != 0) jet_phi12();
+  if (jet_bdiscriminant12_branch != 0) jet_bdiscriminant12();
+  if (jet_pt13_branch != 0) jet_pt13();
+  if (jet_eta13_branch != 0) jet_eta13();
+  if (jet_phi13_branch != 0) jet_phi13();
+  if (jet_bdiscriminant13_branch != 0) jet_bdiscriminant13();
+  if (jet_pt14_branch != 0) jet_pt14();
+  if (jet_eta14_branch != 0) jet_eta14();
+  if (jet_phi14_branch != 0) jet_phi14();
+  if (jet_bdiscriminant14_branch != 0) jet_bdiscriminant14();
+  if (jet_pt15_branch != 0) jet_pt15();
+  if (jet_eta15_branch != 0) jet_eta15();
+  if (jet_phi15_branch != 0) jet_phi15();
+  if (jet_bdiscriminant15_branch != 0) jet_bdiscriminant15();
   if (rho_branch != 0) rho();
   if (nvtx_branch != 0) nvtx();
   if (event_branch != 0) event();
@@ -746,6 +914,32 @@ const float &ttHLeptonic::bjet2_pt() {
   return bjet2_pt_;
 }
 
+const float &ttHLeptonic::bjet1_csv() {
+  if (not bjet1_csv_isLoaded) {
+    if (bjet1_csv_branch != 0) {
+      bjet1_csv_branch->GetEntry(index);
+    } else {
+      printf("branch bjet1_csv_branch does not exist!\n");
+      exit(1);
+    }
+    bjet1_csv_isLoaded = true;
+  }
+  return bjet1_csv_;
+}
+
+const float &ttHLeptonic::bjet2_csv() {
+  if (not bjet2_csv_isLoaded) {
+    if (bjet2_csv_branch != 0) {
+      bjet2_csv_branch->GetEntry(index);
+    } else {
+      printf("branch bjet2_csv_branch does not exist!\n");
+      exit(1);
+    }
+    bjet2_csv_isLoaded = true;
+  }
+  return bjet2_csv_;
+}
+
 const float &ttHLeptonic::Mjj() {
   if (not Mjj_isLoaded) {
     if (Mjj_branch != 0) {
@@ -1019,6 +1213,526 @@ const float &ttHLeptonic::jet_bdiscriminant5() {
   return jet_bdiscriminant5_;
 }
 
+const float &ttHLeptonic::jet_pt6() {
+  if (not jet_pt6_isLoaded) {
+    if (jet_pt6_branch != 0) {
+      jet_pt6_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt6_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt6_isLoaded = true;
+  }
+  return jet_pt6_;
+}
+
+const float &ttHLeptonic::jet_eta6() {
+  if (not jet_eta6_isLoaded) {
+    if (jet_eta6_branch != 0) {
+      jet_eta6_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta6_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta6_isLoaded = true;
+  }
+  return jet_eta6_;
+}
+
+const float &ttHLeptonic::jet_phi6() {
+  if (not jet_phi6_isLoaded) {
+    if (jet_phi6_branch != 0) {
+      jet_phi6_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi6_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi6_isLoaded = true;
+  }
+  return jet_phi6_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant6() {
+  if (not jet_bdiscriminant6_isLoaded) {
+    if (jet_bdiscriminant6_branch != 0) {
+      jet_bdiscriminant6_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant6_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant6_isLoaded = true;
+  }
+  return jet_bdiscriminant6_;
+}
+
+const float &ttHLeptonic::jet_pt7() {
+  if (not jet_pt7_isLoaded) {
+    if (jet_pt7_branch != 0) {
+      jet_pt7_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt7_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt7_isLoaded = true;
+  }
+  return jet_pt7_;
+}
+
+const float &ttHLeptonic::jet_eta7() {
+  if (not jet_eta7_isLoaded) {
+    if (jet_eta7_branch != 0) {
+      jet_eta7_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta7_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta7_isLoaded = true;
+  }
+  return jet_eta7_;
+}
+
+const float &ttHLeptonic::jet_phi7() {
+  if (not jet_phi7_isLoaded) {
+    if (jet_phi7_branch != 0) {
+      jet_phi7_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi7_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi7_isLoaded = true;
+  }
+  return jet_phi7_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant7() {
+  if (not jet_bdiscriminant7_isLoaded) {
+    if (jet_bdiscriminant7_branch != 0) {
+      jet_bdiscriminant7_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant7_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant7_isLoaded = true;
+  }
+  return jet_bdiscriminant7_;
+}
+
+const float &ttHLeptonic::jet_pt8() {
+  if (not jet_pt8_isLoaded) {
+    if (jet_pt8_branch != 0) {
+      jet_pt8_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt8_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt8_isLoaded = true;
+  }
+  return jet_pt8_;
+}
+
+const float &ttHLeptonic::jet_eta8() {
+  if (not jet_eta8_isLoaded) {
+    if (jet_eta8_branch != 0) {
+      jet_eta8_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta8_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta8_isLoaded = true;
+  }
+  return jet_eta8_;
+}
+
+const float &ttHLeptonic::jet_phi8() {
+  if (not jet_phi8_isLoaded) {
+    if (jet_phi8_branch != 0) {
+      jet_phi8_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi8_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi8_isLoaded = true;
+  }
+  return jet_phi8_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant8() {
+  if (not jet_bdiscriminant8_isLoaded) {
+    if (jet_bdiscriminant8_branch != 0) {
+      jet_bdiscriminant8_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant8_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant8_isLoaded = true;
+  }
+  return jet_bdiscriminant8_;
+}
+
+const float &ttHLeptonic::jet_pt9() {
+  if (not jet_pt9_isLoaded) {
+    if (jet_pt9_branch != 0) {
+      jet_pt9_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt9_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt9_isLoaded = true;
+  }
+  return jet_pt9_;
+}
+
+const float &ttHLeptonic::jet_eta9() {
+  if (not jet_eta9_isLoaded) {
+    if (jet_eta9_branch != 0) {
+      jet_eta9_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta9_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta9_isLoaded = true;
+  }
+  return jet_eta9_;
+}
+
+const float &ttHLeptonic::jet_phi9() {
+  if (not jet_phi9_isLoaded) {
+    if (jet_phi9_branch != 0) {
+      jet_phi9_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi9_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi9_isLoaded = true;
+  }
+  return jet_phi9_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant9() {
+  if (not jet_bdiscriminant9_isLoaded) {
+    if (jet_bdiscriminant9_branch != 0) {
+      jet_bdiscriminant9_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant9_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant9_isLoaded = true;
+  }
+  return jet_bdiscriminant9_;
+}
+
+const float &ttHLeptonic::jet_pt10() {
+  if (not jet_pt10_isLoaded) {
+    if (jet_pt10_branch != 0) {
+      jet_pt10_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt10_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt10_isLoaded = true;
+  }
+  return jet_pt10_;
+}
+
+const float &ttHLeptonic::jet_eta10() {
+  if (not jet_eta10_isLoaded) {
+    if (jet_eta10_branch != 0) {
+      jet_eta10_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta10_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta10_isLoaded = true;
+  }
+  return jet_eta10_;
+}
+
+const float &ttHLeptonic::jet_phi10() {
+  if (not jet_phi10_isLoaded) {
+    if (jet_phi10_branch != 0) {
+      jet_phi10_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi10_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi10_isLoaded = true;
+  }
+  return jet_phi10_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant10() {
+  if (not jet_bdiscriminant10_isLoaded) {
+    if (jet_bdiscriminant10_branch != 0) {
+      jet_bdiscriminant10_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant10_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant10_isLoaded = true;
+  }
+  return jet_bdiscriminant10_;
+}
+
+const float &ttHLeptonic::jet_pt11() {
+  if (not jet_pt11_isLoaded) {
+    if (jet_pt11_branch != 0) {
+      jet_pt11_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt11_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt11_isLoaded = true;
+  }
+  return jet_pt11_;
+}
+
+const float &ttHLeptonic::jet_eta11() {
+  if (not jet_eta11_isLoaded) {
+    if (jet_eta11_branch != 0) {
+      jet_eta11_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta11_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta11_isLoaded = true;
+  }
+  return jet_eta11_;
+}
+
+const float &ttHLeptonic::jet_phi11() {
+  if (not jet_phi11_isLoaded) {
+    if (jet_phi11_branch != 0) {
+      jet_phi11_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi11_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi11_isLoaded = true;
+  }
+  return jet_phi11_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant11() {
+  if (not jet_bdiscriminant11_isLoaded) {
+    if (jet_bdiscriminant11_branch != 0) {
+      jet_bdiscriminant11_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant11_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant11_isLoaded = true;
+  }
+  return jet_bdiscriminant11_;
+}
+
+const float &ttHLeptonic::jet_pt12() {
+  if (not jet_pt12_isLoaded) {
+    if (jet_pt12_branch != 0) {
+      jet_pt12_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt12_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt12_isLoaded = true;
+  }
+  return jet_pt12_;
+}
+
+const float &ttHLeptonic::jet_eta12() {
+  if (not jet_eta12_isLoaded) {
+    if (jet_eta12_branch != 0) {
+      jet_eta12_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta12_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta12_isLoaded = true;
+  }
+  return jet_eta12_;
+}
+
+const float &ttHLeptonic::jet_phi12() {
+  if (not jet_phi12_isLoaded) {
+    if (jet_phi12_branch != 0) {
+      jet_phi12_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi12_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi12_isLoaded = true;
+  }
+  return jet_phi12_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant12() {
+  if (not jet_bdiscriminant12_isLoaded) {
+    if (jet_bdiscriminant12_branch != 0) {
+      jet_bdiscriminant12_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant12_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant12_isLoaded = true;
+  }
+  return jet_bdiscriminant12_;
+}
+
+const float &ttHLeptonic::jet_pt13() {
+  if (not jet_pt13_isLoaded) {
+    if (jet_pt13_branch != 0) {
+      jet_pt13_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt13_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt13_isLoaded = true;
+  }
+  return jet_pt13_;
+}
+
+const float &ttHLeptonic::jet_eta13() {
+  if (not jet_eta13_isLoaded) {
+    if (jet_eta13_branch != 0) {
+      jet_eta13_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta13_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta13_isLoaded = true;
+  }
+  return jet_eta13_;
+}
+
+const float &ttHLeptonic::jet_phi13() {
+  if (not jet_phi13_isLoaded) {
+    if (jet_phi13_branch != 0) {
+      jet_phi13_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi13_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi13_isLoaded = true;
+  }
+  return jet_phi13_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant13() {
+  if (not jet_bdiscriminant13_isLoaded) {
+    if (jet_bdiscriminant13_branch != 0) {
+      jet_bdiscriminant13_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant13_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant13_isLoaded = true;
+  }
+  return jet_bdiscriminant13_;
+}
+
+const float &ttHLeptonic::jet_pt14() {
+  if (not jet_pt14_isLoaded) {
+    if (jet_pt14_branch != 0) {
+      jet_pt14_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt14_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt14_isLoaded = true;
+  }
+  return jet_pt14_;
+}
+
+const float &ttHLeptonic::jet_eta14() {
+  if (not jet_eta14_isLoaded) {
+    if (jet_eta14_branch != 0) {
+      jet_eta14_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta14_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta14_isLoaded = true;
+  }
+  return jet_eta14_;
+}
+
+const float &ttHLeptonic::jet_phi14() {
+  if (not jet_phi14_isLoaded) {
+    if (jet_phi14_branch != 0) {
+      jet_phi14_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi14_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi14_isLoaded = true;
+  }
+  return jet_phi14_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant14() {
+  if (not jet_bdiscriminant14_isLoaded) {
+    if (jet_bdiscriminant14_branch != 0) {
+      jet_bdiscriminant14_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant14_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant14_isLoaded = true;
+  }
+  return jet_bdiscriminant14_;
+}
+
+const float &ttHLeptonic::jet_pt15() {
+  if (not jet_pt15_isLoaded) {
+    if (jet_pt15_branch != 0) {
+      jet_pt15_branch->GetEntry(index);
+    } else {
+      printf("branch jet_pt15_branch does not exist!\n");
+      exit(1);
+    }
+    jet_pt15_isLoaded = true;
+  }
+  return jet_pt15_;
+}
+
+const float &ttHLeptonic::jet_eta15() {
+  if (not jet_eta15_isLoaded) {
+    if (jet_eta15_branch != 0) {
+      jet_eta15_branch->GetEntry(index);
+    } else {
+      printf("branch jet_eta15_branch does not exist!\n");
+      exit(1);
+    }
+    jet_eta15_isLoaded = true;
+  }
+  return jet_eta15_;
+}
+
+const float &ttHLeptonic::jet_phi15() {
+  if (not jet_phi15_isLoaded) {
+    if (jet_phi15_branch != 0) {
+      jet_phi15_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi15_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi15_isLoaded = true;
+  }
+  return jet_phi15_;
+}
+
+const float &ttHLeptonic::jet_bdiscriminant15() {
+  if (not jet_bdiscriminant15_isLoaded) {
+    if (jet_bdiscriminant15_branch != 0) {
+      jet_bdiscriminant15_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bdiscriminant15_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bdiscriminant15_isLoaded = true;
+  }
+  return jet_bdiscriminant15_;
+}
+
 const float &ttHLeptonic::rho() {
   if (not rho_isLoaded) {
     if (rho_branch != 0) {
@@ -1182,6 +1896,8 @@ const float &n_bjets() { return cms3.n_bjets(); }
 const float &n_jets() { return cms3.n_jets(); }
 const float &bjet1_pt() { return cms3.bjet1_pt(); }
 const float &bjet2_pt() { return cms3.bjet2_pt(); }
+const float &bjet1_csv() { return cms3.bjet1_csv(); }
+const float &bjet2_csv() { return cms3.bjet2_csv(); }
 const float &Mjj() { return cms3.Mjj(); }
 const float &jet_pt1() { return cms3.jet_pt1(); }
 const float &jet_eta1() { return cms3.jet_eta1(); }
@@ -1203,6 +1919,46 @@ const float &jet_pt5() { return cms3.jet_pt5(); }
 const float &jet_eta5() { return cms3.jet_eta5(); }
 const float &jet_phi5() { return cms3.jet_phi5(); }
 const float &jet_bdiscriminant5() { return cms3.jet_bdiscriminant5(); }
+const float &jet_pt6() { return cms3.jet_pt6(); }
+const float &jet_eta6() { return cms3.jet_eta6(); }
+const float &jet_phi6() { return cms3.jet_phi6(); }
+const float &jet_bdiscriminant6() { return cms3.jet_bdiscriminant6(); }
+const float &jet_pt7() { return cms3.jet_pt7(); }
+const float &jet_eta7() { return cms3.jet_eta7(); }
+const float &jet_phi7() { return cms3.jet_phi7(); }
+const float &jet_bdiscriminant7() { return cms3.jet_bdiscriminant7(); }
+const float &jet_pt8() { return cms3.jet_pt8(); }
+const float &jet_eta8() { return cms3.jet_eta8(); }
+const float &jet_phi8() { return cms3.jet_phi8(); }
+const float &jet_bdiscriminant8() { return cms3.jet_bdiscriminant8(); }
+const float &jet_pt9() { return cms3.jet_pt9(); }
+const float &jet_eta9() { return cms3.jet_eta9(); }
+const float &jet_phi9() { return cms3.jet_phi9(); }
+const float &jet_bdiscriminant9() { return cms3.jet_bdiscriminant9(); }
+const float &jet_pt10() { return cms3.jet_pt10(); }
+const float &jet_eta10() { return cms3.jet_eta10(); }
+const float &jet_phi10() { return cms3.jet_phi10(); }
+const float &jet_bdiscriminant10() { return cms3.jet_bdiscriminant10(); }
+const float &jet_pt11() { return cms3.jet_pt11(); }
+const float &jet_eta11() { return cms3.jet_eta11(); }
+const float &jet_phi11() { return cms3.jet_phi11(); }
+const float &jet_bdiscriminant11() { return cms3.jet_bdiscriminant11(); }
+const float &jet_pt12() { return cms3.jet_pt12(); }
+const float &jet_eta12() { return cms3.jet_eta12(); }
+const float &jet_phi12() { return cms3.jet_phi12(); }
+const float &jet_bdiscriminant12() { return cms3.jet_bdiscriminant12(); }
+const float &jet_pt13() { return cms3.jet_pt13(); }
+const float &jet_eta13() { return cms3.jet_eta13(); }
+const float &jet_phi13() { return cms3.jet_phi13(); }
+const float &jet_bdiscriminant13() { return cms3.jet_bdiscriminant13(); }
+const float &jet_pt14() { return cms3.jet_pt14(); }
+const float &jet_eta14() { return cms3.jet_eta14(); }
+const float &jet_phi14() { return cms3.jet_phi14(); }
+const float &jet_bdiscriminant14() { return cms3.jet_bdiscriminant14(); }
+const float &jet_pt15() { return cms3.jet_pt15(); }
+const float &jet_eta15() { return cms3.jet_eta15(); }
+const float &jet_phi15() { return cms3.jet_phi15(); }
+const float &jet_bdiscriminant15() { return cms3.jet_bdiscriminant15(); }
 const float &rho() { return cms3.rho(); }
 const int &nvtx() { return cms3.nvtx(); }
 const unsigned long long &event() { return cms3.event(); }

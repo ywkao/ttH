@@ -694,7 +694,7 @@ void Comparison::annotate_plot()
 
   if (mVLegendLabels.size() > 0) {
     double j = mVHData.size()*0.05;
-    TLegend* l1 = new TLegend(0.80, 0.82-j, 0.92, 0.89);
+    TLegend* l1 = new TLegend(0.75, 0.75-j, 0.92, 0.89);
     for (int i=0; i<mVHData.size(); i++)
       l1->AddEntry(mVHData[i], mVLegendLabels[i], "lep");
     int idxMC = mVHData.size();

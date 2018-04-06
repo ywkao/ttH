@@ -20,6 +20,11 @@ scale1fb = {}
 for dataset in datasets:
   scale1fb[dataset] = {"xs" : 1, "filter_eff": 1, "br" : 1, "kf" : 1, "nevents" : 1, "negative_weight_frac": 0, "scale1fb" : 0}
 
+with open("NegativeWeightFractions/negative_weight_fractions.json") as json_file:
+  neg_weight_fracs = json.load(json_file)
+  for dataset in datasets:
+    scale1fb[dataset]["negative_weight_frac"] = neg_weight_fracs[dataset.replace("/","")]
+
 # First check summer 16 json file
 with open("../../BabyMaker/CMSSW_8_0_28/src/flashgg/MetaData/work/campaigns/RunIISummer16-2_4_2-25ns_Moriond17.json") as json_file:
   das_datasets = json.load(json_file)
@@ -60,8 +65,6 @@ with open("cross_sections.json") as json_file:
       scale1fb[dataset]["filter_eff"] = cross_sections[ds]["filter_eff"]
       scale1fb[dataset]["br"] = cross_sections[ds]["br"]
       scale1fb[dataset]["kf"] = cross_sections[ds]["kf"]
-
-# Need to insert negative weight fractions here
 
 for key, info in scale1fb.iteritems():
   if scale1fb[key]["nevents"] > 1:

@@ -1,7 +1,11 @@
 export SCRAM_ARCH=slc6_amd64_gcc530
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
-source setup.sh
+if [ ! -d CMSSW_8_0_28 ] ; then
+  echo "Need to run setup.sh first!"
+  exit(1)
+fi
+
 cd CMSSW_8_0_28/src/flashgg
 cmsenv
 
