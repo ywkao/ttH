@@ -26,6 +26,8 @@ int categorize_process(TString currentFileTitle) {
     return 6;
   else if (currentFileTitle.Contains("WG") || currentFileTitle.Contains("ZG"))
     return 7;
+  else if (currentFileTitle.Contains("DoubleEG"))
+    return 8;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -42,6 +44,7 @@ double sgn(double x) {
 }
 
 void add_samples(TChain* ch) {
+  ch->Add("/hadoop/cms/store/user/smay/ttH/DoubleEG_ttH_Babies_v3/merged_ntuple_*.root");
   ch->Add("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2__ttH_Babies_v3/merged_ntuple_*.root");
   ch->Add("/hadoop/cms/store/user/smay/ttH/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_v3/merged_ntuple*.root");
   ch->Add("/hadoop/cms/store/user/smay/ttH/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa__ttH_Babies_v3/merged_ntuple*.root");

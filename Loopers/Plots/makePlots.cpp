@@ -3,20 +3,22 @@
 const int nBkgCats = 7;
 
 void make_plot(TCanvas* c1, TFile* f1, string output_name, TString hist_name, TString x_label, int idx) {
+  TH1D* hData = (TH1D*)f1->Get(hist_name + "_" + to_string(nBkgCats+1));
   TH1D* hSig = (TH1D*)f1->Get(hist_name + "_0");
   vector<TH1D*> hBkg;
   for (int i = 1; i <= nBkgCats; i++) {
-    //if (i == 1 || i == 7) continue;
+    //if (i==4) continue;
     hBkg.push_back((TH1D*)f1->Get(hist_name + "_" + to_string(i)));
   }
-  Comparison* c = new Comparison(c1, hSig, hBkg);
+  Comparison* c = new Comparison(c1, hData, hSig, hBkg);
   c->set_filename(output_name);
   c->set_rat_label("#frac{Signal}{Background}");
-  c->set_legend_labels({"ttH (M125)", "Drell-Yan", "#gamma#gamma + Jets", "#gamma+Jets", "QCD", "TT+#gamma#gamma", "TT+#gamma+Jets", "V+#gamma"});
+  //c->set_legend_labels({"ttH (M125)", "Drell-Yan", "#gamma#gamma + Jets", "#gamma+Jets", "TT+#gamma#gamma", "TT+#gamma+Jets", "V+#gamma"});
+  c->set_legend_labels({"Data", "ttH (M125)", "Drell-Yan", "#gamma#gamma + Jets", "#gamma+Jets", "QCD", "TT+#gamma#gamma", "TT+#gamma+Jets", "V+#gamma"});
   c->set_x_label(x_label);
   c->set_y_label("Events");
-  c->set_data_drawOpt("HIST");
-  c->set_lumi(1);
+  c->set_data_drawOpt("E");
+  c->set_lumi(35.9);
   TString output = output_name;
   if (output.Contains("Hadronic"))	c->set_rat_lim_range({0.0,0.04});
   else if (output.Contains("Leptonic"))	c->set_rat_lim_range({0.0,0.1});
@@ -29,8 +31,10 @@ void make_plot(TCanvas* c1, TFile* f1, string output_name, TString hist_name, TS
     c->give_info("ttH Leptonic Loose Tag");
   else if (output.Contains("Leptonic"))
     c->give_info("ttH Leptonic Tag");
-  c->set_scale(1);
-
+  //c->set_stack_order({4,5,1,6,0,2,3});
+  //c->set_scale(-1);
+  //c->set_no_log();
+  //c->set_rat_lim_range({0.0,2.0});
   // Manually set options for specific plots
   if (hist_name.Contains("SigmaIEtaIEta"))	c->set_x_bin_range({1,50});
      

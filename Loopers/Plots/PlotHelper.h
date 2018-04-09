@@ -37,6 +37,7 @@ class Comparison
     Comparison(TCanvas* c1, TH1D* hData, TH1D* hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData, TH1D* hMC);
     Comparison(TCanvas* c1, TH1D* hData, vector<TH1D*> hMC);
+    Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC);
     ~Comparison();
 
@@ -101,6 +102,7 @@ class Comparison
     vector<TH1D*> mVHMC;
     TH1D* mHRat;
     vector<TH1D*> mVHRat;
+    vector<TH1D*> mVHSignal;
 
     THStack* mStack;
 
@@ -109,6 +111,7 @@ class Comparison
     TH2D* mH2DRat;
     TString m2DDrawOpt;
     TString mDataDrawOpt;
+    TString mSignalDrawOpt;
 
     bool m2D;
     bool mMultipleData;
@@ -144,6 +147,7 @@ class Comparison
     bool mFlow;
     bool mBothData;
     bool mRatio;
+    bool mRatUseData;
 
     int mColor1;
     int mColor2;
@@ -212,6 +216,25 @@ Comparison::Comparison(TCanvas* c1, TH1D* hData, vector<TH1D*> hMC)
     mHMC->Add(hMC[i]);
 }
 
+inline
+Comparison::Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hMC)
+{
+  default_options(c1);
+  mVHData.push_back((TH1D*)hData->Clone("mHData"));
+
+  int nMCHists = hMC.size();
+  for (int i=0; i<nMCHists; i++) {
+    TString idx = Form("%d", i);
+    mVHMC.push_back((TH1D*)hMC[i]->Clone("mHMC"+idx));
+    //mVHRat.push_back((TH1D*)hData[i]->Clone("mHRat"+idx));
+  }
+
+  mHMC = (TH1D*)hMC[0]->Clone("mHMC");
+  for (int i=1; i<nMCHists; i++)
+    mHMC->Add(hMC[i]);
+  
+  mVHSignal.push_back((TH1D*)hSignal->Clone("mHSignal"));
+}
 
 inline
 Comparison::Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC)
@@ -252,8 +275,10 @@ void Comparison::default_options(TCanvas* c1)
   mYLabel = "Events";
   mYLabelFontSize = 0.04;
   mRatLabel = "#frac{2017 Data}{2016 Data}";
+  mRatUseData = false;
 
   mDataDrawOpt = "E";
+  mSignalDrawOpt = "HIST";
 }
 
 inline
@@ -380,16 +405,29 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
   
   if (!customYRange) { // calculate y limits 
     double minContent(1.5*pow(10,308)), maxContent(0), avgContent(0);
-    for (int i=mXBinRange[0]; i<=mXBinRange[1]; i++) {
-      double binContent = mVHData[0]->GetBinContent(i);
-      avgContent += binContent/float(mXBinRange[1] - mXBinRange[0]);
-      if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
-      if (binContent > maxContent) maxContent = binContent;
-      binContent = (mHMC->GetBinContent(i))*mScale;
-      if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
-      if (binContent > maxContent) maxContent = binContent;
+    if (mVHData.size() > 0) {
+      for (int i=mXBinRange[0]; i<=mXBinRange[1]; i++) {
+	double binContent = mVHData[0]->GetBinContent(i);
+	avgContent += binContent/float(mXBinRange[1] - mXBinRange[0]);
+	if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
+	if (binContent > maxContent) maxContent = binContent;
+	binContent = (mHMC->GetBinContent(i))*mScale;
+	if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
+	if (binContent > maxContent) maxContent = binContent;
+      }
     }
     //if (minContent < avgContent/1000) minContent = avgContent/1000;
+    if (mVHSignal.size() > 0) {
+      for (int i=mXBinRange[0]; i<=mXBinRange[1]; i++) {
+	double binContent = mVHSignal[0]->GetBinContent(i);
+	avgContent += binContent/float(mXBinRange[1] - mXBinRange[0]);
+	if ((binContent < minContent) && binContent > mVHSignal[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
+	if (binContent > maxContent) maxContent = binContent;
+	binContent = (mHMC->GetBinContent(i))*mScale;
+	if ((binContent < minContent) && binContent > mVHSignal[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
+	if (binContent > maxContent) maxContent = binContent;
+      }
+    }
     double range;
     double tSpace = topSpace + (0.05*mVInfo.size());
     if (mLog) {
@@ -399,11 +437,12 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
     }
     else {
       range = maxContent - minContent;
-      mYLimRange[1] = maxContent + tSpace*range;
-      mYLimRange[0] = minContent - botSpace*range;
+      //mYLimRange[1] = maxContent + tSpace*range;
+      //mYLimRange[0] = minContent - botSpace*range;
+      mYLimRange[1] = maxContent*1.25;
+      mYLimRange[0] = minContent*0.95;
     }
     if (mYLimRange[0] < 0) mYLimRange[0] = 0;
-    //cout << minContent << " " << maxContent << " " << range << endl;
   }
 
 }
@@ -425,6 +464,15 @@ void Comparison::compute_flow(vector<int> xBinRange)
       double underflowMC = mVHMC[i]->Integral(0, mXBinRange[0]-1);
       mVHMC[i]->AddBinContent(mXBinRange[0], underflowMC);
     }
+    for (int i=0; i<mVHSignal.size(); i++) {
+      double overflowSignal = mVHSignal[i]->Integral(mXBinRange[1]+1, nBins+1);
+      mVHSignal[i]->AddBinContent(mXBinRange[1], overflowSignal);
+
+      double underflowSignal = mVHSignal[i]->Integral(0, mXBinRange[0]-1);
+      mVHSignal[i]->AddBinContent(mXBinRange[0], underflowSignal);
+    }
+
+
     //double overflowMC = mHMC->Integral(mXBinRange[1]+1, nBins+1);
     //mHMC->AddBinContent(mXBinRange[1], overflowMC);
     //double underflowMC = mHMC->Integral(0, mXBinRange[0]-1);
@@ -440,7 +488,8 @@ void Comparison::compute_flow(vector<int> xBinRange)
   mHMC->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
   for (int i=0; i<mVHMC.size(); i++)
     mVHMC[i]->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
-
+  for (int i=0; i<mVHSignal.size(); i++)
+    mVHSignal[i]->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
   for (int i=0; i<mVHData.size(); i++) 
     mVHData[i]->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
 }
@@ -485,6 +534,21 @@ void Comparison::set_histogram_options(int color1, int color2)
   }
   mStack->GetXaxis()->SetLabelOffset(999);
   mStack->GetXaxis()->SetLabelSize(0);
+
+  for (int i=0; i<mVHSignal.size(); i++) {
+    //mVHSignal[i]->SetFillColor(kBlack);
+    mVHSignal[i]->SetLineColor(kBlack);
+    mVHSignal[i]->SetMarkerColor(kBlack);
+    if (mBothData) mVHSignal[i]->SetMarkerStyle(20);
+    mVHSignal[i]->GetYaxis()->SetTitle(mYLabel);
+    mVHSignal[i]->GetYaxis()->SetTitleSize(mYLabelFontSize);
+    mVHSignal[i]->GetYaxis()->SetTitleOffset(1.2);
+    if (!mLog) mVHSignal[i]->GetYaxis()->SetTitleOffset(1.6);
+    mVHSignal[i]->SetLineWidth(3);
+    mVHSignal[i]->GetXaxis()->SetLabelOffset(999);
+    mVHSignal[i]->GetXaxis()->SetLabelSize(0);
+  }
+
 
 }
 
@@ -542,6 +606,9 @@ void Comparison::draw_main_histograms()
   //mHMC->SetMaximum(mYLimRange[1]); 
   for (int i=0; i<mVHData.size(); i++)
     mVHData[i]->Draw("SAME, " + mDataDrawOpt);
+  for (int i=0; i<mVHSignal.size(); i++)
+    mVHSignal[i]->Draw("SAME, " + mSignalDrawOpt);
+
   gPad->RedrawAxis();
 }
 
@@ -710,7 +777,9 @@ void Comparison::annotate_plot()
     TLegend* l1 = new TLegend(0.75, 0.75-j, 0.92, 0.89);
     for (int i=0; i<mVHData.size(); i++)
       l1->AddEntry(mVHData[i], mVLegendLabels[i], "lep");
-    int idxMC = mVHData.size();
+    for (int i=0; i<mVHSignal.size(); i++)
+      l1->AddEntry(mVHSignal[i], mVLegendLabels[i+1], "f");
+    int idxMC = mVHData.size() + mVHSignal.size();
     for (int i=0; i<mVHMC.size(); i++) {
       if (!mBothData) l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC+i], "f");
       else l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC], "lep");
@@ -742,7 +811,10 @@ inline
 void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
 {
   TGaxis::SetMaxDigits(3);
-  mVHRat.push_back((TH1D*)hData->Clone("mVHRat0"));
+  if (mRatUseData)
+    mVHRat.push_back((TH1D*)mVHData[0]->Clone("mVHRat0"));
+  else
+    mVHRat.push_back((TH1D*)mVHSignal[0]->Clone("mVHRat0"));
   mVHRat[0]->SetTitle("");
   mVHRat[0]->Divide(hMC);
   if (mCustomRatRange)
