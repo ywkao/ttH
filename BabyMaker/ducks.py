@@ -7,15 +7,15 @@ from metis.Sample import DirectorySample
 from metis.CondorTask import CondorTask
 from metis.StatsParser import StatsParser
 
-job_tag = "ttH_Babies_v1"
+job_tag = "ttH_Babies_v3"
 exec_path = "condor_exe.sh"
 tar_path = "package.tar.gz"
 hadoop_path = "ttH"
 
 #os.system("rm -rf tasks")
-os.system("rm package.tar.gz")
-os.system("./setup.sh")
-os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' CMSSW_8_0_28")
+#os.system("rm package.tar.gz")
+#os.system("./setup.sh")
+#os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' CMSSW_8_0_28")
 
 base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2"
 dslocs = [
@@ -51,6 +51,8 @@ dslocs = [
     ["/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/", base_path + "/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*", 1] ,
     ["/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/", base_path + "/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*", 1] ,
     ["/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/", base_path + "/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*", 1] ,
+    ["/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/", base_path + "/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*", 1],
+    ["/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/", base_path + "/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*", 1],
     ["/DoubleEG", base_path + "/DoubleEG/*", 25] ,
 ]
 
@@ -78,7 +80,7 @@ while True:
         # save some information for the dashboard
         total_summary[ds] = task.get_task_summary()
     # parse the total summary and write out the dashboard
-    StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
+    #StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
     os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker")
     if allcomplete:
         print ""
