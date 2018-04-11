@@ -57,6 +57,16 @@ void ttHLeptonic::Init(TTree *tree) {
   if (subleadIDMVA_branch) subleadIDMVA_branch->SetAddress(&subleadIDMVA_);
   dipho_rapidity_branch = tree->GetBranch("dipho_rapidity");
   if (dipho_rapidity_branch) dipho_rapidity_branch->SetAddress(&dipho_rapidity_);
+  nGoodEls_branch = tree->GetBranch("nGoodEls");
+  if (nGoodEls_branch) nGoodEls_branch->SetAddress(&nGoodEls_);
+  nGoodElsFromTau_branch = tree->GetBranch("nGoodElsFromTau");
+  if (nGoodElsFromTau_branch) nGoodElsFromTau_branch->SetAddress(&nGoodElsFromTau_);
+  nGoodMus_branch = tree->GetBranch("nGoodMus");
+  if (nGoodMus_branch) nGoodMus_branch->SetAddress(&nGoodMus_);
+  nGoodMusFromTau_branch = tree->GetBranch("nGoodMusFromTau");
+  if (nGoodMusFromTau_branch) nGoodMusFromTau_branch->SetAddress(&nGoodMusFromTau_);
+  nGoodTaus_branch = tree->GetBranch("nGoodTaus");
+  if (nGoodTaus_branch) nGoodTaus_branch->SetAddress(&nGoodTaus_);
   n_ele_branch = tree->GetBranch("n_ele");
   if (n_ele_branch) n_ele_branch->SetAddress(&n_ele_);
   ele1_pt_branch = tree->GetBranch("ele1_pt");
@@ -83,6 +93,10 @@ void ttHLeptonic::Init(TTree *tree) {
   if (bjet2_csv_branch) bjet2_csv_branch->SetAddress(&bjet2_csv_);
   Mjj_branch = tree->GetBranch("Mjj");
   if (Mjj_branch) Mjj_branch->SetAddress(&Mjj_);
+  MetPt_branch = tree->GetBranch("MetPt");
+  if (MetPt_branch) MetPt_branch->SetAddress(&MetPt_);
+  MetPhi_branch = tree->GetBranch("MetPhi");
+  if (MetPhi_branch) MetPhi_branch->SetAddress(&MetPhi_);
   jet_pt1_branch = tree->GetBranch("jet_pt1");
   if (jet_pt1_branch) jet_pt1_branch->SetAddress(&jet_pt1_);
   jet_eta1_branch = tree->GetBranch("jet_eta1");
@@ -252,6 +266,11 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   leadIDMVA_isLoaded = false;
   subleadIDMVA_isLoaded = false;
   dipho_rapidity_isLoaded = false;
+  nGoodEls_isLoaded = false;
+  nGoodElsFromTau_isLoaded = false;
+  nGoodMus_isLoaded = false;
+  nGoodMusFromTau_isLoaded = false;
+  nGoodTaus_isLoaded = false;
   n_ele_isLoaded = false;
   ele1_pt_isLoaded = false;
   ele2_pt_isLoaded = false;
@@ -265,6 +284,8 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   bjet1_csv_isLoaded = false;
   bjet2_csv_isLoaded = false;
   Mjj_isLoaded = false;
+  MetPt_isLoaded = false;
+  MetPhi_isLoaded = false;
   jet_pt1_isLoaded = false;
   jet_eta1_isLoaded = false;
   jet_phi1_isLoaded = false;
@@ -363,6 +384,11 @@ void ttHLeptonic::LoadAllBranches() {
   if (leadIDMVA_branch != 0) leadIDMVA();
   if (subleadIDMVA_branch != 0) subleadIDMVA();
   if (dipho_rapidity_branch != 0) dipho_rapidity();
+  if (nGoodEls_branch != 0) nGoodEls();
+  if (nGoodElsFromTau_branch != 0) nGoodElsFromTau();
+  if (nGoodMus_branch != 0) nGoodMus();
+  if (nGoodMusFromTau_branch != 0) nGoodMusFromTau();
+  if (nGoodTaus_branch != 0) nGoodTaus();
   if (n_ele_branch != 0) n_ele();
   if (ele1_pt_branch != 0) ele1_pt();
   if (ele2_pt_branch != 0) ele2_pt();
@@ -376,6 +402,8 @@ void ttHLeptonic::LoadAllBranches() {
   if (bjet1_csv_branch != 0) bjet1_csv();
   if (bjet2_csv_branch != 0) bjet2_csv();
   if (Mjj_branch != 0) Mjj();
+  if (MetPt_branch != 0) MetPt();
+  if (MetPhi_branch != 0) MetPhi();
   if (jet_pt1_branch != 0) jet_pt1();
   if (jet_eta1_branch != 0) jet_eta1();
   if (jet_phi1_branch != 0) jet_phi1();
@@ -784,6 +812,71 @@ const float &ttHLeptonic::dipho_rapidity() {
   return dipho_rapidity_;
 }
 
+const float &ttHLeptonic::nGoodEls() {
+  if (not nGoodEls_isLoaded) {
+    if (nGoodEls_branch != 0) {
+      nGoodEls_branch->GetEntry(index);
+    } else {
+      printf("branch nGoodEls_branch does not exist!\n");
+      exit(1);
+    }
+    nGoodEls_isLoaded = true;
+  }
+  return nGoodEls_;
+}
+
+const float &ttHLeptonic::nGoodElsFromTau() {
+  if (not nGoodElsFromTau_isLoaded) {
+    if (nGoodElsFromTau_branch != 0) {
+      nGoodElsFromTau_branch->GetEntry(index);
+    } else {
+      printf("branch nGoodElsFromTau_branch does not exist!\n");
+      exit(1);
+    }
+    nGoodElsFromTau_isLoaded = true;
+  }
+  return nGoodElsFromTau_;
+}
+
+const float &ttHLeptonic::nGoodMus() {
+  if (not nGoodMus_isLoaded) {
+    if (nGoodMus_branch != 0) {
+      nGoodMus_branch->GetEntry(index);
+    } else {
+      printf("branch nGoodMus_branch does not exist!\n");
+      exit(1);
+    }
+    nGoodMus_isLoaded = true;
+  }
+  return nGoodMus_;
+}
+
+const float &ttHLeptonic::nGoodMusFromTau() {
+  if (not nGoodMusFromTau_isLoaded) {
+    if (nGoodMusFromTau_branch != 0) {
+      nGoodMusFromTau_branch->GetEntry(index);
+    } else {
+      printf("branch nGoodMusFromTau_branch does not exist!\n");
+      exit(1);
+    }
+    nGoodMusFromTau_isLoaded = true;
+  }
+  return nGoodMusFromTau_;
+}
+
+const float &ttHLeptonic::nGoodTaus() {
+  if (not nGoodTaus_isLoaded) {
+    if (nGoodTaus_branch != 0) {
+      nGoodTaus_branch->GetEntry(index);
+    } else {
+      printf("branch nGoodTaus_branch does not exist!\n");
+      exit(1);
+    }
+    nGoodTaus_isLoaded = true;
+  }
+  return nGoodTaus_;
+}
+
 const float &ttHLeptonic::n_ele() {
   if (not n_ele_isLoaded) {
     if (n_ele_branch != 0) {
@@ -951,6 +1044,32 @@ const float &ttHLeptonic::Mjj() {
     Mjj_isLoaded = true;
   }
   return Mjj_;
+}
+
+const float &ttHLeptonic::MetPt() {
+  if (not MetPt_isLoaded) {
+    if (MetPt_branch != 0) {
+      MetPt_branch->GetEntry(index);
+    } else {
+      printf("branch MetPt_branch does not exist!\n");
+      exit(1);
+    }
+    MetPt_isLoaded = true;
+  }
+  return MetPt_;
+}
+
+const float &ttHLeptonic::MetPhi() {
+  if (not MetPhi_isLoaded) {
+    if (MetPhi_branch != 0) {
+      MetPhi_branch->GetEntry(index);
+    } else {
+      printf("branch MetPhi_branch does not exist!\n");
+      exit(1);
+    }
+    MetPhi_isLoaded = true;
+  }
+  return MetPhi_;
 }
 
 const float &ttHLeptonic::jet_pt1() {
@@ -1886,6 +2005,11 @@ const float &subleadR9() { return cms3.subleadR9(); }
 const float &leadIDMVA() { return cms3.leadIDMVA(); }
 const float &subleadIDMVA() { return cms3.subleadIDMVA(); }
 const float &dipho_rapidity() { return cms3.dipho_rapidity(); }
+const float &nGoodEls() { return cms3.nGoodEls(); }
+const float &nGoodElsFromTau() { return cms3.nGoodElsFromTau(); }
+const float &nGoodMus() { return cms3.nGoodMus(); }
+const float &nGoodMusFromTau() { return cms3.nGoodMusFromTau(); }
+const float &nGoodTaus() { return cms3.nGoodTaus(); }
 const float &n_ele() { return cms3.n_ele(); }
 const float &ele1_pt() { return cms3.ele1_pt(); }
 const float &ele2_pt() { return cms3.ele2_pt(); }
@@ -1899,6 +2023,8 @@ const float &bjet2_pt() { return cms3.bjet2_pt(); }
 const float &bjet1_csv() { return cms3.bjet1_csv(); }
 const float &bjet2_csv() { return cms3.bjet2_csv(); }
 const float &Mjj() { return cms3.Mjj(); }
+const float &MetPt() { return cms3.MetPt(); }
+const float &MetPhi() { return cms3.MetPhi(); }
 const float &jet_pt1() { return cms3.jet_pt1(); }
 const float &jet_eta1() { return cms3.jet_eta1(); }
 const float &jet_phi1() { return cms3.jet_phi1(); }

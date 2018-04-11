@@ -56,6 +56,9 @@ with open("../../BabyMaker/CMSSW_8_0_28/src/flashgg/MetaData/work/campaigns/RunI
 	if scale1fb[dataset]["nevents"] == 1: # this means we didn't find it in Summer 16
           scale1fb[dataset]["nevents"] = nEvents
 
+# Do a few by hand :(
+scale1fb["/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]["nevents"] = 10139950 # http://uaf-10.t2.ucsd.edu/~namin/makers/disMaker/?query=%2FTTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8%2FRunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1%2FMINIAODSIM&type=basic&short=short
+
 with open("cross_sections.json") as json_file:
   cross_sections = json.load(json_file)
   for dataset in datasets:

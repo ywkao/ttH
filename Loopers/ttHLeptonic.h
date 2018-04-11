@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8__ttH_Babies_v3/merged_ntuple_1.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
+// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8__ttH_Babies_v4/merged_ntuple_1.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
 
 #ifndef ttHLeptonic_H
 #define ttHLeptonic_H
@@ -100,6 +100,21 @@ class ttHLeptonic {
   float    dipho_rapidity_;
   TBranch *dipho_rapidity_branch;
   bool     dipho_rapidity_isLoaded;
+  float    nGoodEls_;
+  TBranch *nGoodEls_branch;
+  bool     nGoodEls_isLoaded;
+  float    nGoodElsFromTau_;
+  TBranch *nGoodElsFromTau_branch;
+  bool     nGoodElsFromTau_isLoaded;
+  float    nGoodMus_;
+  TBranch *nGoodMus_branch;
+  bool     nGoodMus_isLoaded;
+  float    nGoodMusFromTau_;
+  TBranch *nGoodMusFromTau_branch;
+  bool     nGoodMusFromTau_isLoaded;
+  float    nGoodTaus_;
+  TBranch *nGoodTaus_branch;
+  bool     nGoodTaus_isLoaded;
   float    n_ele_;
   TBranch *n_ele_branch;
   bool     n_ele_isLoaded;
@@ -139,6 +154,12 @@ class ttHLeptonic {
   float    Mjj_;
   TBranch *Mjj_branch;
   bool     Mjj_isLoaded;
+  float    MetPt_;
+  TBranch *MetPt_branch;
+  bool     MetPt_isLoaded;
+  float    MetPhi_;
+  TBranch *MetPhi_branch;
+  bool     MetPhi_isLoaded;
   float    jet_pt1_;
   TBranch *jet_pt1_branch;
   bool     jet_pt1_isLoaded;
@@ -373,6 +394,11 @@ void LoadAllBranches();
   const float &leadIDMVA();
   const float &subleadIDMVA();
   const float &dipho_rapidity();
+  const float &nGoodEls();
+  const float &nGoodElsFromTau();
+  const float &nGoodMus();
+  const float &nGoodMusFromTau();
+  const float &nGoodTaus();
   const float &n_ele();
   const float &ele1_pt();
   const float &ele2_pt();
@@ -386,6 +412,8 @@ void LoadAllBranches();
   const float &bjet1_csv();
   const float &bjet2_csv();
   const float &Mjj();
+  const float &MetPt();
+  const float &MetPhi();
   const float &jet_pt1();
   const float &jet_eta1();
   const float &jet_phi1();
@@ -489,6 +517,11 @@ namespace tas {
   const float &leadIDMVA();
   const float &subleadIDMVA();
   const float &dipho_rapidity();
+  const float &nGoodEls();
+  const float &nGoodElsFromTau();
+  const float &nGoodMus();
+  const float &nGoodMusFromTau();
+  const float &nGoodTaus();
   const float &n_ele();
   const float &ele1_pt();
   const float &ele2_pt();
@@ -502,6 +535,8 @@ namespace tas {
   const float &bjet1_csv();
   const float &bjet2_csv();
   const float &Mjj();
+  const float &MetPt();
+  const float &MetPhi();
   const float &jet_pt1();
   const float &jet_eta1();
   const float &jet_phi1();

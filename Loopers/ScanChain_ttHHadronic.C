@@ -21,7 +21,7 @@
 using namespace std;
 using namespace tas;
 
-const int nBkgCats = 7;
+const int nBkgCats = 15;
 const double targetLumi = 35.9; 
 
 int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
@@ -37,6 +37,8 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   vector<TH1D*> hRapidity = generate_1Dhist_vector("hRapidity", nBkgCats+2, 25, -3, 3);
   vector<TH1D*> hDiphotonSumPt = generate_1Dhist_vector("hDiphotonSumPt", nBkgCats+2, 25, 0, 1000);
   vector<TH1D*> hDiphotonCosPhi = generate_1Dhist_vector("hDiphotonCosPhi", nBkgCats+2, 25, -1, 1);
+
+  vector<TH1D*> hNVtx = generate_1Dhist_vector("hNVtx", nBkgCats+2, 25, 0, 75);
 
   // Jet kinematics
   vector<TH1D*> hHT = generate_1Dhist_vector("hHT", nBkgCats+2, 50, 0, 2500);
@@ -110,6 +112,8 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 
     // Decide what type of sample this is
     int processId = categorize_process(currentFileTitle);
+    if (currentFileTitle.Contains("TT"))
+      processId += categorize_ttbar(nGoodEls(), nGoodMus()); // increment to appropriately categorize ttbar into had/semilep/dilep
     bool isData = currentFileTitle.Contains("DoubleEG"); 
 
     // Loop over Events in current file
@@ -147,9 +151,14 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 
       // General
       hMass[processId]->Fill(mass(), evt_weight);
+
+      if (!isData && blind && mass() > 120 && mass() < 130)	continue;
+
       hRapidity[processId]->Fill(dipho_rapidity(), evt_weight);
       hDiphotonSumPt[processId]->Fill(dipho_sumpt(), evt_weight);
       hDiphotonCosPhi[processId]->Fill(dipho_cosphi(), evt_weight);
+
+      hNVtx[processId]->Fill(nvtx(), evt_weight);
 
       // Jet kinematics
       double ht = 0;
