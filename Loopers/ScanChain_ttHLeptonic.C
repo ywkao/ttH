@@ -39,10 +39,10 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   vector<TH1D*> hDiphotonCosPhi = generate_1Dhist_vector("hDiphotonCosPhi", nBkgCats+2, 25, -1, 1);
 
   vector<TH1D*> hNVtx = generate_1Dhist_vector("hNVtx", nBkgCats+2, 25, 0, 75);
+  vector<TH1D*> hMetPt = generate_1Dhist_vector("hMetPt", nBkgCats+2, 25, 0, 200);
 
   // Jet kinematics
   vector<TH1D*> hHT = generate_1Dhist_vector("hHT", nBkgCats+2, 50, 0, 2500);
-  //vector<TH1D*> hMET = generate_1Dhist_vector("hHT", nBkgCats+2, 50, 0, 400);
 
   vector<TH1D*> hNJets = generate_1Dhist_vector("hNJets", nBkgCats+2, 16, -0.5, 15.5);
   vector<TH1D*> hNbJets = generate_1Dhist_vector("hNbJets", nBkgCats+2, 16, -0.5, 15.5);
@@ -156,7 +156,7 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       hDiphotonCosPhi[processId]->Fill(dipho_cosphi(), evt_weight);
 
       hNVtx[processId]->Fill(nvtx(), evt_weight);
-
+      hMetPt[processId]->Fill(MetPt(), evt_weight);
       double ht = 0;
       ht += jet_pt1() > 0 ? jet_pt1() : 0;
       ht += jet_pt2() > 0 ? jet_pt2() : 0;
