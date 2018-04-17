@@ -25,13 +25,13 @@ int categorize_process(TString currentFileTitle) {
   else if (currentFileTitle.Contains("TTGJets"))
     return 8; // split into hadronic/semileptonic/dileptonic 
   else if (currentFileTitle.Contains("WG") || currentFileTitle.Contains("ZG"))
-    return 11;
+    return 14;
   else if (currentFileTitle.Contains("WJets"))
-    return 12;
+    return 15;
   else if (currentFileTitle.Contains("TTJets"))
-    return 13; // split into hadronic/semileptonic/dileptonic
+    return 16; // split into hadronic/semileptonic/dileptonic
   else if (currentFileTitle.Contains("DoubleEG"))
-    return 16;
+    return 19;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -45,6 +45,26 @@ int categorize_ttbar(int nGoodEls, int nGoodMus) {
     return 2;
   } 
   return nLeps;
+}
+
+int categorize_ttgjets(int nGoodEls, int nGoodMus) {
+  int nLeps = nGoodEls + nGoodMus;
+  if (nLeps == 0)
+    return 0;
+  if (nLeps == 1) {
+    if (nGoodEls == 1)
+      return 1;
+    if (nGoodMus == 1)
+      return 2;
+  }
+  if (nLeps == 2) {
+    if (nGoodEls == 1 || nGoodMus == 1)
+      return 3;
+    if (nGoodEls >= 2)
+      return 4;
+    if (nGoodMus >= 2)
+      return 5;
+  }  
 }
 
 double sgn(double x) {

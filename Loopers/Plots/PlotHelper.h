@@ -57,7 +57,10 @@ class Comparison
     void set_legend_labels(vector<TString> vLegendLabels) {mVLegendLabels = vLegendLabels;} 
     void set_scale(double scale) { mScale = scale; }
     void set_colors(int color1, int color2) { mColor1 = color1; mColor2 = color2; }
+    void set_colors(vector<int> colorData) { mColorData = colorData; }
     void set_no_flow() { mFlow = false; }
+    void set_no_underflow() {mUnderFlow = false; }
+    void set_verbose() {mVerbose = true;}
     void set_no_log() { mLog = false; }
     void set_log_x() { mLogX = true; }
     void set_log_y() { mLogY = true; }
@@ -137,6 +140,8 @@ class Comparison
     vector<TString> mVInfo;
     vector<TString> mVLegendLabels;
 
+    bool mVerbose;
+
     double mScale;
     bool mScaled;    
     double mLumi;
@@ -145,6 +150,7 @@ class Comparison
     bool mLogX;
     bool mLogY;
     bool mFlow;
+    bool mUnderFlow;
     bool mBothData;
     bool mRatio;
     bool mRatUseData;
@@ -153,7 +159,7 @@ class Comparison
     int mColor2;
     vector<int> mColorData;
 
-    const double topSpace = 0.20;
+    const double topSpace = 0.35;
     const double botSpace = 0.05;
     const double fs = 0.04;
 };
@@ -259,6 +265,7 @@ void Comparison::default_options(TCanvas* c1)
   mLog = true;
   mLogX = false;
   mFlow = true;
+  mUnderFlow = true;
   mBothData = false;
   mCustomXRange = false;
   mCustomYRange = false;
@@ -275,10 +282,11 @@ void Comparison::default_options(TCanvas* c1)
   mYLabel = "Events";
   mYLabelFontSize = 0.04;
   mRatLabel = "#frac{2017 Data}{2016 Data}";
-  mRatUseData = false;
+  mRatUseData = true;
 
   mDataDrawOpt = "E";
   mSignalDrawOpt = "HIST";
+  mVerbose = false;
 }
 
 inline
@@ -411,9 +419,11 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
 	avgContent += binContent/float(mXBinRange[1] - mXBinRange[0]);
 	if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
 	if (binContent > maxContent) maxContent = binContent;
-	binContent = (mHMC->GetBinContent(i))*mScale;
-	if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
-	if (binContent > maxContent) maxContent = binContent;
+        if (mScale != -1) {
+	  binContent = (mHMC->GetBinContent(i)) * mScale;
+	  if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
+	  if (binContent > maxContent) maxContent = binContent;
+        }
       }
     }
     //if (minContent < avgContent/1000) minContent = avgContent/1000;
@@ -436,11 +446,13 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
       mYLimRange[0] = pow(10, log10(minContent) - botSpace*range);
     }
     else {
+      //cout << maxContent << endl;
+      //cout << minContent << endl;
       range = maxContent - minContent;
-      //mYLimRange[1] = maxContent + tSpace*range;
-      //mYLimRange[0] = minContent - botSpace*range;
-      mYLimRange[1] = maxContent*1.25;
-      mYLimRange[0] = minContent*0.95;
+      mYLimRange[1] = maxContent + tSpace*range;
+      mYLimRange[0] = minContent - botSpace*range;
+      //mYLimRange[1] = maxContent*1.25;
+      //mYLimRange[0] = minContent*0.95;
     }
     if (mYLimRange[0] < 0) mYLimRange[0] = 0;
   }
@@ -460,14 +472,14 @@ void Comparison::compute_flow(vector<int> xBinRange)
     for (int i=0; i<mVHMC.size(); i++) {
       double overflowMC = mVHMC[i]->Integral(mXBinRange[1]+1, nBins+1);
       mVHMC[i]->AddBinContent(mXBinRange[1], overflowMC);
-
+      if (!mUnderFlow) continue;
       double underflowMC = mVHMC[i]->Integral(0, mXBinRange[0]-1);
       mVHMC[i]->AddBinContent(mXBinRange[0], underflowMC);
     }
     for (int i=0; i<mVHSignal.size(); i++) {
       double overflowSignal = mVHSignal[i]->Integral(mXBinRange[1]+1, nBins+1);
       mVHSignal[i]->AddBinContent(mXBinRange[1], overflowSignal);
-
+      if (!mUnderFlow) continue;
       double underflowSignal = mVHSignal[i]->Integral(0, mXBinRange[0]-1);
       mVHSignal[i]->AddBinContent(mXBinRange[0], underflowSignal);
     }
@@ -480,7 +492,7 @@ void Comparison::compute_flow(vector<int> xBinRange)
     for (int i=0; i<mVHData.size(); i++) {
       double overflowData = mVHData[i]->Integral(mXBinRange[1]+1, nBins+1);
       mVHData[i]->AddBinContent(mXBinRange[1], overflowData);
-
+      if (!mUnderFlow) continue;
       double underflowData = mVHData[i]->Integral(0, mXBinRange[0]-1);
       mVHData[i]->AddBinContent(mXBinRange[0], underflowData);
     }
@@ -514,12 +526,15 @@ void Comparison::set_histogram_options(int color1, int color2)
     mVHData[i]->SetMarkerStyle(20);
     mVHData[i]->SetMarkerColor(dataColors[i]);
     mVHData[i]->SetLineColor(dataColors[i]); 
-    mVHData[i]->SetLineWidth(2);
+    mVHData[i]->SetLineWidth(4);
     mVHData[i]->GetXaxis()->SetLabelOffset(999);
     mVHData[i]->GetXaxis()->SetLabelSize(0);
   }
 
-  vector<int> vDefaultColors = {kRed - 7, kAzure+1, kViolet -4, kCyan-7, kOrange+1, kGreen-3, kTeal+3, kBlue-6};
+  vector<int> vDefaultColors = {kRed - 7, kAzure+1, kViolet -4, kCyan-7, kOrange+6, kGreen, kYellow, kBlue+2, kPink+9};
+  if (mColorData.size() > 0)
+    vDefaultColors = mColorData;
+  //vector<int> vDefaultColors = {kRed - 7, kAzure+1, kViolet -4, kCyan-7, kOrange+6, kOrange+7, kOrange+4, kGreen-9, kGreen, kGreen+3,kYellow, kBlue+2, kPink+1, kPink+9, kPink+4};
   for (int i=0; i<mVHMC.size(); i++) {
     mVHMC[i]->SetFillColor(vDefaultColors[i]);
     mVHMC[i]->SetLineColor(vDefaultColors[i]);
@@ -565,6 +580,21 @@ void Comparison::draw_main_histograms()
     double eventsData = mVHData[0]->Integral();
     double eventsMC = mHMC->Integral();
     mScale = eventsData/eventsMC;
+  }
+  if (mVerbose) {
+    cout << "Overall normalization: " << mVHData[0]->Integral()/mHMC->Integral() << endl;
+    //cout << "m_gg 120-130 sig/bkg: " << mVHSignal[0]->Integral(25,26)/mHMC->Integral(25,26) << endl;
+    //cout << mVHSignal[0]->Integral(25,26) << endl;
+    //cout << mHMC->Integral(25,26) << endl; 
+    //cout << mHMC->GetBinContent(25) << endl; 
+    //cout << mHMC->GetBinContent(26) << endl;
+    double nEventsSigMgg = mVHSignal[0]->Integral(25,26);
+    double nEventsBkgMgg = 0;
+    for (int i = 0; i < mVHMC.size(); i++) {
+      if (mVHMC[i]->GetBinContent(25) > 0) nEventsBkgMgg += mVHMC[i]->GetBinContent(25);
+      if (mVHMC[i]->GetBinContent(26) > 0) nEventsBkgMgg += mVHMC[i]->GetBinContent(26);
+    }
+    cout << "m_gg 120-130 sig/bkg: " << nEventsSigMgg/nEventsBkgMgg << endl;
   }
   if (!mScaled) {
     mHMC->Scale(mScale);
@@ -766,7 +796,7 @@ void Comparison::annotate_plot()
   for(int i=0; i<mVInfo.size(); i++) {
     double j = i;
     j *= 0.05;
-    t[i] = new TLatex(0.30, 0.85-j, mVInfo[i]);
+    t[i] = new TLatex(0.20, 0.85-j, mVInfo[i]);
     t[i]->SetTextSize(fs);
     t[i]->SetNDC(kTRUE);
     t[i]->Draw("SAME");
@@ -774,7 +804,13 @@ void Comparison::annotate_plot()
 
   if (mVLegendLabels.size() > 0) {
     double j = mVHData.size()*0.05;
-    TLegend* l1 = new TLegend(0.75, 0.75-j, 0.92, 0.89);
+    TLegend* l1;
+    if (mVLegendLabels.size() > 7) {
+      l1 = new TLegend(0.5, 0.7-(j/2), 0.92, 0.89);
+      l1->SetNColumns(2);
+    }
+    else 
+      l1 = new TLegend(0.6, 0.75-j, 0.92, 0.89);
     for (int i=0; i<mVHData.size(); i++)
       l1->AddEntry(mVHData[i], mVLegendLabels[i], "lep");
     for (int i=0; i<mVHSignal.size(); i++)
@@ -784,6 +820,8 @@ void Comparison::annotate_plot()
       if (!mBothData) l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC+i], "f");
       else l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC], "lep");
     }
+    if (mVLegendLabels.size() > 7)
+      l1->SetNColumns(2);
     l1->SetBorderSize(0);
     l1->Draw("SAME");
   }

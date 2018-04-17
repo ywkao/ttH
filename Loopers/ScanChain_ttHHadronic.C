@@ -21,7 +21,7 @@
 using namespace std;
 using namespace tas;
 
-const int nBkgCats = 15;
+const int nBkgCats = 18;
 const double targetLumi = 35.9; 
 
 int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
@@ -111,9 +111,6 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
     cms3.Init(tree);
 
     // Decide what type of sample this is
-    int processId = categorize_process(currentFileTitle);
-    if (currentFileTitle.Contains("TT"))
-      processId += categorize_ttbar(nGoodEls(), nGoodMus()); // increment to appropriately categorize ttbar into had/semilep/dilep
     bool isData = currentFileTitle.Contains("DoubleEG"); 
 
     // Loop over Events in current file
@@ -142,6 +139,15 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       }
       else {
         cout << "Did not recognize tag name" << endl;
+      }
+ 
+      // Decide what type of sample this is
+      int processId = categorize_process(currentFileTitle);
+      if (currentFileTitle.Contains("TTGJets")) {
+        processId += categorize_ttgjets(nGoodEls(), nGoodMus());
+      }
+      else if (currentFileTitle.Contains("TT")) {
+        processId += categorize_ttbar(nGoodEls(), nGoodMus()); // increment to appropriately categorize ttbar into had/semilep/dilep
       }
 
       // Fill histograms //
