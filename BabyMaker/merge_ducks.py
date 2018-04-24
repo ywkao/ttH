@@ -23,3 +23,6 @@ for dir in dirs:
     os.system("mkdir %s" % destination + name)
   print("addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar))
   os.system("addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar))
+  
+  # Delete intermediate files
+  os.system("rm %s" % destination + name + "/merged_ntuple_*.root")
