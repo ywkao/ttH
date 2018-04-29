@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8__ttH_Babies_v4/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
+// makeCMS3ClassFiles("merged_babies/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2__ttH_Babies_v7/merged_ntuple.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
 
 #ifndef ttHHadronic_H
 #define ttHHadronic_H
@@ -64,6 +64,9 @@ class ttHHadronic {
   float    leadR9_;
   TBranch *leadR9_branch;
   bool     leadR9_isLoaded;
+  float    leadGenMatch_;
+  TBranch *leadGenMatch_branch;
+  bool     leadGenMatch_isLoaded;
   float    subleadPt_;
   TBranch *subleadPt_branch;
   bool     subleadPt_isLoaded;
@@ -91,6 +94,9 @@ class ttHHadronic {
   float    subleadR9_;
   TBranch *subleadR9_branch;
   bool     subleadR9_isLoaded;
+  float    subleadGenMatch_;
+  TBranch *subleadGenMatch_branch;
+  bool     subleadGenMatch_isLoaded;
   float    leadIDMVA_;
   TBranch *leadIDMVA_branch;
   bool     leadIDMVA_isLoaded;
@@ -100,6 +106,9 @@ class ttHHadronic {
   float    dipho_rapidity_;
   TBranch *dipho_rapidity_branch;
   bool     dipho_rapidity_isLoaded;
+  float    vertex_idx_;
+  TBranch *vertex_idx_branch;
+  bool     vertex_idx_isLoaded;
   float    nGoodEls_;
   TBranch *nGoodEls_branch;
   bool     nGoodEls_isLoaded;
@@ -115,6 +124,9 @@ class ttHHadronic {
   float    nGoodTaus_;
   TBranch *nGoodTaus_branch;
   bool     nGoodTaus_isLoaded;
+  float    diphoMVARes_;
+  TBranch *diphoMVARes_branch;
+  bool     diphoMVARes_isLoaded;
   float    n_bjets_;
   TBranch *n_bjets_branch;
   bool     n_bjets_isLoaded;
@@ -319,6 +331,7 @@ void LoadAllBranches();
   const float &lead_sigmaEoE();
   const float &lead_ptoM();
   const float &leadR9();
+  const float &leadGenMatch();
   const float &subleadPt();
   const float &subleadEt();
   const float &subleadEta();
@@ -328,14 +341,17 @@ void LoadAllBranches();
   const float &sublead_sigmaEoE();
   const float &sublead_ptoM();
   const float &subleadR9();
+  const float &subleadGenMatch();
   const float &leadIDMVA();
   const float &subleadIDMVA();
   const float &dipho_rapidity();
+  const float &vertex_idx();
   const float &nGoodEls();
   const float &nGoodElsFromTau();
   const float &nGoodMus();
   const float &nGoodMusFromTau();
   const float &nGoodTaus();
+  const float &diphoMVARes();
   const float &n_bjets();
   const float &n_jets();
   const float &bjet1_pt();
@@ -421,6 +437,7 @@ namespace tas {
   const float &lead_sigmaEoE();
   const float &lead_ptoM();
   const float &leadR9();
+  const float &leadGenMatch();
   const float &subleadPt();
   const float &subleadEt();
   const float &subleadEta();
@@ -430,14 +447,17 @@ namespace tas {
   const float &sublead_sigmaEoE();
   const float &sublead_ptoM();
   const float &subleadR9();
+  const float &subleadGenMatch();
   const float &leadIDMVA();
   const float &subleadIDMVA();
   const float &dipho_rapidity();
+  const float &vertex_idx();
   const float &nGoodEls();
   const float &nGoodElsFromTau();
   const float &nGoodMus();
   const float &nGoodMusFromTau();
   const float &nGoodTaus();
+  const float &diphoMVARes();
   const float &n_bjets();
   const float &n_jets();
   const float &bjet1_pt();
