@@ -3,9 +3,6 @@ import numpy
 import glob
 import json
 
-sys.path.append('makers/disMaker/')
-import dis_client
-
 path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2/"
 dirs = glob.glob(path+"*")
 
@@ -20,63 +17,35 @@ scale1fb = {}
 for dataset in datasets:
   scale1fb[dataset] = {"xs" : 1, "filter_eff": 1, "br" : 1, "kf" : 1, "nevents" : 1, "negative_weight_frac": 0, "scale1fb" : 0}
 
-with open("NegativeWeightFractions/negative_weight_fractions.json") as json_file:
-  neg_weight_fracs = json.load(json_file)
+# Get number of events (calculated by scanning central microAOD in /eos on lxplus)
+with open("nEvents/mc_events.json") as json_file:
+  mc_events = json.load(json_file)
   for dataset in datasets:
-    scale1fb[dataset]["negative_weight_frac"] = neg_weight_fracs[dataset.replace("/","")]
+    scale1fb[dataset]["negative_weight_frac"] = mc_events[dataset.replace("/","")][0]
+    scale1fb[dataset]["nevents"] = mc_events[dataset.replace("/","")][1]
 
-# First check summer 16 json file
-with open("../../BabyMaker/CMSSW_8_0_28/src/flashgg/MetaData/work/campaigns/RunIISummer16-2_4_2-25ns_Moriond17.json") as json_file:
-  das_datasets = json.load(json_file)
-  for dataset in datasets:
-    key = ""
-    if "ttH" in dataset:
-      key = "sig"
-    else:
-      key = "bkg"
-    for das_dataset in das_datasets[key]:
-      if dataset in das_dataset: # found a match
-	query_result = dis_client.query(q=das_dataset, typ="basic")
-        nEvents = ((query_result['response'])['payload'])['nevents']
-        scale1fb[dataset]["nevents"] = nEvents
-
-# Then check spring 16 json file (only update entries we didn't find in summer 16)
-with open("../../BabyMaker/CMSSW_8_0_28/src/flashgg/MetaData/work/campaigns/RunIISpring16DR80X-2_3_0-25ns_PostICHEPReReco.json") as json_file:
-  das_datasets = json.load(json_file)
-  for dataset in datasets:
-    key = ""
-    if "ttH" in dataset:
-      key = "sig"
-    else:
-      key = "bkg"
-    for das_dataset in das_datasets[key]:
-      if dataset in das_dataset: # found a match
-        query_result = dis_client.query(q=das_dataset, typ="basic")
-        nEvents = ((query_result['response'])['payload'])['nevents']
-	if scale1fb[dataset]["nevents"] == 1: # this means we didn't find it in Summer 16
-          scale1fb[dataset]["nevents"] = nEvents
-
-# Do a few by hand :(
-scale1fb["/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]["nevents"] = 10139950 # http://uaf-10.t2.ucsd.edu/~namin/makers/disMaker/?query=%2FTTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8%2FRunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1%2FMINIAODSIM&type=basic&short=short
-
-with open("cross_sections.json") as json_file:
+# Take cross sections from flashgg repository instead of Twiki
+with open("cross_sections_flashgg.json") as json_file:
   cross_sections = json.load(json_file)
   for dataset in datasets:
     ds = dataset.replace("/","")
     if ds in cross_sections.keys():
       scale1fb[dataset]["xs"] = cross_sections[ds]["xs"]
-      scale1fb[dataset]["filter_eff"] = cross_sections[ds]["filter_eff"]
-      scale1fb[dataset]["br"] = cross_sections[ds]["br"]
-      scale1fb[dataset]["kf"] = cross_sections[ds]["kf"]
+      if "br" in cross_sections[ds]:
+        scale1fb[dataset]["br"] = cross_sections[ds]["br"]
+      #if "kf" in cross_sections[ds]: #FIXME: should we do k-factor?
+      #  scale1fb[dataset]["kf"] = cross_sections[ds]["kf"]
 
+# Calculate scale1fb
 for key, info in scale1fb.iteritems():
   if scale1fb[key]["nevents"] > 1:
     scale1fb[key]["scale1fb"] = (scale1fb[key]["xs"] * scale1fb[key]["filter_eff"] * scale1fb[key]["br"] * scale1fb[key]["kf"] * 1000) / (scale1fb[key]["nevents"] * ( 1 - 2*scale1fb[key]["negative_weight_frac"]))
   else:
-    print("Did not match dataset %s in either flashgg catalog or on DAS" % key)
+    print("Did not match dataset %s" % key)
     print("Setting scale1fb to 0")
     scale1fb[key]["scale1fb"] = 0
 
+# Check that things look reasonable
 for key, info in scale1fb.iteritems():
   print key
   print info
@@ -90,7 +59,8 @@ with open("scale1fb.h", "w") as fout:
   fout.write("\n")
   fout.write('  TObjArray *tx = currentFileTitle.Tokenize("/");\n')
   fout.write("  TString key = ((TObjString *)(tx->At(tx->GetEntries()-2)))->String();\n")
-  fout.write('  TString to_replace = "__ttH_Babies_v1";\n')
+  fout.write('  TString tag = "v7";\n')
+  fout.write('  TString to_replace = "__ttH_Babies_" + tag;\n')
   fout.write('  TString replace_with = "";\n')
   fout.write('  key = key.ReplaceAll(to_replace, replace_with);\n')
   fout.write("  return m.find(key)->second;\n")
