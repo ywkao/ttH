@@ -238,7 +238,7 @@ Comparison::Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hM
   mHMC = (TH1D*)hMC[0]->Clone("mHMC");
   for (int i=1; i<nMCHists; i++)
     mHMC->Add(hMC[i]);
-  
+
   mVHSignal.push_back((TH1D*)hSignal->Clone("mHSignal"));
 }
 
@@ -485,10 +485,10 @@ void Comparison::compute_flow(vector<int> xBinRange)
     }
 
 
-    //double overflowMC = mHMC->Integral(mXBinRange[1]+1, nBins+1);
-    //mHMC->AddBinContent(mXBinRange[1], overflowMC);
-    //double underflowMC = mHMC->Integral(0, mXBinRange[0]-1);
-    //mHMC->AddBinContent(mXBinRange[0], underflowMC);
+    double overflowMC = mHMC->Integral(mXBinRange[1]+1, nBins+1);
+    mHMC->AddBinContent(mXBinRange[1], overflowMC);
+    double underflowMC = mHMC->Integral(0, mXBinRange[0]-1);
+    if (mUnderFlow) mHMC->AddBinContent(mXBinRange[0], underflowMC);
     for (int i=0; i<mVHData.size(); i++) {
       double overflowData = mVHData[i]->Integral(mXBinRange[1]+1, nBins+1);
       mVHData[i]->AddBinContent(mXBinRange[1], overflowData);
@@ -848,7 +848,7 @@ void Comparison::annotate_plot()
 inline
 void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
 {
-  TGaxis::SetMaxDigits(3);
+  TGaxis::SetMaxDigits(4);
   if (mRatUseData)
     mVHRat.push_back((TH1D*)mVHData[0]->Clone("mVHRat0"));
   else
