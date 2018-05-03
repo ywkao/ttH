@@ -1,0 +1,6 @@
+To remake RooWorkspace_ttHHadronic/Leptonic.txt:
+1. root allData.root
+2. tagsDumper->cd()
+3. RooAbsData* data = cms_hgg_13TeV->data("Data_13TeV_TTHLeptonicTag")
+4. data->Print() (this gives you the number of entries)
+5. for (int i = 0; i < size; i++) { cout<<((const RooArgSet*)  data->get(i))->getRealValue("CMS_hgg_mass")<<endl; }
