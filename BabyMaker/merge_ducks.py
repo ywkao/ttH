@@ -9,6 +9,7 @@ sys.path.append("~/Utilities")
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("tag", help = "job tag e.g. 'v7'", type=str)
+parser.add_argument("--data_only", action="store_true")
 args = parser.parse_args()
 
 dirs = glob.glob("/hadoop/cms/store/user/smay/ttH/*ttH_Babies_" + args.tag)
@@ -25,6 +26,9 @@ if len(old_files) > 0:
 
 nPar = 10
 for dir in dirs:
+  if args.data_only:
+    if "DoubleEG" not in dir:
+      continue
   files = glob.glob(dir+"/merged_ntuple*.root")
   name = dir.split("/")[-1]
   if not os.path.isdir(destination + name):

@@ -3,21 +3,37 @@ import time
 import itertools
 import numpy
 import glob
+import datetime
 
 from metis.Sample import DirectorySample
 from metis.CondorTask import CondorTask
 from metis.StatsParser import StatsParser
 
-job_tag = "ttH_Babies_v7"
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("tag", help = "job tag e.g. 'v7'", type=str)
+parser.add_argument("--data_only", action="store_true")
+args = parser.parse_args()
+
+job_tag = "ttH_Babies_" + args.tag
 exec_path = "condor_exe.sh"
 tar_path = "package.tar.gz"
 hadoop_path = "ttH"
 
-#os.system("rm -rf tasks")
-#os.system("rm package.tar.gz")
-#os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' CMSSW_8_0_28")
+os.system("rm -rf tasks/*" + args.tag)
+os.system("rm package.tar.gz")
+os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' CMSSW_8_0_28")
+
+with open("versions.txt", "a") as fout:
+  os.chdir("CMSSW_8_0_28/src/flashgg/")
+  commit = os.popen("git log -n 1 --pretty=format:'%H'").read()
+  os.chdir("../../..")
+  fout.write("Date: %s \n" % datetime.datetime.now())
+  fout.write("Submitting ttH Babies version %s using commit %s of tth_dev branch of flashgg\n" % (args.tag, commit))
+  fout.write("\n")
 
 base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2"
+#base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
 subdir_map = { 	"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 		"WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
 		"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
@@ -39,8 +55,11 @@ for sample in samples:
   if "DoubleEG" in name:
     nFilesPerOutput = 25
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
-  else:
-    nFilesPerOutput = 1
+  elif not args.data_only:
+    if "ttH" in name or "DiPhoton" in name or "TTGG" in name:
+      nFilesPerOutput = 1
+    else:
+      nFilesPerOutput = 25
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
 
 total_summary = {}
