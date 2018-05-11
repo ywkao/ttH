@@ -39,9 +39,10 @@ class Comparison
     Comparison(TCanvas* c1, TH1D* hData, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC);
+    Comparison(TCanvas* c1, vector<TH1D*> hData);
     ~Comparison();
 
-    void plot(int idx);
+    void plot(int idx, bool compare = true);
 
     // Setters
     void set_filename(string filename) { mFilename = filename; }
@@ -77,10 +78,11 @@ class Comparison
 
   private:
     void default_options(TCanvas* c1);
-    void set_main_pad(TPad* mainPad, bool log);
+    void set_main_pad(TPad* mainPad, bool log, bool rat = true);
     void set_rat_pad(TPad* ratPad);
     void set_2d_pad(TPad* pad, bool log);
 
+    void plotNoCompare(int idx);
     void plot1D(int idx);
     void plot2D(int idx);
 
@@ -88,6 +90,7 @@ class Comparison
     void compute_limits(bool customXRange, bool customYRange, bool customZRange);
     void compute_flow(vector<int> xBinRange);
     void set_histogram_options(int color1, int color2);
+    void draw_histograms();
     void draw_main_histograms();
     void draw_2D_histograms(int idx);
     void annotate_plot();
@@ -256,6 +259,17 @@ Comparison::Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC)
 }
 
 inline
+Comparison::Comparison(TCanvas* c1, vector<TH1D*> hData)
+{
+  default_options(c1);
+  int nDataHists = hData.size();
+  for (int i=0; i<nDataHists; i++) {
+    TString idx = Form("%d", i);
+    mVHData.push_back((TH1D*)hData[i]->Clone("mHData"+idx)); 
+  }
+}
+
+inline
 void Comparison::default_options(TCanvas* c1)
 {
   mCanvas = c1;
@@ -290,10 +304,14 @@ void Comparison::default_options(TCanvas* c1)
 }
 
 inline
-void Comparison::plot(int idx)
+void Comparison::plot(int idx, bool compare)
 {
-  if (!m2D) plot1D(idx);
-  else plot2D(idx);
+  if (compare) {
+    if (!m2D) plot1D(idx);
+    else plot2D(idx);
+  }
+  else
+    plotNoCompare(idx);
 }
 
 inline
@@ -309,6 +327,20 @@ void Comparison::plot1D(int idx)
   make_rat_histogram(mVHData[0], mHMC);
   print(idx);
 }
+
+inline
+void Comparison::plotNoCompare(int idx)
+{
+  set_main_pad(mMainPad, mLog, false);
+  //compute_limits(mCustomXRange, mCustomYRange);
+  //compute_flow(mXBinRange);
+  draw_histograms();
+  set_histogram_options(mColor1, mColor2);
+  annotate_plot();
+  print(idx);
+
+}
+
 
 /*
 inline
@@ -338,11 +370,17 @@ void Comparison::plot2D(int idx)
 }
 
 inline
-void Comparison::set_main_pad(TPad* mainPad, bool log)
+void Comparison::set_main_pad(TPad* mainPad, bool log, bool rat)
 {
   mCanvas->cd();
-  mainPad = new TPad("p_main", "p_main", 0.0, 0.3, 1.0, 1.0);
-  mainPad->SetBottomMargin(0.02);
+  if (rat) {
+    mainPad = new TPad("p_main", "p_main", 0.0, 0.3, 1.0, 1.0);
+    mainPad->SetBottomMargin(0.02);
+  }
+  else {
+    mainPad = new TPad("p_main", "p_main", 0.0, 0.0, 1.0, 1.0);
+    mainPad->SetBottomMargin(0.1);
+  }
   mainPad->SetRightMargin(0.07);
   mainPad->SetTopMargin(0.08);
   mainPad->SetLeftMargin(0.12);
@@ -484,20 +522,22 @@ void Comparison::compute_flow(vector<int> xBinRange)
       mVHSignal[i]->AddBinContent(mXBinRange[0], underflowSignal);
     }
 
-
-    double overflowMC = mHMC->Integral(mXBinRange[1]+1, nBins+1);
-    mHMC->AddBinContent(mXBinRange[1], overflowMC);
-    double underflowMC = mHMC->Integral(0, mXBinRange[0]-1);
-    if (mUnderFlow) mHMC->AddBinContent(mXBinRange[0], underflowMC);
-    for (int i=0; i<mVHData.size(); i++) {
-      double overflowData = mVHData[i]->Integral(mXBinRange[1]+1, nBins+1);
-      mVHData[i]->AddBinContent(mXBinRange[1], overflowData);
-      if (!mUnderFlow) continue;
-      double underflowData = mVHData[i]->Integral(0, mXBinRange[0]-1);
-      mVHData[i]->AddBinContent(mXBinRange[0], underflowData);
+    if (mVHMC.size() > 0) {
+      double overflowMC = mHMC->Integral(mXBinRange[1]+1, nBins+1);
+      mHMC->AddBinContent(mXBinRange[1], overflowMC);
+      double underflowMC = mHMC->Integral(0, mXBinRange[0]-1);
+      if (mUnderFlow) mHMC->AddBinContent(mXBinRange[0], underflowMC);
+      for (int i=0; i<mVHData.size(); i++) {
+	double overflowData = mVHData[i]->Integral(mXBinRange[1]+1, nBins+1);
+	mVHData[i]->AddBinContent(mXBinRange[1], overflowData);
+	if (!mUnderFlow) continue;
+	double underflowData = mVHData[i]->Integral(0, mXBinRange[0]-1);
+	mVHData[i]->AddBinContent(mXBinRange[0], underflowData);
+      }
     }
   }
-  mHMC->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
+  if (mVHMC.size() > 0)
+    mHMC->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
   for (int i=0; i<mVHMC.size(); i++)
     mVHMC[i]->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
   for (int i=0; i<mVHSignal.size(); i++)
@@ -527,8 +567,10 @@ void Comparison::set_histogram_options(int color1, int color2)
     mVHData[i]->SetMarkerColor(dataColors[i]);
     mVHData[i]->SetLineColor(dataColors[i]); 
     mVHData[i]->SetLineWidth(4);
-    mVHData[i]->GetXaxis()->SetLabelOffset(999);
-    mVHData[i]->GetXaxis()->SetLabelSize(0);
+    if (!mVHMC.empty()) {
+      mVHData[i]->GetXaxis()->SetLabelOffset(999);
+      mVHData[i]->GetXaxis()->SetLabelSize(0);
+    }
   }
 
   vector<int> vDefaultColors = {kRed - 7, kAzure+1, kViolet -4, kCyan-7, kOrange+6, kGreen, kYellow, kBlue+2, kPink+9};
@@ -547,8 +589,10 @@ void Comparison::set_histogram_options(int color1, int color2)
     mVHMC[i]->GetXaxis()->SetLabelOffset(999);
     mVHMC[i]->GetXaxis()->SetLabelSize(0);
   }
-  mStack->GetXaxis()->SetLabelOffset(999);
-  mStack->GetXaxis()->SetLabelSize(0);
+  if (mVHMC.size() > 0) {
+    mStack->GetXaxis()->SetLabelOffset(999);
+    mStack->GetXaxis()->SetLabelSize(0);
+  }
 
   for (int i=0; i<mVHSignal.size(); i++) {
     //mVHSignal[i]->SetFillColor(kBlack);
@@ -569,6 +613,27 @@ void Comparison::set_histogram_options(int color1, int color2)
 
 bool sortByValue(const std::pair<int,float>& pair1, const std::pair<int,float>& pair2 ) {
   return pair1.second < pair2.second;
+}
+
+inline
+void Comparison::draw_histograms()
+{
+  for (int i=0; i<mVHData.size(); i++) {
+    if (mScale == -1) {
+      double scale = 1/mVHData[i]->Integral();
+      mVHData[i]->Scale(scale);
+    }
+    if (i == 0) {
+     mVHData[i]->Draw(mDataDrawOpt);
+     mVHData[i]->SetMinimum(mYLimRange[0]);
+     mVHData[i]->SetMaximum(mYLimRange[1]);
+    }
+    else
+     mVHData[i]->Draw("SAME, " + mDataDrawOpt);
+  }
+  mVHData[0]->GetXaxis()->SetTitle(mXLabel);
+  //mVHData[0]->GetXaxis()->SetTitleOffset(1.1);
+  //mVHData[0]->GetXaxis()->SetTitleSize(0.12); 
 }
 
 inline
@@ -805,7 +870,9 @@ void Comparison::annotate_plot()
   if (mVLegendLabels.size() > 0) {
     double j = mVHData.size()*0.05;
     TLegend* l1;
-    if (mVLegendLabels.size() > 7) {
+    if (mVHMC.empty())
+      l1 = new TLegend(0.5, 0.8, 0.92, 0.89);
+    else if (mVLegendLabels.size() > 5) {
       l1 = new TLegend(0.5, 0.7-(j/2), 0.92, 0.89);
       l1->SetNColumns(2);
     }

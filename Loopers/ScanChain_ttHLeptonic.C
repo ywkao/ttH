@@ -82,10 +82,21 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
         if (subleadIDMVA() < -0.9)         continue;
       }
       else if (tag == "ttHLeptonic") {
+	if (mass() < 80)        continue;
         if (diphoMVARes() < -0.405)        continue;
         if (leadIDMVA() < -0.9)         continue;
         if (subleadIDMVA() < -0.9)         continue;  
       }
+      else if (tag == "ttbar_cr") {
+	if (n_jets() < 3) 	continue;
+	if (n_bjets() < 2) 	continue;
+      }
+      else if (tag == "ttbar_cr_loose") {
+        if (n_jets() < 3)       continue;
+        if (n_bjets() < 2)      continue;
+      }
+
+
       else {
         cout << "Did not recognize tag name" << endl;
       } 
@@ -99,9 +110,15 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       double evt_weight = 1;
       if (!isData)
         evt_weight = scale1fb(currentFileTitle) * targetLumi * sgn(weight());
-      
+
+      cout.setf(ios::fixed);
+      cout << std::setprecision(6) << endl;
+      if (isData && mass() >= 100 && mass() <= 180)
+        cout << mass() << endl;     
+ 
       // General
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, genLeptonId, genPhotonId);
+      vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, genLeptonId, genPhotonId);
 
       // Skip blinded region for MC after filling mass histogram
       if (!isData && blind && mass() > 120 && mass() < 130)     continue;
@@ -173,6 +190,14 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, genLeptonId, genPhotonId);
       vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, genLeptonId, genPhotonId); 
 
+      double maxID = leadIDMVA() >= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      double minID = leadIDMVA() >= subleadIDMVA() ? subleadIDMVA() : leadIDMVA();
+
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, genLeptonId, genPhotonId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, genLeptonId, genPhotonId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse", minID, evt_weight, genLeptonId, genPhotonId);
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse", maxID, evt_weight, genLeptonId, genPhotonId);
+      vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, genLeptonId, genPhotonId);
     }
   
     // Clean Up

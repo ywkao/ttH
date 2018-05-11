@@ -25,6 +25,7 @@ void add_variables(vector<Process*> v, TString tag) {
 
   for (int i = 0; i < v.size(); i++) {
     v[i]->add_histogram("hMass", 50, 0, 250);
+    v[i]->add_histogram("hMassAN", 80, 100, 180);
     v[i]->add_histogram("hRapidity", 25, -3, 3);
     v[i]->add_histogram("hDiphotonSumPt", 25, 0, 1000);
     v[i]->add_histogram("hDiphotonCosPhi", 25, -1, 1);
@@ -76,6 +77,12 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("htthMVA", 50, -1, 1);
     v[i]->add_histogram("hMaxBTag", 50, 0, 1);
     v[i]->add_histogram("hSecondMaxBTag", 50, 0, 1);  
+    
+    v[i]->add_histogram("hPhotonMaxIDMVA", 25, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA", 25, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_coarse", 5, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_coarse", 5, -1, 1);
+    v[i]->add_histogram("hDiphoMVA", 25, -1, 1);
   }
 }
 
@@ -162,10 +169,11 @@ double sgn(double x) {
 }
 
 void add_samples(TChain* ch) {
-  TString tag = "v7";
+  TString tag = "v8";
 
   TString location = "merged_babies";
-  ch->Add(location + "/DoubleEG__ttH_Babies_" + tag + "/merged_ntuple.root");
+  //ch->Add(location + "/DoubleEG__ttH_Babies_" + tag + "/merged_ntuple.root");
+  ch->Add(location + "/DoubleEG__ttH_Babies_v10c/merged_ntuple.root");
   ch->Add(location + "/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2__ttH_Babies_" + tag + "/merged_ntuple.root");
   ch->Add(location + "/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_" + tag + "/merged_ntuple.root");
   ch->Add(location + "/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa__ttH_Babies_" + tag + "/merged_ntuple.root");

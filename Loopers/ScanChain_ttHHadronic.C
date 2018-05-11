@@ -82,6 +82,7 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
         if (subleadIDMVA() < -0.9)              continue;
       }
       else if (tag == "ttHHadronic") {
+	if (mass() < 80)                continue;
         if (n_jets() < 3)       continue;
         if (tthMVA() < 0.75)    continue;
         if (diphoMVARes() < 0.4)        continue;
@@ -110,6 +111,12 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
         evt_weight = scale1fb(currentFileTitle) * targetLumi * sgn(weight());
 
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, genLeptonId, genPhotonId);   
+      vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, genLeptonId, genPhotonId);
+      cout.setf(ios::fixed);
+      cout << std::setprecision(6) << endl;
+      if (isData && mass() >= 100 && mass() <= 180)
+	cout << mass() << endl;
+
 
       // Skip blinded region for MC after filling mass histogram
       if (!isData && blind && mass() > 120 && mass() < 130)	continue;
@@ -178,6 +185,14 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId);
       vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, genLeptonId, genPhotonId);
       vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, genLeptonId, genPhotonId);
+
+
+      double maxID = leadIDMVA() >= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      double minID = leadIDMVA() >= subleadIDMVA() ? subleadIDMVA() : leadIDMVA();
+
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, genLeptonId, genPhotonId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, genLeptonId, genPhotonId);
+      vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, genLeptonId, genPhotonId);
 
       // ttH-Hadronic Specific
       vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, genLeptonId, genPhotonId);

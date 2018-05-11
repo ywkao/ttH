@@ -1,5 +1,5 @@
 #include "PlotHelper.h"
-
+#include <iomanip>
 
 // histogram index to sample
 // 0: ttH
@@ -16,13 +16,13 @@
 std::map<TString, TString> mLabels = {
 	{"DY", "Drell-Yan"}, 
 	{"DiPhoton", "#gamma#gamma + Jets"},
-	{"GammaJets", "#gamma+Jets"},
+	{"GammaJets", "#gamma + Jets"},
 	{"QCD", "QCD"},
-	{"TTGG", "TT+#gamma#gamma"},
-	{"TTGJets", "TT+#gamma+Jets"},
+	{"TTGG", "t#bar{t} + #gamma#gamma"},
+	{"TTGJets", "t#bar{t}+#gamma+Jets"},
 	{"VG", "V+#gamma"},
 	{"WJets", "W+Jets"},
-	{"TTJets", "TT + Jets"} 
+	{"TTJets", "t#bar{t} + Jets"} 
 };
 
 std::map<TString, int> mColors = {
@@ -34,8 +34,21 @@ std::map<TString, int> mColors = {
         {"TTGJets", kTeal+10},
         {"VG", kGreen+3},
         {"WJets", kBlue+2},
-        {"TTJets", kSpring-2}
+        {"TTJets", kPink-2}
 };
+
+std::map<TString, TString> mLatex = {
+        {"DY", "Drell-Yan"},
+        {"DiPhoton", "$\\gamma\\gamma$ + Jets"},
+        {"GammaJets", "$\\gamma$ + Jets"},
+        {"QCD", "QCD"},
+        {"TTGG", "$t\\bar{t}+\\gamma\\gamma$"},
+        {"TTGJets", "$t\\bar{t}+\\gamma$ + Jets"},
+        {"VG", "V + $\\gamma$"},
+        {"WJets", "W + Jets"},
+        {"TTJets", "$t\\bar{t}$ + Jets"}
+};
+
 
 const int nGenPhotonCats = 3;
 const int nGenLeptonCats = 6;
@@ -55,6 +68,16 @@ std::map<int, TString> mLeptons = {
 	{5, "(#mu#mu)"}
 };
 
+std::map<int, TString> mLeptonsLatex = {
+        {0, "Hadronic"},
+        {1, "$e$"},
+        {2, "$\\mu$"},
+        {3, "$e\\mu$"},
+        {4, "$ee$"},
+        {5, "$\\mu\\mu$"}
+};
+
+
 void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, int idx, TString type = "std") {
   TH1D* hData = (TH1D*)file->Get(hist_name + "_Data");
   TH1D* hSig = (TH1D*)file->Get(hist_name + "_ttH");
@@ -71,6 +94,33 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
       vColors.push_back(mColors.find(vBkgs[i])->second);
     }
+ 
+    // print latex table
+    if (hist_name == "hNVtx") {
+      int n_bins = hData->GetSize()-2;
+      double yield_data = hData->Integral(0, n_bins+1);
+      double yield_signal = hSig->Integral(0, n_bins+1);
+      double yield_bkg = 0;
+      vector<double> yield_mc;
+      for (int i = 0; i < hBkg.size(); i++) {
+        yield_bkg += hBkg[i]->Integral(0, n_bins+1);
+        yield_mc.push_back(hBkg[i]->Integral(0, n_bins+1));
+      }
+      cout.setf(ios::fixed);
+      cout << std::setprecision(2) << endl;
+      cout << "\\begin{center} \\Fontvi" << endl;
+      cout << "\\begin{tabular}{| r || r | r|} \\hline" << endl;
+      cout << "Process & Yield & Frac. of total bkg. \\\\ \\hline" << endl;
+      for (int i = 0; i < vBkgs.size(); i++) {
+        if (i == vBkgs.size() - 1)
+          cout << mLatex.find(vBkgs[i])->second << " & " << yield_mc[i] << " & " << yield_mc[i]/yield_bkg << " \\\\ \\hline" << endl;
+        else 
+          cout << mLatex.find(vBkgs[i])->second << " & " << yield_mc[i] << " & " << yield_mc[i]/yield_bkg << " \\\\" << endl;
+      }
+      cout << "All bkg. & " << yield_bkg << " & " << yield_bkg/yield_bkg << " \\\\ \\hline" << endl;
+      cout << "Data & " << yield_data << " & " << yield_data/yield_bkg << " \\\\ \\hline" << endl;
+      cout << "\\end{tabular} \\end{center}" << endl;
+    }
   }
 
   else if (type =="genPhoton") {
@@ -81,6 +131,55 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + "GenPhoton_" + to_string(j)));
         vLegendLabels.push_back(mLabels.find(vBkgs[i])->second + mPhotons.find(j)->second);
       }   
+    }
+    // print latex table
+    if (hist_name == "hMass") {
+      int n_bins = hData->GetSize()-2;
+      int start_bin;
+      if (!(output_name == "ttHLeptonic_ttbarCR_plotsgenPhoton.pdf" || output_name == "ttHLeptonic_ttbarCR_plotsstd.pdf"))
+        start_bin = 21; // start at m_gg of 80 GeV
+      else
+	start_bin = 1;
+      double yield_data_unc(0), yield_signal_unc(0), yield_bkg_unc(0);
+      vector<double> yield_mc_unc;
+      double yield_data = hData->IntegralAndError(start_bin, n_bins+1, yield_data_unc);
+      double yield_signal = hSig->IntegralAndError(start_bin, n_bins+1, yield_signal_unc);
+      double yield_bkg = 0;
+      vector<double> yield_mc;
+    
+      vector<TH1D*> hBkgNominal;
+      for (int i = 0; i < vBkgs.size(); i++)
+        hBkgNominal.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i]));
+
+      for (int i = 0; i < hBkg.size(); i++) {
+        yield_bkg += hBkg[i]->IntegralAndError(start_bin, n_bins+1, yield_bkg_unc);
+        yield_mc_unc.push_back(0);
+        yield_mc.push_back(hBkg[i]->IntegralAndError(start_bin, n_bins+1, yield_mc_unc[i]));
+      }
+      cout.setf(ios::fixed);
+      cout << std::setprecision(2) << endl;
+      cout << "\\begin{center} \\Fontvi" << endl;
+      cout << "\\begin{tabular}{| c | r || r |} \\hline" << endl;
+      cout << "Process & Component & Yield \\\\ \\hline" << endl;
+      for (int i = 0; i < vBkgs.size(); i++) {
+        double yield_process_unc;
+        double yield_process = hBkgNominal[i]->IntegralAndError(start_bin, n_bins+1, yield_process_unc);
+        for (int j = 0; j < nGenPhotonCats; j++) {
+          double yield_component = yield_mc[(i*nGenPhotonCats)+j];
+          if (j == 0)
+            cout << "\\multirow{" << nGenPhotonCats+1 << "}{*}{" << mLatex.find(vBkgs[i])->second << "} & " << mPhotons.find(j)->second << " & " << yield_component << " $\\pm$ " << yield_mc_unc[(i*nGenPhotonCats)+j] << " \\\\" << endl;
+          else if (j == nGenPhotonCats-1)
+            cout << " & " << mPhotons.find(j)->second<< " & " << yield_component << " $\\pm$ " << yield_mc_unc[(i*nGenPhotonCats)+j] << " \\\\ \\cline{2-3}" << endl;
+          else
+            cout << " & " << mPhotons.find(j)->second<< " & " << yield_component << " $\\pm$ " << yield_mc_unc[(i*nGenPhotonCats)+j] << " \\\\" << endl;
+        }
+        cout << " & All Components & " << yield_process << " $\\pm$ " << yield_process_unc << " \\\\ \\hline" << endl;
+
+      }
+      //cout << "\\multicolumn{2}{|c||}{All background} & " << yield_bkg << " & " << yield_bkg/yield_bkg << " \\\\ \\hline" << endl;
+      //cout << "\\multicolumn{2}{|c||}{Signal} & " << yield_signal << " & " << yield_signal/yield_bkg << " \\\\ \\hline" << endl;
+      cout << "\\end{tabular} \\end{center}" << endl;
+
     }
   }
 
@@ -93,6 +192,51 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         vLegendLabels.push_back(mLabels.find(vBkgs[i])->second + mLeptons.find(j)->second);
       }
     }
+
+    if (hist_name == "hMass") {
+      int n_bins = hData->GetSize()-2;
+      int start_bin = 21; // start at m_gg of 80 GeV
+      double yield_data_unc(0), yield_signal_unc(0), yield_bkg_unc(0);
+      vector<double> yield_mc_unc;
+      double yield_data = hData->IntegralAndError(start_bin, n_bins+1, yield_data_unc);
+      double yield_signal = hSig->IntegralAndError(start_bin, n_bins+1, yield_signal_unc);
+      double yield_bkg = 0;
+      vector<double> yield_mc;
+
+      vector<TH1D*> hBkgNominal;
+      for (int i = 0; i < vBkgs.size(); i++)
+        hBkgNominal.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i]));   
+ 
+      for (int i = 0; i < hBkg.size(); i++) {
+        yield_bkg += hBkg[i]->IntegralAndError(start_bin, n_bins+1, yield_bkg_unc);
+	yield_mc_unc.push_back(0);
+        yield_mc.push_back(hBkg[i]->IntegralAndError(start_bin, n_bins+1, yield_mc_unc[i]));
+      }
+      cout.setf(ios::fixed);
+      cout << std::setprecision(2) << endl;
+      cout << "\\begin{center} \\Fontvi" << endl;
+      cout << "\\begin{tabular}{| c | r || r |} \\hline" << endl;
+      cout << "Process & Component & Yield \\\\ \\hline" << endl;
+      for (int i = 0; i < vBkgs.size(); i++) {
+        double yield_process_unc;
+        double yield_process = hBkgNominal[i]->IntegralAndError(start_bin, n_bins+1, yield_process_unc);
+	for (int j = 0; j < nGenLeptonCats; j++) {
+          double yield_component = yield_mc[(i*nGenLeptonCats)+j];
+          if (j == 0)
+            cout << "\\multirow{" << nGenLeptonCats+1 << "}{*}{" << mLatex.find(vBkgs[i])->second << "} & " << mLeptonsLatex.find(j)->second << " & " << yield_component << " $\\pm$ " << yield_mc_unc[(i*nGenLeptonCats)+j] << " \\\\" << endl;
+          else if (j == nGenLeptonCats-1)
+            cout << " & " << mLeptonsLatex.find(j)->second<< " & " << yield_component << " $\\pm$ " << yield_mc_unc[(i*nGenLeptonCats)+j] << " \\\\ \\cline{2-3}" << endl;
+          else
+            cout << " & " << mLeptonsLatex.find(j)->second<< " & " << yield_component << " $\\pm$ " << yield_mc_unc[(i*nGenLeptonCats)+j] << " \\\\" << endl;
+        }
+        cout << " & All Components & " << yield_process << " $\\pm$ " << yield_process_unc << " \\\\ \\hline" << endl;
+
+      }
+      //cout << "\\multicolumn{2}{|c||}{All background} & " << yield_bkg << " & " << yield_bkg/yield_bkg << " \\\\ \\hline" << endl;
+      //cout << "\\multicolumn{2}{|c||}{Signal} & " << yield_signal << " & " << yield_signal/yield_bkg << " \\\\ \\hline" << endl;
+      cout << "\\end{tabular} \\end{center}" << endl;
+    }
+
   }
 
  
@@ -114,9 +258,16 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   c->set_y_label("Events");
   c->set_lumi(35.9);
   TString output = output_name;
+  if (hist_name == "hMassAN") {
+    c->set_no_flow();
+  }
+  
+
   if (hist_name == "hMass") {
+   if (!(output_name == "ttHLeptonic_ttbarCR_plotsgenPhoton.pdf" || output_name == "ttHLeptonic_ttbarCR_plotsstd.pdf") ) {
     c->set_no_underflow();
     c->set_x_bin_range({17,50});
+    }
     if (type == "std")
       c->set_verbose();
   }
@@ -127,6 +278,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->give_info("ttH Hadronic Tag");
   else if (output.Contains("LeptonicLoose"))
     c->give_info("ttH Leptonic Loose Tag");
+  else if (output.Contains("ttbarCR")) {
+    c->give_info("ttH Leptonic");
+    c->give_info("t#bar{t}-Enriched Region");
+  }
   else if (output.Contains("Leptonic"))
     c->give_info("ttH Leptonic Tag");
   if (hist_name.Contains("SigmaIEtaIEta"))      c->set_x_bin_range({1,50});
@@ -180,16 +335,30 @@ int main(int argc, char* argv[])
   TFile* f4 = new TFile("../ttHLeptonicLoose_histograms.root");
   string output_name_leptonic_loose = "ttHLeptonicLoose_plots_" + type_s + ".pdf";
 
-  vector<TFile*> vFiles = {f1, f2, f3, f4};
-  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose};
+  TFile* f5 = new TFile("../ttbar_cr_histograms.root");
+  string output_name_leptonic_ttbar_cr = "ttHLeptonic_ttbarCR_plots" + type_s + ".pdf";
+
+  vector<TFile*> vFiles = {f1, f2, f3, f4, f5};
+  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_leptonic_ttbar_cr};
 
   vector<TString> vBkgs;
-  if (type == "std") 
+  if (type == "std") { 
+    //vBkgs = {"DY", "DiPhoton", "GammaJets", "TTGG", "TTGJets", "VG", "WJets"}; 
     vBkgs = {"DY", "DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG", "WJets"}; 
-  else if (type == "genPhoton")
-    vBkgs = {"DiPhoton", "GammaJets", "QCD"}; 
-  else if (type == "genLepton")
+    //vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "WJets"}; 
+  }
+  else if (type == "genPhoton") {
+    //vBkgs = {"DiPhoton", "GammaJets", "QCD"};
+    //vBkgs = {"TTGG", "TTGJets", "TTJets"};
     vBkgs = {"TTGG", "TTGJets"};
+  } 
+  else if (type == "genLepton") {
+    //vBkgs = {"TTGG", "TTGJets", "TTJets"};
+    //vBkgs = {"TTGJets"};
+    //vBkgs = {"TTGG"};
+    vBkgs = {"TTJets"};
+    //vBkgs = {"TTGG", "TTGJets"};
+  }
 
   for (int i = 0; i < vFiles.size(); i++) {
     make_plot(c1, vFiles[i], vNames[i], "hMass", "m_{#gamma#gamma} [GeV]", vBkgs, 0,type);
@@ -237,6 +406,14 @@ int main(int argc, char* argv[])
 
     make_plot(c1, vFiles[i], vNames[i], "hHT", "HT [GeV]", vBkgs, 1,type);
     make_plot(c1, vFiles[i], vNames[i], "hMetPt", "E_{T}^{miss} [GeV]", vBkgs, 1,type);
+
+    if (vNames[i] == "ttHLeptonic_ttbarCR_plots" + type_s + ".pdf") {
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA", "Max #gamma ID", vBkgs, 1, type);
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA", "Min #gamma ID", vBkgs, 1, type);
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type);
+      make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type);
+    }
+    //make_plot(c1, vFiles[i], vNames[i], "hMassAN", "m_{#gamma#gamma} [GeV]", vBkgs, 1,type);
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type);
   }
 }
