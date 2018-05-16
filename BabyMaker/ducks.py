@@ -82,7 +82,8 @@ while True:
                 special_dir = hadoop_path
                 )
         task.process()
-        allcomplete = allcomplete and task.complete()
+	if not task.complete():
+          allcomplete = False
         # save some information for the dashboard
         total_summary[ds] = task.get_task_summary()
     # parse the total summary and write out the dashboard

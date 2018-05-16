@@ -33,6 +33,7 @@ for dir in dirs:
   name = dir.split("/")[-1]
   if not os.path.isdir(destination + name):
     os.system("mkdir %s" % destination + name)
+  print("addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar))
   os.system("addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar))
   
   # Delete intermediate files
