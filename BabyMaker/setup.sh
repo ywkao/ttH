@@ -32,6 +32,9 @@ else
   cd ../../   
 fi
 
+if [ ! -d logs ]; then
+  mkdir logs
+fi
 
 pushd ~/ProjectMetis # or replace with your metis location
 source setup.sh

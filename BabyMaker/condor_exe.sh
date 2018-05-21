@@ -39,6 +39,17 @@ scram b
 eval `scramv1 runtime -sh`
 cd $CMSSW_BASE/src/flashgg
 
+# Check python env
+#python check_python.py
+#exit_value=$?
+#zero=0
+#if [ "$exit_value" -eq "$zero" ]; then
+#  continue
+#else
+#  exit 1
+#fi
+  
+
 # Create tag file
 echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun Taggers/test/ttH_Tag.py"
 cmsRun Taggers/test/ttH_Tag.py ${INPUTFILENAMES}
