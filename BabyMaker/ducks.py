@@ -20,9 +20,9 @@ exec_path = "condor_exe.sh"
 tar_path = "package.tar.gz"
 hadoop_path = "ttH"
 
-#os.system("rm -rf tasks/*" + args.tag)
-#os.system("rm package.tar.gz")
-#os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' CMSSW_8_0_28")
+os.system("rm -rf tasks/*" + args.tag)
+os.system("rm package.tar.gz")
+os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' CMSSW_8_0_28")
 
 #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2"
 base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"

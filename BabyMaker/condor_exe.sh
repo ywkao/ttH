@@ -4,8 +4,6 @@ OUTPUTFILENAME=$2
 INPUTFILENAMES=$3
 INDEX=$4
 
-# probably need a few other args, like nEvents and xSec (or maybe not?)
-
 echo "[wrapper] OUTPUTDIR	= " ${OUTPUTDIR}
 echo "[wrapper] OUTPUTFILENAME	= " ${OUTPUTFILENAME}
 echo "[wrapper] INPUTFILENAMES	= " ${INPUTFILENAMES}
@@ -52,14 +50,7 @@ cd $CMSSW_BASE/src/flashgg
 
 # Create tag file
 echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun Taggers/test/ttH_Tag.py"
-cmsRun Taggers/test/ttH_Tag.py ${INPUTFILENAMES}
-
-echo "[wrapper] output root files are currently: "
-ls -lh *.root
-
-# Create flat ntuple from tag
-echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun ttHTagsDumper_cfg.py"
-cmsRun Validation/test/ttHTagsDumper_cfg.py
+cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES}
 
 echo "[wrapper] output root files are currently: "
 ls -lh *.root
