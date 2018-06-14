@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("merged_babies/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2__ttH_Babies_v7/merged_ntuple.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
+// makeCMS3ClassFiles("merged_babies/DoubleEG__ttH_Babies_v12/merged_ntuple.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
 
 #ifndef ttHLeptonic_H
 #define ttHLeptonic_H
@@ -127,6 +127,33 @@ class ttHLeptonic {
   float    diphoMVARes_;
   TBranch *diphoMVARes_branch;
   bool     diphoMVARes_isLoaded;
+  float    leadPassEVeto_;
+  TBranch *leadPassEVeto_branch;
+  bool     leadPassEVeto_isLoaded;
+  float    subleadPassEVeto_;
+  TBranch *subleadPassEVeto_branch;
+  bool     subleadPassEVeto_isLoaded;
+  float    leadPixelSeed_;
+  TBranch *leadPixelSeed_branch;
+  bool     leadPixelSeed_isLoaded;
+  float    subleadPixelSeed_;
+  TBranch *subleadPixelSeed_branch;
+  bool     subleadPixelSeed_isLoaded;
+  float    nb_loose_;
+  TBranch *nb_loose_branch;
+  bool     nb_loose_isLoaded;
+  float    nb_medium_;
+  TBranch *nb_medium_branch;
+  bool     nb_medium_isLoaded;
+  float    nb_tight_;
+  TBranch *nb_tight_branch;
+  bool     nb_tight_isLoaded;
+  float    lead_photon_type_;
+  TBranch *lead_photon_type_branch;
+  bool     lead_photon_type_isLoaded;
+  float    sublead_photon_type_;
+  TBranch *sublead_photon_type_branch;
+  bool     sublead_photon_type_isLoaded;
   float    n_ele_;
   TBranch *n_ele_branch;
   bool     n_ele_isLoaded;
@@ -415,6 +442,15 @@ void LoadAllBranches();
   const float &nGoodMusFromTau();
   const float &nGoodTaus();
   const float &diphoMVARes();
+  const float &leadPassEVeto();
+  const float &subleadPassEVeto();
+  const float &leadPixelSeed();
+  const float &subleadPixelSeed();
+  const float &nb_loose();
+  const float &nb_medium();
+  const float &nb_tight();
+  const float &lead_photon_type();
+  const float &sublead_photon_type();
   const float &n_ele();
   const float &ele1_pt();
   const float &ele2_pt();
@@ -542,6 +578,15 @@ namespace tas {
   const float &nGoodMusFromTau();
   const float &nGoodTaus();
   const float &diphoMVARes();
+  const float &leadPassEVeto();
+  const float &subleadPassEVeto();
+  const float &leadPixelSeed();
+  const float &subleadPixelSeed();
+  const float &nb_loose();
+  const float &nb_medium();
+  const float &nb_tight();
+  const float &lead_photon_type();
+  const float &sublead_photon_type();
   const float &n_ele();
   const float &ele1_pt();
   const float &ele2_pt();

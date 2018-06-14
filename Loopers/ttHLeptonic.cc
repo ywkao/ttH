@@ -75,6 +75,24 @@ void ttHLeptonic::Init(TTree *tree) {
   if (nGoodTaus_branch) nGoodTaus_branch->SetAddress(&nGoodTaus_);
   diphoMVARes_branch = tree->GetBranch("diphoMVARes");
   if (diphoMVARes_branch) diphoMVARes_branch->SetAddress(&diphoMVARes_);
+  leadPassEVeto_branch = tree->GetBranch("leadPassEVeto");
+  if (leadPassEVeto_branch) leadPassEVeto_branch->SetAddress(&leadPassEVeto_);
+  subleadPassEVeto_branch = tree->GetBranch("subleadPassEVeto");
+  if (subleadPassEVeto_branch) subleadPassEVeto_branch->SetAddress(&subleadPassEVeto_);
+  leadPixelSeed_branch = tree->GetBranch("leadPixelSeed");
+  if (leadPixelSeed_branch) leadPixelSeed_branch->SetAddress(&leadPixelSeed_);
+  subleadPixelSeed_branch = tree->GetBranch("subleadPixelSeed");
+  if (subleadPixelSeed_branch) subleadPixelSeed_branch->SetAddress(&subleadPixelSeed_);
+  nb_loose_branch = tree->GetBranch("nb_loose");
+  if (nb_loose_branch) nb_loose_branch->SetAddress(&nb_loose_);
+  nb_medium_branch = tree->GetBranch("nb_medium");
+  if (nb_medium_branch) nb_medium_branch->SetAddress(&nb_medium_);
+  nb_tight_branch = tree->GetBranch("nb_tight");
+  if (nb_tight_branch) nb_tight_branch->SetAddress(&nb_tight_);
+  lead_photon_type_branch = tree->GetBranch("lead_photon_type");
+  if (lead_photon_type_branch) lead_photon_type_branch->SetAddress(&lead_photon_type_);
+  sublead_photon_type_branch = tree->GetBranch("sublead_photon_type");
+  if (sublead_photon_type_branch) sublead_photon_type_branch->SetAddress(&sublead_photon_type_);
   n_ele_branch = tree->GetBranch("n_ele");
   if (n_ele_branch) n_ele_branch->SetAddress(&n_ele_);
   ele1_pt_branch = tree->GetBranch("ele1_pt");
@@ -283,6 +301,15 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   nGoodMusFromTau_isLoaded = false;
   nGoodTaus_isLoaded = false;
   diphoMVARes_isLoaded = false;
+  leadPassEVeto_isLoaded = false;
+  subleadPassEVeto_isLoaded = false;
+  leadPixelSeed_isLoaded = false;
+  subleadPixelSeed_isLoaded = false;
+  nb_loose_isLoaded = false;
+  nb_medium_isLoaded = false;
+  nb_tight_isLoaded = false;
+  lead_photon_type_isLoaded = false;
+  sublead_photon_type_isLoaded = false;
   n_ele_isLoaded = false;
   ele1_pt_isLoaded = false;
   ele2_pt_isLoaded = false;
@@ -405,6 +432,15 @@ void ttHLeptonic::LoadAllBranches() {
   if (nGoodMusFromTau_branch != 0) nGoodMusFromTau();
   if (nGoodTaus_branch != 0) nGoodTaus();
   if (diphoMVARes_branch != 0) diphoMVARes();
+  if (leadPassEVeto_branch != 0) leadPassEVeto();
+  if (subleadPassEVeto_branch != 0) subleadPassEVeto();
+  if (leadPixelSeed_branch != 0) leadPixelSeed();
+  if (subleadPixelSeed_branch != 0) subleadPixelSeed();
+  if (nb_loose_branch != 0) nb_loose();
+  if (nb_medium_branch != 0) nb_medium();
+  if (nb_tight_branch != 0) nb_tight();
+  if (lead_photon_type_branch != 0) lead_photon_type();
+  if (sublead_photon_type_branch != 0) sublead_photon_type();
   if (n_ele_branch != 0) n_ele();
   if (ele1_pt_branch != 0) ele1_pt();
   if (ele2_pt_branch != 0) ele2_pt();
@@ -943,6 +979,123 @@ const float &ttHLeptonic::diphoMVARes() {
     diphoMVARes_isLoaded = true;
   }
   return diphoMVARes_;
+}
+
+const float &ttHLeptonic::leadPassEVeto() {
+  if (not leadPassEVeto_isLoaded) {
+    if (leadPassEVeto_branch != 0) {
+      leadPassEVeto_branch->GetEntry(index);
+    } else {
+      printf("branch leadPassEVeto_branch does not exist!\n");
+      exit(1);
+    }
+    leadPassEVeto_isLoaded = true;
+  }
+  return leadPassEVeto_;
+}
+
+const float &ttHLeptonic::subleadPassEVeto() {
+  if (not subleadPassEVeto_isLoaded) {
+    if (subleadPassEVeto_branch != 0) {
+      subleadPassEVeto_branch->GetEntry(index);
+    } else {
+      printf("branch subleadPassEVeto_branch does not exist!\n");
+      exit(1);
+    }
+    subleadPassEVeto_isLoaded = true;
+  }
+  return subleadPassEVeto_;
+}
+
+const float &ttHLeptonic::leadPixelSeed() {
+  if (not leadPixelSeed_isLoaded) {
+    if (leadPixelSeed_branch != 0) {
+      leadPixelSeed_branch->GetEntry(index);
+    } else {
+      printf("branch leadPixelSeed_branch does not exist!\n");
+      exit(1);
+    }
+    leadPixelSeed_isLoaded = true;
+  }
+  return leadPixelSeed_;
+}
+
+const float &ttHLeptonic::subleadPixelSeed() {
+  if (not subleadPixelSeed_isLoaded) {
+    if (subleadPixelSeed_branch != 0) {
+      subleadPixelSeed_branch->GetEntry(index);
+    } else {
+      printf("branch subleadPixelSeed_branch does not exist!\n");
+      exit(1);
+    }
+    subleadPixelSeed_isLoaded = true;
+  }
+  return subleadPixelSeed_;
+}
+
+const float &ttHLeptonic::nb_loose() {
+  if (not nb_loose_isLoaded) {
+    if (nb_loose_branch != 0) {
+      nb_loose_branch->GetEntry(index);
+    } else {
+      printf("branch nb_loose_branch does not exist!\n");
+      exit(1);
+    }
+    nb_loose_isLoaded = true;
+  }
+  return nb_loose_;
+}
+
+const float &ttHLeptonic::nb_medium() {
+  if (not nb_medium_isLoaded) {
+    if (nb_medium_branch != 0) {
+      nb_medium_branch->GetEntry(index);
+    } else {
+      printf("branch nb_medium_branch does not exist!\n");
+      exit(1);
+    }
+    nb_medium_isLoaded = true;
+  }
+  return nb_medium_;
+}
+
+const float &ttHLeptonic::nb_tight() {
+  if (not nb_tight_isLoaded) {
+    if (nb_tight_branch != 0) {
+      nb_tight_branch->GetEntry(index);
+    } else {
+      printf("branch nb_tight_branch does not exist!\n");
+      exit(1);
+    }
+    nb_tight_isLoaded = true;
+  }
+  return nb_tight_;
+}
+
+const float &ttHLeptonic::lead_photon_type() {
+  if (not lead_photon_type_isLoaded) {
+    if (lead_photon_type_branch != 0) {
+      lead_photon_type_branch->GetEntry(index);
+    } else {
+      printf("branch lead_photon_type_branch does not exist!\n");
+      exit(1);
+    }
+    lead_photon_type_isLoaded = true;
+  }
+  return lead_photon_type_;
+}
+
+const float &ttHLeptonic::sublead_photon_type() {
+  if (not sublead_photon_type_isLoaded) {
+    if (sublead_photon_type_branch != 0) {
+      sublead_photon_type_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_photon_type_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_photon_type_isLoaded = true;
+  }
+  return sublead_photon_type_;
 }
 
 const float &ttHLeptonic::n_ele() {
@@ -2082,6 +2235,15 @@ const float &nGoodMus() { return cms3.nGoodMus(); }
 const float &nGoodMusFromTau() { return cms3.nGoodMusFromTau(); }
 const float &nGoodTaus() { return cms3.nGoodTaus(); }
 const float &diphoMVARes() { return cms3.diphoMVARes(); }
+const float &leadPassEVeto() { return cms3.leadPassEVeto(); }
+const float &subleadPassEVeto() { return cms3.subleadPassEVeto(); }
+const float &leadPixelSeed() { return cms3.leadPixelSeed(); }
+const float &subleadPixelSeed() { return cms3.subleadPixelSeed(); }
+const float &nb_loose() { return cms3.nb_loose(); }
+const float &nb_medium() { return cms3.nb_medium(); }
+const float &nb_tight() { return cms3.nb_tight(); }
+const float &lead_photon_type() { return cms3.lead_photon_type(); }
+const float &sublead_photon_type() { return cms3.sublead_photon_type(); }
 const float &n_ele() { return cms3.n_ele(); }
 const float &ele1_pt() { return cms3.ele1_pt(); }
 const float &ele2_pt() { return cms3.ele2_pt(); }

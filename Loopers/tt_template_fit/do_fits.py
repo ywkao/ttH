@@ -3,12 +3,12 @@ import ROOT
 import numpy
 
 pp_template = "TTGG"
-fp_template = "TTGG"
+fp_template = "TTGJets"
 ff_template = "TTJets"
 
 hist = "hPhotonMinIDMVA_coarse"
 
-f = ROOT.TFile("../ttbar_cr_histograms.root")
+f = ROOT.TFile("../ttbar_cr_v2_histograms.root")
 h_data = f.Get(hist + "_Data")
 h_pp = f.Get(hist + "_" + pp_template + "GenPhoton_2")
 h_fp = f.Get(hist + "_" + fp_template + "GenPhoton_1")
@@ -44,7 +44,10 @@ for entry in hist_list:
 
 fit = ROOT.TFractionFitter(h_data, mc, "Q")
 for i in range(4):
-  fit.Constrain(i, 0.0, 1.0)
+  if i == 2 or i == 3:
+    fit.Constrain(i, initial_fracs[i]-0.00000001, initial_fracs[i]+0.00000001)
+  else:
+    fit.Constrain(i, 0.0, 1.0)
   #fit.Constrain(i, initial_fracs[i]-0.25, initial_fracs[i]+0.25)
 
 fit.Fit()

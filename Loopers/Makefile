@@ -12,3 +12,6 @@ ttHHadronicLooper: ScanChain_ttHHadronic.C ttHHadronicLooper.cpp scale1fb/scale1
 
 ttHLeptonicLooper: ScanChain_ttHLeptonic.C ttHLeptonicLooper.cpp scale1fb/scale1fb.h ttHLooper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o ttHLeptonicLooper ttHLeptonicLooper.cpp $(ROOTLIBS)
+
+find_zombies: find_zombies.cpp
+	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o find_zombies find_zombies.cpp $(ROOTLIBS)

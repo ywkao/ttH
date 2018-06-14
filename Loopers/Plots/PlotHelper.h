@@ -71,6 +71,7 @@ class Comparison
     void set_2DdrawOpt(TString drawOpt) {m2DDrawOpt = drawOpt;}
     void set_data_drawOpt(TString drawOpt) {mDataDrawOpt = drawOpt;}
     void set_stack_order(vector<int> vOrder) {mCustomStackOrder = true; mVOrder = vOrder;}
+    void set_lower_lim(double value) {mCustomLowerLimit = true; mLowerLimit = value;}
 
     void give_hlines(vector<double> vHLines) {mVHLines = vHLines;}
     void give_vlines(vector<double> vVLines) {mVVLines = vVLines;}
@@ -133,6 +134,9 @@ class Comparison
     bool mCustomStackOrder;
     vector<int> mVOrder;
 
+    bool mCustomLowerLimit;
+    double mLowerLimit;
+
     vector<double> mVHLines;
     vector<double> mVVLines;
 
@@ -174,9 +178,11 @@ Comparison::~Comparison()
   if (!m2D) {
     for (int i=0; i<mVHData.size(); i++){
       delete mVHData[i];
-      delete mVHRat[i];
     }
-    delete mHMC;  
+    for (int i=0; i<mVHRat.size(); i++)
+      delete mVHRat[i];
+    if (mVHMC.size() > 0)
+      delete mHMC;  
   }
   else {
     delete mH2DData;
@@ -285,6 +291,7 @@ void Comparison::default_options(TCanvas* c1)
   mCustomYRange = false;
   mCustomRatRange = false;
   mCustomStackOrder = false;
+  mCustomLowerLimit = false;
   mXBinRange.reserve(2);
   mYLimRange.reserve(2);
   mScale = 1;
@@ -493,6 +500,7 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
       //mYLimRange[0] = minContent*0.95;
     }
     if (mYLimRange[0] < 0) mYLimRange[0] = 0;
+    if (mCustomLowerLimit) mYLimRange[0] = mLowerLimit;
   }
 
 }
@@ -632,6 +640,7 @@ void Comparison::draw_histograms()
      mVHData[i]->Draw("SAME, " + mDataDrawOpt);
   }
   mVHData[0]->GetXaxis()->SetTitle(mXLabel);
+  mVHData[0]->GetYaxis()->SetTitle(mYLabel);
   //mVHData[0]->GetXaxis()->SetTitleOffset(1.1);
   //mVHData[0]->GetXaxis()->SetTitleSize(0.12); 
 }
@@ -871,7 +880,7 @@ void Comparison::annotate_plot()
     double j = mVHData.size()*0.05;
     TLegend* l1;
     if (mVHMC.empty())
-      l1 = new TLegend(0.5, 0.8, 0.92, 0.89);
+      l1 = new TLegend(0.6, 0.75, 0.92, 0.89);
     else if (mVLegendLabels.size() > 5) {
       l1 = new TLegend(0.5, 0.7-(j/2), 0.92, 0.89);
       l1->SetNColumns(2);

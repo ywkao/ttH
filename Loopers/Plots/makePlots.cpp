@@ -95,6 +95,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       vColors.push_back(mColors.find(vBkgs[i])->second);
     }
  
+    
+
     // print latex table
     if (hist_name == "hNVtx") {
       int n_bins = hData->GetSize()-2;
@@ -260,6 +262,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   TString output = output_name;
   if (hist_name == "hMassAN") {
     c->set_no_flow();
+    c->set_no_log();
+    c->set_y_lim_range({0,10});
+    c->set_x_bin_range({1,80});
+    cout << "Data yield in [100,120], [130,180]: " << hData->Integral() << endl;
+    cout << "Signal yield in [120, 130]: " << hSig->Integral(21,30) << endl;
   }
   
 
@@ -284,6 +291,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
   else if (output.Contains("Leptonic"))
     c->give_info("ttH Leptonic Tag");
+  if (output.Contains("PSV")) {
+    c->give_info("Pixel Seed Veto");
+    c->give_info("        Applied");
+  }
   if (hist_name.Contains("SigmaIEtaIEta"))      c->set_x_bin_range({1,50});
 
   c->plot(idx);
@@ -323,6 +334,7 @@ int main(int argc, char* argv[])
     type_s = "std";
   }
   TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
+  TCanvas* c2 = new TCanvas("c2", "histos2", 800, 700);
   TFile* f1 = new TFile("../ttHHadronic_histograms.root");
   string output_name_hadronic = "ttHHadronic_plots_" + type_s + ".pdf";
 
@@ -335,17 +347,22 @@ int main(int argc, char* argv[])
   TFile* f4 = new TFile("../ttHLeptonicLoose_histograms.root");
   string output_name_leptonic_loose = "ttHLeptonicLoose_plots_" + type_s + ".pdf";
 
-  TFile* f5 = new TFile("../ttbar_cr_histograms.root");
+  //TFile* f5 = new TFile("../ttbar_cr_histograms.root");
+  TFile* f5 = new TFile("../ttbar_cr_v2_histograms.root");
   string output_name_leptonic_ttbar_cr = "ttHLeptonic_ttbarCR_plots" + type_s + ".pdf";
 
-  vector<TFile*> vFiles = {f1, f2, f3, f4, f5};
-  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_leptonic_ttbar_cr};
+  TFile* f6 = new TFile("../ttHLeptonic_v2_histograms.root");
+  string output_name_leptonic_v2 = "ttHLeptonic_PSV_plots" + type_s + ".pdf";
+
+  vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6};
+  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_leptonic_ttbar_cr, output_name_leptonic_v2};
 
   vector<TString> vBkgs;
   if (type == "std") { 
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "TTGG", "TTGJets", "VG", "WJets"}; 
-    vBkgs = {"DY", "DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG", "WJets"}; 
+    //vBkgs = {"DY", "DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "WJets"}; 
+    vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG"};
   }
   else if (type == "genPhoton") {
     //vBkgs = {"DiPhoton", "GammaJets", "QCD"};
@@ -413,7 +430,11 @@ int main(int argc, char* argv[])
       make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type);
       make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type);
     }
-    //make_plot(c1, vFiles[i], vNames[i], "hMassAN", "m_{#gamma#gamma} [GeV]", vBkgs, 1,type);
+    make_plot(c2, vFiles[i], vNames[i], "hMassAN", "m_{#gamma#gamma} [GeV]", vBkgs, 1,type);
+    make_plot(c1, vFiles[i], vNames[i], "hMassAN", "m_{#gamma#gamma} [GeV]", vBkgs, 1,type);
+    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_prompt", "#gamma ID (Prompt)", vBkgs, 1, type);
+    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_elec", "#gamma ID (Elec)", vBkgs, 1, type);
+    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_fake", "#gamma ID (Fake)", vBkgs, 1, type);
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type);
   }
 }
