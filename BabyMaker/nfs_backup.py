@@ -72,18 +72,19 @@ free_space = float(os.popen("df %s --block-size=1T | tail -n +3 |  awk '{ print 
 # Can we backup?
 remaining_space = free_space - size_of_backup
 if remaining_space > breathing_room: # backup these files!
+  print("Backing up files from hadoop in NFS\n")
   did_backup = True
   for file in files_to_backup:
     print("cp %s %s" % (file, file.replace(hadoop_dir, nfs_dir)))
-    #os.system("cp %s %s" % (file, file.replace(hadoop_dir, nfs_dir)))    
+    os.system("cp %s %s" % (file, file.replace(hadoop_dir, nfs_dir)))    
 
 else:
   did_backup = False
 
 # Replace any corrupted files with the healthy versions on NFS
-for file in corrupt_files_backed_up:
-  print("cp %s %s" % (file, file.replace(hadoop_dir, nfs_dir)))
-  #os.system("cp %s %s" % (file, file.replace(hadoop_dir, nfs_dir)))
+#for file in corrupt_files_backed_up:
+#  print("cp %s %s" % (file, file.replace(nfs_dir, hadoop_dir)))
+#  os.system("cp %s %s" % (file, file.replace(nfs_dir, hadoop_dir)))
 
 # Now log the results
 date = datetime.date.today().strftime("%d") + datetime.date.today().strftime("%B") + datetime.date.today().strftime("%Y")

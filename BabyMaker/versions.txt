@@ -15,3 +15,21 @@ Submitting ttH Babies version v3.1 using skims in /hadoop/cms/store/user/bemarsh
 Date: 2018-05-21 07:30:52.244219 
 Submitting ttH Babies version v3.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit 71fc57d82072e73db59a51539a04d4758364a7e4 of tth_dev branch of flashgg
 
+Date: 2018-05-22 04:32:09.344736 
+Submitting ttH Babies version v3.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit 71fc57d82072e73db59a51539a04d4758364a7e4 of tth_dev branch of flashgg
+
+Date: 2018-05-22 04:35:57.385590 
+Submitting ttH Babies version v2.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2 and commit 71fc57d82072e73db59a51539a04d4758364a7e4 of tth_dev branch of flashgg
+
+Date: 2018-05-22 05:00:48.006231 
+Submitting ttH Babies version v2.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2 and commit 71fc57d82072e73db59a51539a04d4758364a7e4 of tth_dev branch of flashgg
+
+Date: 2018-05-22 05:03:52.422863 
+Submitting ttH Babies version v3.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit 71fc57d82072e73db59a51539a04d4758364a7e4 of tth_dev branch of flashgg
+
+Date: 2018-05-24 08:59:26.971397 
+Submitting ttH Babies version v3.2 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit 1a6976e4f2da6c2327cc49aed97a2c85a09aa014 of tth_dev branch of flashgg
+
+Date: 2018-06-11 11:19:56.719886 
+Submitting ttH Babies version v2.2 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2 and commit 4b5e9142517ef11aef0b94a9bf77c4a6f693ea21 of tth_dev branch of flashgg
+

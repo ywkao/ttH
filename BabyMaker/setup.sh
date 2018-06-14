@@ -26,7 +26,7 @@ if [ ! -d flashgg ]; then
 
   # Build
   cd $CMSSW_BASE/src
-  scram b -j 20
+  scram b -j 30
   cd ../../
 else
   cd ../../   
