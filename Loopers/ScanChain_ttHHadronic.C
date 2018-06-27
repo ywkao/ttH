@@ -43,6 +43,8 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
+  int nLowID = 0;
+
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -76,19 +78,22 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 
       // Selection
       if (tag == "ttHHadronicLoose") {
-        if (mass() < 80)                continue;
-        if (diphoMVARes() < 0.6)        continue;
-        if (leadIDMVA() < -0.9)         continue;
-        if (subleadIDMVA() < -0.9)              continue;
+        if (mass() < 100)                continue;
+	if (n_jets() < 2)		continue;
+	if (nb_loose() < 1)		continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        //if (diphoMVARes() < 0.6)        continue;
+        //if (leadIDMVA() < -0.9)         continue;
+        //if (subleadIDMVA() < -0.9)              continue;
       }
       else if (tag == "ttHHadronic") {
-	if (mass() < 80)                continue;
+	if (mass() < 100)                continue;
         if (n_jets() < 3)       continue;
         if (tthMVA() < 0.75)    continue;
         if (diphoMVARes() < 0.4)        continue;
         if (leadIDMVA() < -0.9)         continue;
         if (subleadIDMVA() < -0.9)         continue;
-        if (bjet1_csv() < 0.5426)       continue;
+	if (nb_loose() < 1)	continue;
       }
       else if (tag == "2017MVAPreSel") {
         if (mass() < 100)       continue;
@@ -117,8 +122,12 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       cout.setf(ios::fixed);
       cout << std::setprecision(6);
       if (isData && mass() >= 100 && mass() <= 180) {
-	//cout << mass() << endl;
-	cout << "Mass: " << mass() << " , Event: " << cms3.event() << " , Run: " << run() << " , Lumi: " << lumi() << endl;
+	cout << mass() << endl;
+	//cout << "Mass: " << mass() << " , Event: " << cms3.event() << " , Run: " << run() << " , Lumi: " << lumi() << endl;
+      }
+
+      if (isData && (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)) {
+        nLowID++;
       }
 
       // Skip blinded region for MC after filling mass histogram
@@ -151,7 +160,7 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       vProcess[processId]->fill_histogram("hHT", ht, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
 
       vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hNbJets", n_bjets(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId); // medium id
+      vProcess[processId]->fill_histogram("hNbJets", nb_loose(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId); // medium id
       if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("hJet1pT", jet1_pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("hJet2pT", jet2_pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("hJet3pT", jet3_pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
@@ -229,6 +238,8 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   // Example Histograms
   f1->Write();
   f1->Close(); 
+
+  cout << "Number of data events with one photon with ID < -0.9: " << nLowID << endl;
  
   // return
   bmark->Stop("benchmark");

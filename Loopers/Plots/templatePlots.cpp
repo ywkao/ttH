@@ -122,7 +122,7 @@ void compare_templates(TCanvas* c1, TFile* file, string output_name, TString his
   delete cFF;
 }
 
-void compare_photon_origins(TCanvas* c1, TFile* file, string output_name, TString process, TString x_label, vector<TString> vInfo, int idx) {
+void compare_photon_origins(TCanvas* c1, TFile* file, string output_name, TString process, TString hist, TString x_label, vector<TString> vInfo, int idx) {
   TH1D *hPrompt, *hElec, *hFake;
   TString output = output_name;
   if (output.Contains("minID")) {
@@ -131,9 +131,9 @@ void compare_photon_origins(TCanvas* c1, TFile* file, string output_name, TStrin
     hPrompt = (TH1D*)file->Get("hPhotonMinIDMVA_coarse_" + process + "GenPhotonDetail_5");
   }
   else {
-    hPrompt = (TH1D*)file->Get("hPhotonIDMVA_prompt_" + process);
-    hElec = (TH1D*)file->Get("hPhotonIDMVA_elec_" + process);
-    hFake = (TH1D*)file->Get("hPhotonIDMVA_fake_" + process); 
+    hPrompt = (TH1D*)file->Get(hist + "_prompt_" + process);
+    hElec = (TH1D*)file->Get(hist + "_elec_" + process);
+    hFake = (TH1D*)file->Get(hist + "_fake_" + process); 
   }
 
   vector<TH1D*> vH= {hElec, hFake, hPrompt}; 
@@ -157,9 +157,9 @@ void compare_photon_origins(TCanvas* c1, TFile* file, string output_name, TStrin
   delete c;
 }
 
-void compare_vetos(TCanvas* c1, TFile* file, string output_name, TString process, TString x_label, vector<TString> vInfo, int idx) {
-  TH1D* hRemovedByEVeto = (TH1D*)file->Get("hPhotonMinIDMVA_failEVeto_" + process);
-  TH1D* hRemovedByPSV = (TH1D*)file->Get("hPhotonMinIDMVA_failPSV_" + process);
+void compare_vetos(TCanvas* c1, TFile* file, string output_name, TString process, TString hist, TString x_label, vector<TString> vInfo, int idx) {
+  TH1D* hRemovedByEVeto = (TH1D*)file->Get(hist + "_failEVeto_" + process);
+  TH1D* hRemovedByPSV = (TH1D*)file->Get(hist + "_failPSV_" + process);
 
   vector<TH1D*> vH = {hRemovedByEVeto, hRemovedByPSV};
   Comparison* c = new Comparison(c1, vH);
@@ -313,16 +313,23 @@ int main(int argc, char* argv[]) {
 
   //make_prefit_plot(c1, f1, "ttHLeptonic_template_postfit.pdf", "hPhotonMinIDMVA_coarse", "Min #gamma ID MVA", vBkgs, {3.5885351626194707e-07, 119.64862304327923, 0.5384692738360889, 3.826623401711424e-07});
   //make_prefit_plot(c1, f1, "ttHLeptonic_template_postfit.pdf", "hPhotonMinIDMVA_coarse", "Min #gamma ID MVA", vBkgs, {0.00014332822051296823, 160.80686724029272, 0.4331537473237817, 3.334613563392507e-06});
+
   make_prefit_plot(c1, f1, "ttHLeptonic_template_postfit.pdf", "hPhotonMinIDMVA_coarse", "Min #gamma ID MVA", vBkgs, {1.449702793941148, 1.0066722244162387, 0.9999999714826685, 1.0000000495976293});
 
 
-  compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_minIDShapes.pdf", "TTGJets", "Minimum #gamma ID MVA", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 1);
-  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_minIDbyVeto.pdf", "TTGJets", "Mininum #gamma ID MVA", {"t#bar{t} + #gamma + Jets"}, 0);
-  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_minIDbyVeto.pdf", "Data", "Mininum #gamma ID MVA", {"Data"}, 2);
+  //compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_minIDShapes.pdf", "TTGJets", "Minimum #gamma ID MVA", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 1);
+  //compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_minIDbyVeto.pdf", "TTGJets", "Mininum #gamma ID MVA", {"t#bar{t} + #gamma + Jets"}, 0);
+  //compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_minIDbyVeto.pdf", "Data", "Mininum #gamma ID MVA", {"Data"}, 2);
 
-  compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_IDShapes.pdf", "TTGJets", "#gamma ID MVA", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 1);
-  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "TTGJets", "#gamma ID MVA", {"t#bar{t} + #gamma + Jets"}, 0);
-  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "Data", "#gamma ID MVA", {"Data"}, 2);
-  
+  compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_IDShapes.pdf", "TTGJets", "hPhotonIDMVA", "#gamma ID MVA", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 0);
+  compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_IDShapes.pdf", "TTGJets", "hPhotonPt", "p_{T} [GeV]", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 1);
+  compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_IDShapes.pdf", "TTGJets", "hPhotonEta", "#eta", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 2);
+
+  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "TTGJets", "hPhotonIDMVA", "#gamma ID MVA", {"t#bar{t} + #gamma + Jets"}, 0);
+  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "Data", "hPhotonIDMVA", "#gamma ID MVA", {"Data"}, 1);
+  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "TTGJets", "hPhotonPt", "p_{T} [GeV]", {"t#bar{t} + #gamma + Jets"}, 1);
+  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "Data", "hPhotonPt", "p_{T} [GeV]", {"Data"}, 1);
+  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "TTGJets", "hPhotonEta", "#eta", {"t#bar{t} + #gamma + Jets"}, 1);
+  compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "Data", "hPhotonEta", "#eta", {"Data"}, 2); 
 
 }

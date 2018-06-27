@@ -263,7 +263,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   if (hist_name == "hMassAN") {
     c->set_no_flow();
     c->set_no_log();
-    c->set_y_lim_range({0,10});
+    TString output = output_name;
+    if (output.Contains("Leptonic"))
+      c->set_y_lim_range({0,12});
+    else
+      c->set_y_lim_range({0,15});
     c->set_x_bin_range({1,80});
     cout << "Data yield in [100,120], [130,180]: " << hData->Integral() << endl;
     cout << "Signal yield in [120, 130]: " << hSig->Integral(21,30) << endl;
@@ -273,7 +277,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   if (hist_name == "hMass") {
    if (!(output_name == "ttHLeptonic_ttbarCR_plotsgenPhoton.pdf" || output_name == "ttHLeptonic_ttbarCR_plotsstd.pdf") ) {
     c->set_no_underflow();
-    c->set_x_bin_range({17,50});
+    c->set_x_bin_range({21,50});
     }
     if (type == "std")
       c->set_verbose();
@@ -334,7 +338,7 @@ int main(int argc, char* argv[])
     type_s = "std";
   }
   TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
-  TCanvas* c2 = new TCanvas("c2", "histos2", 800, 700);
+  TCanvas* c2 = new TCanvas("c2", "histos2", 800, 800);
   TFile* f1 = new TFile("../ttHHadronic_histograms.root");
   string output_name_hadronic = "ttHHadronic_plots_" + type_s + ".pdf";
 
@@ -354,7 +358,8 @@ int main(int argc, char* argv[])
   TFile* f6 = new TFile("../ttHLeptonic_v2_histograms.root");
   string output_name_leptonic_v2 = "ttHLeptonic_PSV_plots" + type_s + ".pdf";
 
-  vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6};
+  vector<TFile*> vFiles = {f1, f2, f3, f4};
+  //vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6};
   vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_leptonic_ttbar_cr, output_name_leptonic_v2};
 
   vector<TString> vBkgs;
@@ -362,7 +367,7 @@ int main(int argc, char* argv[])
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "WJets"}; 
-    vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG"};
+    vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
   }
   else if (type == "genPhoton") {
     //vBkgs = {"DiPhoton", "GammaJets", "QCD"};
@@ -384,7 +389,7 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hDiphotonCosPhi", "|cos(#Delta #phi_{#gamma 1, #gamma 2})|", vBkgs, 1,type);
 
     make_plot(c1, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, 1,type);
-    make_plot(c1, vFiles[i], vNames[i], "hNbJets", "N_{b-jets} (medium)", vBkgs, 1,type);
+    make_plot(c1, vFiles[i], vNames[i], "hNbJets", "N_{b-jets} (loose)", vBkgs, 1,type);
     make_plot(c1, vFiles[i], vNames[i], "hJet1pT", "Jet1 p_{T} [GeV]", vBkgs, 1,type);
     make_plot(c1, vFiles[i], vNames[i], "hJet2pT", "Jet2 p_{T} [GeV]", vBkgs, 1,type);
     make_plot(c1, vFiles[i], vNames[i], "hJet3pT", "Jet3 p_{T} [GeV]", vBkgs, 1,type);
@@ -435,6 +440,12 @@ int main(int argc, char* argv[])
     //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_prompt", "#gamma ID (Prompt)", vBkgs, 1, type);
     //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_elec", "#gamma ID (Elec)", vBkgs, 1, type);
     //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_fake", "#gamma ID (Fake)", vBkgs, 1, type);
+    make_plot(c1, vFiles[i], vNames[i], "hMT", "m_{T}(E_{T}^{miss}, lep) [GeV]", vBkgs, 1, type);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA", "Max #gamma ID", vBkgs, 1, type);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA", "Min #gamma ID", vBkgs, 1, type);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type);
+    make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type);
+
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type);
   }
 }

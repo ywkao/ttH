@@ -24,8 +24,8 @@ os.system("rm -rf tasks/*" + args.tag)
 os.system("rm package.tar.gz")
 os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' CMSSW_8_0_28")
 
-base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2"
-#base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
+#base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2"
+base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
 with open("versions.txt", "a") as fout:
   os.chdir("CMSSW_8_0_28/src/flashgg/")
   commit = os.popen("git log -n 1 --pretty=format:'%H'").read()

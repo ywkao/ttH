@@ -219,10 +219,12 @@ int main(int argc, char* argv[])
 
   TFile* f_veto_studies = new TFile("../ttHLeptonic_veto_study_histograms.root");
 
-  vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12};
+  vector<TFile*> vFiles = {f1, f2, f3, f4};
+  //vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12};
   vector<TString> vLabels = {"Hadronic", "Leptonic", "Hadronic Loose", "Leptonic Loose", "ttbar cr", "ttbar cr v2", "ttbar cr v3", "Leptonic v2", "ttH Leptonic Blinded Region", "ttH Leptonic Blinded Region + Pixel Seed Veto", "ttH Leptonic no Vetos", "ttH Leptonic Pixel Seed Only"};
 
-  vector<TString> vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "WJets", "DY"};
+  vector<TString> vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+  
 
   for (int i = 0; i < vFiles.size(); i++) {
     make_table_std(vFiles[i], "hNVtx", vBkgs, vLabels[i]);

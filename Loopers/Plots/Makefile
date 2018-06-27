@@ -3,7 +3,7 @@ ROOTLIBS = $(shell root-config --libs) -lMinuit -lMLP -lXMLIO -lTMVA -lGenVector
 CC = g++
 CFLAGS = -g -std=c++1y
 
-TARGET = makePlots templatePlots makeTables 
+TARGET = makePlots templatePlots makeTables fit_plots 
 
 all: $(TARGET)
 
@@ -15,3 +15,6 @@ templatePlots: templatePlots.cpp PlotHelper.h
 
 makeTables: makeTables.cpp PlotHelper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o makeTables makeTables.cpp $(ROOTLIBS)
+
+fit_plots: fit_plots.cpp PlotHelper.h
+	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o fit_plots fit_plots.cpp $(ROOTLIBS)

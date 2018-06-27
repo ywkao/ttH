@@ -123,6 +123,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (MetPt_branch) MetPt_branch->SetAddress(&MetPt_);
   MetPhi_branch = tree->GetBranch("MetPhi");
   if (MetPhi_branch) MetPhi_branch->SetAddress(&MetPhi_);
+  mT_branch = tree->GetBranch("mT");
+  if (mT_branch) mT_branch->SetAddress(&mT_);
   jet_pt1_branch = tree->GetBranch("jet_pt1");
   if (jet_pt1_branch) jet_pt1_branch->SetAddress(&jet_pt1_);
   jet_eta1_branch = tree->GetBranch("jet_eta1");
@@ -325,6 +327,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   Mjj_isLoaded = false;
   MetPt_isLoaded = false;
   MetPhi_isLoaded = false;
+  mT_isLoaded = false;
   jet_pt1_isLoaded = false;
   jet_eta1_isLoaded = false;
   jet_phi1_isLoaded = false;
@@ -456,6 +459,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (Mjj_branch != 0) Mjj();
   if (MetPt_branch != 0) MetPt();
   if (MetPhi_branch != 0) MetPhi();
+  if (mT_branch != 0) mT();
   if (jet_pt1_branch != 0) jet_pt1();
   if (jet_eta1_branch != 0) jet_eta1();
   if (jet_phi1_branch != 0) jet_phi1();
@@ -1291,6 +1295,19 @@ const float &ttHLeptonic::MetPhi() {
     MetPhi_isLoaded = true;
   }
   return MetPhi_;
+}
+
+const float &ttHLeptonic::mT() {
+  if (not mT_isLoaded) {
+    if (mT_branch != 0) {
+      mT_branch->GetEntry(index);
+    } else {
+      printf("branch mT_branch does not exist!\n");
+      exit(1);
+    }
+    mT_isLoaded = true;
+  }
+  return mT_;
 }
 
 const float &ttHLeptonic::jet_pt1() {
@@ -2259,6 +2276,7 @@ const float &bjet2_csv() { return cms3.bjet2_csv(); }
 const float &Mjj() { return cms3.Mjj(); }
 const float &MetPt() { return cms3.MetPt(); }
 const float &MetPhi() { return cms3.MetPhi(); }
+const float &mT() { return cms3.mT(); }
 const float &jet_pt1() { return cms3.jet_pt1(); }
 const float &jet_eta1() { return cms3.jet_eta1(); }
 const float &jet_phi1() { return cms3.jet_phi1(); }

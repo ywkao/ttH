@@ -5,10 +5,12 @@ mgg_ttHHadronic_looper = []
 mgg_ttHLeptonic_workspace = []
 mgg_ttHLeptonic_looper = []
 
+unblind = False
+
 with open("RooWorkspace_ttHHadronic.txt") as fin:
   for line in fin:
     if not line.strip(): continue
-    if not (float(line) > 120 and float(line) < 130):
+    if not (float(line) > 120 and float(line) < 130) or unblind:
       mgg_ttHHadronic_workspace.append(float(line))
 
 with open("Looper_ttHHadronic.txt") as fin:
@@ -19,7 +21,7 @@ with open("Looper_ttHHadronic.txt") as fin:
 with open("RooWorkspace_ttHLeptonic.txt") as fin:
   for line in fin:
     if not line.strip(): continue
-    if not (float(line) > 120 and float(line) < 130):
+    if not (float(line) > 120 and float(line) < 130) or unblind:
       mgg_ttHLeptonic_workspace.append(float(line))
 
 with open("Looper_ttHLeptonic.txt") as fin:
