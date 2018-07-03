@@ -35,6 +35,10 @@ void ttHLeptonic::Init(TTree *tree) {
   if (leadR9_branch) leadR9_branch->SetAddress(&leadR9_);
   leadGenMatch_branch = tree->GetBranch("leadGenMatch");
   if (leadGenMatch_branch) leadGenMatch_branch->SetAddress(&leadGenMatch_);
+  leadPtGen_branch = tree->GetBranch("leadPtGen");
+  if (leadPtGen_branch) leadPtGen_branch->SetAddress(&leadPtGen_);
+  leadGendeltaR_branch = tree->GetBranch("leadGendeltaR");
+  if (leadGendeltaR_branch) leadGendeltaR_branch->SetAddress(&leadGendeltaR_);
   subleadPt_branch = tree->GetBranch("subleadPt");
   if (subleadPt_branch) subleadPt_branch->SetAddress(&subleadPt_);
   subleadEt_branch = tree->GetBranch("subleadEt");
@@ -55,6 +59,10 @@ void ttHLeptonic::Init(TTree *tree) {
   if (subleadR9_branch) subleadR9_branch->SetAddress(&subleadR9_);
   subleadGenMatch_branch = tree->GetBranch("subleadGenMatch");
   if (subleadGenMatch_branch) subleadGenMatch_branch->SetAddress(&subleadGenMatch_);
+  subleadPtGen_branch = tree->GetBranch("subleadPtGen");
+  if (subleadPtGen_branch) subleadPtGen_branch->SetAddress(&subleadPtGen_);
+  subleadGendeltaR_branch = tree->GetBranch("subleadGendeltaR");
+  if (subleadGendeltaR_branch) subleadGendeltaR_branch->SetAddress(&subleadGendeltaR_);
   leadIDMVA_branch = tree->GetBranch("leadIDMVA");
   if (leadIDMVA_branch) leadIDMVA_branch->SetAddress(&leadIDMVA_);
   subleadIDMVA_branch = tree->GetBranch("subleadIDMVA");
@@ -283,6 +291,8 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   lead_ptoM_isLoaded = false;
   leadR9_isLoaded = false;
   leadGenMatch_isLoaded = false;
+  leadPtGen_isLoaded = false;
+  leadGendeltaR_isLoaded = false;
   subleadPt_isLoaded = false;
   subleadEt_isLoaded = false;
   subleadEta_isLoaded = false;
@@ -293,6 +303,8 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   sublead_ptoM_isLoaded = false;
   subleadR9_isLoaded = false;
   subleadGenMatch_isLoaded = false;
+  subleadPtGen_isLoaded = false;
+  subleadGendeltaR_isLoaded = false;
   leadIDMVA_isLoaded = false;
   subleadIDMVA_isLoaded = false;
   dipho_rapidity_isLoaded = false;
@@ -415,6 +427,8 @@ void ttHLeptonic::LoadAllBranches() {
   if (lead_ptoM_branch != 0) lead_ptoM();
   if (leadR9_branch != 0) leadR9();
   if (leadGenMatch_branch != 0) leadGenMatch();
+  if (leadPtGen_branch != 0) leadPtGen();
+  if (leadGendeltaR_branch != 0) leadGendeltaR();
   if (subleadPt_branch != 0) subleadPt();
   if (subleadEt_branch != 0) subleadEt();
   if (subleadEta_branch != 0) subleadEta();
@@ -425,6 +439,8 @@ void ttHLeptonic::LoadAllBranches() {
   if (sublead_ptoM_branch != 0) sublead_ptoM();
   if (subleadR9_branch != 0) subleadR9();
   if (subleadGenMatch_branch != 0) subleadGenMatch();
+  if (subleadPtGen_branch != 0) subleadPtGen();
+  if (subleadGendeltaR_branch != 0) subleadGendeltaR();
   if (leadIDMVA_branch != 0) leadIDMVA();
   if (subleadIDMVA_branch != 0) subleadIDMVA();
   if (dipho_rapidity_branch != 0) dipho_rapidity();
@@ -725,6 +741,32 @@ const float &ttHLeptonic::leadGenMatch() {
   return leadGenMatch_;
 }
 
+const float &ttHLeptonic::leadPtGen() {
+  if (not leadPtGen_isLoaded) {
+    if (leadPtGen_branch != 0) {
+      leadPtGen_branch->GetEntry(index);
+    } else {
+      printf("branch leadPtGen_branch does not exist!\n");
+      exit(1);
+    }
+    leadPtGen_isLoaded = true;
+  }
+  return leadPtGen_;
+}
+
+const float &ttHLeptonic::leadGendeltaR() {
+  if (not leadGendeltaR_isLoaded) {
+    if (leadGendeltaR_branch != 0) {
+      leadGendeltaR_branch->GetEntry(index);
+    } else {
+      printf("branch leadGendeltaR_branch does not exist!\n");
+      exit(1);
+    }
+    leadGendeltaR_isLoaded = true;
+  }
+  return leadGendeltaR_;
+}
+
 const float &ttHLeptonic::subleadPt() {
   if (not subleadPt_isLoaded) {
     if (subleadPt_branch != 0) {
@@ -853,6 +895,32 @@ const float &ttHLeptonic::subleadGenMatch() {
     subleadGenMatch_isLoaded = true;
   }
   return subleadGenMatch_;
+}
+
+const float &ttHLeptonic::subleadPtGen() {
+  if (not subleadPtGen_isLoaded) {
+    if (subleadPtGen_branch != 0) {
+      subleadPtGen_branch->GetEntry(index);
+    } else {
+      printf("branch subleadPtGen_branch does not exist!\n");
+      exit(1);
+    }
+    subleadPtGen_isLoaded = true;
+  }
+  return subleadPtGen_;
+}
+
+const float &ttHLeptonic::subleadGendeltaR() {
+  if (not subleadGendeltaR_isLoaded) {
+    if (subleadGendeltaR_branch != 0) {
+      subleadGendeltaR_branch->GetEntry(index);
+    } else {
+      printf("branch subleadGendeltaR_branch does not exist!\n");
+      exit(1);
+    }
+    subleadGendeltaR_isLoaded = true;
+  }
+  return subleadGendeltaR_;
 }
 
 const float &ttHLeptonic::leadIDMVA() {
@@ -2232,6 +2300,8 @@ const float &lead_sigmaEoE() { return cms3.lead_sigmaEoE(); }
 const float &lead_ptoM() { return cms3.lead_ptoM(); }
 const float &leadR9() { return cms3.leadR9(); }
 const float &leadGenMatch() { return cms3.leadGenMatch(); }
+const float &leadPtGen() { return cms3.leadPtGen(); }
+const float &leadGendeltaR() { return cms3.leadGendeltaR(); }
 const float &subleadPt() { return cms3.subleadPt(); }
 const float &subleadEt() { return cms3.subleadEt(); }
 const float &subleadEta() { return cms3.subleadEta(); }
@@ -2242,6 +2312,8 @@ const float &sublead_sigmaEoE() { return cms3.sublead_sigmaEoE(); }
 const float &sublead_ptoM() { return cms3.sublead_ptoM(); }
 const float &subleadR9() { return cms3.subleadR9(); }
 const float &subleadGenMatch() { return cms3.subleadGenMatch(); }
+const float &subleadPtGen() { return cms3.subleadPtGen(); }
+const float &subleadGendeltaR() { return cms3.subleadGendeltaR(); }
 const float &leadIDMVA() { return cms3.leadIDMVA(); }
 const float &subleadIDMVA() { return cms3.subleadIDMVA(); }
 const float &dipho_rapidity() { return cms3.dipho_rapidity(); }

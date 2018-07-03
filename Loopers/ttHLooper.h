@@ -59,7 +59,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonLeadSigmaIEtaIEta", 50, 0, 0.05);
     v[i]->add_histogram("hPhotonLeadHOverE", 25, 0, 0.1);
     v[i]->add_histogram("hPhotonLeadR9", 25, 0, 1);
-    v[i]->add_histogram("hPhotonLeadIDMVA", 25, -1, 1);
+    v[i]->add_histogram("hPhotonLeadIDMVA", 20, -1, 1);
     v[i]->add_histogram("hPhotonLeadPToM", 25, 0, 5);
     v[i]->add_histogram("hPhotonLeadSigmaEOverE", 25, 0, 1);
 
@@ -71,7 +71,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonSubleadSigmaIEtaIEta", 50, 0, 0.05);
     v[i]->add_histogram("hPhotonSubleadHOverE", 25, 0, 0.1);
     v[i]->add_histogram("hPhotonSubleadR9", 25, 0, 1);
-    v[i]->add_histogram("hPhotonSubleadIDMVA", 25, -1, 1);
+    v[i]->add_histogram("hPhotonSubleadIDMVA", 20, -1, 1);
     v[i]->add_histogram("hPhotonSubleadPToM", 25, 0, 5);
     v[i]->add_histogram("hPhotonSubleadSigmaEOverE", 25, 0, 1);
 
@@ -79,8 +79,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hMaxBTag", 50, 0, 1);
     v[i]->add_histogram("hSecondMaxBTag", 50, 0, 1);  
     
-    v[i]->add_histogram("hPhotonMaxIDMVA", 25, -1, 1);
-    v[i]->add_histogram("hPhotonMinIDMVA", 25, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA", 10, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_coarse", 5, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_coarse", 5, -1, 1);
     v[i]->add_histogram("hDiphoMVA", 25, -1, 1);
@@ -88,6 +88,14 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonIDMVA_prompt", 5, -1, 1);
     v[i]->add_histogram("hPhotonIDMVA_elec", 5, -1, 1);
     v[i]->add_histogram("hPhotonIDMVA_fake", 5, -1, 1);
+
+    v[i]->add_histogram("hPhotonPt_prompt", 8, 0, 200);
+    v[i]->add_histogram("hPhotonPt_elec", 8, 0, 200);
+    v[i]->add_histogram("hPhotonPt_fake", 8, 0, 200);
+
+    v[i]->add_histogram("hPhotonEta_prompt", 10, -3, 3);
+    v[i]->add_histogram("hPhotonEta_elec", 10, -3, 3);
+    v[i]->add_histogram("hPhotonEta_fake", 10, -3, 3);
 
     v[i]->add_histogram("hPhotonMinIDMVA_passPSV", 5, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_failPSV", 5, -1, 1);
@@ -102,6 +110,21 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonIDMVA_failEVeto", 5, -1, 1);
     v[i]->add_histogram("hPhotonIDMVA_passBothVeto", 5, -1, 1);
     v[i]->add_histogram("hPhotonIDMVA_failBothVeto", 5, -1, 1);
+
+    v[i]->add_histogram("hPhotonPt_passPSV", 8, 0, 200);
+    v[i]->add_histogram("hPhotonPt_failPSV", 8, 0, 200);
+    v[i]->add_histogram("hPhotonPt_passEVeto", 8, 0, 200);
+    v[i]->add_histogram("hPhotonPt_failEVeto", 8, 0, 200);
+    v[i]->add_histogram("hPhotonPt_passBothVeto", 8, 0, 200);
+    v[i]->add_histogram("hPhotonPt_failBothVeto", 8, 0, 200);
+
+    v[i]->add_histogram("hPhotonEta_passPSV", 10, -3, 3);
+    v[i]->add_histogram("hPhotonEta_failPSV", 10, -3, 3);
+    v[i]->add_histogram("hPhotonEta_passEVeto", 10, -3, 3);
+    v[i]->add_histogram("hPhotonEta_failEVeto", 10, -3, 3);
+    v[i]->add_histogram("hPhotonEta_passBothVeto", 10, -3, 3);
+    v[i]->add_histogram("hPhotonEta_failBothVeto", 10, -3, 3); 
+
   }
 }
 
@@ -217,9 +240,10 @@ double sgn(double x) {
 }
 
 void add_samples(TChain* ch) {
-  TString tag = "v2.2";
+  TString tag = "v3.6";
 
   TString location = "merged_babies";
+  //ch->Add(location + "/DoubleEG__ttH_Babies_v3.3/merged_ntuple.root");
   ch->Add(location + "/DoubleEG__ttH_Babies_" + tag + "/merged_ntuple.root");
   //ch->Add(location + "/DoubleEG__ttH_Babies_v10c/merged_ntuple.root"); // old skims, full sync for hadronic
   //ch->Add(location + "/DoubleEG__ttH_Babies_v10/merged_ntuple.root"); // new skims, missing more events

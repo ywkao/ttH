@@ -37,7 +37,7 @@ double scale1fb(TString currentFileTitle) {
   };
   TObjArray *tx = currentFileTitle.Tokenize("/");
   TString key = ((TObjString *)(tx->At(tx->GetEntries()-2)))->String();
-  TString tag = "v3.5";
+  TString tag = "v3.6";
   TString to_replace = "__ttH_Babies_" + tag;
   TString replace_with = "";
   key = key.ReplaceAll(to_replace, replace_with);

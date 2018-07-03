@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8__ttH_Babies_v3.4/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
+// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8__ttH_Babies_v3.6/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
 
 #ifndef ttHHadronic_H
 #define ttHHadronic_H
@@ -67,6 +67,12 @@ class ttHHadronic {
   float    leadGenMatch_;
   TBranch *leadGenMatch_branch;
   bool     leadGenMatch_isLoaded;
+  float    leadPtGen_;
+  TBranch *leadPtGen_branch;
+  bool     leadPtGen_isLoaded;
+  float    leadGendeltaR_;
+  TBranch *leadGendeltaR_branch;
+  bool     leadGendeltaR_isLoaded;
   float    subleadPt_;
   TBranch *subleadPt_branch;
   bool     subleadPt_isLoaded;
@@ -97,6 +103,12 @@ class ttHHadronic {
   float    subleadGenMatch_;
   TBranch *subleadGenMatch_branch;
   bool     subleadGenMatch_isLoaded;
+  float    subleadPtGen_;
+  TBranch *subleadPtGen_branch;
+  bool     subleadPtGen_isLoaded;
+  float    subleadGendeltaR_;
+  TBranch *subleadGendeltaR_branch;
+  bool     subleadGendeltaR_isLoaded;
   float    leadIDMVA_;
   TBranch *leadIDMVA_branch;
   bool     leadIDMVA_isLoaded;
@@ -359,6 +371,8 @@ void LoadAllBranches();
   const float &lead_ptoM();
   const float &leadR9();
   const float &leadGenMatch();
+  const float &leadPtGen();
+  const float &leadGendeltaR();
   const float &subleadPt();
   const float &subleadEt();
   const float &subleadEta();
@@ -369,6 +383,8 @@ void LoadAllBranches();
   const float &sublead_ptoM();
   const float &subleadR9();
   const float &subleadGenMatch();
+  const float &subleadPtGen();
+  const float &subleadGendeltaR();
   const float &leadIDMVA();
   const float &subleadIDMVA();
   const float &dipho_rapidity();
@@ -474,6 +490,8 @@ namespace tas {
   const float &lead_ptoM();
   const float &leadR9();
   const float &leadGenMatch();
+  const float &leadPtGen();
+  const float &leadGendeltaR();
   const float &subleadPt();
   const float &subleadEt();
   const float &subleadEta();
@@ -484,6 +502,8 @@ namespace tas {
   const float &sublead_ptoM();
   const float &subleadR9();
   const float &subleadGenMatch();
+  const float &subleadPtGen();
+  const float &subleadGendeltaR();
   const float &leadIDMVA();
   const float &subleadIDMVA();
   const float &dipho_rapidity();
