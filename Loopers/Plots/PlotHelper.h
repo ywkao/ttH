@@ -29,7 +29,7 @@
 
 using namespace std;
 
-const vector<int> dataColors = {kBlack, kRed, kGreen, kBlue, kGray};
+const vector<int> dataColors = {kBlack, kRed, kGreen, kBlue, kGray, kTeal};
 
 class Comparison 
 {
@@ -65,6 +65,7 @@ class Comparison
     void set_no_log() { mLog = false; }
     void set_log_x() { mLogX = true; }
     void set_log_y() { mLogY = true; }
+    void set_log_rat() { mLogRat = true; }
     void set_both_data() { mBothData = true; }
     void set_lumi(double lumi) {mLumi = lumi;}
     void set_no_lumi() {mLumi = -1;}
@@ -156,6 +157,7 @@ class Comparison
     bool mLog;
     bool mLogX;
     bool mLogY;
+    bool mLogRat;
     bool mFlow;
     bool mUnderFlow;
     bool mBothData;
@@ -284,6 +286,7 @@ void Comparison::default_options(TCanvas* c1)
 
   mLog = true;
   mLogX = false;
+  mLogRat = false;
   mFlow = true;
   mUnderFlow = true;
   mBothData = false;
@@ -410,6 +413,7 @@ void Comparison::set_rat_pad(TPad* ratPad)
   ratPad->cd();
   ratPad->SetGridy();
   if (mLogX) ratPad->SetLogx();
+  if (mLogRat) ratPad->SetLogy();
 }
 
 inline
@@ -870,7 +874,7 @@ void Comparison::annotate_plot()
   for(int i=0; i<mVInfo.size(); i++) {
     double j = i;
     j *= 0.05;
-    t[i] = new TLatex(0.20, 0.85-j, mVInfo[i]);
+    t[i] = new TLatex(0.15, 0.85-j, mVInfo[i]);
     t[i]->SetTextSize(fs);
     t[i]->SetNDC(kTRUE);
     t[i]->Draw("SAME");

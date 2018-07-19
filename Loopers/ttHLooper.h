@@ -62,6 +62,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonLeadIDMVA", 20, -1, 1);
     v[i]->add_histogram("hPhotonLeadPToM", 25, 0, 5);
     v[i]->add_histogram("hPhotonLeadSigmaEOverE", 25, 0, 1);
+    v[i]->add_histogram("hPhotonLeadPtGen", 25, 0, 350);
 
     // Subleading photon
     v[i]->add_histogram("hPhotonSubleadPt", 25, 0, 350);
@@ -74,13 +75,19 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonSubleadIDMVA", 20, -1, 1);
     v[i]->add_histogram("hPhotonSubleadPToM", 25, 0, 5);
     v[i]->add_histogram("hPhotonSubleadSigmaEOverE", 25, 0, 1);
+    v[i]->add_histogram("hPhotonSubleadPtGen", 25, 0, 350);
+
+    v[i]->add_histogram("hPhotonPtRatio", 50, 0.0, 2.0);
+    v[i]->add_histogram("hPhotonDeltaRGen", 50, 0, 0.15);
 
     v[i]->add_histogram("htthMVA", 50, -1, 1);
     v[i]->add_histogram("hMaxBTag", 50, 0, 1);
     v[i]->add_histogram("hSecondMaxBTag", 50, 0, 1);  
-    
+
     v[i]->add_histogram("hPhotonMaxIDMVA", 10, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_entries", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_entries", 10, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_coarse", 5, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_coarse", 5, -1, 1);
     v[i]->add_histogram("hDiphoMVA", 25, -1, 1);
@@ -96,6 +103,11 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonEta_prompt", 10, -3, 3);
     v[i]->add_histogram("hPhotonEta_elec", 10, -3, 3);
     v[i]->add_histogram("hPhotonEta_fake", 10, -3, 3);
+
+    v[i]->add_histogram("hHadronicMVA", 25, -1.0, 1.0);
+
+
+
 
     v[i]->add_histogram("hPhotonMinIDMVA_passPSV", 5, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_failPSV", 5, -1, 1);
@@ -240,14 +252,10 @@ double sgn(double x) {
 }
 
 void add_samples(TChain* ch) {
-  TString tag = "v3.6";
+  TString tag = "v3.7";
 
   TString location = "merged_babies";
-  //ch->Add(location + "/DoubleEG__ttH_Babies_v3.3/merged_ntuple.root");
   ch->Add(location + "/DoubleEG__ttH_Babies_" + tag + "/merged_ntuple.root");
-  //ch->Add(location + "/DoubleEG__ttH_Babies_v10c/merged_ntuple.root"); // old skims, full sync for hadronic
-  //ch->Add(location + "/DoubleEG__ttH_Babies_v10/merged_ntuple.root"); // new skims, missing more events
-
   ch->Add(location + "/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2__ttH_Babies_" + tag + "/merged_ntuple.root");
   ch->Add(location + "/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__ttH_Babies_" + tag + "/merged_ntuple.root");
   ch->Add(location + "/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa__ttH_Babies_" + tag + "/merged_ntuple.root");

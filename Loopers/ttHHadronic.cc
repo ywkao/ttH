@@ -101,6 +101,14 @@ void ttHHadronic::Init(TTree *tree) {
   if (lead_photon_type_branch) lead_photon_type_branch->SetAddress(&lead_photon_type_);
   sublead_photon_type_branch = tree->GetBranch("sublead_photon_type");
   if (sublead_photon_type_branch) sublead_photon_type_branch->SetAddress(&sublead_photon_type_);
+  lead_closest_gen_Pt_branch = tree->GetBranch("lead_closest_gen_Pt");
+  if (lead_closest_gen_Pt_branch) lead_closest_gen_Pt_branch->SetAddress(&lead_closest_gen_Pt_);
+  sublead_closest_gen_Pt_branch = tree->GetBranch("sublead_closest_gen_Pt");
+  if (sublead_closest_gen_Pt_branch) sublead_closest_gen_Pt_branch->SetAddress(&sublead_closest_gen_Pt_);
+  lead_closest_gen_dR_branch = tree->GetBranch("lead_closest_gen_dR");
+  if (lead_closest_gen_dR_branch) lead_closest_gen_dR_branch->SetAddress(&lead_closest_gen_dR_);
+  sublead_closest_gen_dR_branch = tree->GetBranch("sublead_closest_gen_dR");
+  if (sublead_closest_gen_dR_branch) sublead_closest_gen_dR_branch->SetAddress(&sublead_closest_gen_dR_);
   n_bjets_branch = tree->GetBranch("n_bjets");
   if (n_bjets_branch) n_bjets_branch->SetAddress(&n_bjets_);
   n_jets_branch = tree->GetBranch("n_jets");
@@ -280,6 +288,10 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   nb_tight_isLoaded = false;
   lead_photon_type_isLoaded = false;
   sublead_photon_type_isLoaded = false;
+  lead_closest_gen_Pt_isLoaded = false;
+  sublead_closest_gen_Pt_isLoaded = false;
+  lead_closest_gen_dR_isLoaded = false;
+  sublead_closest_gen_dR_isLoaded = false;
   n_bjets_isLoaded = false;
   n_jets_isLoaded = false;
   bjet1_pt_isLoaded = false;
@@ -394,6 +406,10 @@ void ttHHadronic::LoadAllBranches() {
   if (nb_tight_branch != 0) nb_tight();
   if (lead_photon_type_branch != 0) lead_photon_type();
   if (sublead_photon_type_branch != 0) sublead_photon_type();
+  if (lead_closest_gen_Pt_branch != 0) lead_closest_gen_Pt();
+  if (sublead_closest_gen_Pt_branch != 0) sublead_closest_gen_Pt();
+  if (lead_closest_gen_dR_branch != 0) lead_closest_gen_dR();
+  if (sublead_closest_gen_dR_branch != 0) sublead_closest_gen_dR();
   if (n_bjets_branch != 0) n_bjets();
   if (n_jets_branch != 0) n_jets();
   if (bjet1_pt_branch != 0) bjet1_pt();
@@ -1080,6 +1096,58 @@ const float &ttHHadronic::sublead_photon_type() {
     sublead_photon_type_isLoaded = true;
   }
   return sublead_photon_type_;
+}
+
+const float &ttHHadronic::lead_closest_gen_Pt() {
+  if (not lead_closest_gen_Pt_isLoaded) {
+    if (lead_closest_gen_Pt_branch != 0) {
+      lead_closest_gen_Pt_branch->GetEntry(index);
+    } else {
+      printf("branch lead_closest_gen_Pt_branch does not exist!\n");
+      exit(1);
+    }
+    lead_closest_gen_Pt_isLoaded = true;
+  }
+  return lead_closest_gen_Pt_;
+}
+
+const float &ttHHadronic::sublead_closest_gen_Pt() {
+  if (not sublead_closest_gen_Pt_isLoaded) {
+    if (sublead_closest_gen_Pt_branch != 0) {
+      sublead_closest_gen_Pt_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_closest_gen_Pt_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_closest_gen_Pt_isLoaded = true;
+  }
+  return sublead_closest_gen_Pt_;
+}
+
+const float &ttHHadronic::lead_closest_gen_dR() {
+  if (not lead_closest_gen_dR_isLoaded) {
+    if (lead_closest_gen_dR_branch != 0) {
+      lead_closest_gen_dR_branch->GetEntry(index);
+    } else {
+      printf("branch lead_closest_gen_dR_branch does not exist!\n");
+      exit(1);
+    }
+    lead_closest_gen_dR_isLoaded = true;
+  }
+  return lead_closest_gen_dR_;
+}
+
+const float &ttHHadronic::sublead_closest_gen_dR() {
+  if (not sublead_closest_gen_dR_isLoaded) {
+    if (sublead_closest_gen_dR_branch != 0) {
+      sublead_closest_gen_dR_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_closest_gen_dR_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_closest_gen_dR_isLoaded = true;
+  }
+  return sublead_closest_gen_dR_;
 }
 
 const float &ttHHadronic::n_bjets() {
@@ -1959,6 +2027,10 @@ const float &nb_medium() { return cms3.nb_medium(); }
 const float &nb_tight() { return cms3.nb_tight(); }
 const float &lead_photon_type() { return cms3.lead_photon_type(); }
 const float &sublead_photon_type() { return cms3.sublead_photon_type(); }
+const float &lead_closest_gen_Pt() { return cms3.lead_closest_gen_Pt(); }
+const float &sublead_closest_gen_Pt() { return cms3.sublead_closest_gen_Pt(); }
+const float &lead_closest_gen_dR() { return cms3.lead_closest_gen_dR(); }
+const float &sublead_closest_gen_dR() { return cms3.sublead_closest_gen_dR(); }
 const float &n_bjets() { return cms3.n_bjets(); }
 const float &n_jets() { return cms3.n_jets(); }
 const float &bjet1_pt() { return cms3.bjet1_pt(); }

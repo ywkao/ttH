@@ -109,7 +109,11 @@ void make_table_std(TFile* file, TString hist_name, vector<TString> vBkgs, TStri
   }
 }
 
-void make_table_components(TFile* file, TString hist_name, vector<TString> vBkgs, TString label, std::map<int, TString> mMap, TString mapTitle, bool include_data = false) {
+double unc(double quantity, double value1, double unc1, double value2, double unc2) {
+  return quantity * sqrt( pow(unc1/value1, 2) + pow(unc2/value2, 2));
+}
+
+void make_table_components(TFile* file, TString hist_name, vector<TString> vBkgs, TString label, std::map<int, TString> mMap, TString mapTitle, bool include_data = false, bool verbose = false) {
   vector<TH1D*> hBkgIncl;
   vector<TH1D*> hBkg;
 
@@ -141,24 +145,49 @@ void make_table_components(TFile* file, TString hist_name, vector<TString> vBkgs
   cout.setf(ios::fixed);
   cout << std::setprecision(2) << endl;
 
-  cout << endl << label << " " << mapTitle << " table: " << endl;
-  cout << "\\begin{center} \\Fontvi" << endl;
-  cout << "\\begin{tabular}{| c | r || r |} \\hline" << endl;
-  cout << "Process & Component & Yield \\\\ \\hline" << endl;
 
-  for (int i = 0; i < vBkgs.size(); i++) {
-    for (int j = 0; j < mMap.size(); j++) {
-      int idx = (i*mMap.size())+j;
-      if (j == 0)
-        cout << "\\multirow{" << mMap.size() + 1 << "}{*}{" << mLatex.find(vBkgs[i])->second << "}";
-      cout << "& " << mMap.find(j)->second << " & " << yield_bkg[idx] << " $\\pm$ " << yield_bkg_unc[idx] << " \\\\";
-      if (j == mMap.size() - 1)
-        cout << " \\hline";
-      cout << endl;
+  if (!verbose) {
+    cout << endl << label << " " << mapTitle << " table: " << endl;
+    cout << "\\begin{center} \\Fontvi" << endl;
+    cout << "\\begin{tabular}{| c | r || r |} \\hline" << endl;
+    cout << "Process & Component & Yield \\\\ \\hline" << endl;
+
+    for (int i = 0; i < vBkgs.size(); i++) {
+      for (int j = 0; j < mMap.size(); j++) {
+	int idx = (i*mMap.size())+j;
+	if (j == 0)
+	  cout << "\\multirow{" << mMap.size() + 1 << "}{*}{" << mLatex.find(vBkgs[i])->second << "}";
+	cout << "& " << mMap.find(j)->second << " & " << yield_bkg[idx] << " $\\pm$ " << yield_bkg_unc[idx] << " \\\\";
+	if (j == mMap.size() - 1)
+	  cout << " \\cline{2-3}";
+	cout << endl;
+      }
+      cout << " & All Components & " << yield_bkg_incl[i] << " $\\pm$ " << yield_bkg_incl_unc[i] << " \\\\ \\hline" << endl;
     }
-    cout << " & All Components & " << yield_bkg_incl[i] << " $\\pm$ " << yield_bkg_incl_unc[i] << " \\\\ \\hline" << endl;
+    cout << "\\end{tabular} \\end{center}" << endl; 
   }
-  cout << "\\end{tabular} \\end{center}" << endl;  
+  else {
+    cout << endl << label << " " << mapTitle << " table: " << endl;
+    cout << "\\begin{center} \\Fontvi" << endl;
+    cout << "\\begin{tabular}{| c | r || r | r| r|} \\hline" << endl;
+    cout << "Process & Component & Yield & Frac. of Total Sample & Fractional Error\\\\ \\hline" << endl;
+
+    for (int i = 0; i < vBkgs.size(); i++) {
+      for (int j = 0; j < mMap.size(); j++) {
+        int idx = (i*mMap.size())+j;
+        if (j == 0)
+          cout << "\\multirow{" << mMap.size() + 1 << "}{*}{" << mLatex.find(vBkgs[i])->second << "}";
+        cout << "& " << mMap.find(j)->second << " & " << yield_bkg[idx] << " $\\pm$ " << yield_bkg_unc[idx] << " & " << yield_bkg[idx] / yield_bkg_incl[i] << " $\\pm$ " << unc(yield_bkg[idx] / yield_bkg_incl[i], yield_bkg[idx], yield_bkg_unc[idx], yield_bkg_incl[i], yield_bkg_incl_unc[i]) << " & " << yield_bkg_unc[idx] / yield_bkg[idx] << " \\\\";
+        if (j == mMap.size() - 1)
+          cout << " \\cline{2-5}";
+        cout << endl;
+      }
+      cout << " & All Components & " << yield_bkg_incl[i] << " $\\pm$ " << yield_bkg_incl_unc[i] << " & 1.00 $\\pm$ 0.00 & " << yield_bkg_incl_unc[i] / yield_bkg_incl[i]  << " \\\\ \\hline" << endl;
+    }
+    cout << "\\end{tabular} \\end{center}" << endl;
+
+  }
+ 
 }
 
 void make_table_vetos(TFile* file, TString process) {
@@ -236,6 +265,9 @@ int main(int argc, char* argv[])
 
   make_table_vetos(f_veto_studies, "Data"); 
   make_table_vetos(f_veto_studies, "TTGJets");
+
+  make_table_components(f3, "hNVtx", {"DiPhoton", "GammaJets", "QCD"}, "Hadronic Loose", mPhotons, "GenPhoton", false, true);
+
   //make_table_components(f_veto_studies, "hNVtx", vBkgs, "Starting yield", mPhotonLocations, "PhotonLocations", true);
   //make_table_components(f_veto_studies, "hPhotonMinIDMVA_passEVeto", vBkgs, "Passing e-veto", mPhotonLocations, "PhotonLocations", true);
   //make_table_components(f_veto_studies, "hPhotonMinIDMVA_passPSV", vBkgs, "Passing PSV", mPhotonLocations, "PhotonLocations", true);

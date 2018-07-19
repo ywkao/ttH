@@ -11,8 +11,6 @@ from sklearn import metrics
 import utils
 import tmva_utils
 
-
-print xgboost.__version__ 
 # Read features
 f = h5py.File("ttHHadronic_features.hdf5")
 
@@ -44,11 +42,11 @@ d_test = xgboost.DMatrix(X_test, label = y_test)
 # Define BDT parameters
 param = { 
     	'max_depth': 5,
-	'eta': 0.2,
+	'eta': 0.5,
 	'objective': 'binary:logistic',
 	}
 
-n_round = 250
+n_round = 500
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -73,9 +71,6 @@ tmva_utils.convert_model(model, input_variables = input_variables, output_xml = 
 pred_train = bdt.predict(d_train)
 pred_test = bdt.predict(d_test)
 
-for i in range(100):
-  print(pred_test[i])
-
 # analysis
 fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train)
 fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test)
@@ -94,6 +89,7 @@ import matplotlib.pyplot as plt
 # variable importance #
 fig = plt.figure()
 xgboost.plot_importance(bdt)
+plt.tight_layout()
 plt.savefig('feature_importance.pdf')
 
 # make ROC curve #

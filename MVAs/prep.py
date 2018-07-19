@@ -4,24 +4,26 @@ import ROOT
 import numpy
 import root_numpy
 
-
 baby_file = "../Loopers/MVABaby_ttHHadronic.root"
 output_file = "ttHHadronic_features.hdf5"
-branches_hadronic = ["evt_weight_", "label_", "process_id_", "njets_", "ht_", "leadPt_", "subleadPt_", "maxIDMVA_", "minIDMVA_", "jet1_pt_", "jet1_eta_", "jet2_pt_", "jet2_eta_", "jet3_pt_", "jet3_eta_", "jet4_pt_", "jet4_eta_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"]
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
 
 # load tree to array
-features = root_numpy.tree2array(tree, branches = branches_hadronic, selection = 'label_ != 2') # 0 = signal, 1 = bkg, 2 = data
+feature_names = (root_numpy.tree2array(tree, branches = ["mva_branches"], start=0, stop=1))[0][0]
+feature_names = list(feature_names) 
+
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "process_id_"]))
 
 # grab features
-feature_names = numpy.array(["njets_", "ht_", "leadPt_", "subleadPt_", "maxIDMVA_", "minIDMVA_", "jet1_pt_", "jet1_eta_", "jet2_pt_", "jet2_eta_", "jet3_pt_", "jet3_eta_", "jet4_pt_", "jet4_eta_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"])
+features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != 2') # 0 = signal, 1 = bkg, 2 = data
+
+# organize features
 global_features = [] 
 for feature in feature_names:
   global_features.append(features[feature])
 global_features = numpy.asarray(global_features)
-#global_features = numpy.array([features["njets_"], features["nbjets_"], features["ht_"], features["leadPt_"], features["subleadPt_"], features["maxIDMVA_"], features["minIDMVA_"]])
 label = features["label_"]
 weights = features["evt_weight_"]
 

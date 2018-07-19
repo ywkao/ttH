@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8__ttH_Babies_v3.6/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
+// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa__ttH_Babies_v3.7/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
 
 #ifndef ttHHadronic_H
 #define ttHHadronic_H
@@ -166,6 +166,18 @@ class ttHHadronic {
   float    sublead_photon_type_;
   TBranch *sublead_photon_type_branch;
   bool     sublead_photon_type_isLoaded;
+  float    lead_closest_gen_Pt_;
+  TBranch *lead_closest_gen_Pt_branch;
+  bool     lead_closest_gen_Pt_isLoaded;
+  float    sublead_closest_gen_Pt_;
+  TBranch *sublead_closest_gen_Pt_branch;
+  bool     sublead_closest_gen_Pt_isLoaded;
+  float    lead_closest_gen_dR_;
+  TBranch *lead_closest_gen_dR_branch;
+  bool     lead_closest_gen_dR_isLoaded;
+  float    sublead_closest_gen_dR_;
+  TBranch *sublead_closest_gen_dR_branch;
+  bool     sublead_closest_gen_dR_isLoaded;
   float    n_bjets_;
   TBranch *n_bjets_branch;
   bool     n_bjets_isLoaded;
@@ -404,6 +416,10 @@ void LoadAllBranches();
   const float &nb_tight();
   const float &lead_photon_type();
   const float &sublead_photon_type();
+  const float &lead_closest_gen_Pt();
+  const float &sublead_closest_gen_Pt();
+  const float &lead_closest_gen_dR();
+  const float &sublead_closest_gen_dR();
   const float &n_bjets();
   const float &n_jets();
   const float &bjet1_pt();
@@ -523,6 +539,10 @@ namespace tas {
   const float &nb_tight();
   const float &lead_photon_type();
   const float &sublead_photon_type();
+  const float &lead_closest_gen_Pt();
+  const float &sublead_closest_gen_Pt();
+  const float &lead_closest_gen_dR();
+  const float &sublead_closest_gen_dR();
   const float &n_bjets();
   const float &n_jets();
   const float &bjet1_pt();

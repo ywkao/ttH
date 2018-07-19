@@ -125,6 +125,15 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     }
   }
 
+  else if (type == "shape") {
+    vLegendLabels = {"ttH (M125)"};
+    for (int i = 0; i < vBkgs.size(); i++) {
+      hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i]));
+      vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
+      vColors.push_back(mColors.find(vBkgs[i])->second);
+    }
+  }
+
   else if (type =="genPhoton") {
     vLegendLabels = {"ttH (M125)"};
     vColors = {kBlue+2, kAzure+1, kCyan-7, kYellow, kGreen -4, kTeal + 3, kRed+3, kRed, kMagenta-9};
@@ -247,6 +256,14 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_data_drawOpt("E");
     c->set_rat_label("#frac{Data}{MC}");
   }
+  else if (type == "shape") {
+    c = new Comparison(c1, hSig, hBkg);
+    c->set_data_drawOpt("HIST");
+    c->set_rat_label("#frac{Signal}{Background}");
+    c->set_scale(-1);
+    c->set_log_rat();
+    c->set_rat_lim_range({0.03333, 33.3});
+  }
   else {
     c = new Comparison(c1, hSig, hBkg);
     c->set_data_drawOpt("HIST");
@@ -270,6 +287,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_y_lim_range({0,15});
     c->set_x_bin_range({1,80});
     cout << "Data yield in [100,120], [130,180]: " << hData->Integral() << endl;
+    cout << "Data yield in [115, 120], [130, 135]: " << hData->Integral(16,20) + hData->Integral(31,35) << endl;
     cout << "Signal yield in [120, 130]: " << hSig->Integral(21,30) << endl;
   }
   
@@ -284,11 +302,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
 
   if (output.Contains("HadronicLoose"))
-    c->give_info("ttH Hadronic Loose Tag");
+    c->give_info("ttH Hadronic Loose");
   else if (output.Contains("Hadronic"))
     c->give_info("ttH Hadronic Tag");
   else if (output.Contains("LeptonicLoose"))
-    c->give_info("ttH Leptonic Loose Tag");
+    c->give_info("ttH Leptonic Loose");
   else if (output.Contains("ttbarCR")) {
     c->give_info("ttH Leptonic");
     c->give_info("t#bar{t}-Enriched Region");
@@ -358,12 +376,16 @@ int main(int argc, char* argv[])
   TFile* f6 = new TFile("../ttHLeptonic_v2_histograms.root");
   string output_name_leptonic_v2 = "ttHLeptonic_PSV_plots" + type_s + ".pdf";
 
-  vector<TFile*> vFiles = {f1, f2, f3, f4};
+  TFile* f7 = new TFile("../ttHHadronicCustom_histograms.root");
+  string output_name_hadronic_custom = "ttHHadronicCustom_plots_" + type_s + ".pdf";
+
+  vector<TFile*> vFiles = {f1, f2, f3, f4, f7};
   //vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6};
-  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_leptonic_ttbar_cr, output_name_leptonic_v2};
+  //vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_leptonic_ttbar_cr, output_name_leptonic_v2};
+  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_hadronic_custom};
 
   vector<TString> vBkgs;
-  if (type == "std") { 
+  if (type == "std" || type == "shape") { 
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "WJets"}; 
@@ -445,6 +467,9 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA", "Min #gamma ID", vBkgs, 1, type);
     make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type);
     make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type);
+
+    if (vNames[i] == "ttHHadronicLoose_plots_" + type_s + ".pdf" || vNames[i] == "ttHHadronicCustom_plots_" + type_s + ".pdf")
+      make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA", "Hadronic MVA Score", vBkgs, 1, type); 
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type);
   }

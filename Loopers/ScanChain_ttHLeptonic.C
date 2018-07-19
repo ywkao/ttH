@@ -195,6 +195,9 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       if (!isData)
         evt_weight = scale1fb(currentFileTitle) * targetLumi * sgn(weight());
 
+     
+      //cout << currentFileTitle << " has weight: " << evt_weight << endl;
+
       cout.setf(ios::fixed);
       cout << std::setprecision(6);
       if (isData && mass() >= 100 && mass() <= 180) {
@@ -211,7 +214,8 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
 
       // Skip blinded region for MC after filling mass histogram
-      if (!isData && blind && mass() > 120 && mass() < 130)     continue;
+      bool isSignal = processId == 0;
+      if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
 
       double ht = 0;
       ht += jet_pt1() > 0 ? jet_pt1() : 0;
@@ -269,6 +273,12 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       vProcess[processId]->fill_histogram("hPhotonLeadPToM", lead_ptoM(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       vProcess[processId]->fill_histogram("hPhotonLeadSigmaEOverE", lead_sigmaEoE(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
 
+      if (lead_closest_gen_dR() < 999) {
+        vProcess[processId]->fill_histogram("hPhotonLeadPtGen", lead_closest_gen_Pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonPtRatio", leadPt() / lead_closest_gen_Pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonDeltaRGen", lead_closest_gen_dR(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      }
+      
       // Subleading Photon
       vProcess[processId]->fill_histogram("hPhotonSubleadPt", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       vProcess[processId]->fill_histogram("hPhotonSubleadEt", subleadEt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
@@ -280,6 +290,12 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId); 
+
+      if (sublead_closest_gen_dR() < 999) {
+        vProcess[processId]->fill_histogram("hPhotonSubleadPtGen", sublead_closest_gen_Pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonPtRatio", subleadPt() / sublead_closest_gen_Pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonDeltaRGen", sublead_closest_gen_dR(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      }
 
       double maxID = leadIDMVA() >= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       double minID = leadIDMVA() >= subleadIDMVA() ? subleadIDMVA() : leadIDMVA();

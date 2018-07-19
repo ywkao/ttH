@@ -101,6 +101,14 @@ void ttHLeptonic::Init(TTree *tree) {
   if (lead_photon_type_branch) lead_photon_type_branch->SetAddress(&lead_photon_type_);
   sublead_photon_type_branch = tree->GetBranch("sublead_photon_type");
   if (sublead_photon_type_branch) sublead_photon_type_branch->SetAddress(&sublead_photon_type_);
+  lead_closest_gen_Pt_branch = tree->GetBranch("lead_closest_gen_Pt");
+  if (lead_closest_gen_Pt_branch) lead_closest_gen_Pt_branch->SetAddress(&lead_closest_gen_Pt_);
+  sublead_closest_gen_Pt_branch = tree->GetBranch("sublead_closest_gen_Pt");
+  if (sublead_closest_gen_Pt_branch) sublead_closest_gen_Pt_branch->SetAddress(&sublead_closest_gen_Pt_);
+  lead_closest_gen_dR_branch = tree->GetBranch("lead_closest_gen_dR");
+  if (lead_closest_gen_dR_branch) lead_closest_gen_dR_branch->SetAddress(&lead_closest_gen_dR_);
+  sublead_closest_gen_dR_branch = tree->GetBranch("sublead_closest_gen_dR");
+  if (sublead_closest_gen_dR_branch) sublead_closest_gen_dR_branch->SetAddress(&sublead_closest_gen_dR_);
   n_ele_branch = tree->GetBranch("n_ele");
   if (n_ele_branch) n_ele_branch->SetAddress(&n_ele_);
   ele1_pt_branch = tree->GetBranch("ele1_pt");
@@ -324,6 +332,10 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   nb_tight_isLoaded = false;
   lead_photon_type_isLoaded = false;
   sublead_photon_type_isLoaded = false;
+  lead_closest_gen_Pt_isLoaded = false;
+  sublead_closest_gen_Pt_isLoaded = false;
+  lead_closest_gen_dR_isLoaded = false;
+  sublead_closest_gen_dR_isLoaded = false;
   n_ele_isLoaded = false;
   ele1_pt_isLoaded = false;
   ele2_pt_isLoaded = false;
@@ -460,6 +472,10 @@ void ttHLeptonic::LoadAllBranches() {
   if (nb_tight_branch != 0) nb_tight();
   if (lead_photon_type_branch != 0) lead_photon_type();
   if (sublead_photon_type_branch != 0) sublead_photon_type();
+  if (lead_closest_gen_Pt_branch != 0) lead_closest_gen_Pt();
+  if (sublead_closest_gen_Pt_branch != 0) sublead_closest_gen_Pt();
+  if (lead_closest_gen_dR_branch != 0) lead_closest_gen_dR();
+  if (sublead_closest_gen_dR_branch != 0) sublead_closest_gen_dR();
   if (n_ele_branch != 0) n_ele();
   if (ele1_pt_branch != 0) ele1_pt();
   if (ele2_pt_branch != 0) ele2_pt();
@@ -1168,6 +1184,58 @@ const float &ttHLeptonic::sublead_photon_type() {
     sublead_photon_type_isLoaded = true;
   }
   return sublead_photon_type_;
+}
+
+const float &ttHLeptonic::lead_closest_gen_Pt() {
+  if (not lead_closest_gen_Pt_isLoaded) {
+    if (lead_closest_gen_Pt_branch != 0) {
+      lead_closest_gen_Pt_branch->GetEntry(index);
+    } else {
+      printf("branch lead_closest_gen_Pt_branch does not exist!\n");
+      exit(1);
+    }
+    lead_closest_gen_Pt_isLoaded = true;
+  }
+  return lead_closest_gen_Pt_;
+}
+
+const float &ttHLeptonic::sublead_closest_gen_Pt() {
+  if (not sublead_closest_gen_Pt_isLoaded) {
+    if (sublead_closest_gen_Pt_branch != 0) {
+      sublead_closest_gen_Pt_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_closest_gen_Pt_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_closest_gen_Pt_isLoaded = true;
+  }
+  return sublead_closest_gen_Pt_;
+}
+
+const float &ttHLeptonic::lead_closest_gen_dR() {
+  if (not lead_closest_gen_dR_isLoaded) {
+    if (lead_closest_gen_dR_branch != 0) {
+      lead_closest_gen_dR_branch->GetEntry(index);
+    } else {
+      printf("branch lead_closest_gen_dR_branch does not exist!\n");
+      exit(1);
+    }
+    lead_closest_gen_dR_isLoaded = true;
+  }
+  return lead_closest_gen_dR_;
+}
+
+const float &ttHLeptonic::sublead_closest_gen_dR() {
+  if (not sublead_closest_gen_dR_isLoaded) {
+    if (sublead_closest_gen_dR_branch != 0) {
+      sublead_closest_gen_dR_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_closest_gen_dR_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_closest_gen_dR_isLoaded = true;
+  }
+  return sublead_closest_gen_dR_;
 }
 
 const float &ttHLeptonic::n_ele() {
@@ -2333,6 +2401,10 @@ const float &nb_medium() { return cms3.nb_medium(); }
 const float &nb_tight() { return cms3.nb_tight(); }
 const float &lead_photon_type() { return cms3.lead_photon_type(); }
 const float &sublead_photon_type() { return cms3.sublead_photon_type(); }
+const float &lead_closest_gen_Pt() { return cms3.lead_closest_gen_Pt(); }
+const float &sublead_closest_gen_Pt() { return cms3.sublead_closest_gen_Pt(); }
+const float &lead_closest_gen_dR() { return cms3.lead_closest_gen_dR(); }
+const float &sublead_closest_gen_dR() { return cms3.sublead_closest_gen_dR(); }
 const float &n_ele() { return cms3.n_ele(); }
 const float &ele1_pt() { return cms3.ele1_pt(); }
 const float &ele2_pt() { return cms3.ele2_pt(); }
