@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa__ttH_Babies_v3.7/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
+// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8__ttH_Babies_v3.8/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
 
 #ifndef ttHHadronic_H
 #define ttHHadronic_H
@@ -331,6 +331,51 @@ class ttHHadronic {
   float    jet15_phi_;
   TBranch *jet15_phi_branch;
   bool     jet15_phi_isLoaded;
+  float    jet1_bdiscriminant_;
+  TBranch *jet1_bdiscriminant_branch;
+  bool     jet1_bdiscriminant_isLoaded;
+  float    jet2_bdiscriminant_;
+  TBranch *jet2_bdiscriminant_branch;
+  bool     jet2_bdiscriminant_isLoaded;
+  float    jet3_bdiscriminant_;
+  TBranch *jet3_bdiscriminant_branch;
+  bool     jet3_bdiscriminant_isLoaded;
+  float    jet4_bdiscriminant_;
+  TBranch *jet4_bdiscriminant_branch;
+  bool     jet4_bdiscriminant_isLoaded;
+  float    jet5_bdiscriminant_;
+  TBranch *jet5_bdiscriminant_branch;
+  bool     jet5_bdiscriminant_isLoaded;
+  float    jet6_bdiscriminant_;
+  TBranch *jet6_bdiscriminant_branch;
+  bool     jet6_bdiscriminant_isLoaded;
+  float    jet7_bdiscriminant_;
+  TBranch *jet7_bdiscriminant_branch;
+  bool     jet7_bdiscriminant_isLoaded;
+  float    jet8_bdiscriminant_;
+  TBranch *jet8_bdiscriminant_branch;
+  bool     jet8_bdiscriminant_isLoaded;
+  float    jet9_bdiscriminant_;
+  TBranch *jet9_bdiscriminant_branch;
+  bool     jet9_bdiscriminant_isLoaded;
+  float    jet10_bdiscriminant_;
+  TBranch *jet10_bdiscriminant_branch;
+  bool     jet10_bdiscriminant_isLoaded;
+  float    jet11_bdiscriminant_;
+  TBranch *jet11_bdiscriminant_branch;
+  bool     jet11_bdiscriminant_isLoaded;
+  float    jet12_bdiscriminant_;
+  TBranch *jet12_bdiscriminant_branch;
+  bool     jet12_bdiscriminant_isLoaded;
+  float    jet13_bdiscriminant_;
+  TBranch *jet13_bdiscriminant_branch;
+  bool     jet13_bdiscriminant_isLoaded;
+  float    jet14_bdiscriminant_;
+  TBranch *jet14_bdiscriminant_branch;
+  bool     jet14_bdiscriminant_isLoaded;
+  float    jet15_bdiscriminant_;
+  TBranch *jet15_bdiscriminant_branch;
+  bool     jet15_bdiscriminant_isLoaded;
   float    bjet1_csv_;
   TBranch *bjet1_csv_branch;
   bool     bjet1_csv_isLoaded;
@@ -471,6 +516,21 @@ void LoadAllBranches();
   const float &jet13_phi();
   const float &jet14_phi();
   const float &jet15_phi();
+  const float &jet1_bdiscriminant();
+  const float &jet2_bdiscriminant();
+  const float &jet3_bdiscriminant();
+  const float &jet4_bdiscriminant();
+  const float &jet5_bdiscriminant();
+  const float &jet6_bdiscriminant();
+  const float &jet7_bdiscriminant();
+  const float &jet8_bdiscriminant();
+  const float &jet9_bdiscriminant();
+  const float &jet10_bdiscriminant();
+  const float &jet11_bdiscriminant();
+  const float &jet12_bdiscriminant();
+  const float &jet13_bdiscriminant();
+  const float &jet14_bdiscriminant();
+  const float &jet15_bdiscriminant();
   const float &bjet1_csv();
   const float &bjet2_csv();
   const float &tthMVA();
@@ -594,6 +654,21 @@ namespace tas {
   const float &jet13_phi();
   const float &jet14_phi();
   const float &jet15_phi();
+  const float &jet1_bdiscriminant();
+  const float &jet2_bdiscriminant();
+  const float &jet3_bdiscriminant();
+  const float &jet4_bdiscriminant();
+  const float &jet5_bdiscriminant();
+  const float &jet6_bdiscriminant();
+  const float &jet7_bdiscriminant();
+  const float &jet8_bdiscriminant();
+  const float &jet9_bdiscriminant();
+  const float &jet10_bdiscriminant();
+  const float &jet11_bdiscriminant();
+  const float &jet12_bdiscriminant();
+  const float &jet13_bdiscriminant();
+  const float &jet14_bdiscriminant();
+  const float &jet15_bdiscriminant();
   const float &bjet1_csv();
   const float &bjet2_csv();
   const float &tthMVA();

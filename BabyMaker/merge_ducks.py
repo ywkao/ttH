@@ -14,6 +14,10 @@ parser.add_argument("--no_signal", action="store_true")
 args = parser.parse_args()
 
 dirs = glob.glob("/hadoop/cms/store/user/smay/ttH/*ttH_Babies_" + args.tag)
+print dirs
+
+os.system("sleep 10s")
+
 
 destination = (os.popen("pwd").read()).rstrip() + "/../Loopers/merged_babies/"
 
