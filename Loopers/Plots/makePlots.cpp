@@ -281,10 +281,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_no_flow();
     c->set_no_log();
     TString output = output_name;
-    if (output.Contains("Leptonic"))
-      c->set_y_lim_range({0,12});
-    else
-      c->set_y_lim_range({0,15});
+    //if (output.Contains("Leptonic"))
+    //  c->set_y_lim_range({0,12});
+    //else
+    //  c->set_y_lim_range({0,15});
     c->set_x_bin_range({1,80});
     cout << "Data yield in [100,120], [130,180]: " << hData->Integral() << endl;
     cout << "Data yield in [115, 120], [130, 135]: " << hData->Integral(16,20) + hData->Integral(31,35) << endl;
@@ -379,10 +379,13 @@ int main(int argc, char* argv[])
   TFile* f7 = new TFile("../ttHHadronicCustom_histograms.root");
   string output_name_hadronic_custom = "ttHHadronicCustom_plots_" + type_s + ".pdf";
 
-  vector<TFile*> vFiles = {f1, f2, f3, f4, f7};
+  TFile* f8 = new TFile("../ttHLeptonicCustom_histograms.root");
+  string output_name_leptonic_custom = "ttHLeptonicCustom_plots_" + type_s + ".pdf";
+
+  vector<TFile*> vFiles = {f1, f2, f3, f4, f7, f8};
   //vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6};
   //vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_leptonic_ttbar_cr, output_name_leptonic_v2};
-  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_hadronic_custom};
+  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_hadronic_custom, output_name_leptonic_custom};
 
   vector<TString> vBkgs;
   if (type == "std" || type == "shape") { 
@@ -470,6 +473,9 @@ int main(int argc, char* argv[])
 
     if (vNames[i] == "ttHHadronicLoose_plots_" + type_s + ".pdf" || vNames[i] == "ttHHadronicCustom_plots_" + type_s + ".pdf")
       make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA", "Hadronic MVA Score", vBkgs, 1, type); 
+
+    if (vNames[i] == "ttHLeptonicLoose_plots_" + type_s + ".pdf" || vNames[i] == "ttHLeptonicCustom_plots_" + type_s + ".pdf")
+      make_plot(c1, vFiles[i], vNames[i], "hLeptonicMVA", "Leptonic MVA Score", vBkgs, 1, type);
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type);
   }

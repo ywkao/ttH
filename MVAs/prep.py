@@ -4,8 +4,13 @@ import ROOT
 import numpy
 import root_numpy
 
-baby_file = "../Loopers/MVABaby_ttHHadronic.root"
-output_file = "ttHHadronic_features.hdf5"
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("tag", help = "e.g. Hadronic or Leptonic", type=str)
+args = parser.parse_args()
+
+baby_file = "../Loopers/MVABaby_ttH" + args.tag + ".root"
+output_file = "ttH" + args.tag + "_features.hdf5"
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
@@ -13,6 +18,8 @@ tree = f.Get("t")
 # load tree to array
 feature_names = (root_numpy.tree2array(tree, branches = ["mva_branches"], start=0, stop=1))[0][0]
 feature_names = list(feature_names) 
+
+print feature_names
 
 branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "process_id_"]))
 

@@ -11,8 +11,13 @@ from sklearn import metrics
 import utils
 import tmva_utils
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("tag", help = "e.g. Hadronic or Leptonic", type=str)
+args = parser.parse_args()
+
 # Read features
-f = h5py.File("ttHHadronic_features.hdf5")
+f = h5py.File("ttH" + args.tag + "_features.hdf5")
 
 global_features = f['global']
 feature_names = f['feature_names']
@@ -24,7 +29,7 @@ label = numpy.asarray(label)
 weights = numpy.asarray(weights)
 feature_names = numpy.asarray(feature_names)
 
-train_frac = 0.8 # use this fraction of data for training, use 1-train_frac for testing
+train_frac = 0.95 # use this fraction of data for training, use 1-train_frac for testing
 nTrain = int(len(label)*train_frac)
 
 print global_features.shape
@@ -39,14 +44,22 @@ X_test = pandas.DataFrame(data=x_test, columns = feature_names)
 d_train = xgboost.DMatrix(X_train, label = y_train, weight = weights_train)
 d_test = xgboost.DMatrix(X_test, label = y_test)
 
+sum_neg_weights = utils.sum_of_weights(weights, label, 0)
+sum_pos_weights = utils.sum_of_weights(weights, label, 1)
+
+print sum_pos_weights, sum_neg_weights
+
 # Define BDT parameters
 param = { 
     	'max_depth': 5,
-	'eta': 0.5,
+	'eta': 0.1,
 	'objective': 'binary:logistic',
+	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
+	'subsample': 1.0,
+	'colsample_bytree': 1.0,
 	}
 
-n_round = 500
+n_round = 300
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -56,16 +69,17 @@ progress = {}
 #model.fit(x_train, y_train)
 bdt = xgboost.train(param, d_train, n_round, evallist, evals_result = progress)	
 
-bdt.save_model("hadronic_bdt.xgb")
+bdt.save_model(args.tag + "_bdt.xgb")
 model = bdt.get_dump()
 
-with open("model.json", "w") as fhout:
-    fhout.write("[\n"+",\n".join(bdt.get_dump(dump_format="json"))+"\n]")
+# save to json format a la Nick
+#with open("model.json", "w") as fhout:
+#    fhout.write("[\n"+",\n".join(bdt.get_dump(dump_format="json"))+"\n]")
 
 input_variables = []
 for name in feature_names:
   input_variables.append((name, 'F'))
-tmva_utils.convert_model(model, input_variables = input_variables, output_xml = 'hadronic_bdt.xml')
+tmva_utils.convert_model(model, input_variables = input_variables, output_xml = args.tag + '_bdt.xml')
 
 # predict
 pred_train = bdt.predict(d_train)
@@ -90,7 +104,7 @@ import matplotlib.pyplot as plt
 fig = plt.figure()
 xgboost.plot_importance(bdt)
 plt.tight_layout()
-plt.savefig('feature_importance.pdf')
+plt.savefig('feature_importance_' + args.tag + '.pdf')
 
 # make ROC curve #
 fig = plt.figure()
@@ -109,4 +123,4 @@ plt.ylim([0.3, 1.05])
 plt.xlabel('False Positive Rate (background efficiency)')
 plt.ylabel('True Positive Rate (signal efficiency)')
 plt.legend(loc='lower right')
-plt.savefig('plot.pdf', bbox_inches='tight')
+plt.savefig('roc' + args.tag + '.pdf', bbox_inches='tight')

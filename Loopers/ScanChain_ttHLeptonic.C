@@ -18,6 +18,9 @@
 #include "ttHLooper.h"
 #include "scale1fb/scale1fb.h"
 
+// tmva
+#include "TMVA/Reader.h"
+
 using namespace std;
 using namespace tas;
 
@@ -44,6 +47,78 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   TFile *currentFile = 0;
 
   int nLowID = 0;
+
+  unique_ptr<TMVA::Reader> mva;
+  float njets_;
+  float ht_;
+  float leadptoM_;
+  float subleadptoM_;
+  float leadIDMVA_;
+  float subleadIDMVA_;
+  float lead_eta_;
+  float sublead_eta_;
+
+  float jet1_pt_;
+  float jet1_eta_;
+  float jet1_btag_;
+  float jet2_pt_;
+  float jet2_eta_;
+  float jet2_btag_;
+  float jet3_pt_;
+  float jet3_eta_;
+  float jet3_btag_;
+  float jet4_pt_;
+  float jet4_eta_;
+  float jet4_btag_;
+  float jet5_pt_;
+  float jet5_eta_;
+  float jet5_btag_;
+
+  float leadPSV_;
+  float subleadPSV_;
+
+  float dipho_cosphi_;
+  float dipho_rapidity_;
+  float met_;
+  float mt_; 
+
+  mva.reset(new TMVA::Reader( "!Color:Silent" ));
+  mva->AddVariable("njets_", &njets_);
+  mva->AddVariable("ht_", &ht_);
+  mva->AddVariable("leadptoM_", &leadptoM_);
+  mva->AddVariable("subleadptoM_", &subleadptoM_);
+  mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+  mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
+  mva->AddVariable("lead_eta_", &lead_eta_);
+  mva->AddVariable("sublead_eta_", &sublead_eta_);
+
+  mva->AddVariable("jet1_pt_", &jet1_pt_);
+  mva->AddVariable("jet1_eta_", &jet1_eta_);
+  mva->AddVariable("jet1_btag_", &jet1_btag_);
+  mva->AddVariable("jet2_pt_", &jet2_pt_);
+  mva->AddVariable("jet2_eta_", &jet2_eta_);
+  mva->AddVariable("jet2_btag_", &jet2_btag_);
+  mva->AddVariable("jet3_pt_", &jet3_pt_);
+  mva->AddVariable("jet3_eta_", &jet3_eta_);
+  mva->AddVariable("jet3_btag_", &jet3_btag_);
+  mva->AddVariable("jet4_pt_", &jet4_pt_);
+  mva->AddVariable("jet4_eta_", &jet4_eta_);
+  mva->AddVariable("jet4_btag_", &jet4_btag_);
+  mva->AddVariable("jet5_pt_", &jet5_pt_);
+  mva->AddVariable("jet5_eta_", &jet5_eta_);
+  mva->AddVariable("jet5_btag_", &jet5_btag_);
+
+  mva->AddVariable("leadPSV_", &leadPSV_);
+  mva->AddVariable("subleadPSV_", &subleadPSV_);
+
+  mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
+  mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
+  mva->AddVariable("met_", &met_);
+  mva->AddVariable("mt_", &mt_);
+
+  mva->BookMVA("BDT", "../MVAs/Leptonic_bdt.xml");
+
+
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
@@ -83,6 +158,66 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       // Blinded region 
       if (isData && blind && mass() > 120 && mass() < 130)        continue;
 
+      // Apply preselection before calculating MVA value
+      if (mass() < 100)                continue;
+      if (n_jets() < 2)               continue;
+      if (nb_loose() < 1)             continue;
+      if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+
+      // Calculate MVA value
+      double ht = 0;
+      ht += jet_pt1() > 0 ? jet_pt1() : 0;
+      ht += jet_pt2() > 0 ? jet_pt2() : 0;
+      ht += jet_pt3() > 0 ? jet_pt3() : 0;
+      ht += jet_pt4() > 0 ? jet_pt4() : 0;
+      ht += jet_pt5() > 0 ? jet_pt5() : 0;
+      ht += jet_pt6() > 0 ? jet_pt6() : 0;
+      ht += jet_pt7() > 0 ? jet_pt7() : 0;
+      ht += jet_pt8() > 0 ? jet_pt8() : 0;
+      ht += jet_pt9() > 0 ? jet_pt9() : 0;
+      ht += jet_pt10() > 0 ? jet_pt10() : 0;
+      ht += jet_pt11() > 0 ? jet_pt11() : 0;
+      ht += jet_pt12() > 0 ? jet_pt12() : 0;
+      ht += jet_pt13() > 0 ? jet_pt13() : 0;
+      ht += jet_pt14() > 0 ? jet_pt14() : 0;
+      ht += jet_pt15() > 0 ? jet_pt15() : 0;
+      ht_ = ht;
+
+      njets_ = n_jets();
+      //nbjets_ = nb_medium();
+      jet1_pt_ = jet_pt1();
+      jet1_eta_ = jet_eta1();
+      jet1_btag_ = jet_bdiscriminant1();
+      jet2_pt_ = jet_pt2();
+      jet2_eta_ = jet_eta2();
+      jet2_btag_ = jet_bdiscriminant2();
+      jet3_pt_ = jet_pt3();
+      jet3_eta_ = jet_eta3();
+      jet3_btag_ = jet_bdiscriminant3();
+      jet4_pt_ = jet_pt4();
+      jet4_eta_ = jet_eta4();
+      jet4_btag_ = jet_bdiscriminant4();
+      jet5_pt_ = jet_pt5();
+      jet5_eta_ = jet_eta5();
+      jet5_btag_ = jet_bdiscriminant5();
+
+      leadptoM_ = lead_ptoM();
+      subleadptoM_ = sublead_ptoM();
+      leadIDMVA_ = leadIDMVA();
+      subleadIDMVA_ = subleadIDMVA();
+      lead_eta_ = leadEta();
+      sublead_eta_ = subleadEta();
+
+      leadPSV_ = leadPixelSeed();
+      subleadPSV_ = subleadPixelSeed();
+
+      dipho_cosphi_ = dipho_cosphi();
+      dipho_rapidity_ = dipho_rapidity();
+      met_ = MetPt();
+      mt_ = mT();
+
+      float mva_value = mva->EvaluateMVA( "BDT" );
+
       // Selection
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
@@ -90,6 +225,14 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+      else if (tag == "ttHLeptonicCustom") {
+        if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (mva_value < 0.85)	continue;
+      }
+
       else if (tag == "ttHLeptonic") {
 	if (mass() < 100)        continue;
         if (diphoMVARes() < -0.405)        continue;
@@ -217,23 +360,9 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       bool isSignal = processId == 0;
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
 
-      double ht = 0;
-      ht += jet_pt1() > 0 ? jet_pt1() : 0;
-      ht += jet_pt2() > 0 ? jet_pt2() : 0;
-      ht += jet_pt3() > 0 ? jet_pt3() : 0;
-      ht += jet_pt4() > 0 ? jet_pt4() : 0;
-      ht += jet_pt5() > 0 ? jet_pt5() : 0;
-      ht += jet_pt6() > 0 ? jet_pt6() : 0;
-      ht += jet_pt7() > 0 ? jet_pt7() : 0;
-      ht += jet_pt8() > 0 ? jet_pt8() : 0;
-      ht += jet_pt9() > 0 ? jet_pt9() : 0;
-      ht += jet_pt10() > 0 ? jet_pt10() : 0;
-      ht += jet_pt11() > 0 ? jet_pt11() : 0;
-      ht += jet_pt12() > 0 ? jet_pt12() : 0;
-      ht += jet_pt13() > 0 ? jet_pt13() : 0;
-      ht += jet_pt14() > 0 ? jet_pt14() : 0;
-      ht += jet_pt15() > 0 ? jet_pt15() : 0;
 
+
+      vProcess[processId]->fill_histogram("hLeptonicMVA", mva_value, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       vProcess[processId]->fill_histogram("hDiphotonSumPt", dipho_sumpt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
       vProcess[processId]->fill_histogram("hDiphotonCosPhi", dipho_cosphi(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);

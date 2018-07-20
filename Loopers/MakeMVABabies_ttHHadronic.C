@@ -58,7 +58,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
-    bool isSignal = currentFileTitle.Contains("ttH");
+    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -142,6 +142,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
       jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
       jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;     
+      jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
+      jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
+      jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
+      jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
 
       max1_btag_ = bjet1_csv();
       max2_btag_ = bjet2_csv();

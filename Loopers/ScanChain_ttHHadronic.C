@@ -67,6 +67,10 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   float jet3_eta_;
   float jet4_pt_;
   float jet4_eta_;
+  float jet5_pt_;
+  float jet5_eta_;
+  float jet6_pt_;
+  float jet6_eta_;
 
   float max1_btag_;
   float max2_btag_;
@@ -97,6 +101,10 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   mva->AddVariable("jet3_eta_", &jet3_eta_);
   mva->AddVariable("jet4_pt_", &jet4_pt_);
   mva->AddVariable("jet4_eta_", &jet4_eta_);
+  mva->AddVariable("jet5_pt_", &jet5_pt_);
+  mva->AddVariable("jet5_eta_", &jet5_eta_);
+  mva->AddVariable("jet6_pt_", &jet6_pt_);
+  mva->AddVariable("jet6_eta_", &jet6_eta_);
 
   mva->AddVariable("max1_btag_", &max1_btag_);
   mva->AddVariable("max2_btag_", &max2_btag_);
@@ -108,7 +116,7 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
   mva->AddVariable("met_", &met_);
 
-  mva->BookMVA("BDT", "../MVAs/hadronic_bdt.xml");
+  mva->BookMVA("BDT", "../MVAs/Hadronic_bdt.xml");
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
@@ -177,6 +185,10 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
       jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
       jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
+      jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
+      jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
+      jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
+      jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
 
       max1_btag_ = bjet1_csv();
       max2_btag_ = bjet2_csv();
@@ -220,7 +232,7 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
         if (n_jets() < 3)               continue;
         if (nb_loose() < 1)             continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (mva_value < 0.8)		continue;
+	if (mva_value < 0.999)		continue;
       }
       else if (tag == "2017MVAPreSel") {
         if (mass() < 100)       continue;
