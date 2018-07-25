@@ -230,7 +230,7 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
         if (n_jets() < 2)       continue;
         if (nb_loose() < 1)             continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (mva_value < 0.85)	continue;
+	if (mva_value < -0.9)	continue;
       }
 
       else if (tag == "ttHLeptonic") {
@@ -320,6 +320,13 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 	if (nb_medium() < 1)            continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+
+      else if (tag == "quality_photons") {
+	if (leadPixelSeed())    continue;
+        if (subleadPixelSeed()) continue;
+	if (leadIDMVA() < 0.5)         continue;
+        if (subleadIDMVA() < 0.5)         continue;
+      } 
 
 
       else {

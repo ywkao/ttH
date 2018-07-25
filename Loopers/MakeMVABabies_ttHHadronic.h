@@ -33,7 +33,7 @@ class BabyMaker {
     TFile *BabyFile_;
     TTree *BabyTree_;
 
-    vector<string> mva_branches = {"njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet2_pt_", "jet2_eta_", "jet3_pt_", "jet3_eta_", "jet4_pt_", "jet4_eta_", "jet5_pt_", "jet5_eta_", "jet6_pt_", "jet6_eta_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"};
+    vector<string> mva_branches = {"njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"};
     
 
     int 	label_;
@@ -47,16 +47,22 @@ class BabyMaker {
 
     double	jet1_pt_;
     double      jet1_eta_;
+    double 	jet1_btag_;
     double      jet2_pt_;
     double      jet2_eta_;
+    double      jet2_btag_;
     double      jet3_pt_;
     double      jet3_eta_;
+    double      jet3_btag_;
     double      jet4_pt_;
     double      jet4_eta_;
+    double      jet4_btag_;
     double      jet5_pt_;
     double      jet5_eta_;
+    double      jet5_btag_;
     double      jet6_pt_;
     double      jet6_eta_;
+    double      jet6_btag_;
 
     double	max1_btag_;
     double	max2_btag_;
@@ -94,16 +100,22 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("jet1_pt_"            , &jet1_pt_   );
   BabyTree_->Branch("jet1_eta_"            , &jet1_eta_ );
+  BabyTree_->Branch("jet1_btag_"            , &jet1_btag_ );
   BabyTree_->Branch("jet2_pt_"            , &jet2_pt_   );
   BabyTree_->Branch("jet2_eta_"            , &jet2_eta_ );
+  BabyTree_->Branch("jet2_btag_"            , &jet2_btag_ );
   BabyTree_->Branch("jet3_pt_"            , &jet3_pt_   );
   BabyTree_->Branch("jet3_eta_"            , &jet3_eta_ );
+  BabyTree_->Branch("jet3_btag_"            , &jet3_btag_ );
   BabyTree_->Branch("jet4_pt_"            , &jet4_pt_   );
   BabyTree_->Branch("jet4_eta_"            , &jet4_eta_ );
+  BabyTree_->Branch("jet4_btag_"            , &jet4_btag_ );
   BabyTree_->Branch("jet5_pt_"            , &jet5_pt_   );
   BabyTree_->Branch("jet5_eta_"            , &jet5_eta_ );
+  BabyTree_->Branch("jet5_btag_"            , &jet5_btag_ );
   BabyTree_->Branch("jet6_pt_"            , &jet6_pt_   );
   BabyTree_->Branch("jet6_eta_"            , &jet6_eta_ );
+  BabyTree_->Branch("jet6_btag_"            , &jet6_btag_ );
  
   BabyTree_->Branch("max1_btag_"            , &max1_btag_   );
   BabyTree_->Branch("max2_btag_"            , &max2_btag_   );

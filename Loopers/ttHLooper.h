@@ -252,7 +252,7 @@ double sgn(double x) {
 }
 
 void add_samples(TChain* ch) {
-  TString tag = "v3.7";
+  TString tag = "v3.8";
 
   TString location = "merged_babies";
   ch->Add(location + "/DoubleEG__ttH_Babies_" + tag + "/merged_ntuple.root");

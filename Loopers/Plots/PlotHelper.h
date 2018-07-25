@@ -975,6 +975,7 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
     mVHRat[i]->SetStats(0);
     mVHRat[i]->Draw("e1x0, same");
   }
+
 }
 
 inline

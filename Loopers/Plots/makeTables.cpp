@@ -245,10 +245,11 @@ int main(int argc, char* argv[])
   TFile* f10 = new TFile("../ttHLeptonic_blinded_region_v2_histograms.root");
   TFile* f11 = new TFile("../ttHLeptonic_no_veto_histograms.root");
   TFile* f12 = new TFile("../ttHLeptonic_pixel_only_histograms.root");
+  TFile* f13 = new TFile("../quality_photons_histograms.root");
 
   TFile* f_veto_studies = new TFile("../ttHLeptonic_veto_study_histograms.root");
 
-  vector<TFile*> vFiles = {f1, f2, f3, f4};
+  vector<TFile*> vFiles = {f1, f2, f3, f4, f13};
   //vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12};
   vector<TString> vLabels = {"Hadronic", "Leptonic", "Hadronic Loose", "Leptonic Loose", "ttbar cr", "ttbar cr v2", "ttbar cr v3", "Leptonic v2", "ttH Leptonic Blinded Region", "ttH Leptonic Blinded Region + Pixel Seed Veto", "ttH Leptonic no Vetos", "ttH Leptonic Pixel Seed Only"};
 
@@ -267,6 +268,7 @@ int main(int argc, char* argv[])
   make_table_vetos(f_veto_studies, "TTGJets");
 
   make_table_components(f3, "hNVtx", {"DiPhoton", "GammaJets", "QCD"}, "Hadronic Loose", mPhotons, "GenPhoton", false, true);
+  make_table_components(f13, "hNVtx", {"TTGG", "TTGJets", "TTJets"}, "Leptonic Quality Photons", mPhotonsDetail, "GenPhotonDetail");
 
   //make_table_components(f_veto_studies, "hNVtx", vBkgs, "Starting yield", mPhotonLocations, "PhotonLocations", true);
   //make_table_components(f_veto_studies, "hPhotonMinIDMVA_passEVeto", vBkgs, "Passing e-veto", mPhotonLocations, "PhotonLocations", true);

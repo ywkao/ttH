@@ -33,8 +33,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
   // Make baby ntuple
   MakeBabyNtuple( Form("%s.root", "MVABaby_ttHHadronic"));
 
-  // Create "process" objects
-
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;
   unsigned int nEventsChain = chain->GetEntries();
@@ -136,16 +134,22 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       //nbjets_ = nb_medium();
       jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
       jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
+      jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
       jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
       jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
+      jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
       jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
       jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
+      jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
       jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
-      jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;     
+      jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
+      jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;     
       jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
       jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
+      jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
       jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
       jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
+      jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
 
       max1_btag_ = bjet1_csv();
       max2_btag_ = bjet2_csv();

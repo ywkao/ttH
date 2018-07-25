@@ -79,6 +79,7 @@ std::map<int, TString> mLeptonsLatex = {
 
 
 void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, int idx, TString type = "std") {
+
   TH1D* hData = (TH1D*)file->Get(hist_name + "_Data");
   TH1D* hSig = (TH1D*)file->Get(hist_name + "_ttH");
   vector<TH1D*> hBkg;
@@ -280,7 +281,6 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   if (hist_name == "hMassAN") {
     c->set_no_flow();
     c->set_no_log();
-    TString output = output_name;
     //if (output.Contains("Leptonic"))
     //  c->set_y_lim_range({0,12});
     //else
@@ -302,21 +302,29 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
 
   if (output.Contains("HadronicLoose"))
-    c->give_info("ttH Hadronic Loose");
-  else if (output.Contains("Hadronic"))
+    c->give_info("ttH Hadronic Presel.");
+  else if (output.Contains("Hadronic") && !output.Contains("Custom"))
     c->give_info("ttH Hadronic Tag");
+  else if (output.Contains("Hadronic") && output.Contains("Custom")) {
+    c->give_info("ttH Hadronic Presel.");
+  }
   else if (output.Contains("LeptonicLoose"))
-    c->give_info("ttH Leptonic Loose");
+    c->give_info("ttH Leptonic Presel.");
   else if (output.Contains("ttbarCR")) {
     c->give_info("ttH Leptonic");
     c->give_info("t#bar{t}-Enriched Region");
   }
-  else if (output.Contains("Leptonic"))
+  else if (output.Contains("Leptonic") && !output.Contains("Custom"))
     c->give_info("ttH Leptonic Tag");
+  else if (output.Contains("Leptonic") && output.Contains("Custom"))
+    c->give_info("ttH Leptonic Presel.");
   if (output.Contains("PSV")) {
     c->give_info("Pixel Seed Veto");
     c->give_info("        Applied");
   }
+  if (output.Contains("Custom"))
+    c->give_info("Loose MVA cut applied");
+
   if (hist_name.Contains("SigmaIEtaIEta"))      c->set_x_bin_range({1,50});
 
   c->plot(idx);

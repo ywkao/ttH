@@ -52,11 +52,11 @@ print sum_pos_weights, sum_neg_weights
 # Define BDT parameters
 param = { 
     	'max_depth': 5,
-	'eta': 0.1,
+	'eta': 0.2,
 	'objective': 'binary:logistic',
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
-	'subsample': 1.0,
-	'colsample_bytree': 1.0,
+	'subsample': 0.8,
+	'colsample_bytree': 0.8,
 	}
 
 n_round = 300

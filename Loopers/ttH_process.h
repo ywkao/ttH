@@ -9,6 +9,8 @@ const int nGenLeptonCats = 6;
 const int nGenPhotonCats = 3;
 const int nGenPhotonDetailCats = 6;
 const int nPhotonLocations = 3;
+const int nMVACategories = 2;
+
 
 class Process
 {
@@ -17,7 +19,8 @@ class Process
     ~Process();  
 
     void add_histogram(TString name, int nBins, double xLow, double xHigh);
-    void fill_histogram(TString name, double value, double weight, int genLeptonId = -1, int genPhotonId = -1, int genPhotonDetailId = -1, int photonLocationId = -1);
+    void fill_histogram(TString name, double value, double weight, int genLeptonId = -1, int genPhotonId = -1, int genPhotonDetailId = -1, int photonLocationId = -1, int mvaCategoryId = -1);
+    void fill_histogram(TString name, double value, double weight, vector<int> vId);
 
   private:
     TFile* mFile;
@@ -34,6 +37,9 @@ class Process
 
     bool mPhotonLocations;
     vector<vector<TH1D*>> mHPhotonLocations;
+
+    bool mMVACategories;
+    vector<vector<TH1D*>> mHMVACategories;
     
     std::map<TString, int> mMap;
 };
@@ -58,6 +64,11 @@ inline Process::~Process()
     for (int j = 0; j < mHPhotonLocations[i].size(); j++) 
     delete mHPhotonLocations[i][j];
   }
+  for (int i = 0; i < mHMVACategories.size(); i ++ ) {
+    for (int j = 0; j < mHMVACategories[i].size(); j++)
+    delete mHMVACategories[i][j];
+  }
+
 }
 
 inline Process::Process(TFile* f, TString name) 
@@ -69,6 +80,7 @@ inline Process::Process(TFile* f, TString name)
   mGenPhoton = true;
   mGenPhotonDetail = true;
   mPhotonLocations = true; 
+  mMVACategories = true;
 }
 
 inline void Process::add_histogram(TString name, int nBins, double xLow, double xHigh)
@@ -112,10 +124,20 @@ inline void Process::add_histogram(TString name, int nBins, double xLow, double 
     mHPhotonLocations.push_back(vTemp);
   }
 
+  if (mMVACategories) {
+    vector<TH1D*> vTemp;
+    for (int i = 0; i < nMVACategories; i++) {
+      vTemp.push_back(new TH1D(name + "_" + mName + "MVACategories_" + to_string(i), "", nBins, xLow, xHigh));
+      vTemp[i]->Sumw2();
+    }
+    mHMVACategories.push_back(vTemp);
+  }
+
+
   mMap[name] = mH.size() - 1;
 }
 
-inline void Process::fill_histogram(TString name, double value, double weight, int genLeptonId, int genPhotonId, int genPhotonDetailId, int photonLocationId)
+inline void Process::fill_histogram(TString name, double value, double weight, int genLeptonId, int genPhotonId, int genPhotonDetailId, int photonLocationId, int mvaCategoryId)
 {
   int idx = mMap.find(name)->second;
   mH[idx]->Fill(value, weight);
@@ -128,6 +150,31 @@ inline void Process::fill_histogram(TString name, double value, double weight, i
     mHGenPhotonDetailComp[idx][genPhotonDetailId]->Fill(value, weight);
   if (photonLocationId >= 0)
     mHPhotonLocations[idx][photonLocationId]->Fill(value, weight);
+  if (mvaCategoryId >= 0)
+    mHPhotonLocations[idx][mvaCategoryId]->Fill(value, weight);  
+}
+
+inline void Process::fill_histogram(TString name, double value, double weight, vector<int> vId)
+{
+  int idx = mMap.find(name)->second;
+  mH[idx]->Fill(value, weight);
+
+  int genLeptonId = vId.size() > 0 ? vId[0] : -1;
+  int genPhotonId = vId.size() > 1 ? vId[1] : -1;
+  int genPhotonDetailId = vId.size() > 2 ? vId[2] : -1;
+  int photonLocationId = vId.size() > 3 ? vId[3]: -1;
+  int mvaCategoryId = vId.size() > 4 ? vId[4]: -1;
+
+  if (genLeptonId >= 0)
+    mHGenLeptonComp[idx][genLeptonId]->Fill(value, weight);
+  if (genPhotonId >= 0)
+    mHGenPhotonComp[idx][genPhotonId]->Fill(value, weight);
+  if (genPhotonDetailId >= 0)
+    mHGenPhotonDetailComp[idx][genPhotonDetailId]->Fill(value, weight);
+  if (photonLocationId >= 0)
+    mHPhotonLocations[idx][photonLocationId]->Fill(value, weight);
+  if (mvaCategoryId >= 0)
+    mHPhotonLocations[idx][mvaCategoryId]->Fill(value, weight);
 }
 
 #endif // _TTH_PROCESS_H_
