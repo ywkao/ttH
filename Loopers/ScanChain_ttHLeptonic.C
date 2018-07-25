@@ -17,6 +17,7 @@
 #include "ttHLeptonic.cc"
 #include "ttHLooper.h"
 #include "scale1fb/scale1fb.h"
+#include "MakeMVAOptimizationBabies.h"
 
 // tmva
 #include "TMVA/Reader.h"
@@ -33,6 +34,10 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
+
+  // Make MVA Optimization Baby
+  BabyMaker* baby = new BabyMaker();
+  baby->MakeBabyNtuple( Form("%s.root", "Optimization/MVAOptimizationBaby_ttHLeptonic"));
 
   // Create "process" objects
   vector<Process*> vProcess = generate_processes(f1);
@@ -133,6 +138,7 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG");
+    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -217,6 +223,22 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       mt_ = mT();
 
       float mva_value = mva->EvaluateMVA( "BDT" );
+      // Fill mva baby before any selections
+      int processId = categorize_process(currentFileTitle);
+      int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
+      int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
+      int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
+      int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
+      int mvaCategoryId = mva_value < -0.92 ? 0 : 1;
+
+      // Fill histograms //
+      double evt_weight = 1;
+      if (!isData)
+        evt_weight = scale1fb(currentFileTitle) * targetLumi * sgn(weight());
+
+      int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+      baby->FillBabyNtuple(label, evt_weight, processId, mass(), mva_value);
+
 
       // Selection
       if (tag == "ttHLeptonicLoose") {
@@ -333,208 +355,184 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
         cout << "Did not recognize tag name" << endl;
       } 
 
-      // Decide what type of sample this is
-      int processId = categorize_process(currentFileTitle);
-      int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
-      int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
-      int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
-      int photonLocationId = categorize_photon_locations(leadEta(), subleadEta()); 
 
-      // Fill histograms //
-      double evt_weight = 1;
-      if (!isData)
-        evt_weight = scale1fb(currentFileTitle) * targetLumi * sgn(weight());
-
-     
-      //cout << currentFileTitle << " has weight: " << evt_weight << endl;
-
-      cout.setf(ios::fixed);
-      cout << std::setprecision(6);
-      if (isData && mass() >= 100 && mass() <= 180) {
-        cout << mass() << endl;     
-        //cout << mass() << " , run: " << run() << "  , lumi: " << lumi() << "  , event: " << tas::event() << endl;
-      } 
-
-      if (isData && (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)) {
-	nLowID++;
-      }
+      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
 
       // General
-      vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
 
       // Skip blinded region for MC after filling mass histogram
-      bool isSignal = processId == 0;
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
 
 
 
-      vProcess[processId]->fill_histogram("hLeptonicMVA", mva_value, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hDiphotonSumPt", dipho_sumpt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hDiphotonCosPhi", dipho_cosphi(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      vProcess[processId]->fill_histogram("hLeptonicMVA", mva_value, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hDiphotonSumPt", dipho_sumpt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hDiphotonCosPhi", dipho_cosphi(), evt_weight, vId);
 
-      vProcess[processId]->fill_histogram("hNVtx", nvtx(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hMetPt", MetPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hHT", ht, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      vProcess[processId]->fill_histogram("hNVtx", nvtx(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMetPt", MetPt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hHT", ht, evt_weight, vId);
 
-      vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hNbJets", nb_loose(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hMT", mT(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (jet_pt1() != -100)      vProcess[processId]->fill_histogram("hJet1pT", jet_pt1(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (jet_pt2() != -100)      vProcess[processId]->fill_histogram("hJet2pT", jet_pt2(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (jet_pt3() != -100)      vProcess[processId]->fill_histogram("hJet3pT", jet_pt3(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (jet_pt4() != -100)      vProcess[processId]->fill_histogram("hJet4pT", jet_pt4(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNbJets", nb_loose(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMT", mT(), evt_weight, vId);
+      if (jet_pt1() != -100)      vProcess[processId]->fill_histogram("hJet1pT", jet_pt1(), evt_weight, vId);
+      if (jet_pt2() != -100)      vProcess[processId]->fill_histogram("hJet2pT", jet_pt2(), evt_weight, vId);
+      if (jet_pt3() != -100)      vProcess[processId]->fill_histogram("hJet3pT", jet_pt3(), evt_weight, vId);
+      if (jet_pt4() != -100)      vProcess[processId]->fill_histogram("hJet4pT", jet_pt4(), evt_weight, vId);
 
-      if (jet_pt1() != -100)      vProcess[processId]->fill_histogram("hJet1Eta", jet_eta1(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (jet_pt2() != -100)      vProcess[processId]->fill_histogram("hJet2Eta", jet_eta2(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (jet_pt3() != -100)      vProcess[processId]->fill_histogram("hJet3Eta", jet_eta3(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (jet_pt4() != -100)      vProcess[processId]->fill_histogram("hJet4Eta", jet_eta4(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      if (jet_pt1() != -100)      vProcess[processId]->fill_histogram("hJet1Eta", jet_eta1(), evt_weight, vId);
+      if (jet_pt2() != -100)      vProcess[processId]->fill_histogram("hJet2Eta", jet_eta2(), evt_weight, vId);
+      if (jet_pt3() != -100)      vProcess[processId]->fill_histogram("hJet3Eta", jet_eta3(), evt_weight, vId);
+      if (jet_pt4() != -100)      vProcess[processId]->fill_histogram("hJet4Eta", jet_eta4(), evt_weight, vId);
 
-      if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hbJet1pT", bjet1_pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hbJet2pT", bjet2_pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hbJet1pT", bjet1_pt(), evt_weight, vId);
+      if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hbJet2pT", bjet2_pt(), evt_weight, vId);
 
-      if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, vId);
+      if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, vId);
 
       // Leading Photon
-      vProcess[processId]->fill_histogram("hPhotonLeadPt", leadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadEt", leadEt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadEta", leadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadPhi", leadPhi(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadSigmaIEtaIEta", lead_sieie(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadHOverE", lead_hoe(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadR9", leadR9(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadIDMVA", leadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadPToM", lead_ptoM(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonLeadSigmaEOverE", lead_sigmaEoE(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      vProcess[processId]->fill_histogram("hPhotonLeadPt", leadPt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadEt", leadEt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadEta", leadEta(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadPhi", leadPhi(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadSigmaIEtaIEta", lead_sieie(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadHOverE", lead_hoe(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadR9", leadR9(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadIDMVA", leadIDMVA(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadPToM", lead_ptoM(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadSigmaEOverE", lead_sigmaEoE(), evt_weight, vId);
 
       if (lead_closest_gen_dR() < 999) {
-        vProcess[processId]->fill_histogram("hPhotonLeadPtGen", lead_closest_gen_Pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonPtRatio", leadPt() / lead_closest_gen_Pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonDeltaRGen", lead_closest_gen_dR(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonLeadPtGen", lead_closest_gen_Pt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonPtRatio", leadPt() / lead_closest_gen_Pt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonDeltaRGen", lead_closest_gen_dR(), evt_weight, vId);
       }
       
       // Subleading Photon
-      vProcess[processId]->fill_histogram("hPhotonSubleadPt", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadEt", subleadEt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadEta", subleadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadPhi", subleadPhi(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadSigmaIEtaIEta", sublead_sieie(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadHOverE", sublead_hoe(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadR9", subleadR9(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId); 
+      vProcess[processId]->fill_histogram("hPhotonSubleadPt", subleadPt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadEt", subleadEt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadEta", subleadEta(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadPhi", subleadPhi(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadSigmaIEtaIEta", sublead_sieie(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadHOverE", sublead_hoe(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadR9", subleadR9(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadIDMVA(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, vId); 
 
       if (sublead_closest_gen_dR() < 999) {
-        vProcess[processId]->fill_histogram("hPhotonSubleadPtGen", sublead_closest_gen_Pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonPtRatio", subleadPt() / sublead_closest_gen_Pt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonDeltaRGen", sublead_closest_gen_dR(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonSubleadPtGen", sublead_closest_gen_Pt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonPtRatio", subleadPt() / sublead_closest_gen_Pt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonDeltaRGen", sublead_closest_gen_dR(), evt_weight, vId);
       }
 
       double maxID = leadIDMVA() >= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       double minID = leadIDMVA() >= subleadIDMVA() ? subleadIDMVA() : leadIDMVA();
 
-      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse", minID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse", maxID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-      vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse", minID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse", maxID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, vId);
      
       if (lead_photon_type() == 1) {
-	vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", leadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_prompt", leadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_prompt", leadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", leadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_prompt", leadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_prompt", leadEta(), evt_weight, vId);
       }
       else if (lead_photon_type() == 2) {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_elec", leadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_elec", leadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_elec", leadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_elec", leadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_elec", leadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_elec", leadEta(), evt_weight, vId);
       }
       else if (lead_photon_type() == 3) {
-	vProcess[processId]->fill_histogram("hPhotonIDMVA_fake", leadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_fake", leadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_fake", leadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonIDMVA_fake", leadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_fake", leadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_fake", leadEta(), evt_weight, vId);
       }
 
       if (sublead_photon_type() == 1) {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_prompt", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_prompt", subleadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", subleadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_prompt", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_prompt", subleadEta(), evt_weight, vId);
       }
       else if (sublead_photon_type() == 2) {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_elec", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_elec", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_elec", subleadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_elec", subleadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_elec", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_elec", subleadEta(), evt_weight, vId);
       }
       else if (sublead_photon_type() == 3) {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_fake", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_fake", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_fake", subleadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_fake", subleadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_fake", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_fake", subleadEta(), evt_weight, vId);
       }
 
 
       // Fill veto study histograms
       if (leadPassEVeto()) {
-	vProcess[processId]->fill_histogram("hPhotonIDMVA_passEVeto", leadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_passEVeto", leadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonEta_passEVeto", leadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonIDMVA_passEVeto", leadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_passEVeto", leadPt(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonEta_passEVeto", leadEta(), evt_weight, vId);
       }
       else {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_failEVeto", leadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_failEVeto", leadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonEta_failEVeto", leadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_failEVeto", leadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_failEVeto", leadPt(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonEta_failEVeto", leadEta(), evt_weight, vId);
       }
       if (subleadPassEVeto()) {
-	vProcess[processId]->fill_histogram("hPhotonIDMVA_passEVeto", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);	
-	vProcess[processId]->fill_histogram("hPhotonPt_passEVeto", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_passEVeto", subleadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonIDMVA_passEVeto", subleadIDMVA(), evt_weight, vId);	
+	vProcess[processId]->fill_histogram("hPhotonPt_passEVeto", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_passEVeto", subleadEta(), evt_weight, vId);
       }
       else {
-	vProcess[processId]->fill_histogram("hPhotonIDMVA_failEVeto", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_failEVeto", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_failEVeto", subleadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonIDMVA_failEVeto", subleadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_failEVeto", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_failEVeto", subleadEta(), evt_weight, vId);
       }
 
       if (!leadPixelSeed()) {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_passPSV", leadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_passPSV", leadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_passPSV", leadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_passPSV", leadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_passPSV", leadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_passPSV", leadEta(), evt_weight, vId);
       }
       else {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_failPSV", leadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_failPSV", leadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_failPSV", leadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_failPSV", leadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_failPSV", leadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_failPSV", leadEta(), evt_weight, vId);
       }
       if (!subleadPixelSeed()) {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_passPSV", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_passPSV", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_passPSV", subleadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_passPSV", subleadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_passPSV", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_passPSV", subleadEta(), evt_weight, vId);
       }
       else {
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_failPSV", subleadIDMVA(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-	vProcess[processId]->fill_histogram("hPhotonPt_failPSV", subleadPt(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
-        vProcess[processId]->fill_histogram("hPhotonEta_failPSV", subleadEta(), evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonIDMVA_failPSV", subleadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonPt_failPSV", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonEta_failPSV", subleadEta(), evt_weight, vId);
       }
 
 
       if (leadPixelSeed() || subleadPixelSeed()) 
-	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_failPSV", minID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_failPSV", minID, evt_weight, vId);
       else
-	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_passPSV", minID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_passPSV", minID, evt_weight, vId);
 
       // pass E-veto
       if (leadPassEVeto() && subleadPassEVeto())
-        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_passEVeto", minID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_passEVeto", minID, evt_weight, vId);
       else
-	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_failEVeto", minID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_failEVeto", minID, evt_weight, vId);
 
       // pass both
       if ((!leadPixelSeed() && !subleadPixelSeed()) && (leadPassEVeto() && subleadPassEVeto()))
-        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_passBothVeto", minID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_passBothVeto", minID, evt_weight, vId);
       else
-	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_failBothVeto", minID, evt_weight, genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId);
+	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_failBothVeto", minID, evt_weight, vId);
 
     }
   

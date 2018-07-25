@@ -282,7 +282,6 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
         cout << "Did not recognize tag name" << endl;
       }
  
-      // Decide what type of sample this is
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
 
       // Fill histograms //
