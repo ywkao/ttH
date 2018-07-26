@@ -38,9 +38,9 @@ def calc_sigma_eff(signal_data, weights, idx):
   plt.plot(x_plot, gaus(x_plot, *popt), 'r-', label = 'fit')
   plt.errorbar(x_fit, y_fit, yerr = y_err, label = 'ttH', fmt = 'o')
   plt.legend(loc = 'upper right')
-  plt.savefig("bkg_fits/sig_fit_%d.pdf" % idx)
   plt.xlabel(r'$m_{\gamma \gamma}$ [GeV]')
   plt.ylabel("Events/1 GeV")
+  plt.savefig("bkg_fits/sig_fit_%d.pdf" % idx)
   plt.xlim([120, 130])
   plt.close()
 
