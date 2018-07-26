@@ -39,6 +39,8 @@ def calc_sigma_eff(signal_data, weights, idx):
   plt.errorbar(x_fit, y_fit, yerr = y_err, label = 'ttH', fmt = 'o')
   plt.legend(loc = 'upper right')
   plt.savefig("bkg_fits/sig_fit_%d.pdf" % idx)
+  plt.xlabel(r'$m_{\gamma \gamma}$ [GeV]')
+  plt.ylabel("Events/1 GeV")
   plt.xlim([120, 130])
   plt.close()
 
@@ -59,7 +61,7 @@ def fit_exp(data, mean_eff, sigma_eff, idx):
     y_fit.append(h.GetBinContent(i+1))
   popt, pcov = curve_fit(exp, x_fit, y_fit, p0 = [10, 0.01])
 
-  bkg_pred = quad(exp, mean_eff - (1.675*sigma_eff), mean_eff + (1.675*sigma_eff), args = (popt[0], popt[1]))[0]
+  bkg_pred = quad(exp, mean_eff - (1.645*sigma_eff), mean_eff + (1.645*sigma_eff), args = (popt[0], popt[1]))[0]
 
   fig = plt.figure()
   x = numpy.linspace(100, 180, 80)
@@ -67,6 +69,8 @@ def fit_exp(data, mean_eff, sigma_eff, idx):
   plt.errorbar(x_fit, y_fit, yerr = numpy.sqrt(y_fit), label = 'data', fmt='o')  
   plt.legend(loc='upper right')
   plt.xlim([100, 180])
+  plt.xlabel(r'$m_{\gamma \gamma}$ [GeV]')
+  plt.ylabel("Events/1 GeV")
   plt.savefig("bkg_fits/bkg_fit_%d.pdf" % idx)
   plt.close()
 
