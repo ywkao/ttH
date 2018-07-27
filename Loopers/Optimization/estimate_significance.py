@@ -50,7 +50,17 @@ sig_data = []
 # for each signal efficiency between 0-100%, calculate Z_A
 selection_signal = "label_ == 1"
 selection_bkg = "label_ == 0"
-selection_data = "label_ == 2"
+selection_data = "label_ == 2 && mass_ >= 100 && mass_ <= 180"
+
+
+#print Z_A(2.18, 0.94)
+#print Z_A(1.77, 3.9)
+#print Z_A(2.44, 17.11)
+#print Z_A(1.56, 28.60)
+
+#print Z_A(1.95, 1.1)
+#print Z_A(1.03, 0.55)
+
 
 for i in range(len(quantiles)):
   selection_base = "mva_score_ >= %.6f" % mva_cut[i][0]
@@ -60,7 +70,7 @@ for i in range(len(quantiles)):
 
   # calculate effective width
   mean_eff, sigma_eff = utils.calc_sigma_eff(sig_mass, sig_weights, i)
-  selection_mass = "mass_ >= %.6f && mass_ <= %.6f" % (mean_eff - (1.675 * sigma_eff), mean_eff + (1.675 * sigma_eff))
+  selection_mass = "mass_ >= %.6f && mass_ <= %.6f" % (mean_eff - (1.645 * sigma_eff), mean_eff + (1.645 * sigma_eff))
 
   # calculate s
   sig_events = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_signal + " && " + selection_base + " && " + selection_mass)
@@ -72,7 +82,7 @@ for i in range(len(quantiles)):
 
   # calculate b from fit to data sidebands
   data_events = root_numpy.tree2array(tree, branches = "mass_", selection = selection_data + " && " + selection_base)
-  if len(data_events) < 5:
+  if len(data_events) < 4:
     continue # fit doesn't seem to work with less than 5 events
   b_data = utils.fit_exp(data_events, mean_eff, sigma_eff, i)
 
