@@ -43,7 +43,8 @@ signal_mva_scores = root_numpy.tree2array(tree, branches = ["mva_score_"], selec
 n_quantiles = 100
 quantiles, mva_cut = quantiles_to_mva_score(n_quantiles, signal_mva_scores)
 
-quants = []
+quants_mc = []
+quants_data = []
 sig_mc = []
 sig_data = []
 
@@ -51,6 +52,7 @@ sig_data = []
 selection_signal = "label_ == 1"
 selection_bkg = "label_ == 0"
 selection_data = "label_ == 2 && mass_ >= 100 && mass_ <= 180"
+selection_sideband = "mass_ >= 100 && mass_ <= 180"
 
 
 #print Z_A(2.18, 0.94)
@@ -77,22 +79,28 @@ for i in range(len(quantiles)):
   s = numpy.sum(sig_events)
 
   # calculate b from mc
-  bkg_events = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_bkg + " && " + selection_base + " && " + selection_mass)
-  b_mc = numpy.sum(bkg_events)
+  selection_bkg_sidebands = selection_bkg + " && " + selection_base + " && " + selection_sideband
+  bkg_weights = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_bkg_sidebands) 
+  bkg_events = root_numpy.tree2array(tree, branches = "mass_", selection = selection_bkg_sidebands) 
+
+  b_mc = utils.fit_exp(bkg_events, bkg_weights, mean_eff, sigma_eff, i)
+
+  z_mc = Z_A(s*0.9, b_mc)
+  quants_mc.append(quantiles[i])
+  sig_mc.append(z_mc)
 
   # calculate b from fit to data sidebands
   data_events = root_numpy.tree2array(tree, branches = "mass_", selection = selection_data + " && " + selection_base)
   if len(data_events) < 4:
     continue # fit doesn't seem to work with less than 5 events
-  b_data = utils.fit_exp(data_events, mean_eff, sigma_eff, i)
+  b_data = utils.fit_exp(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, i)
 
   z_mc = Z_A(s*0.9, b_mc)
   z_data = Z_A(s*0.9, b_data)
 
   print s, b_mc, b_data, z_mc, z_data
 
-  quants.append(quantiles[i])
-  sig_mc.append(z_mc)
+  quants_data.append(quantiles[i])
   sig_data.append(z_data)
 
 ### Make diagnostic plots ###
@@ -101,8 +109,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 fig = plt.figure()
-plt.plot(quants, sig_mc, label='Estimate bkg from MC')
-plt.plot(quants, sig_data, label='Estimate bkg from data')
+plt.plot(quants_mc, sig_mc, label='Estimate bkg from MC')
+plt.plot(quants_data, sig_data, label='Estimate bkg from data')
 plt.xlabel('Signal Efficiency')
 plt.ylabel('Significance (Z_A)')
 plt.ylim([0.0, 3.0])
