@@ -93,6 +93,11 @@
  "VHToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8" : [0.196627 , 342161 ],
  "VBFHToGG_M75_13TeV_amcatnlo_pythia8" : [0.347656 , 286818 ],
  "ggZH_HToGG_ZToLL_M126_13TeV_powheg_pythia8" : [0 , 300000 ],
- "GluGluHToGG_M123_13TeV_amcatnloFXFX_pythia8" : [0.213651 , 503911 ]
+ "GluGluHToGG_M123_13TeV_amcatnloFXFX_pythia8" : [0.213651 , 503911 ],
+ "GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8" : [0 , 1.76787e+07 ],
+ "GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8" : [0 , 7.92434e+07 ],
+ "QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8" : [0 , 1.45018e+07 ],
+ "QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8" : [0 , 2.04337e+07 ],
+ "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8" : [0 , 4.19543e+07 ]
  }
 
