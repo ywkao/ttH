@@ -9,11 +9,12 @@ sys.path.append("~/Utilities")
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("tag", help = "job tag e.g. 'v7'", type=str)
+parser.add_argument("year", help = "2016 or 2017", type=str)
 parser.add_argument("--data_only", action="store_true")
 parser.add_argument("--no_signal", action="store_true")
 args = parser.parse_args()
 
-dirs = glob.glob("/hadoop/cms/store/user/smay/ttH/*ttH_Babies_" + args.tag)
+dirs = glob.glob("/hadoop/cms/store/user/smay/ttH/*ttH_Babies_" + args.tag + "_" + args.year)
 print dirs
 
 os.system("sleep 10s")

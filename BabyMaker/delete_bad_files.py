@@ -7,7 +7,7 @@ parser.add_argument("tag", help = "job tag e.g. 'v7'", type=str)
 args = parser.parse_args()
 
 
-os.system("du -a /hadoop/cms/store/user/smay/ttH/*" + args.tag + " | awk '$1*512 < 2000 {print $2} ' > bad_files.txt")
+os.system("du -a /hadoop/cms/store/user/smay/ttH/*" + args.tag + "* | awk '$1*512 < 2000 {print $2} ' > bad_files.txt")
 
 with open ("bad_files.txt") as fin:
   for line in fin:
