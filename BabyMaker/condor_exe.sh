@@ -3,6 +3,7 @@ OUTPUTDIR=$1
 OUTPUTFILENAME=$2
 INPUTFILENAMES=$3
 INDEX=$4
+CMSSW_VER=$5
 
 echo "[wrapper] OUTPUTDIR	= " ${OUTPUTDIR}
 echo "[wrapper] OUTPUTFILENAME	= " ${OUTPUTFILENAME}
@@ -28,7 +29,7 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 tar -xvf package.tar.gz
 
 # Build
-cd CMSSW_8_0_28/src/flashgg
+cd $CMSSW_VER/src/flashgg
 echo "[wrapper] in directory: " ${PWD}
 echo "[wrapper] attempting to build"
 eval `scramv1 runtime -sh`
@@ -49,8 +50,13 @@ cd $CMSSW_BASE/src/flashgg
   
 
 # Create tag file
-echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun Taggers/test/ttH_Tag.py"
+echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun Taggers/test/ttH_TagAndDump.py"
 cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES}
+
+if [ "$?" != "0" ]; then
+    echo "Removing output file because cmsRun crashed with exit code $?"
+    rm *.root
+fi
 
 echo "[wrapper] output root files are currently: "
 ls -lh *.root
