@@ -65,6 +65,8 @@ samples = glob.glob(base_path + "/*")
 dslocs = []
 for sample in samples:
   name = sample.split("/")[-1]
+  if args.data_only and not "DoubleEG" in name:
+    continue
   if not args.do_all and not important_sample(name):
     print "Skipping %s" % name
     continue
