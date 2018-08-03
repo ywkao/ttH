@@ -276,11 +276,20 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   c->set_filename(output_name);
   c->set_x_label(x_label);
   c->set_y_label("Events");
-  c->set_lumi(35.9);
   TString output = output_name;
+  if (output.Contains("17"))
+    c->set_lumi(41.5);
+  else
+    c->set_lumi(35.9);
   if (hist_name == "hMassAN") {
     c->set_no_flow();
     c->set_no_log();
+    if (output.Contains("SR3"))
+      c->set_y_lim_range({0, 5});
+    if (output.Contains("SR2"))
+      c->set_y_lim_range({0, 8});
+    if (output.Contains("SR1"))
+      c->set_y_lim_range({0, 25});
     //if (output.Contains("Leptonic"))
     //  c->set_y_lim_range({0,12});
     //else
@@ -341,60 +350,24 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
 int main(int argc, char* argv[])
 {
-  // Style options
-  gStyle->SetOptStat(0);
-  gStyle->SetPalette(kRainBow,0);
-  gStyle->SetPaintTextFormat(".2f");
-  gStyle->SetTickLength(0.01);
-  gStyle->SetErrorX(0);
-  gStyle->SetPadTickX(1);
-  gStyle->SetPadTickY(1);
-  gStyle->SetTitleAlign(33);
-  gStyle->SetTitleX(.93);
-  gStyle->SetTitleFontSize(0.03);
-
-  TString type;
-  string type_s;
-  if (argc >= 2) {
-    type = argv[1];
-    type_s = argv[1];
+  // Parse args
+  if (argc != 3) {
+    cout << "Please provide two arguments: type of plot to make (e.g. 'std') and input file (e.g. '../ttHHadronicLoose_histograms.root')" << endl;
+    return 0;
   }
-  else {
-    type = "std";
-    type_s = "std";
-  }
-  TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
-  TCanvas* c2 = new TCanvas("c2", "histos2", 800, 800);
-  TFile* f1 = new TFile("../ttHHadronic_histograms.root");
-  string output_name_hadronic = "ttHHadronic_plots_" + type_s + ".pdf";
 
-  TFile* f2 = new TFile("../ttHLeptonic_histograms.root");
-  string output_name_leptonic = "ttHLeptonic_plots_" + type_s + ".pdf";
+  TString type = argv[1];
+  TString type_s = argv[1];
 
-  TFile* f3 = new TFile("../ttHHadronicLoose_histograms.root");
-  string output_name_hadronic_loose = "ttHHadronicLoose_plots_" + type_s + ".pdf";
+  TString file_path = argv[2];
 
-  TFile* f4 = new TFile("../ttHLeptonicLoose_histograms.root");
-  string output_name_leptonic_loose = "ttHLeptonicLoose_plots_" + type_s + ".pdf";
+  TFile* f = new TFile(file_path); 
+  vector<TFile*> vFiles = {f};
+  string output = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", ".pdf").Data();
+  
+  vector<string> vNames = {output};
 
-  //TFile* f5 = new TFile("../ttbar_cr_histograms.root");
-  TFile* f5 = new TFile("../ttbar_cr_v2_histograms.root");
-  string output_name_leptonic_ttbar_cr = "ttHLeptonic_ttbarCR_plots" + type_s + ".pdf";
-
-  TFile* f6 = new TFile("../ttHLeptonic_v2_histograms.root");
-  string output_name_leptonic_v2 = "ttHLeptonic_PSV_plots" + type_s + ".pdf";
-
-  TFile* f7 = new TFile("../ttHHadronicCustom_histograms.root");
-  string output_name_hadronic_custom = "ttHHadronicCustom_plots_" + type_s + ".pdf";
-
-  TFile* f8 = new TFile("../ttHLeptonicCustom_histograms.root");
-  string output_name_leptonic_custom = "ttHLeptonicCustom_plots_" + type_s + ".pdf";
-
-  vector<TFile*> vFiles = {f1, f2, f3, f4, f7, f8};
-  //vector<TFile*> vFiles = {f1, f2, f3, f4, f5, f6};
-  //vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_leptonic_ttbar_cr, output_name_leptonic_v2};
-  vector<string> vNames = {output_name_hadronic, output_name_leptonic, output_name_hadronic_loose, output_name_leptonic_loose, output_name_hadronic_custom, output_name_leptonic_custom};
-
+  // Decide which backgrounds you want to plot
   vector<TString> vBkgs;
   if (type == "std" || type == "shape") { 
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "TTGG", "TTGJets", "VG", "WJets"}; 
@@ -414,6 +387,21 @@ int main(int argc, char* argv[])
     vBkgs = {"TTJets"};
     //vBkgs = {"TTGG", "TTGJets"};
   }
+
+  // Style options
+  gStyle->SetOptStat(0);
+  gStyle->SetPalette(kRainBow,0);
+  gStyle->SetPaintTextFormat(".2f");
+  gStyle->SetTickLength(0.01);
+  gStyle->SetErrorX(0);
+  gStyle->SetPadTickX(1);
+  gStyle->SetPadTickY(1);
+  gStyle->SetTitleAlign(33);
+  gStyle->SetTitleX(.93);
+  gStyle->SetTitleFontSize(0.03); 
+
+  TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
+  TCanvas* c2 = new TCanvas("c2", "histos2", 900, 800);
 
   for (int i = 0; i < vFiles.size(); i++) {
     make_plot(c1, vFiles[i], vNames[i], "hMass", "m_{#gamma#gamma} [GeV]", vBkgs, 0,type);
