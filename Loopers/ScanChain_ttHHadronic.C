@@ -16,7 +16,8 @@
 // ttHHadronic
 #include "ttHHadronic.cc"
 #include "ttHLooper.h"
-#include "scale1fb/scale1fb.h"
+#include "scale1fb/scale1fb_2016.h"
+#include "scale1fb/scale1fb_2017.h"
 #include "MakeMVAOptimizationBabies.h"
 
 // tmva
@@ -25,7 +26,22 @@
 using namespace std;
 using namespace tas;
 
-const double targetLumi = 35.9; 
+const double lumi_2016 = 35.9;
+const double lumi_2017 = 41.5;
+
+const bool evaluate_mva = false;
+
+const vector<double> mva_thresh_2017 = { 0.38, 0.48, 0.56 };
+
+bool pass_2016_mva_presel() {
+  if (mass() < 100)             	return false;
+  if (n_jets() < 3)       		return false;
+  if (diphoMVARes() < 0.4)        	return false;
+  if (leadIDMVA() < -0.9)         	return false;
+  if (subleadIDMVA() < -0.9)         	return false;
+  if (nb_loose() < 1)     		return false;
+  return true;
+}
 
 int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_histograms.root", "RECREATE");
@@ -51,8 +67,6 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
-
-  int nLowID = 0;
 
   unique_ptr<TMVA::Reader> mva;
   float njets_;
@@ -94,47 +108,51 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   float dipho_rapidity_;
   float met_;
 
-  mva.reset(new TMVA::Reader( "!Color:Silent" ));
-  mva->AddVariable("njets_", &njets_);
-  //mva->AddVariable("nbjets_", &nbjets_);
-  mva->AddVariable("ht_", &ht_);
-  mva->AddVariable("leadptoM_", &leadptoM_);
-  mva->AddVariable("subleadptoM_", &subleadptoM_);
-  mva->AddVariable("leadIDMVA_", &leadIDMVA_);
-  mva->AddVariable("subleadIDMVA_", &subleadIDMVA_); 
-  mva->AddVariable("lead_eta_", &lead_eta_);
-  mva->AddVariable("sublead_eta_", &sublead_eta_);
+  if (evaluate_mva) {
+    mva.reset(new TMVA::Reader( "!Color:Silent" ));
+    mva->AddVariable("njets_", &njets_);
+    //mva->AddVariable("nbjets_", &nbjets_);
+    mva->AddVariable("ht_", &ht_);
+    mva->AddVariable("leadptoM_", &leadptoM_);
+    mva->AddVariable("subleadptoM_", &subleadptoM_);
+    mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    mva->AddVariable("subleadIDMVA_", &subleadIDMVA_); 
+    mva->AddVariable("lead_eta_", &lead_eta_);
+    mva->AddVariable("sublead_eta_", &sublead_eta_);
 
-  mva->AddVariable("jet1_pt_", &jet1_pt_);
-  mva->AddVariable("jet1_eta_", &jet1_eta_);
-  mva->AddVariable("jet1_btag_", &jet1_btag_);
-  mva->AddVariable("jet2_pt_", &jet2_pt_);
-  mva->AddVariable("jet2_eta_", &jet2_eta_);
-  mva->AddVariable("jet2_btag_", &jet2_btag_);
-  mva->AddVariable("jet3_pt_", &jet3_pt_);
-  mva->AddVariable("jet3_eta_", &jet3_eta_);
-  mva->AddVariable("jet3_btag_", &jet3_btag_);
-  mva->AddVariable("jet4_pt_", &jet4_pt_);
-  mva->AddVariable("jet4_eta_", &jet4_eta_);
-  mva->AddVariable("jet4_btag_", &jet4_btag_);
-  mva->AddVariable("jet5_pt_", &jet5_pt_);
-  mva->AddVariable("jet5_eta_", &jet5_eta_);
-  mva->AddVariable("jet5_btag_", &jet5_btag_);
-  mva->AddVariable("jet6_pt_", &jet6_pt_);
-  mva->AddVariable("jet6_eta_", &jet6_eta_);
-  mva->AddVariable("jet6_btag_", &jet6_btag_);
+    mva->AddVariable("jet1_pt_", &jet1_pt_);
+    mva->AddVariable("jet1_eta_", &jet1_eta_);
+    mva->AddVariable("jet1_btag_", &jet1_btag_);
+    mva->AddVariable("jet2_pt_", &jet2_pt_);
+    mva->AddVariable("jet2_eta_", &jet2_eta_);
+    mva->AddVariable("jet2_btag_", &jet2_btag_);
+    mva->AddVariable("jet3_pt_", &jet3_pt_);
+    mva->AddVariable("jet3_eta_", &jet3_eta_);
+    mva->AddVariable("jet3_btag_", &jet3_btag_);
+    mva->AddVariable("jet4_pt_", &jet4_pt_);
+    mva->AddVariable("jet4_eta_", &jet4_eta_);
+    mva->AddVariable("jet4_btag_", &jet4_btag_);
+    mva->AddVariable("jet5_pt_", &jet5_pt_);
+    mva->AddVariable("jet5_eta_", &jet5_eta_);
+    mva->AddVariable("jet5_btag_", &jet5_btag_);
+    mva->AddVariable("jet6_pt_", &jet6_pt_);
+    mva->AddVariable("jet6_eta_", &jet6_eta_);
+    mva->AddVariable("jet6_btag_", &jet6_btag_);
 
-  mva->AddVariable("max1_btag_", &max1_btag_);
-  mva->AddVariable("max2_btag_", &max2_btag_);
+    mva->AddVariable("max1_btag_", &max1_btag_);
+    mva->AddVariable("max2_btag_", &max2_btag_);
 
-  mva->AddVariable("leadPSV_", &leadPSV_);
-  mva->AddVariable("subleadPSV_", &subleadPSV_);
+    mva->AddVariable("leadPSV_", &leadPSV_);
+    mva->AddVariable("subleadPSV_", &subleadPSV_);
 
-  mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
-  mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
-  mva->AddVariable("met_", &met_);
+    mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
+    mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
+    mva->AddVariable("met_", &met_);
 
-  mva->BookMVA("BDT", "../MVAs/Hadronic_bdt.xml");
+    mva->BookMVA("BDT", "../MVAs/Hadronic_bdt.xml");
+  }
+
+
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
@@ -150,14 +168,12 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-
-    bool print = true;
+    TString year = currentFileTitle.Contains("2017") ? "2017" : "2016"; 
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
     for (unsigned int event = 0; event < nEventsTree; ++event) {
-
 
       // Get Event Content
       if (nEventsTotal >= nEventsChain) continue;
@@ -171,13 +187,25 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       // Blinded region
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
-      // Apply preselection before calculating MVA value
-      if (mass() < 100)                continue;
-      if (n_jets() < 3)               continue;
-      if (nb_loose() < 1)             continue;
-      if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      // Fill mva baby before any selections
+      int processId = categorize_process(currentFileTitle);
+      int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
+      int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
+      int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
+      int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
-      // Calculate MVA value
+      double evt_weight = 1.;
+      if (!isData) {
+        if (year == "2016")
+          evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
+        else if (year == "2017")
+          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
+      }
+
+      int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+
+
+      // have to calculate ht this dumb way :(
       ht_ = 0;
       ht_ += jet1_pt() > 0 ? jet1_pt() : 0;
       ht_ += jet2_pt() > 0 ? jet2_pt() : 0;
@@ -195,59 +223,66 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       ht_ += jet14_pt() > 0 ? jet14_pt() : 0;
       ht_ += jet15_pt() > 0 ? jet15_pt() : 0;
 
-      njets_ = n_jets();
-      //nbjets_ = nb_medium();
-      jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
-      jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
-      jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
-      jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
-      jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
-      jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
-      jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
-      jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
-      jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
-      jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
-      jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
-      jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;
-      jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
-      jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
-      jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
-      jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
-      jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
-      jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
+      // Evaluate MVA, if we choose
+      double mva_value = -999;
+      if (evaluate_mva) {
+	// Apply preselection before calculating MVA value
+	if (mass() < 100)                continue;
+	if (n_jets() < 3)               continue;
+	if (nb_loose() < 1)             continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 
-      max1_btag_ = bjet1_csv();
-      max2_btag_ = bjet2_csv();
+	// Calculate MVA value
+	njets_ = n_jets();
+	//nbjets_ = nb_medium();
+	jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
+	jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
+	jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
+	jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
+	jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
+	jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
+	jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
+	jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
+	jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
+	jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
+	jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
+	jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;
+	jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
+	jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
+	jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
+	jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
+	jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
+	jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
 
-      leadptoM_ = lead_ptoM();
-      subleadptoM_ = sublead_ptoM();
-      leadIDMVA_ = leadIDMVA();
-      subleadIDMVA_ = subleadIDMVA();
-      lead_eta_ = leadEta();
-      sublead_eta_ = subleadEta();
+	max1_btag_ = bjet1_csv();
+	max2_btag_ = bjet2_csv();
 
-      leadPSV_ = leadPixelSeed();
-      subleadPSV_ = subleadPixelSeed();
+	leadptoM_ = lead_ptoM();
+	subleadptoM_ = sublead_ptoM();
+	leadIDMVA_ = leadIDMVA();
+	subleadIDMVA_ = subleadIDMVA();
+	lead_eta_ = leadEta();
+	sublead_eta_ = subleadEta();
 
-      dipho_cosphi_ = dipho_cosphi();
-      dipho_rapidity_ = dipho_rapidity();
-      met_ = MetPt();
+	leadPSV_ = leadPixelSeed();
+	subleadPSV_ = subleadPixelSeed();
 
-      float mva_value = mva->EvaluateMVA( "BDT" );
-      // Fill mva baby before any selections
-      int processId = categorize_process(currentFileTitle);
-      int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
-      int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
-      int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
-      int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
+	dipho_cosphi_ = dipho_cosphi();
+	dipho_rapidity_ = dipho_rapidity();
+	met_ = MetPt();
+
+	mva_value = mva->EvaluateMVA( "BDT" );
+	double reference_mva = tthMVA();
+	bool pass_ref_presel = pass_2016_mva_presel();
+        baby->FillBabyNtuple(label, evt_weight, processId, mass(), mva_value, reference_mva, pass_ref_presel);
+      }
+
       int mvaCategoryId = mva_value < -0.92 ? 0 : 1;
+      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
 
-      double evt_weight = 1.;
-      if (!isData)
-        evt_weight = scale1fb(currentFileTitle) * targetLumi * sgn(weight());
-    
-      int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
-      baby->FillBabyNtuple(label, evt_weight, processId, mass(), mva_value);
+
+
+
 
       // Selection
       if (tag == "ttHHadronicLoose") {
@@ -278,30 +313,54 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
         if (leadIDMVA() < -0.1)         continue;
         if (subleadIDMVA() < -0.1)         continue;
       }
+      else if (tag == "ttHHadronic_2017_SR1") {
+	if (mass() < 100)			continue;
+	if (isData && blind && mass() > 115 && mass() < 135)      continue;
+	if (leadIDMVA() < -0.2)			continue;
+	if (subleadIDMVA() < -0.2)		continue;
+	if (n_jets() < 2)			continue;
+	if (!(tthMVA() >= mva_thresh_2017[0] && tthMVA() < mva_thresh_2017[1]))	continue; 
+      }
+      else if (tag == "ttHHadronic_2017_SR2") {
+        if (mass() < 100)                       continue;
+	if (isData && blind && mass() > 115 && mass() < 135)      continue;
+        if (leadIDMVA() < -0.2)                 continue;
+        if (subleadIDMVA() < -0.2)              continue;
+        if (n_jets() < 2)                       continue;
+        if (!(tthMVA() >= mva_thresh_2017[1] && tthMVA() < mva_thresh_2017[2])) continue;
+      }
+      else if (tag == "ttHHadronic_2017_SR3") {
+        if (mass() < 100)                       continue;
+	if (isData && blind && mass() > 115 && mass() < 135)      continue;
+        if (leadIDMVA() < -0.2)                 continue;
+        if (subleadIDMVA() < -0.2)              continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (n_jets() < 2)                       continue;
+	if (tthMVA() < mva_thresh_2017[2])	continue;
+      }
+
       else {
         cout << "Did not recognize tag name" << endl;
       }
  
-      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
+
+
+
+
+
+
 
       // Fill histograms //
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   
       vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
       cout.setf(ios::fixed);
       cout << std::setprecision(6);
-      if (isData && mass() >= 100 && mass() <= 180) {
-	//cout << mass() << endl;
-	//cout << "Mass: " << mass() << " , Event: " << cms3.event() << " , Run: " << run() << " , Lumi: " << lumi() << endl;
-      }
-
-      if (isData && (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)) {
-        nLowID++;
-      }
 
       // Skip blinded region for MC after filling mass histogram
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
 
 
+      // Fill rest of histograms //
       vProcess[processId]->fill_histogram("hHadronicMVA", mva_value, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
@@ -410,7 +469,6 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   f1->Write();
   f1->Close(); 
 
-  cout << "Number of data events with one photon with ID < -0.9: " << nLowID << endl;
  
   // return
   bmark->Stop("benchmark");

@@ -1,4 +1,4 @@
-double scale1fb(TString currentFileTitle) {
+double scale1fb_2017(TString currentFileTitle) {
   std::map<TString, double> m = {
   	{"VHToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8", 0.0000258279},
   	{"GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_PSWeights", 0.0017546008},
@@ -104,8 +104,8 @@ double scale1fb(TString currentFileTitle) {
   };
   TObjArray *tx = currentFileTitle.Tokenize("/");
   TString key = ((TObjString *)(tx->At(tx->GetEntries()-2)))->String();
-  TString tag = "v7";
-  TString to_replace = "__ttH_Babies_" + tag;
+  TString tag = "v3.11";
+  TString to_replace = "__ttH_Babies_" + tag + "_2017";
   TString replace_with = "";
   key = key.ReplaceAll(to_replace, replace_with);
   return m.find(key)->second;

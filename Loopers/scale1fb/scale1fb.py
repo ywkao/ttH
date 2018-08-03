@@ -3,14 +3,25 @@ import numpy
 import glob
 import json
 
-path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v2/"
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("year", type=str)
+args = parser.parse_args()
+
+if args.year == "2016":
+  path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20/"
+elif args.year == "2017":
+  path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1/"
 dirs = glob.glob(path+"*")
+
 
 datasets = []
 for dir in dirs:
   if "DoubleEG" in dir: #only do this for MC
     continue
-  dataset = dir.replace(path, "/") 
+  if args.year == "2016" and ("GluGluHToGG" in dir or "VBF" in dir or "VH" in dir or "bbH" in dir):
+    continue
+  dataset = dir.replace(path, "/")
   datasets.append(dataset)
 
 scale1fb = {}
@@ -18,11 +29,17 @@ for dataset in datasets:
   scale1fb[dataset] = {"xs" : 1, "filter_eff": 1, "br" : 1, "kf" : 1, "nevents" : 1, "negative_weight_frac": 0, "scale1fb" : 0}
 
 # Get number of events (calculated by scanning central microAOD in /eos on lxplus)
-with open("nEvents/mc_events.json") as json_file:
-  mc_events = json.load(json_file)
-  for dataset in datasets:
-    scale1fb[dataset]["negative_weight_frac"] = mc_events[dataset.replace("/","")][0]
-    scale1fb[dataset]["nevents"] = mc_events[dataset.replace("/","")][1]
+def grab_event_info(json_file_):
+  with open(json_file_) as json_file:
+    mc_events = json.load(json_file)
+    for dataset in datasets:
+      scale1fb[dataset]["negative_weight_frac"] = mc_events[dataset.replace("/","")][0]
+      scale1fb[dataset]["nevents"] = mc_events[dataset.replace("/","")][1]
+
+if args.year == "2016":
+  grab_event_info("nEvents/mc_events_2016_80X.json")
+elif args.year == "2017":
+  grab_event_info("nEvents/mc_events_2017_94X.json")
 
 # Take cross sections from flashgg repository instead of Twiki
 with open("cross_sections_flashgg.json") as json_file:
@@ -50,8 +67,8 @@ for key, info in scale1fb.iteritems():
   print key
   print info
 
-with open("scale1fb.h", "w") as fout:
-  fout.write("double scale1fb(TString currentFileTitle) {\n")
+with open("scale1fb_%s.h" % args.year, "w") as fout:
+  fout.write("double scale1fb_%s(TString currentFileTitle) {\n" % args.year)
   fout.write("  std::map<TString, double> m = {\n")
   for key, info in scale1fb.iteritems():
     fout.write('  	{"%s", %.10f},\n' % (key.replace("/",""), info["scale1fb"]))
@@ -59,8 +76,8 @@ with open("scale1fb.h", "w") as fout:
   fout.write("\n")
   fout.write('  TObjArray *tx = currentFileTitle.Tokenize("/");\n')
   fout.write("  TString key = ((TObjString *)(tx->At(tx->GetEntries()-2)))->String();\n")
-  fout.write('  TString tag = "v7";\n')
-  fout.write('  TString to_replace = "__ttH_Babies_" + tag;\n')
+  fout.write('  TString tag = "v3.11";\n')
+  fout.write('  TString to_replace = "__ttH_Babies_" + tag + "_%s";\n' % args.year)
   fout.write('  TString replace_with = "";\n')
   fout.write('  key = key.ReplaceAll(to_replace, replace_with);\n')
   fout.write("  return m.find(key)->second;\n")
