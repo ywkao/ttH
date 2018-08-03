@@ -55,11 +55,11 @@ param = {
 	'eta': 0.2,
 	'objective': 'binary:logistic',
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
-	'subsample': 0.8,
-	'colsample_bytree': 0.8,
+	'subsample': 1.0,
+	'colsample_bytree': 1.0,
 	}
 
-n_round = 300
+n_round = 500
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -88,6 +88,8 @@ pred_test = bdt.predict(d_test)
 # analysis
 fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train)
 fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test)
+#fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train, sample_weight = weights_train)
+#fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test, sample_weight = weights_test)
 
 auc_train = metrics.auc(fpr_train, tpr_train)
 auc_test = metrics.auc(fpr_test, tpr_test)

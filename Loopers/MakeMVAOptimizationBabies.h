@@ -24,7 +24,7 @@ class BabyMaker {
     }
     void MakeBabyNtuple(const char *);
     void InitBabyNtuple();
-    void FillBabyNtuple(int label, double evt_weight, int process_id, double mass, double mva_score);
+    void FillBabyNtuple(int label, double evt_weight, int process_id, double mass, double mva_score, double reference_mva, bool pass_ref_presel);
     void CloseBabyNtuple();
 
         
@@ -39,6 +39,8 @@ class BabyMaker {
 
     double	mass_;
     double 	mva_score_;
+    double	reference_mva_;
+    bool 	pass_ref_presel_;
 };
 
 inline
@@ -53,6 +55,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("mass_"       	, &mass_  );
   BabyTree_->Branch("mva_score_"       	, &mva_score_  );
+  BabyTree_->Branch("reference_mva_"	, &reference_mva_ );
+  BabyTree_->Branch("pass_ref_presel_"	, &pass_ref_presel_);
   return;
 }
 
@@ -62,13 +66,15 @@ void BabyMaker::InitBabyNtuple () {
 }
 
 inline
-void BabyMaker::FillBabyNtuple(int label, double evt_weight, int process_id, double mass, double mva_score){
+void BabyMaker::FillBabyNtuple(int label, double evt_weight, int process_id, double mass, double mva_score, double reference_mva, bool pass_ref_presel){
   label_ = label;
   evt_weight_ = evt_weight;
   process_id_ = process_id;
 
   mass_ = mass;
   mva_score_ = mva_score;
+  reference_mva_ = reference_mva;
+  pass_ref_presel_ = pass_ref_presel;
 
   BabyTree_->Fill();
   return;
