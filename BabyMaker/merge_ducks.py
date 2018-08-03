@@ -14,11 +14,12 @@ parser.add_argument("--data_only", action="store_true")
 parser.add_argument("--no_signal", action="store_true")
 args = parser.parse_args()
 
-dirs = glob.glob("/hadoop/cms/store/user/smay/ttH/*ttH_Babies_" + args.tag + "_" + args.year)
-print dirs
+hadoop_name = "smay" if os.environ.get("USER") == "sjmay" else os.environ.get("USER")
 
-os.system("sleep 10s")
-
+dirs = glob.glob(("/hadoop/cms/store/user/%s/ttH/*ttH_Babies_" % hadoop_name) + args.tag + "_" + args.year)
+print "Adding ntuples from the following directories:"
+for dir in dirs:
+  print dir
 
 destination = (os.popen("pwd").read()).rstrip() + "/../Loopers/merged_babies/"
 

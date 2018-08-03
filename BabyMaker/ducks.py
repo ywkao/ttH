@@ -120,6 +120,6 @@ while True:
         print "Job={} finished".format(job_tag)
         print ""
         break
-    os.system("python delete_bad_files.py %s" % args.tag)
+    #os.system("python delete_bad_files.py %s" % args.tag)
     print "Sleeping 300 seconds ..."
     time.sleep(300)
