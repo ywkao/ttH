@@ -233,6 +233,24 @@ void make_table_vetos(TFile* file, TString process) {
 
 int main(int argc, char* argv[])
 {
+
+  if (argc != 2) {
+    cout << "Please provide one argument: input file (e.g. '../ttHHadronicLoose_histograms.root')" << endl;
+    return 0;
+  }
+
+  TString file_path = argv[1];
+  TFile* f = new TFile(file_path);
+  vector<TString> vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+
+  TString label = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", "");
+  make_table_std(f, "hNVtx", vBkgs, label);
+  make_table_components(f, "hNVtx", vBkgs, label, mLeptons, "GenLepton");
+  make_table_components(f, "hNVtx", vBkgs, label, mPhotons, "GenPhoton"); 
+  make_table_components(f, "hNVtx", vBkgs, label, mPhotonsDetail, "GenPhotonDetail");
+  make_table_components(f, "hNVtx", vBkgs, label, mPhotonLocations, "PhotonLocations", true);
+
+  /*
   TFile* f1 = new TFile("../ttHHadronic_histograms.root");
   TFile* f2 = new TFile("../ttHLeptonic_histograms.root");
   TFile* f3 = new TFile("../ttHHadronicLoose_histograms.root");
@@ -273,6 +291,6 @@ int main(int argc, char* argv[])
   //make_table_components(f_veto_studies, "hNVtx", vBkgs, "Starting yield", mPhotonLocations, "PhotonLocations", true);
   //make_table_components(f_veto_studies, "hPhotonMinIDMVA_passEVeto", vBkgs, "Passing e-veto", mPhotonLocations, "PhotonLocations", true);
   //make_table_components(f_veto_studies, "hPhotonMinIDMVA_passPSV", vBkgs, "Passing PSV", mPhotonLocations, "PhotonLocations", true);
-  //make_table_components(f_veto_studies, "hPhotonMinIDMVA_passBothVeto", vBkgs, "Passing Both", mPhotonLocations, "PhotonLocations", true); 
+  //make_table_components(f_veto_studies, "hPhotonMinIDMVA_passBothVeto", vBkgs, "Passing Both", mPhotonLocations, "PhotonLocations", true); */ 
 }
 
