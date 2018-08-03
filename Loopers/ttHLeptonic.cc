@@ -97,6 +97,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (nb_medium_branch) nb_medium_branch->SetAddress(&nb_medium_);
   nb_tight_branch = tree->GetBranch("nb_tight");
   if (nb_tight_branch) nb_tight_branch->SetAddress(&nb_tight_);
+  rand_branch = tree->GetBranch("rand");
+  if (rand_branch) rand_branch->SetAddress(&rand_);
   lead_photon_type_branch = tree->GetBranch("lead_photon_type");
   if (lead_photon_type_branch) lead_photon_type_branch->SetAddress(&lead_photon_type_);
   sublead_photon_type_branch = tree->GetBranch("sublead_photon_type");
@@ -115,24 +117,24 @@ void ttHLeptonic::Init(TTree *tree) {
   if (ele1_pt_branch) ele1_pt_branch->SetAddress(&ele1_pt_);
   ele2_pt_branch = tree->GetBranch("ele2_pt");
   if (ele2_pt_branch) ele2_pt_branch->SetAddress(&ele2_pt_);
+  ele1_eta_branch = tree->GetBranch("ele1_eta");
+  if (ele1_eta_branch) ele1_eta_branch->SetAddress(&ele1_eta_);
+  ele2_eta_branch = tree->GetBranch("ele2_eta");
+  if (ele2_eta_branch) ele2_eta_branch->SetAddress(&ele2_eta_);
   n_muons_branch = tree->GetBranch("n_muons");
   if (n_muons_branch) n_muons_branch->SetAddress(&n_muons_);
   muon1_pt_branch = tree->GetBranch("muon1_pt");
   if (muon1_pt_branch) muon1_pt_branch->SetAddress(&muon1_pt_);
   muon2_pt_branch = tree->GetBranch("muon2_pt");
   if (muon2_pt_branch) muon2_pt_branch->SetAddress(&muon2_pt_);
+  muon1_eta_branch = tree->GetBranch("muon1_eta");
+  if (muon1_eta_branch) muon1_eta_branch->SetAddress(&muon1_eta_);
+  muon2_eta_branch = tree->GetBranch("muon2_eta");
+  if (muon2_eta_branch) muon2_eta_branch->SetAddress(&muon2_eta_);
   n_bjets_branch = tree->GetBranch("n_bjets");
   if (n_bjets_branch) n_bjets_branch->SetAddress(&n_bjets_);
   n_jets_branch = tree->GetBranch("n_jets");
   if (n_jets_branch) n_jets_branch->SetAddress(&n_jets_);
-  bjet1_pt_branch = tree->GetBranch("bjet1_pt");
-  if (bjet1_pt_branch) bjet1_pt_branch->SetAddress(&bjet1_pt_);
-  bjet2_pt_branch = tree->GetBranch("bjet2_pt");
-  if (bjet2_pt_branch) bjet2_pt_branch->SetAddress(&bjet2_pt_);
-  bjet1_csv_branch = tree->GetBranch("bjet1_csv");
-  if (bjet1_csv_branch) bjet1_csv_branch->SetAddress(&bjet1_csv_);
-  bjet2_csv_branch = tree->GetBranch("bjet2_csv");
-  if (bjet2_csv_branch) bjet2_csv_branch->SetAddress(&bjet2_csv_);
   Mjj_branch = tree->GetBranch("Mjj");
   if (Mjj_branch) Mjj_branch->SetAddress(&Mjj_);
   MetPt_branch = tree->GetBranch("MetPt");
@@ -141,6 +143,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (MetPhi_branch) MetPhi_branch->SetAddress(&MetPhi_);
   mT_branch = tree->GetBranch("mT");
   if (mT_branch) mT_branch->SetAddress(&mT_);
+  tthMVA_branch = tree->GetBranch("tthMVA");
+  if (tthMVA_branch) tthMVA_branch->SetAddress(&tthMVA_);
   jet_pt1_branch = tree->GetBranch("jet_pt1");
   if (jet_pt1_branch) jet_pt1_branch->SetAddress(&jet_pt1_);
   jet_eta1_branch = tree->GetBranch("jet_eta1");
@@ -261,6 +265,96 @@ void ttHLeptonic::Init(TTree *tree) {
   if (jet_phi15_branch) jet_phi15_branch->SetAddress(&jet_phi15_);
   jet_bdiscriminant15_branch = tree->GetBranch("jet_bdiscriminant15");
   if (jet_bdiscriminant15_branch) jet_bdiscriminant15_branch->SetAddress(&jet_bdiscriminant15_);
+  jet_bbdiscriminant1_branch = tree->GetBranch("jet_bbdiscriminant1");
+  if (jet_bbdiscriminant1_branch) jet_bbdiscriminant1_branch->SetAddress(&jet_bbdiscriminant1_);
+  jet_bbdiscriminant2_branch = tree->GetBranch("jet_bbdiscriminant2");
+  if (jet_bbdiscriminant2_branch) jet_bbdiscriminant2_branch->SetAddress(&jet_bbdiscriminant2_);
+  jet_bbdiscriminant3_branch = tree->GetBranch("jet_bbdiscriminant3");
+  if (jet_bbdiscriminant3_branch) jet_bbdiscriminant3_branch->SetAddress(&jet_bbdiscriminant3_);
+  jet_bbdiscriminant4_branch = tree->GetBranch("jet_bbdiscriminant4");
+  if (jet_bbdiscriminant4_branch) jet_bbdiscriminant4_branch->SetAddress(&jet_bbdiscriminant4_);
+  jet_bbdiscriminant5_branch = tree->GetBranch("jet_bbdiscriminant5");
+  if (jet_bbdiscriminant5_branch) jet_bbdiscriminant5_branch->SetAddress(&jet_bbdiscriminant5_);
+  jet_bbdiscriminant6_branch = tree->GetBranch("jet_bbdiscriminant6");
+  if (jet_bbdiscriminant6_branch) jet_bbdiscriminant6_branch->SetAddress(&jet_bbdiscriminant6_);
+  jet_bbdiscriminant7_branch = tree->GetBranch("jet_bbdiscriminant7");
+  if (jet_bbdiscriminant7_branch) jet_bbdiscriminant7_branch->SetAddress(&jet_bbdiscriminant7_);
+  jet_bbdiscriminant8_branch = tree->GetBranch("jet_bbdiscriminant8");
+  if (jet_bbdiscriminant8_branch) jet_bbdiscriminant8_branch->SetAddress(&jet_bbdiscriminant8_);
+  jet_bbdiscriminant9_branch = tree->GetBranch("jet_bbdiscriminant9");
+  if (jet_bbdiscriminant9_branch) jet_bbdiscriminant9_branch->SetAddress(&jet_bbdiscriminant9_);
+  jet_bbdiscriminant10_branch = tree->GetBranch("jet_bbdiscriminant10");
+  if (jet_bbdiscriminant10_branch) jet_bbdiscriminant10_branch->SetAddress(&jet_bbdiscriminant10_);
+  jet_bbdiscriminant11_branch = tree->GetBranch("jet_bbdiscriminant11");
+  if (jet_bbdiscriminant11_branch) jet_bbdiscriminant11_branch->SetAddress(&jet_bbdiscriminant11_);
+  jet_bbdiscriminant12_branch = tree->GetBranch("jet_bbdiscriminant12");
+  if (jet_bbdiscriminant12_branch) jet_bbdiscriminant12_branch->SetAddress(&jet_bbdiscriminant12_);
+  jet_bbdiscriminant13_branch = tree->GetBranch("jet_bbdiscriminant13");
+  if (jet_bbdiscriminant13_branch) jet_bbdiscriminant13_branch->SetAddress(&jet_bbdiscriminant13_);
+  jet_bbdiscriminant14_branch = tree->GetBranch("jet_bbdiscriminant14");
+  if (jet_bbdiscriminant14_branch) jet_bbdiscriminant14_branch->SetAddress(&jet_bbdiscriminant14_);
+  jet_bbdiscriminant15_branch = tree->GetBranch("jet_bbdiscriminant15");
+  if (jet_bbdiscriminant15_branch) jet_bbdiscriminant15_branch->SetAddress(&jet_bbdiscriminant15_);
+  jet_cdiscriminant1_branch = tree->GetBranch("jet_cdiscriminant1");
+  if (jet_cdiscriminant1_branch) jet_cdiscriminant1_branch->SetAddress(&jet_cdiscriminant1_);
+  jet_cdiscriminant2_branch = tree->GetBranch("jet_cdiscriminant2");
+  if (jet_cdiscriminant2_branch) jet_cdiscriminant2_branch->SetAddress(&jet_cdiscriminant2_);
+  jet_cdiscriminant3_branch = tree->GetBranch("jet_cdiscriminant3");
+  if (jet_cdiscriminant3_branch) jet_cdiscriminant3_branch->SetAddress(&jet_cdiscriminant3_);
+  jet_cdiscriminant4_branch = tree->GetBranch("jet_cdiscriminant4");
+  if (jet_cdiscriminant4_branch) jet_cdiscriminant4_branch->SetAddress(&jet_cdiscriminant4_);
+  jet_cdiscriminant5_branch = tree->GetBranch("jet_cdiscriminant5");
+  if (jet_cdiscriminant5_branch) jet_cdiscriminant5_branch->SetAddress(&jet_cdiscriminant5_);
+  jet_cdiscriminant6_branch = tree->GetBranch("jet_cdiscriminant6");
+  if (jet_cdiscriminant6_branch) jet_cdiscriminant6_branch->SetAddress(&jet_cdiscriminant6_);
+  jet_cdiscriminant7_branch = tree->GetBranch("jet_cdiscriminant7");
+  if (jet_cdiscriminant7_branch) jet_cdiscriminant7_branch->SetAddress(&jet_cdiscriminant7_);
+  jet_cdiscriminant8_branch = tree->GetBranch("jet_cdiscriminant8");
+  if (jet_cdiscriminant8_branch) jet_cdiscriminant8_branch->SetAddress(&jet_cdiscriminant8_);
+  jet_cdiscriminant9_branch = tree->GetBranch("jet_cdiscriminant9");
+  if (jet_cdiscriminant9_branch) jet_cdiscriminant9_branch->SetAddress(&jet_cdiscriminant9_);
+  jet_cdiscriminant10_branch = tree->GetBranch("jet_cdiscriminant10");
+  if (jet_cdiscriminant10_branch) jet_cdiscriminant10_branch->SetAddress(&jet_cdiscriminant10_);
+  jet_cdiscriminant11_branch = tree->GetBranch("jet_cdiscriminant11");
+  if (jet_cdiscriminant11_branch) jet_cdiscriminant11_branch->SetAddress(&jet_cdiscriminant11_);
+  jet_cdiscriminant12_branch = tree->GetBranch("jet_cdiscriminant12");
+  if (jet_cdiscriminant12_branch) jet_cdiscriminant12_branch->SetAddress(&jet_cdiscriminant12_);
+  jet_cdiscriminant13_branch = tree->GetBranch("jet_cdiscriminant13");
+  if (jet_cdiscriminant13_branch) jet_cdiscriminant13_branch->SetAddress(&jet_cdiscriminant13_);
+  jet_cdiscriminant14_branch = tree->GetBranch("jet_cdiscriminant14");
+  if (jet_cdiscriminant14_branch) jet_cdiscriminant14_branch->SetAddress(&jet_cdiscriminant14_);
+  jet_cdiscriminant15_branch = tree->GetBranch("jet_cdiscriminant15");
+  if (jet_cdiscriminant15_branch) jet_cdiscriminant15_branch->SetAddress(&jet_cdiscriminant15_);
+  jet_udsgdiscriminant1_branch = tree->GetBranch("jet_udsgdiscriminant1");
+  if (jet_udsgdiscriminant1_branch) jet_udsgdiscriminant1_branch->SetAddress(&jet_udsgdiscriminant1_);
+  jet_udsgdiscriminant2_branch = tree->GetBranch("jet_udsgdiscriminant2");
+  if (jet_udsgdiscriminant2_branch) jet_udsgdiscriminant2_branch->SetAddress(&jet_udsgdiscriminant2_);
+  jet_udsgdiscriminant3_branch = tree->GetBranch("jet_udsgdiscriminant3");
+  if (jet_udsgdiscriminant3_branch) jet_udsgdiscriminant3_branch->SetAddress(&jet_udsgdiscriminant3_);
+  jet_udsgdiscriminant4_branch = tree->GetBranch("jet_udsgdiscriminant4");
+  if (jet_udsgdiscriminant4_branch) jet_udsgdiscriminant4_branch->SetAddress(&jet_udsgdiscriminant4_);
+  jet_udsgdiscriminant5_branch = tree->GetBranch("jet_udsgdiscriminant5");
+  if (jet_udsgdiscriminant5_branch) jet_udsgdiscriminant5_branch->SetAddress(&jet_udsgdiscriminant5_);
+  jet_udsgdiscriminant6_branch = tree->GetBranch("jet_udsgdiscriminant6");
+  if (jet_udsgdiscriminant6_branch) jet_udsgdiscriminant6_branch->SetAddress(&jet_udsgdiscriminant6_);
+  jet_udsgdiscriminant7_branch = tree->GetBranch("jet_udsgdiscriminant7");
+  if (jet_udsgdiscriminant7_branch) jet_udsgdiscriminant7_branch->SetAddress(&jet_udsgdiscriminant7_);
+  jet_udsgdiscriminant8_branch = tree->GetBranch("jet_udsgdiscriminant8");
+  if (jet_udsgdiscriminant8_branch) jet_udsgdiscriminant8_branch->SetAddress(&jet_udsgdiscriminant8_);
+  jet_udsgdiscriminant9_branch = tree->GetBranch("jet_udsgdiscriminant9");
+  if (jet_udsgdiscriminant9_branch) jet_udsgdiscriminant9_branch->SetAddress(&jet_udsgdiscriminant9_);
+  jet_udsgdiscriminant10_branch = tree->GetBranch("jet_udsgdiscriminant10");
+  if (jet_udsgdiscriminant10_branch) jet_udsgdiscriminant10_branch->SetAddress(&jet_udsgdiscriminant10_);
+  jet_udsgdiscriminant11_branch = tree->GetBranch("jet_udsgdiscriminant11");
+  if (jet_udsgdiscriminant11_branch) jet_udsgdiscriminant11_branch->SetAddress(&jet_udsgdiscriminant11_);
+  jet_udsgdiscriminant12_branch = tree->GetBranch("jet_udsgdiscriminant12");
+  if (jet_udsgdiscriminant12_branch) jet_udsgdiscriminant12_branch->SetAddress(&jet_udsgdiscriminant12_);
+  jet_udsgdiscriminant13_branch = tree->GetBranch("jet_udsgdiscriminant13");
+  if (jet_udsgdiscriminant13_branch) jet_udsgdiscriminant13_branch->SetAddress(&jet_udsgdiscriminant13_);
+  jet_udsgdiscriminant14_branch = tree->GetBranch("jet_udsgdiscriminant14");
+  if (jet_udsgdiscriminant14_branch) jet_udsgdiscriminant14_branch->SetAddress(&jet_udsgdiscriminant14_);
+  jet_udsgdiscriminant15_branch = tree->GetBranch("jet_udsgdiscriminant15");
+  if (jet_udsgdiscriminant15_branch) jet_udsgdiscriminant15_branch->SetAddress(&jet_udsgdiscriminant15_);
   rho_branch = tree->GetBranch("rho");
   if (rho_branch) rho_branch->SetAddress(&rho_);
   nvtx_branch = tree->GetBranch("nvtx");
@@ -330,6 +424,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   nb_loose_isLoaded = false;
   nb_medium_isLoaded = false;
   nb_tight_isLoaded = false;
+  rand_isLoaded = false;
   lead_photon_type_isLoaded = false;
   sublead_photon_type_isLoaded = false;
   lead_closest_gen_Pt_isLoaded = false;
@@ -339,19 +434,20 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   n_ele_isLoaded = false;
   ele1_pt_isLoaded = false;
   ele2_pt_isLoaded = false;
+  ele1_eta_isLoaded = false;
+  ele2_eta_isLoaded = false;
   n_muons_isLoaded = false;
   muon1_pt_isLoaded = false;
   muon2_pt_isLoaded = false;
+  muon1_eta_isLoaded = false;
+  muon2_eta_isLoaded = false;
   n_bjets_isLoaded = false;
   n_jets_isLoaded = false;
-  bjet1_pt_isLoaded = false;
-  bjet2_pt_isLoaded = false;
-  bjet1_csv_isLoaded = false;
-  bjet2_csv_isLoaded = false;
   Mjj_isLoaded = false;
   MetPt_isLoaded = false;
   MetPhi_isLoaded = false;
   mT_isLoaded = false;
+  tthMVA_isLoaded = false;
   jet_pt1_isLoaded = false;
   jet_eta1_isLoaded = false;
   jet_phi1_isLoaded = false;
@@ -412,6 +508,51 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   jet_eta15_isLoaded = false;
   jet_phi15_isLoaded = false;
   jet_bdiscriminant15_isLoaded = false;
+  jet_bbdiscriminant1_isLoaded = false;
+  jet_bbdiscriminant2_isLoaded = false;
+  jet_bbdiscriminant3_isLoaded = false;
+  jet_bbdiscriminant4_isLoaded = false;
+  jet_bbdiscriminant5_isLoaded = false;
+  jet_bbdiscriminant6_isLoaded = false;
+  jet_bbdiscriminant7_isLoaded = false;
+  jet_bbdiscriminant8_isLoaded = false;
+  jet_bbdiscriminant9_isLoaded = false;
+  jet_bbdiscriminant10_isLoaded = false;
+  jet_bbdiscriminant11_isLoaded = false;
+  jet_bbdiscriminant12_isLoaded = false;
+  jet_bbdiscriminant13_isLoaded = false;
+  jet_bbdiscriminant14_isLoaded = false;
+  jet_bbdiscriminant15_isLoaded = false;
+  jet_cdiscriminant1_isLoaded = false;
+  jet_cdiscriminant2_isLoaded = false;
+  jet_cdiscriminant3_isLoaded = false;
+  jet_cdiscriminant4_isLoaded = false;
+  jet_cdiscriminant5_isLoaded = false;
+  jet_cdiscriminant6_isLoaded = false;
+  jet_cdiscriminant7_isLoaded = false;
+  jet_cdiscriminant8_isLoaded = false;
+  jet_cdiscriminant9_isLoaded = false;
+  jet_cdiscriminant10_isLoaded = false;
+  jet_cdiscriminant11_isLoaded = false;
+  jet_cdiscriminant12_isLoaded = false;
+  jet_cdiscriminant13_isLoaded = false;
+  jet_cdiscriminant14_isLoaded = false;
+  jet_cdiscriminant15_isLoaded = false;
+  jet_udsgdiscriminant1_isLoaded = false;
+  jet_udsgdiscriminant2_isLoaded = false;
+  jet_udsgdiscriminant3_isLoaded = false;
+  jet_udsgdiscriminant4_isLoaded = false;
+  jet_udsgdiscriminant5_isLoaded = false;
+  jet_udsgdiscriminant6_isLoaded = false;
+  jet_udsgdiscriminant7_isLoaded = false;
+  jet_udsgdiscriminant8_isLoaded = false;
+  jet_udsgdiscriminant9_isLoaded = false;
+  jet_udsgdiscriminant10_isLoaded = false;
+  jet_udsgdiscriminant11_isLoaded = false;
+  jet_udsgdiscriminant12_isLoaded = false;
+  jet_udsgdiscriminant13_isLoaded = false;
+  jet_udsgdiscriminant14_isLoaded = false;
+  jet_udsgdiscriminant15_isLoaded = false;
   rho_isLoaded = false;
   nvtx_isLoaded = false;
   event_isLoaded = false;
@@ -470,6 +611,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (nb_loose_branch != 0) nb_loose();
   if (nb_medium_branch != 0) nb_medium();
   if (nb_tight_branch != 0) nb_tight();
+  if (rand_branch != 0) rand();
   if (lead_photon_type_branch != 0) lead_photon_type();
   if (sublead_photon_type_branch != 0) sublead_photon_type();
   if (lead_closest_gen_Pt_branch != 0) lead_closest_gen_Pt();
@@ -479,19 +621,20 @@ void ttHLeptonic::LoadAllBranches() {
   if (n_ele_branch != 0) n_ele();
   if (ele1_pt_branch != 0) ele1_pt();
   if (ele2_pt_branch != 0) ele2_pt();
+  if (ele1_eta_branch != 0) ele1_eta();
+  if (ele2_eta_branch != 0) ele2_eta();
   if (n_muons_branch != 0) n_muons();
   if (muon1_pt_branch != 0) muon1_pt();
   if (muon2_pt_branch != 0) muon2_pt();
+  if (muon1_eta_branch != 0) muon1_eta();
+  if (muon2_eta_branch != 0) muon2_eta();
   if (n_bjets_branch != 0) n_bjets();
   if (n_jets_branch != 0) n_jets();
-  if (bjet1_pt_branch != 0) bjet1_pt();
-  if (bjet2_pt_branch != 0) bjet2_pt();
-  if (bjet1_csv_branch != 0) bjet1_csv();
-  if (bjet2_csv_branch != 0) bjet2_csv();
   if (Mjj_branch != 0) Mjj();
   if (MetPt_branch != 0) MetPt();
   if (MetPhi_branch != 0) MetPhi();
   if (mT_branch != 0) mT();
+  if (tthMVA_branch != 0) tthMVA();
   if (jet_pt1_branch != 0) jet_pt1();
   if (jet_eta1_branch != 0) jet_eta1();
   if (jet_phi1_branch != 0) jet_phi1();
@@ -552,6 +695,51 @@ void ttHLeptonic::LoadAllBranches() {
   if (jet_eta15_branch != 0) jet_eta15();
   if (jet_phi15_branch != 0) jet_phi15();
   if (jet_bdiscriminant15_branch != 0) jet_bdiscriminant15();
+  if (jet_bbdiscriminant1_branch != 0) jet_bbdiscriminant1();
+  if (jet_bbdiscriminant2_branch != 0) jet_bbdiscriminant2();
+  if (jet_bbdiscriminant3_branch != 0) jet_bbdiscriminant3();
+  if (jet_bbdiscriminant4_branch != 0) jet_bbdiscriminant4();
+  if (jet_bbdiscriminant5_branch != 0) jet_bbdiscriminant5();
+  if (jet_bbdiscriminant6_branch != 0) jet_bbdiscriminant6();
+  if (jet_bbdiscriminant7_branch != 0) jet_bbdiscriminant7();
+  if (jet_bbdiscriminant8_branch != 0) jet_bbdiscriminant8();
+  if (jet_bbdiscriminant9_branch != 0) jet_bbdiscriminant9();
+  if (jet_bbdiscriminant10_branch != 0) jet_bbdiscriminant10();
+  if (jet_bbdiscriminant11_branch != 0) jet_bbdiscriminant11();
+  if (jet_bbdiscriminant12_branch != 0) jet_bbdiscriminant12();
+  if (jet_bbdiscriminant13_branch != 0) jet_bbdiscriminant13();
+  if (jet_bbdiscriminant14_branch != 0) jet_bbdiscriminant14();
+  if (jet_bbdiscriminant15_branch != 0) jet_bbdiscriminant15();
+  if (jet_cdiscriminant1_branch != 0) jet_cdiscriminant1();
+  if (jet_cdiscriminant2_branch != 0) jet_cdiscriminant2();
+  if (jet_cdiscriminant3_branch != 0) jet_cdiscriminant3();
+  if (jet_cdiscriminant4_branch != 0) jet_cdiscriminant4();
+  if (jet_cdiscriminant5_branch != 0) jet_cdiscriminant5();
+  if (jet_cdiscriminant6_branch != 0) jet_cdiscriminant6();
+  if (jet_cdiscriminant7_branch != 0) jet_cdiscriminant7();
+  if (jet_cdiscriminant8_branch != 0) jet_cdiscriminant8();
+  if (jet_cdiscriminant9_branch != 0) jet_cdiscriminant9();
+  if (jet_cdiscriminant10_branch != 0) jet_cdiscriminant10();
+  if (jet_cdiscriminant11_branch != 0) jet_cdiscriminant11();
+  if (jet_cdiscriminant12_branch != 0) jet_cdiscriminant12();
+  if (jet_cdiscriminant13_branch != 0) jet_cdiscriminant13();
+  if (jet_cdiscriminant14_branch != 0) jet_cdiscriminant14();
+  if (jet_cdiscriminant15_branch != 0) jet_cdiscriminant15();
+  if (jet_udsgdiscriminant1_branch != 0) jet_udsgdiscriminant1();
+  if (jet_udsgdiscriminant2_branch != 0) jet_udsgdiscriminant2();
+  if (jet_udsgdiscriminant3_branch != 0) jet_udsgdiscriminant3();
+  if (jet_udsgdiscriminant4_branch != 0) jet_udsgdiscriminant4();
+  if (jet_udsgdiscriminant5_branch != 0) jet_udsgdiscriminant5();
+  if (jet_udsgdiscriminant6_branch != 0) jet_udsgdiscriminant6();
+  if (jet_udsgdiscriminant7_branch != 0) jet_udsgdiscriminant7();
+  if (jet_udsgdiscriminant8_branch != 0) jet_udsgdiscriminant8();
+  if (jet_udsgdiscriminant9_branch != 0) jet_udsgdiscriminant9();
+  if (jet_udsgdiscriminant10_branch != 0) jet_udsgdiscriminant10();
+  if (jet_udsgdiscriminant11_branch != 0) jet_udsgdiscriminant11();
+  if (jet_udsgdiscriminant12_branch != 0) jet_udsgdiscriminant12();
+  if (jet_udsgdiscriminant13_branch != 0) jet_udsgdiscriminant13();
+  if (jet_udsgdiscriminant14_branch != 0) jet_udsgdiscriminant14();
+  if (jet_udsgdiscriminant15_branch != 0) jet_udsgdiscriminant15();
   if (rho_branch != 0) rho();
   if (nvtx_branch != 0) nvtx();
   if (event_branch != 0) event();
@@ -1160,6 +1348,19 @@ const float &ttHLeptonic::nb_tight() {
   return nb_tight_;
 }
 
+const float &ttHLeptonic::rand() {
+  if (not rand_isLoaded) {
+    if (rand_branch != 0) {
+      rand_branch->GetEntry(index);
+    } else {
+      printf("branch rand_branch does not exist!\n");
+      exit(1);
+    }
+    rand_isLoaded = true;
+  }
+  return rand_;
+}
+
 const float &ttHLeptonic::lead_photon_type() {
   if (not lead_photon_type_isLoaded) {
     if (lead_photon_type_branch != 0) {
@@ -1277,6 +1478,32 @@ const float &ttHLeptonic::ele2_pt() {
   return ele2_pt_;
 }
 
+const float &ttHLeptonic::ele1_eta() {
+  if (not ele1_eta_isLoaded) {
+    if (ele1_eta_branch != 0) {
+      ele1_eta_branch->GetEntry(index);
+    } else {
+      printf("branch ele1_eta_branch does not exist!\n");
+      exit(1);
+    }
+    ele1_eta_isLoaded = true;
+  }
+  return ele1_eta_;
+}
+
+const float &ttHLeptonic::ele2_eta() {
+  if (not ele2_eta_isLoaded) {
+    if (ele2_eta_branch != 0) {
+      ele2_eta_branch->GetEntry(index);
+    } else {
+      printf("branch ele2_eta_branch does not exist!\n");
+      exit(1);
+    }
+    ele2_eta_isLoaded = true;
+  }
+  return ele2_eta_;
+}
+
 const float &ttHLeptonic::n_muons() {
   if (not n_muons_isLoaded) {
     if (n_muons_branch != 0) {
@@ -1316,6 +1543,32 @@ const float &ttHLeptonic::muon2_pt() {
   return muon2_pt_;
 }
 
+const float &ttHLeptonic::muon1_eta() {
+  if (not muon1_eta_isLoaded) {
+    if (muon1_eta_branch != 0) {
+      muon1_eta_branch->GetEntry(index);
+    } else {
+      printf("branch muon1_eta_branch does not exist!\n");
+      exit(1);
+    }
+    muon1_eta_isLoaded = true;
+  }
+  return muon1_eta_;
+}
+
+const float &ttHLeptonic::muon2_eta() {
+  if (not muon2_eta_isLoaded) {
+    if (muon2_eta_branch != 0) {
+      muon2_eta_branch->GetEntry(index);
+    } else {
+      printf("branch muon2_eta_branch does not exist!\n");
+      exit(1);
+    }
+    muon2_eta_isLoaded = true;
+  }
+  return muon2_eta_;
+}
+
 const float &ttHLeptonic::n_bjets() {
   if (not n_bjets_isLoaded) {
     if (n_bjets_branch != 0) {
@@ -1340,58 +1593,6 @@ const float &ttHLeptonic::n_jets() {
     n_jets_isLoaded = true;
   }
   return n_jets_;
-}
-
-const float &ttHLeptonic::bjet1_pt() {
-  if (not bjet1_pt_isLoaded) {
-    if (bjet1_pt_branch != 0) {
-      bjet1_pt_branch->GetEntry(index);
-    } else {
-      printf("branch bjet1_pt_branch does not exist!\n");
-      exit(1);
-    }
-    bjet1_pt_isLoaded = true;
-  }
-  return bjet1_pt_;
-}
-
-const float &ttHLeptonic::bjet2_pt() {
-  if (not bjet2_pt_isLoaded) {
-    if (bjet2_pt_branch != 0) {
-      bjet2_pt_branch->GetEntry(index);
-    } else {
-      printf("branch bjet2_pt_branch does not exist!\n");
-      exit(1);
-    }
-    bjet2_pt_isLoaded = true;
-  }
-  return bjet2_pt_;
-}
-
-const float &ttHLeptonic::bjet1_csv() {
-  if (not bjet1_csv_isLoaded) {
-    if (bjet1_csv_branch != 0) {
-      bjet1_csv_branch->GetEntry(index);
-    } else {
-      printf("branch bjet1_csv_branch does not exist!\n");
-      exit(1);
-    }
-    bjet1_csv_isLoaded = true;
-  }
-  return bjet1_csv_;
-}
-
-const float &ttHLeptonic::bjet2_csv() {
-  if (not bjet2_csv_isLoaded) {
-    if (bjet2_csv_branch != 0) {
-      bjet2_csv_branch->GetEntry(index);
-    } else {
-      printf("branch bjet2_csv_branch does not exist!\n");
-      exit(1);
-    }
-    bjet2_csv_isLoaded = true;
-  }
-  return bjet2_csv_;
 }
 
 const float &ttHLeptonic::Mjj() {
@@ -1444,6 +1645,19 @@ const float &ttHLeptonic::mT() {
     mT_isLoaded = true;
   }
   return mT_;
+}
+
+const float &ttHLeptonic::tthMVA() {
+  if (not tthMVA_isLoaded) {
+    if (tthMVA_branch != 0) {
+      tthMVA_branch->GetEntry(index);
+    } else {
+      printf("branch tthMVA_branch does not exist!\n");
+      exit(1);
+    }
+    tthMVA_isLoaded = true;
+  }
+  return tthMVA_;
 }
 
 const float &ttHLeptonic::jet_pt1() {
@@ -2226,6 +2440,591 @@ const float &ttHLeptonic::jet_bdiscriminant15() {
   return jet_bdiscriminant15_;
 }
 
+const float &ttHLeptonic::jet_bbdiscriminant1() {
+  if (not jet_bbdiscriminant1_isLoaded) {
+    if (jet_bbdiscriminant1_branch != 0) {
+      jet_bbdiscriminant1_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant1_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant1_isLoaded = true;
+  }
+  return jet_bbdiscriminant1_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant2() {
+  if (not jet_bbdiscriminant2_isLoaded) {
+    if (jet_bbdiscriminant2_branch != 0) {
+      jet_bbdiscriminant2_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant2_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant2_isLoaded = true;
+  }
+  return jet_bbdiscriminant2_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant3() {
+  if (not jet_bbdiscriminant3_isLoaded) {
+    if (jet_bbdiscriminant3_branch != 0) {
+      jet_bbdiscriminant3_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant3_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant3_isLoaded = true;
+  }
+  return jet_bbdiscriminant3_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant4() {
+  if (not jet_bbdiscriminant4_isLoaded) {
+    if (jet_bbdiscriminant4_branch != 0) {
+      jet_bbdiscriminant4_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant4_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant4_isLoaded = true;
+  }
+  return jet_bbdiscriminant4_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant5() {
+  if (not jet_bbdiscriminant5_isLoaded) {
+    if (jet_bbdiscriminant5_branch != 0) {
+      jet_bbdiscriminant5_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant5_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant5_isLoaded = true;
+  }
+  return jet_bbdiscriminant5_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant6() {
+  if (not jet_bbdiscriminant6_isLoaded) {
+    if (jet_bbdiscriminant6_branch != 0) {
+      jet_bbdiscriminant6_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant6_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant6_isLoaded = true;
+  }
+  return jet_bbdiscriminant6_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant7() {
+  if (not jet_bbdiscriminant7_isLoaded) {
+    if (jet_bbdiscriminant7_branch != 0) {
+      jet_bbdiscriminant7_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant7_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant7_isLoaded = true;
+  }
+  return jet_bbdiscriminant7_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant8() {
+  if (not jet_bbdiscriminant8_isLoaded) {
+    if (jet_bbdiscriminant8_branch != 0) {
+      jet_bbdiscriminant8_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant8_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant8_isLoaded = true;
+  }
+  return jet_bbdiscriminant8_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant9() {
+  if (not jet_bbdiscriminant9_isLoaded) {
+    if (jet_bbdiscriminant9_branch != 0) {
+      jet_bbdiscriminant9_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant9_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant9_isLoaded = true;
+  }
+  return jet_bbdiscriminant9_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant10() {
+  if (not jet_bbdiscriminant10_isLoaded) {
+    if (jet_bbdiscriminant10_branch != 0) {
+      jet_bbdiscriminant10_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant10_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant10_isLoaded = true;
+  }
+  return jet_bbdiscriminant10_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant11() {
+  if (not jet_bbdiscriminant11_isLoaded) {
+    if (jet_bbdiscriminant11_branch != 0) {
+      jet_bbdiscriminant11_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant11_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant11_isLoaded = true;
+  }
+  return jet_bbdiscriminant11_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant12() {
+  if (not jet_bbdiscriminant12_isLoaded) {
+    if (jet_bbdiscriminant12_branch != 0) {
+      jet_bbdiscriminant12_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant12_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant12_isLoaded = true;
+  }
+  return jet_bbdiscriminant12_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant13() {
+  if (not jet_bbdiscriminant13_isLoaded) {
+    if (jet_bbdiscriminant13_branch != 0) {
+      jet_bbdiscriminant13_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant13_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant13_isLoaded = true;
+  }
+  return jet_bbdiscriminant13_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant14() {
+  if (not jet_bbdiscriminant14_isLoaded) {
+    if (jet_bbdiscriminant14_branch != 0) {
+      jet_bbdiscriminant14_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant14_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant14_isLoaded = true;
+  }
+  return jet_bbdiscriminant14_;
+}
+
+const float &ttHLeptonic::jet_bbdiscriminant15() {
+  if (not jet_bbdiscriminant15_isLoaded) {
+    if (jet_bbdiscriminant15_branch != 0) {
+      jet_bbdiscriminant15_branch->GetEntry(index);
+    } else {
+      printf("branch jet_bbdiscriminant15_branch does not exist!\n");
+      exit(1);
+    }
+    jet_bbdiscriminant15_isLoaded = true;
+  }
+  return jet_bbdiscriminant15_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant1() {
+  if (not jet_cdiscriminant1_isLoaded) {
+    if (jet_cdiscriminant1_branch != 0) {
+      jet_cdiscriminant1_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant1_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant1_isLoaded = true;
+  }
+  return jet_cdiscriminant1_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant2() {
+  if (not jet_cdiscriminant2_isLoaded) {
+    if (jet_cdiscriminant2_branch != 0) {
+      jet_cdiscriminant2_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant2_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant2_isLoaded = true;
+  }
+  return jet_cdiscriminant2_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant3() {
+  if (not jet_cdiscriminant3_isLoaded) {
+    if (jet_cdiscriminant3_branch != 0) {
+      jet_cdiscriminant3_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant3_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant3_isLoaded = true;
+  }
+  return jet_cdiscriminant3_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant4() {
+  if (not jet_cdiscriminant4_isLoaded) {
+    if (jet_cdiscriminant4_branch != 0) {
+      jet_cdiscriminant4_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant4_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant4_isLoaded = true;
+  }
+  return jet_cdiscriminant4_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant5() {
+  if (not jet_cdiscriminant5_isLoaded) {
+    if (jet_cdiscriminant5_branch != 0) {
+      jet_cdiscriminant5_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant5_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant5_isLoaded = true;
+  }
+  return jet_cdiscriminant5_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant6() {
+  if (not jet_cdiscriminant6_isLoaded) {
+    if (jet_cdiscriminant6_branch != 0) {
+      jet_cdiscriminant6_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant6_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant6_isLoaded = true;
+  }
+  return jet_cdiscriminant6_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant7() {
+  if (not jet_cdiscriminant7_isLoaded) {
+    if (jet_cdiscriminant7_branch != 0) {
+      jet_cdiscriminant7_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant7_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant7_isLoaded = true;
+  }
+  return jet_cdiscriminant7_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant8() {
+  if (not jet_cdiscriminant8_isLoaded) {
+    if (jet_cdiscriminant8_branch != 0) {
+      jet_cdiscriminant8_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant8_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant8_isLoaded = true;
+  }
+  return jet_cdiscriminant8_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant9() {
+  if (not jet_cdiscriminant9_isLoaded) {
+    if (jet_cdiscriminant9_branch != 0) {
+      jet_cdiscriminant9_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant9_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant9_isLoaded = true;
+  }
+  return jet_cdiscriminant9_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant10() {
+  if (not jet_cdiscriminant10_isLoaded) {
+    if (jet_cdiscriminant10_branch != 0) {
+      jet_cdiscriminant10_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant10_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant10_isLoaded = true;
+  }
+  return jet_cdiscriminant10_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant11() {
+  if (not jet_cdiscriminant11_isLoaded) {
+    if (jet_cdiscriminant11_branch != 0) {
+      jet_cdiscriminant11_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant11_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant11_isLoaded = true;
+  }
+  return jet_cdiscriminant11_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant12() {
+  if (not jet_cdiscriminant12_isLoaded) {
+    if (jet_cdiscriminant12_branch != 0) {
+      jet_cdiscriminant12_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant12_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant12_isLoaded = true;
+  }
+  return jet_cdiscriminant12_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant13() {
+  if (not jet_cdiscriminant13_isLoaded) {
+    if (jet_cdiscriminant13_branch != 0) {
+      jet_cdiscriminant13_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant13_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant13_isLoaded = true;
+  }
+  return jet_cdiscriminant13_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant14() {
+  if (not jet_cdiscriminant14_isLoaded) {
+    if (jet_cdiscriminant14_branch != 0) {
+      jet_cdiscriminant14_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant14_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant14_isLoaded = true;
+  }
+  return jet_cdiscriminant14_;
+}
+
+const float &ttHLeptonic::jet_cdiscriminant15() {
+  if (not jet_cdiscriminant15_isLoaded) {
+    if (jet_cdiscriminant15_branch != 0) {
+      jet_cdiscriminant15_branch->GetEntry(index);
+    } else {
+      printf("branch jet_cdiscriminant15_branch does not exist!\n");
+      exit(1);
+    }
+    jet_cdiscriminant15_isLoaded = true;
+  }
+  return jet_cdiscriminant15_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant1() {
+  if (not jet_udsgdiscriminant1_isLoaded) {
+    if (jet_udsgdiscriminant1_branch != 0) {
+      jet_udsgdiscriminant1_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant1_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant1_isLoaded = true;
+  }
+  return jet_udsgdiscriminant1_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant2() {
+  if (not jet_udsgdiscriminant2_isLoaded) {
+    if (jet_udsgdiscriminant2_branch != 0) {
+      jet_udsgdiscriminant2_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant2_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant2_isLoaded = true;
+  }
+  return jet_udsgdiscriminant2_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant3() {
+  if (not jet_udsgdiscriminant3_isLoaded) {
+    if (jet_udsgdiscriminant3_branch != 0) {
+      jet_udsgdiscriminant3_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant3_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant3_isLoaded = true;
+  }
+  return jet_udsgdiscriminant3_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant4() {
+  if (not jet_udsgdiscriminant4_isLoaded) {
+    if (jet_udsgdiscriminant4_branch != 0) {
+      jet_udsgdiscriminant4_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant4_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant4_isLoaded = true;
+  }
+  return jet_udsgdiscriminant4_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant5() {
+  if (not jet_udsgdiscriminant5_isLoaded) {
+    if (jet_udsgdiscriminant5_branch != 0) {
+      jet_udsgdiscriminant5_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant5_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant5_isLoaded = true;
+  }
+  return jet_udsgdiscriminant5_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant6() {
+  if (not jet_udsgdiscriminant6_isLoaded) {
+    if (jet_udsgdiscriminant6_branch != 0) {
+      jet_udsgdiscriminant6_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant6_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant6_isLoaded = true;
+  }
+  return jet_udsgdiscriminant6_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant7() {
+  if (not jet_udsgdiscriminant7_isLoaded) {
+    if (jet_udsgdiscriminant7_branch != 0) {
+      jet_udsgdiscriminant7_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant7_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant7_isLoaded = true;
+  }
+  return jet_udsgdiscriminant7_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant8() {
+  if (not jet_udsgdiscriminant8_isLoaded) {
+    if (jet_udsgdiscriminant8_branch != 0) {
+      jet_udsgdiscriminant8_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant8_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant8_isLoaded = true;
+  }
+  return jet_udsgdiscriminant8_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant9() {
+  if (not jet_udsgdiscriminant9_isLoaded) {
+    if (jet_udsgdiscriminant9_branch != 0) {
+      jet_udsgdiscriminant9_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant9_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant9_isLoaded = true;
+  }
+  return jet_udsgdiscriminant9_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant10() {
+  if (not jet_udsgdiscriminant10_isLoaded) {
+    if (jet_udsgdiscriminant10_branch != 0) {
+      jet_udsgdiscriminant10_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant10_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant10_isLoaded = true;
+  }
+  return jet_udsgdiscriminant10_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant11() {
+  if (not jet_udsgdiscriminant11_isLoaded) {
+    if (jet_udsgdiscriminant11_branch != 0) {
+      jet_udsgdiscriminant11_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant11_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant11_isLoaded = true;
+  }
+  return jet_udsgdiscriminant11_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant12() {
+  if (not jet_udsgdiscriminant12_isLoaded) {
+    if (jet_udsgdiscriminant12_branch != 0) {
+      jet_udsgdiscriminant12_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant12_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant12_isLoaded = true;
+  }
+  return jet_udsgdiscriminant12_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant13() {
+  if (not jet_udsgdiscriminant13_isLoaded) {
+    if (jet_udsgdiscriminant13_branch != 0) {
+      jet_udsgdiscriminant13_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant13_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant13_isLoaded = true;
+  }
+  return jet_udsgdiscriminant13_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant14() {
+  if (not jet_udsgdiscriminant14_isLoaded) {
+    if (jet_udsgdiscriminant14_branch != 0) {
+      jet_udsgdiscriminant14_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant14_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant14_isLoaded = true;
+  }
+  return jet_udsgdiscriminant14_;
+}
+
+const float &ttHLeptonic::jet_udsgdiscriminant15() {
+  if (not jet_udsgdiscriminant15_isLoaded) {
+    if (jet_udsgdiscriminant15_branch != 0) {
+      jet_udsgdiscriminant15_branch->GetEntry(index);
+    } else {
+      printf("branch jet_udsgdiscriminant15_branch does not exist!\n");
+      exit(1);
+    }
+    jet_udsgdiscriminant15_isLoaded = true;
+  }
+  return jet_udsgdiscriminant15_;
+}
+
 const float &ttHLeptonic::rho() {
   if (not rho_isLoaded) {
     if (rho_branch != 0) {
@@ -2399,6 +3198,7 @@ const float &subleadPixelSeed() { return cms3.subleadPixelSeed(); }
 const float &nb_loose() { return cms3.nb_loose(); }
 const float &nb_medium() { return cms3.nb_medium(); }
 const float &nb_tight() { return cms3.nb_tight(); }
+const float &rand() { return cms3.rand(); }
 const float &lead_photon_type() { return cms3.lead_photon_type(); }
 const float &sublead_photon_type() { return cms3.sublead_photon_type(); }
 const float &lead_closest_gen_Pt() { return cms3.lead_closest_gen_Pt(); }
@@ -2408,19 +3208,20 @@ const float &sublead_closest_gen_dR() { return cms3.sublead_closest_gen_dR(); }
 const float &n_ele() { return cms3.n_ele(); }
 const float &ele1_pt() { return cms3.ele1_pt(); }
 const float &ele2_pt() { return cms3.ele2_pt(); }
+const float &ele1_eta() { return cms3.ele1_eta(); }
+const float &ele2_eta() { return cms3.ele2_eta(); }
 const float &n_muons() { return cms3.n_muons(); }
 const float &muon1_pt() { return cms3.muon1_pt(); }
 const float &muon2_pt() { return cms3.muon2_pt(); }
+const float &muon1_eta() { return cms3.muon1_eta(); }
+const float &muon2_eta() { return cms3.muon2_eta(); }
 const float &n_bjets() { return cms3.n_bjets(); }
 const float &n_jets() { return cms3.n_jets(); }
-const float &bjet1_pt() { return cms3.bjet1_pt(); }
-const float &bjet2_pt() { return cms3.bjet2_pt(); }
-const float &bjet1_csv() { return cms3.bjet1_csv(); }
-const float &bjet2_csv() { return cms3.bjet2_csv(); }
 const float &Mjj() { return cms3.Mjj(); }
 const float &MetPt() { return cms3.MetPt(); }
 const float &MetPhi() { return cms3.MetPhi(); }
 const float &mT() { return cms3.mT(); }
+const float &tthMVA() { return cms3.tthMVA(); }
 const float &jet_pt1() { return cms3.jet_pt1(); }
 const float &jet_eta1() { return cms3.jet_eta1(); }
 const float &jet_phi1() { return cms3.jet_phi1(); }
@@ -2481,6 +3282,51 @@ const float &jet_pt15() { return cms3.jet_pt15(); }
 const float &jet_eta15() { return cms3.jet_eta15(); }
 const float &jet_phi15() { return cms3.jet_phi15(); }
 const float &jet_bdiscriminant15() { return cms3.jet_bdiscriminant15(); }
+const float &jet_bbdiscriminant1() { return cms3.jet_bbdiscriminant1(); }
+const float &jet_bbdiscriminant2() { return cms3.jet_bbdiscriminant2(); }
+const float &jet_bbdiscriminant3() { return cms3.jet_bbdiscriminant3(); }
+const float &jet_bbdiscriminant4() { return cms3.jet_bbdiscriminant4(); }
+const float &jet_bbdiscriminant5() { return cms3.jet_bbdiscriminant5(); }
+const float &jet_bbdiscriminant6() { return cms3.jet_bbdiscriminant6(); }
+const float &jet_bbdiscriminant7() { return cms3.jet_bbdiscriminant7(); }
+const float &jet_bbdiscriminant8() { return cms3.jet_bbdiscriminant8(); }
+const float &jet_bbdiscriminant9() { return cms3.jet_bbdiscriminant9(); }
+const float &jet_bbdiscriminant10() { return cms3.jet_bbdiscriminant10(); }
+const float &jet_bbdiscriminant11() { return cms3.jet_bbdiscriminant11(); }
+const float &jet_bbdiscriminant12() { return cms3.jet_bbdiscriminant12(); }
+const float &jet_bbdiscriminant13() { return cms3.jet_bbdiscriminant13(); }
+const float &jet_bbdiscriminant14() { return cms3.jet_bbdiscriminant14(); }
+const float &jet_bbdiscriminant15() { return cms3.jet_bbdiscriminant15(); }
+const float &jet_cdiscriminant1() { return cms3.jet_cdiscriminant1(); }
+const float &jet_cdiscriminant2() { return cms3.jet_cdiscriminant2(); }
+const float &jet_cdiscriminant3() { return cms3.jet_cdiscriminant3(); }
+const float &jet_cdiscriminant4() { return cms3.jet_cdiscriminant4(); }
+const float &jet_cdiscriminant5() { return cms3.jet_cdiscriminant5(); }
+const float &jet_cdiscriminant6() { return cms3.jet_cdiscriminant6(); }
+const float &jet_cdiscriminant7() { return cms3.jet_cdiscriminant7(); }
+const float &jet_cdiscriminant8() { return cms3.jet_cdiscriminant8(); }
+const float &jet_cdiscriminant9() { return cms3.jet_cdiscriminant9(); }
+const float &jet_cdiscriminant10() { return cms3.jet_cdiscriminant10(); }
+const float &jet_cdiscriminant11() { return cms3.jet_cdiscriminant11(); }
+const float &jet_cdiscriminant12() { return cms3.jet_cdiscriminant12(); }
+const float &jet_cdiscriminant13() { return cms3.jet_cdiscriminant13(); }
+const float &jet_cdiscriminant14() { return cms3.jet_cdiscriminant14(); }
+const float &jet_cdiscriminant15() { return cms3.jet_cdiscriminant15(); }
+const float &jet_udsgdiscriminant1() { return cms3.jet_udsgdiscriminant1(); }
+const float &jet_udsgdiscriminant2() { return cms3.jet_udsgdiscriminant2(); }
+const float &jet_udsgdiscriminant3() { return cms3.jet_udsgdiscriminant3(); }
+const float &jet_udsgdiscriminant4() { return cms3.jet_udsgdiscriminant4(); }
+const float &jet_udsgdiscriminant5() { return cms3.jet_udsgdiscriminant5(); }
+const float &jet_udsgdiscriminant6() { return cms3.jet_udsgdiscriminant6(); }
+const float &jet_udsgdiscriminant7() { return cms3.jet_udsgdiscriminant7(); }
+const float &jet_udsgdiscriminant8() { return cms3.jet_udsgdiscriminant8(); }
+const float &jet_udsgdiscriminant9() { return cms3.jet_udsgdiscriminant9(); }
+const float &jet_udsgdiscriminant10() { return cms3.jet_udsgdiscriminant10(); }
+const float &jet_udsgdiscriminant11() { return cms3.jet_udsgdiscriminant11(); }
+const float &jet_udsgdiscriminant12() { return cms3.jet_udsgdiscriminant12(); }
+const float &jet_udsgdiscriminant13() { return cms3.jet_udsgdiscriminant13(); }
+const float &jet_udsgdiscriminant14() { return cms3.jet_udsgdiscriminant14(); }
+const float &jet_udsgdiscriminant15() { return cms3.jet_udsgdiscriminant15(); }
 const float &rho() { return cms3.rho(); }
 const int &nvtx() { return cms3.nvtx(); }
 const unsigned long long &event() { return cms3.event(); }

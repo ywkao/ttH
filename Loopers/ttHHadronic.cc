@@ -97,6 +97,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (nb_medium_branch) nb_medium_branch->SetAddress(&nb_medium_);
   nb_tight_branch = tree->GetBranch("nb_tight");
   if (nb_tight_branch) nb_tight_branch->SetAddress(&nb_tight_);
+  rand_branch = tree->GetBranch("rand");
+  if (rand_branch) rand_branch->SetAddress(&rand_);
   lead_photon_type_branch = tree->GetBranch("lead_photon_type");
   if (lead_photon_type_branch) lead_photon_type_branch->SetAddress(&lead_photon_type_);
   sublead_photon_type_branch = tree->GetBranch("sublead_photon_type");
@@ -241,6 +243,96 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet14_bdiscriminant_branch) jet14_bdiscriminant_branch->SetAddress(&jet14_bdiscriminant_);
   jet15_bdiscriminant_branch = tree->GetBranch("jet15_bdiscriminant");
   if (jet15_bdiscriminant_branch) jet15_bdiscriminant_branch->SetAddress(&jet15_bdiscriminant_);
+  jet1_bbdiscriminant_branch = tree->GetBranch("jet1_bbdiscriminant");
+  if (jet1_bbdiscriminant_branch) jet1_bbdiscriminant_branch->SetAddress(&jet1_bbdiscriminant_);
+  jet2_bbdiscriminant_branch = tree->GetBranch("jet2_bbdiscriminant");
+  if (jet2_bbdiscriminant_branch) jet2_bbdiscriminant_branch->SetAddress(&jet2_bbdiscriminant_);
+  jet3_bbdiscriminant_branch = tree->GetBranch("jet3_bbdiscriminant");
+  if (jet3_bbdiscriminant_branch) jet3_bbdiscriminant_branch->SetAddress(&jet3_bbdiscriminant_);
+  jet4_bbdiscriminant_branch = tree->GetBranch("jet4_bbdiscriminant");
+  if (jet4_bbdiscriminant_branch) jet4_bbdiscriminant_branch->SetAddress(&jet4_bbdiscriminant_);
+  jet5_bbdiscriminant_branch = tree->GetBranch("jet5_bbdiscriminant");
+  if (jet5_bbdiscriminant_branch) jet5_bbdiscriminant_branch->SetAddress(&jet5_bbdiscriminant_);
+  jet6_bbdiscriminant_branch = tree->GetBranch("jet6_bbdiscriminant");
+  if (jet6_bbdiscriminant_branch) jet6_bbdiscriminant_branch->SetAddress(&jet6_bbdiscriminant_);
+  jet7_bbdiscriminant_branch = tree->GetBranch("jet7_bbdiscriminant");
+  if (jet7_bbdiscriminant_branch) jet7_bbdiscriminant_branch->SetAddress(&jet7_bbdiscriminant_);
+  jet8_bbdiscriminant_branch = tree->GetBranch("jet8_bbdiscriminant");
+  if (jet8_bbdiscriminant_branch) jet8_bbdiscriminant_branch->SetAddress(&jet8_bbdiscriminant_);
+  jet9_bbdiscriminant_branch = tree->GetBranch("jet9_bbdiscriminant");
+  if (jet9_bbdiscriminant_branch) jet9_bbdiscriminant_branch->SetAddress(&jet9_bbdiscriminant_);
+  jet10_bbdiscriminant_branch = tree->GetBranch("jet10_bbdiscriminant");
+  if (jet10_bbdiscriminant_branch) jet10_bbdiscriminant_branch->SetAddress(&jet10_bbdiscriminant_);
+  jet11_bbdiscriminant_branch = tree->GetBranch("jet11_bbdiscriminant");
+  if (jet11_bbdiscriminant_branch) jet11_bbdiscriminant_branch->SetAddress(&jet11_bbdiscriminant_);
+  jet12_bbdiscriminant_branch = tree->GetBranch("jet12_bbdiscriminant");
+  if (jet12_bbdiscriminant_branch) jet12_bbdiscriminant_branch->SetAddress(&jet12_bbdiscriminant_);
+  jet13_bbdiscriminant_branch = tree->GetBranch("jet13_bbdiscriminant");
+  if (jet13_bbdiscriminant_branch) jet13_bbdiscriminant_branch->SetAddress(&jet13_bbdiscriminant_);
+  jet14_bbdiscriminant_branch = tree->GetBranch("jet14_bbdiscriminant");
+  if (jet14_bbdiscriminant_branch) jet14_bbdiscriminant_branch->SetAddress(&jet14_bbdiscriminant_);
+  jet15_bbdiscriminant_branch = tree->GetBranch("jet15_bbdiscriminant");
+  if (jet15_bbdiscriminant_branch) jet15_bbdiscriminant_branch->SetAddress(&jet15_bbdiscriminant_);
+  jet1_cdiscriminant_branch = tree->GetBranch("jet1_cdiscriminant");
+  if (jet1_cdiscriminant_branch) jet1_cdiscriminant_branch->SetAddress(&jet1_cdiscriminant_);
+  jet2_cdiscriminant_branch = tree->GetBranch("jet2_cdiscriminant");
+  if (jet2_cdiscriminant_branch) jet2_cdiscriminant_branch->SetAddress(&jet2_cdiscriminant_);
+  jet3_cdiscriminant_branch = tree->GetBranch("jet3_cdiscriminant");
+  if (jet3_cdiscriminant_branch) jet3_cdiscriminant_branch->SetAddress(&jet3_cdiscriminant_);
+  jet4_cdiscriminant_branch = tree->GetBranch("jet4_cdiscriminant");
+  if (jet4_cdiscriminant_branch) jet4_cdiscriminant_branch->SetAddress(&jet4_cdiscriminant_);
+  jet5_cdiscriminant_branch = tree->GetBranch("jet5_cdiscriminant");
+  if (jet5_cdiscriminant_branch) jet5_cdiscriminant_branch->SetAddress(&jet5_cdiscriminant_);
+  jet6_cdiscriminant_branch = tree->GetBranch("jet6_cdiscriminant");
+  if (jet6_cdiscriminant_branch) jet6_cdiscriminant_branch->SetAddress(&jet6_cdiscriminant_);
+  jet7_cdiscriminant_branch = tree->GetBranch("jet7_cdiscriminant");
+  if (jet7_cdiscriminant_branch) jet7_cdiscriminant_branch->SetAddress(&jet7_cdiscriminant_);
+  jet8_cdiscriminant_branch = tree->GetBranch("jet8_cdiscriminant");
+  if (jet8_cdiscriminant_branch) jet8_cdiscriminant_branch->SetAddress(&jet8_cdiscriminant_);
+  jet9_cdiscriminant_branch = tree->GetBranch("jet9_cdiscriminant");
+  if (jet9_cdiscriminant_branch) jet9_cdiscriminant_branch->SetAddress(&jet9_cdiscriminant_);
+  jet10_cdiscriminant_branch = tree->GetBranch("jet10_cdiscriminant");
+  if (jet10_cdiscriminant_branch) jet10_cdiscriminant_branch->SetAddress(&jet10_cdiscriminant_);
+  jet11_cdiscriminant_branch = tree->GetBranch("jet11_cdiscriminant");
+  if (jet11_cdiscriminant_branch) jet11_cdiscriminant_branch->SetAddress(&jet11_cdiscriminant_);
+  jet12_cdiscriminant_branch = tree->GetBranch("jet12_cdiscriminant");
+  if (jet12_cdiscriminant_branch) jet12_cdiscriminant_branch->SetAddress(&jet12_cdiscriminant_);
+  jet13_cdiscriminant_branch = tree->GetBranch("jet13_cdiscriminant");
+  if (jet13_cdiscriminant_branch) jet13_cdiscriminant_branch->SetAddress(&jet13_cdiscriminant_);
+  jet14_cdiscriminant_branch = tree->GetBranch("jet14_cdiscriminant");
+  if (jet14_cdiscriminant_branch) jet14_cdiscriminant_branch->SetAddress(&jet14_cdiscriminant_);
+  jet15_cdiscriminant_branch = tree->GetBranch("jet15_cdiscriminant");
+  if (jet15_cdiscriminant_branch) jet15_cdiscriminant_branch->SetAddress(&jet15_cdiscriminant_);
+  jet1_udsgdiscriminant_branch = tree->GetBranch("jet1_udsgdiscriminant");
+  if (jet1_udsgdiscriminant_branch) jet1_udsgdiscriminant_branch->SetAddress(&jet1_udsgdiscriminant_);
+  jet2_udsgdiscriminant_branch = tree->GetBranch("jet2_udsgdiscriminant");
+  if (jet2_udsgdiscriminant_branch) jet2_udsgdiscriminant_branch->SetAddress(&jet2_udsgdiscriminant_);
+  jet3_udsgdiscriminant_branch = tree->GetBranch("jet3_udsgdiscriminant");
+  if (jet3_udsgdiscriminant_branch) jet3_udsgdiscriminant_branch->SetAddress(&jet3_udsgdiscriminant_);
+  jet4_udsgdiscriminant_branch = tree->GetBranch("jet4_udsgdiscriminant");
+  if (jet4_udsgdiscriminant_branch) jet4_udsgdiscriminant_branch->SetAddress(&jet4_udsgdiscriminant_);
+  jet5_udsgdiscriminant_branch = tree->GetBranch("jet5_udsgdiscriminant");
+  if (jet5_udsgdiscriminant_branch) jet5_udsgdiscriminant_branch->SetAddress(&jet5_udsgdiscriminant_);
+  jet6_udsgdiscriminant_branch = tree->GetBranch("jet6_udsgdiscriminant");
+  if (jet6_udsgdiscriminant_branch) jet6_udsgdiscriminant_branch->SetAddress(&jet6_udsgdiscriminant_);
+  jet7_udsgdiscriminant_branch = tree->GetBranch("jet7_udsgdiscriminant");
+  if (jet7_udsgdiscriminant_branch) jet7_udsgdiscriminant_branch->SetAddress(&jet7_udsgdiscriminant_);
+  jet8_udsgdiscriminant_branch = tree->GetBranch("jet8_udsgdiscriminant");
+  if (jet8_udsgdiscriminant_branch) jet8_udsgdiscriminant_branch->SetAddress(&jet8_udsgdiscriminant_);
+  jet9_udsgdiscriminant_branch = tree->GetBranch("jet9_udsgdiscriminant");
+  if (jet9_udsgdiscriminant_branch) jet9_udsgdiscriminant_branch->SetAddress(&jet9_udsgdiscriminant_);
+  jet10_udsgdiscriminant_branch = tree->GetBranch("jet10_udsgdiscriminant");
+  if (jet10_udsgdiscriminant_branch) jet10_udsgdiscriminant_branch->SetAddress(&jet10_udsgdiscriminant_);
+  jet11_udsgdiscriminant_branch = tree->GetBranch("jet11_udsgdiscriminant");
+  if (jet11_udsgdiscriminant_branch) jet11_udsgdiscriminant_branch->SetAddress(&jet11_udsgdiscriminant_);
+  jet12_udsgdiscriminant_branch = tree->GetBranch("jet12_udsgdiscriminant");
+  if (jet12_udsgdiscriminant_branch) jet12_udsgdiscriminant_branch->SetAddress(&jet12_udsgdiscriminant_);
+  jet13_udsgdiscriminant_branch = tree->GetBranch("jet13_udsgdiscriminant");
+  if (jet13_udsgdiscriminant_branch) jet13_udsgdiscriminant_branch->SetAddress(&jet13_udsgdiscriminant_);
+  jet14_udsgdiscriminant_branch = tree->GetBranch("jet14_udsgdiscriminant");
+  if (jet14_udsgdiscriminant_branch) jet14_udsgdiscriminant_branch->SetAddress(&jet14_udsgdiscriminant_);
+  jet15_udsgdiscriminant_branch = tree->GetBranch("jet15_udsgdiscriminant");
+  if (jet15_udsgdiscriminant_branch) jet15_udsgdiscriminant_branch->SetAddress(&jet15_udsgdiscriminant_);
   bjet1_csv_branch = tree->GetBranch("bjet1_csv");
   if (bjet1_csv_branch) bjet1_csv_branch->SetAddress(&bjet1_csv_);
   bjet2_csv_branch = tree->GetBranch("bjet2_csv");
@@ -316,6 +408,7 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   nb_loose_isLoaded = false;
   nb_medium_isLoaded = false;
   nb_tight_isLoaded = false;
+  rand_isLoaded = false;
   lead_photon_type_isLoaded = false;
   sublead_photon_type_isLoaded = false;
   lead_closest_gen_Pt_isLoaded = false;
@@ -388,6 +481,51 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet13_bdiscriminant_isLoaded = false;
   jet14_bdiscriminant_isLoaded = false;
   jet15_bdiscriminant_isLoaded = false;
+  jet1_bbdiscriminant_isLoaded = false;
+  jet2_bbdiscriminant_isLoaded = false;
+  jet3_bbdiscriminant_isLoaded = false;
+  jet4_bbdiscriminant_isLoaded = false;
+  jet5_bbdiscriminant_isLoaded = false;
+  jet6_bbdiscriminant_isLoaded = false;
+  jet7_bbdiscriminant_isLoaded = false;
+  jet8_bbdiscriminant_isLoaded = false;
+  jet9_bbdiscriminant_isLoaded = false;
+  jet10_bbdiscriminant_isLoaded = false;
+  jet11_bbdiscriminant_isLoaded = false;
+  jet12_bbdiscriminant_isLoaded = false;
+  jet13_bbdiscriminant_isLoaded = false;
+  jet14_bbdiscriminant_isLoaded = false;
+  jet15_bbdiscriminant_isLoaded = false;
+  jet1_cdiscriminant_isLoaded = false;
+  jet2_cdiscriminant_isLoaded = false;
+  jet3_cdiscriminant_isLoaded = false;
+  jet4_cdiscriminant_isLoaded = false;
+  jet5_cdiscriminant_isLoaded = false;
+  jet6_cdiscriminant_isLoaded = false;
+  jet7_cdiscriminant_isLoaded = false;
+  jet8_cdiscriminant_isLoaded = false;
+  jet9_cdiscriminant_isLoaded = false;
+  jet10_cdiscriminant_isLoaded = false;
+  jet11_cdiscriminant_isLoaded = false;
+  jet12_cdiscriminant_isLoaded = false;
+  jet13_cdiscriminant_isLoaded = false;
+  jet14_cdiscriminant_isLoaded = false;
+  jet15_cdiscriminant_isLoaded = false;
+  jet1_udsgdiscriminant_isLoaded = false;
+  jet2_udsgdiscriminant_isLoaded = false;
+  jet3_udsgdiscriminant_isLoaded = false;
+  jet4_udsgdiscriminant_isLoaded = false;
+  jet5_udsgdiscriminant_isLoaded = false;
+  jet6_udsgdiscriminant_isLoaded = false;
+  jet7_udsgdiscriminant_isLoaded = false;
+  jet8_udsgdiscriminant_isLoaded = false;
+  jet9_udsgdiscriminant_isLoaded = false;
+  jet10_udsgdiscriminant_isLoaded = false;
+  jet11_udsgdiscriminant_isLoaded = false;
+  jet12_udsgdiscriminant_isLoaded = false;
+  jet13_udsgdiscriminant_isLoaded = false;
+  jet14_udsgdiscriminant_isLoaded = false;
+  jet15_udsgdiscriminant_isLoaded = false;
   bjet1_csv_isLoaded = false;
   bjet2_csv_isLoaded = false;
   tthMVA_isLoaded = false;
@@ -449,6 +587,7 @@ void ttHHadronic::LoadAllBranches() {
   if (nb_loose_branch != 0) nb_loose();
   if (nb_medium_branch != 0) nb_medium();
   if (nb_tight_branch != 0) nb_tight();
+  if (rand_branch != 0) rand();
   if (lead_photon_type_branch != 0) lead_photon_type();
   if (sublead_photon_type_branch != 0) sublead_photon_type();
   if (lead_closest_gen_Pt_branch != 0) lead_closest_gen_Pt();
@@ -521,6 +660,51 @@ void ttHHadronic::LoadAllBranches() {
   if (jet13_bdiscriminant_branch != 0) jet13_bdiscriminant();
   if (jet14_bdiscriminant_branch != 0) jet14_bdiscriminant();
   if (jet15_bdiscriminant_branch != 0) jet15_bdiscriminant();
+  if (jet1_bbdiscriminant_branch != 0) jet1_bbdiscriminant();
+  if (jet2_bbdiscriminant_branch != 0) jet2_bbdiscriminant();
+  if (jet3_bbdiscriminant_branch != 0) jet3_bbdiscriminant();
+  if (jet4_bbdiscriminant_branch != 0) jet4_bbdiscriminant();
+  if (jet5_bbdiscriminant_branch != 0) jet5_bbdiscriminant();
+  if (jet6_bbdiscriminant_branch != 0) jet6_bbdiscriminant();
+  if (jet7_bbdiscriminant_branch != 0) jet7_bbdiscriminant();
+  if (jet8_bbdiscriminant_branch != 0) jet8_bbdiscriminant();
+  if (jet9_bbdiscriminant_branch != 0) jet9_bbdiscriminant();
+  if (jet10_bbdiscriminant_branch != 0) jet10_bbdiscriminant();
+  if (jet11_bbdiscriminant_branch != 0) jet11_bbdiscriminant();
+  if (jet12_bbdiscriminant_branch != 0) jet12_bbdiscriminant();
+  if (jet13_bbdiscriminant_branch != 0) jet13_bbdiscriminant();
+  if (jet14_bbdiscriminant_branch != 0) jet14_bbdiscriminant();
+  if (jet15_bbdiscriminant_branch != 0) jet15_bbdiscriminant();
+  if (jet1_cdiscriminant_branch != 0) jet1_cdiscriminant();
+  if (jet2_cdiscriminant_branch != 0) jet2_cdiscriminant();
+  if (jet3_cdiscriminant_branch != 0) jet3_cdiscriminant();
+  if (jet4_cdiscriminant_branch != 0) jet4_cdiscriminant();
+  if (jet5_cdiscriminant_branch != 0) jet5_cdiscriminant();
+  if (jet6_cdiscriminant_branch != 0) jet6_cdiscriminant();
+  if (jet7_cdiscriminant_branch != 0) jet7_cdiscriminant();
+  if (jet8_cdiscriminant_branch != 0) jet8_cdiscriminant();
+  if (jet9_cdiscriminant_branch != 0) jet9_cdiscriminant();
+  if (jet10_cdiscriminant_branch != 0) jet10_cdiscriminant();
+  if (jet11_cdiscriminant_branch != 0) jet11_cdiscriminant();
+  if (jet12_cdiscriminant_branch != 0) jet12_cdiscriminant();
+  if (jet13_cdiscriminant_branch != 0) jet13_cdiscriminant();
+  if (jet14_cdiscriminant_branch != 0) jet14_cdiscriminant();
+  if (jet15_cdiscriminant_branch != 0) jet15_cdiscriminant();
+  if (jet1_udsgdiscriminant_branch != 0) jet1_udsgdiscriminant();
+  if (jet2_udsgdiscriminant_branch != 0) jet2_udsgdiscriminant();
+  if (jet3_udsgdiscriminant_branch != 0) jet3_udsgdiscriminant();
+  if (jet4_udsgdiscriminant_branch != 0) jet4_udsgdiscriminant();
+  if (jet5_udsgdiscriminant_branch != 0) jet5_udsgdiscriminant();
+  if (jet6_udsgdiscriminant_branch != 0) jet6_udsgdiscriminant();
+  if (jet7_udsgdiscriminant_branch != 0) jet7_udsgdiscriminant();
+  if (jet8_udsgdiscriminant_branch != 0) jet8_udsgdiscriminant();
+  if (jet9_udsgdiscriminant_branch != 0) jet9_udsgdiscriminant();
+  if (jet10_udsgdiscriminant_branch != 0) jet10_udsgdiscriminant();
+  if (jet11_udsgdiscriminant_branch != 0) jet11_udsgdiscriminant();
+  if (jet12_udsgdiscriminant_branch != 0) jet12_udsgdiscriminant();
+  if (jet13_udsgdiscriminant_branch != 0) jet13_udsgdiscriminant();
+  if (jet14_udsgdiscriminant_branch != 0) jet14_udsgdiscriminant();
+  if (jet15_udsgdiscriminant_branch != 0) jet15_udsgdiscriminant();
   if (bjet1_csv_branch != 0) bjet1_csv();
   if (bjet2_csv_branch != 0) bjet2_csv();
   if (tthMVA_branch != 0) tthMVA();
@@ -1130,6 +1314,19 @@ const float &ttHHadronic::nb_tight() {
     nb_tight_isLoaded = true;
   }
   return nb_tight_;
+}
+
+const float &ttHHadronic::rand() {
+  if (not rand_isLoaded) {
+    if (rand_branch != 0) {
+      rand_branch->GetEntry(index);
+    } else {
+      printf("branch rand_branch does not exist!\n");
+      exit(1);
+    }
+    rand_isLoaded = true;
+  }
+  return rand_;
 }
 
 const float &ttHHadronic::lead_photon_type() {
@@ -2068,6 +2265,591 @@ const float &ttHHadronic::jet15_bdiscriminant() {
   return jet15_bdiscriminant_;
 }
 
+const float &ttHHadronic::jet1_bbdiscriminant() {
+  if (not jet1_bbdiscriminant_isLoaded) {
+    if (jet1_bbdiscriminant_branch != 0) {
+      jet1_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet1_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet1_bbdiscriminant_isLoaded = true;
+  }
+  return jet1_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet2_bbdiscriminant() {
+  if (not jet2_bbdiscriminant_isLoaded) {
+    if (jet2_bbdiscriminant_branch != 0) {
+      jet2_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet2_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet2_bbdiscriminant_isLoaded = true;
+  }
+  return jet2_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet3_bbdiscriminant() {
+  if (not jet3_bbdiscriminant_isLoaded) {
+    if (jet3_bbdiscriminant_branch != 0) {
+      jet3_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet3_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet3_bbdiscriminant_isLoaded = true;
+  }
+  return jet3_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet4_bbdiscriminant() {
+  if (not jet4_bbdiscriminant_isLoaded) {
+    if (jet4_bbdiscriminant_branch != 0) {
+      jet4_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet4_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet4_bbdiscriminant_isLoaded = true;
+  }
+  return jet4_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet5_bbdiscriminant() {
+  if (not jet5_bbdiscriminant_isLoaded) {
+    if (jet5_bbdiscriminant_branch != 0) {
+      jet5_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet5_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet5_bbdiscriminant_isLoaded = true;
+  }
+  return jet5_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet6_bbdiscriminant() {
+  if (not jet6_bbdiscriminant_isLoaded) {
+    if (jet6_bbdiscriminant_branch != 0) {
+      jet6_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet6_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet6_bbdiscriminant_isLoaded = true;
+  }
+  return jet6_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet7_bbdiscriminant() {
+  if (not jet7_bbdiscriminant_isLoaded) {
+    if (jet7_bbdiscriminant_branch != 0) {
+      jet7_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet7_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet7_bbdiscriminant_isLoaded = true;
+  }
+  return jet7_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet8_bbdiscriminant() {
+  if (not jet8_bbdiscriminant_isLoaded) {
+    if (jet8_bbdiscriminant_branch != 0) {
+      jet8_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet8_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet8_bbdiscriminant_isLoaded = true;
+  }
+  return jet8_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet9_bbdiscriminant() {
+  if (not jet9_bbdiscriminant_isLoaded) {
+    if (jet9_bbdiscriminant_branch != 0) {
+      jet9_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet9_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet9_bbdiscriminant_isLoaded = true;
+  }
+  return jet9_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet10_bbdiscriminant() {
+  if (not jet10_bbdiscriminant_isLoaded) {
+    if (jet10_bbdiscriminant_branch != 0) {
+      jet10_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet10_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet10_bbdiscriminant_isLoaded = true;
+  }
+  return jet10_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet11_bbdiscriminant() {
+  if (not jet11_bbdiscriminant_isLoaded) {
+    if (jet11_bbdiscriminant_branch != 0) {
+      jet11_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet11_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet11_bbdiscriminant_isLoaded = true;
+  }
+  return jet11_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet12_bbdiscriminant() {
+  if (not jet12_bbdiscriminant_isLoaded) {
+    if (jet12_bbdiscriminant_branch != 0) {
+      jet12_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet12_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet12_bbdiscriminant_isLoaded = true;
+  }
+  return jet12_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet13_bbdiscriminant() {
+  if (not jet13_bbdiscriminant_isLoaded) {
+    if (jet13_bbdiscriminant_branch != 0) {
+      jet13_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet13_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet13_bbdiscriminant_isLoaded = true;
+  }
+  return jet13_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet14_bbdiscriminant() {
+  if (not jet14_bbdiscriminant_isLoaded) {
+    if (jet14_bbdiscriminant_branch != 0) {
+      jet14_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet14_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet14_bbdiscriminant_isLoaded = true;
+  }
+  return jet14_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet15_bbdiscriminant() {
+  if (not jet15_bbdiscriminant_isLoaded) {
+    if (jet15_bbdiscriminant_branch != 0) {
+      jet15_bbdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet15_bbdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet15_bbdiscriminant_isLoaded = true;
+  }
+  return jet15_bbdiscriminant_;
+}
+
+const float &ttHHadronic::jet1_cdiscriminant() {
+  if (not jet1_cdiscriminant_isLoaded) {
+    if (jet1_cdiscriminant_branch != 0) {
+      jet1_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet1_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet1_cdiscriminant_isLoaded = true;
+  }
+  return jet1_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet2_cdiscriminant() {
+  if (not jet2_cdiscriminant_isLoaded) {
+    if (jet2_cdiscriminant_branch != 0) {
+      jet2_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet2_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet2_cdiscriminant_isLoaded = true;
+  }
+  return jet2_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet3_cdiscriminant() {
+  if (not jet3_cdiscriminant_isLoaded) {
+    if (jet3_cdiscriminant_branch != 0) {
+      jet3_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet3_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet3_cdiscriminant_isLoaded = true;
+  }
+  return jet3_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet4_cdiscriminant() {
+  if (not jet4_cdiscriminant_isLoaded) {
+    if (jet4_cdiscriminant_branch != 0) {
+      jet4_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet4_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet4_cdiscriminant_isLoaded = true;
+  }
+  return jet4_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet5_cdiscriminant() {
+  if (not jet5_cdiscriminant_isLoaded) {
+    if (jet5_cdiscriminant_branch != 0) {
+      jet5_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet5_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet5_cdiscriminant_isLoaded = true;
+  }
+  return jet5_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet6_cdiscriminant() {
+  if (not jet6_cdiscriminant_isLoaded) {
+    if (jet6_cdiscriminant_branch != 0) {
+      jet6_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet6_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet6_cdiscriminant_isLoaded = true;
+  }
+  return jet6_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet7_cdiscriminant() {
+  if (not jet7_cdiscriminant_isLoaded) {
+    if (jet7_cdiscriminant_branch != 0) {
+      jet7_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet7_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet7_cdiscriminant_isLoaded = true;
+  }
+  return jet7_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet8_cdiscriminant() {
+  if (not jet8_cdiscriminant_isLoaded) {
+    if (jet8_cdiscriminant_branch != 0) {
+      jet8_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet8_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet8_cdiscriminant_isLoaded = true;
+  }
+  return jet8_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet9_cdiscriminant() {
+  if (not jet9_cdiscriminant_isLoaded) {
+    if (jet9_cdiscriminant_branch != 0) {
+      jet9_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet9_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet9_cdiscriminant_isLoaded = true;
+  }
+  return jet9_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet10_cdiscriminant() {
+  if (not jet10_cdiscriminant_isLoaded) {
+    if (jet10_cdiscriminant_branch != 0) {
+      jet10_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet10_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet10_cdiscriminant_isLoaded = true;
+  }
+  return jet10_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet11_cdiscriminant() {
+  if (not jet11_cdiscriminant_isLoaded) {
+    if (jet11_cdiscriminant_branch != 0) {
+      jet11_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet11_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet11_cdiscriminant_isLoaded = true;
+  }
+  return jet11_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet12_cdiscriminant() {
+  if (not jet12_cdiscriminant_isLoaded) {
+    if (jet12_cdiscriminant_branch != 0) {
+      jet12_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet12_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet12_cdiscriminant_isLoaded = true;
+  }
+  return jet12_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet13_cdiscriminant() {
+  if (not jet13_cdiscriminant_isLoaded) {
+    if (jet13_cdiscriminant_branch != 0) {
+      jet13_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet13_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet13_cdiscriminant_isLoaded = true;
+  }
+  return jet13_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet14_cdiscriminant() {
+  if (not jet14_cdiscriminant_isLoaded) {
+    if (jet14_cdiscriminant_branch != 0) {
+      jet14_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet14_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet14_cdiscriminant_isLoaded = true;
+  }
+  return jet14_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet15_cdiscriminant() {
+  if (not jet15_cdiscriminant_isLoaded) {
+    if (jet15_cdiscriminant_branch != 0) {
+      jet15_cdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet15_cdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet15_cdiscriminant_isLoaded = true;
+  }
+  return jet15_cdiscriminant_;
+}
+
+const float &ttHHadronic::jet1_udsgdiscriminant() {
+  if (not jet1_udsgdiscriminant_isLoaded) {
+    if (jet1_udsgdiscriminant_branch != 0) {
+      jet1_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet1_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet1_udsgdiscriminant_isLoaded = true;
+  }
+  return jet1_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet2_udsgdiscriminant() {
+  if (not jet2_udsgdiscriminant_isLoaded) {
+    if (jet2_udsgdiscriminant_branch != 0) {
+      jet2_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet2_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet2_udsgdiscriminant_isLoaded = true;
+  }
+  return jet2_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet3_udsgdiscriminant() {
+  if (not jet3_udsgdiscriminant_isLoaded) {
+    if (jet3_udsgdiscriminant_branch != 0) {
+      jet3_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet3_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet3_udsgdiscriminant_isLoaded = true;
+  }
+  return jet3_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet4_udsgdiscriminant() {
+  if (not jet4_udsgdiscriminant_isLoaded) {
+    if (jet4_udsgdiscriminant_branch != 0) {
+      jet4_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet4_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet4_udsgdiscriminant_isLoaded = true;
+  }
+  return jet4_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet5_udsgdiscriminant() {
+  if (not jet5_udsgdiscriminant_isLoaded) {
+    if (jet5_udsgdiscriminant_branch != 0) {
+      jet5_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet5_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet5_udsgdiscriminant_isLoaded = true;
+  }
+  return jet5_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet6_udsgdiscriminant() {
+  if (not jet6_udsgdiscriminant_isLoaded) {
+    if (jet6_udsgdiscriminant_branch != 0) {
+      jet6_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet6_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet6_udsgdiscriminant_isLoaded = true;
+  }
+  return jet6_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet7_udsgdiscriminant() {
+  if (not jet7_udsgdiscriminant_isLoaded) {
+    if (jet7_udsgdiscriminant_branch != 0) {
+      jet7_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet7_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet7_udsgdiscriminant_isLoaded = true;
+  }
+  return jet7_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet8_udsgdiscriminant() {
+  if (not jet8_udsgdiscriminant_isLoaded) {
+    if (jet8_udsgdiscriminant_branch != 0) {
+      jet8_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet8_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet8_udsgdiscriminant_isLoaded = true;
+  }
+  return jet8_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet9_udsgdiscriminant() {
+  if (not jet9_udsgdiscriminant_isLoaded) {
+    if (jet9_udsgdiscriminant_branch != 0) {
+      jet9_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet9_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet9_udsgdiscriminant_isLoaded = true;
+  }
+  return jet9_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet10_udsgdiscriminant() {
+  if (not jet10_udsgdiscriminant_isLoaded) {
+    if (jet10_udsgdiscriminant_branch != 0) {
+      jet10_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet10_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet10_udsgdiscriminant_isLoaded = true;
+  }
+  return jet10_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet11_udsgdiscriminant() {
+  if (not jet11_udsgdiscriminant_isLoaded) {
+    if (jet11_udsgdiscriminant_branch != 0) {
+      jet11_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet11_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet11_udsgdiscriminant_isLoaded = true;
+  }
+  return jet11_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet12_udsgdiscriminant() {
+  if (not jet12_udsgdiscriminant_isLoaded) {
+    if (jet12_udsgdiscriminant_branch != 0) {
+      jet12_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet12_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet12_udsgdiscriminant_isLoaded = true;
+  }
+  return jet12_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet13_udsgdiscriminant() {
+  if (not jet13_udsgdiscriminant_isLoaded) {
+    if (jet13_udsgdiscriminant_branch != 0) {
+      jet13_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet13_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet13_udsgdiscriminant_isLoaded = true;
+  }
+  return jet13_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet14_udsgdiscriminant() {
+  if (not jet14_udsgdiscriminant_isLoaded) {
+    if (jet14_udsgdiscriminant_branch != 0) {
+      jet14_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet14_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet14_udsgdiscriminant_isLoaded = true;
+  }
+  return jet14_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet15_udsgdiscriminant() {
+  if (not jet15_udsgdiscriminant_isLoaded) {
+    if (jet15_udsgdiscriminant_branch != 0) {
+      jet15_udsgdiscriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet15_udsgdiscriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet15_udsgdiscriminant_isLoaded = true;
+  }
+  return jet15_udsgdiscriminant_;
+}
+
 const float &ttHHadronic::bjet1_csv() {
   if (not bjet1_csv_isLoaded) {
     if (bjet1_csv_branch != 0) {
@@ -2280,6 +3062,7 @@ const float &subleadPixelSeed() { return cms3.subleadPixelSeed(); }
 const float &nb_loose() { return cms3.nb_loose(); }
 const float &nb_medium() { return cms3.nb_medium(); }
 const float &nb_tight() { return cms3.nb_tight(); }
+const float &rand() { return cms3.rand(); }
 const float &lead_photon_type() { return cms3.lead_photon_type(); }
 const float &sublead_photon_type() { return cms3.sublead_photon_type(); }
 const float &lead_closest_gen_Pt() { return cms3.lead_closest_gen_Pt(); }
@@ -2352,6 +3135,51 @@ const float &jet12_bdiscriminant() { return cms3.jet12_bdiscriminant(); }
 const float &jet13_bdiscriminant() { return cms3.jet13_bdiscriminant(); }
 const float &jet14_bdiscriminant() { return cms3.jet14_bdiscriminant(); }
 const float &jet15_bdiscriminant() { return cms3.jet15_bdiscriminant(); }
+const float &jet1_bbdiscriminant() { return cms3.jet1_bbdiscriminant(); }
+const float &jet2_bbdiscriminant() { return cms3.jet2_bbdiscriminant(); }
+const float &jet3_bbdiscriminant() { return cms3.jet3_bbdiscriminant(); }
+const float &jet4_bbdiscriminant() { return cms3.jet4_bbdiscriminant(); }
+const float &jet5_bbdiscriminant() { return cms3.jet5_bbdiscriminant(); }
+const float &jet6_bbdiscriminant() { return cms3.jet6_bbdiscriminant(); }
+const float &jet7_bbdiscriminant() { return cms3.jet7_bbdiscriminant(); }
+const float &jet8_bbdiscriminant() { return cms3.jet8_bbdiscriminant(); }
+const float &jet9_bbdiscriminant() { return cms3.jet9_bbdiscriminant(); }
+const float &jet10_bbdiscriminant() { return cms3.jet10_bbdiscriminant(); }
+const float &jet11_bbdiscriminant() { return cms3.jet11_bbdiscriminant(); }
+const float &jet12_bbdiscriminant() { return cms3.jet12_bbdiscriminant(); }
+const float &jet13_bbdiscriminant() { return cms3.jet13_bbdiscriminant(); }
+const float &jet14_bbdiscriminant() { return cms3.jet14_bbdiscriminant(); }
+const float &jet15_bbdiscriminant() { return cms3.jet15_bbdiscriminant(); }
+const float &jet1_cdiscriminant() { return cms3.jet1_cdiscriminant(); }
+const float &jet2_cdiscriminant() { return cms3.jet2_cdiscriminant(); }
+const float &jet3_cdiscriminant() { return cms3.jet3_cdiscriminant(); }
+const float &jet4_cdiscriminant() { return cms3.jet4_cdiscriminant(); }
+const float &jet5_cdiscriminant() { return cms3.jet5_cdiscriminant(); }
+const float &jet6_cdiscriminant() { return cms3.jet6_cdiscriminant(); }
+const float &jet7_cdiscriminant() { return cms3.jet7_cdiscriminant(); }
+const float &jet8_cdiscriminant() { return cms3.jet8_cdiscriminant(); }
+const float &jet9_cdiscriminant() { return cms3.jet9_cdiscriminant(); }
+const float &jet10_cdiscriminant() { return cms3.jet10_cdiscriminant(); }
+const float &jet11_cdiscriminant() { return cms3.jet11_cdiscriminant(); }
+const float &jet12_cdiscriminant() { return cms3.jet12_cdiscriminant(); }
+const float &jet13_cdiscriminant() { return cms3.jet13_cdiscriminant(); }
+const float &jet14_cdiscriminant() { return cms3.jet14_cdiscriminant(); }
+const float &jet15_cdiscriminant() { return cms3.jet15_cdiscriminant(); }
+const float &jet1_udsgdiscriminant() { return cms3.jet1_udsgdiscriminant(); }
+const float &jet2_udsgdiscriminant() { return cms3.jet2_udsgdiscriminant(); }
+const float &jet3_udsgdiscriminant() { return cms3.jet3_udsgdiscriminant(); }
+const float &jet4_udsgdiscriminant() { return cms3.jet4_udsgdiscriminant(); }
+const float &jet5_udsgdiscriminant() { return cms3.jet5_udsgdiscriminant(); }
+const float &jet6_udsgdiscriminant() { return cms3.jet6_udsgdiscriminant(); }
+const float &jet7_udsgdiscriminant() { return cms3.jet7_udsgdiscriminant(); }
+const float &jet8_udsgdiscriminant() { return cms3.jet8_udsgdiscriminant(); }
+const float &jet9_udsgdiscriminant() { return cms3.jet9_udsgdiscriminant(); }
+const float &jet10_udsgdiscriminant() { return cms3.jet10_udsgdiscriminant(); }
+const float &jet11_udsgdiscriminant() { return cms3.jet11_udsgdiscriminant(); }
+const float &jet12_udsgdiscriminant() { return cms3.jet12_udsgdiscriminant(); }
+const float &jet13_udsgdiscriminant() { return cms3.jet13_udsgdiscriminant(); }
+const float &jet14_udsgdiscriminant() { return cms3.jet14_udsgdiscriminant(); }
+const float &jet15_udsgdiscriminant() { return cms3.jet15_udsgdiscriminant(); }
 const float &bjet1_csv() { return cms3.bjet1_csv(); }
 const float &bjet2_csv() { return cms3.bjet2_csv(); }
 const float &tthMVA() { return cms3.tthMVA(); }
