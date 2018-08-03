@@ -41,3 +41,6 @@ Submitting ttH Babies version v3.8 using skims in /hadoop/cms/store/user/bemarsh
 Date: 2018-07-23 12:37:14.187169 
 Submitting ttH Babies version v3.9 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit e1fcb601973fef662a7ef99d31c7ececc547002a of tth_dev branch of flashgg
 
+Date: 2018-08-02 14:33:49.711289 
+Submitting ttH Babies version v3.11 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1 and commit 22d1899310db174bcec8c3379c44fc2e4d6ce205 of tth_dev_94X branch of flashgg
+
