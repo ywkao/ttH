@@ -1,71 +1,85 @@
 export SCRAM_ARCH=slc6_amd64_gcc530
 
 # Set up Shell Utilities
-source ~/Utilities/ShellFunctions.sh
+source /home/users/sjmay/Utilities/ShellFunctions.sh
 export -f addHistos
 
-# Set up CMMSW 80X
-if [ ! -d CMSSW_8_0_28 ]; then
-  cmsrel CMSSW_8_0_28
-  cd CMSSW_8_0_28/src
-  cmsenv
-  git cms-init
-else
-  cd CMSSW_8_0_28/src
-  cmsenv
+
+if (( $# < 1 )); then
+  echo "Please provide CMSSW version to setup ('80X' for 2016 or '94X' for 2017)"
+  return
 fi
 
-if [ ! -d flashgg ]; then
-  cd $CMSSW_BASE/src
-  git clone https://github.com/sam-may/flashgg 
-  cd flashgg
-  git checkout tth_dev_80X
+CMSSW_VER=$1
+echo "Setting up for $CMSSW_VER"
 
-  cd ..
-  source flashgg/setup_8_0_X.sh # ignore the "error: addinfo_cache" messages
+if [ "$CMSSW_VER" = "80X" ]; then
+  # Set up CMMSW 80X
+  export SCRAM_ARCH=slc6_amd64_gcc530
+  if [ ! -d CMSSW_8_0_28 ]; then
+    cmsrel CMSSW_8_0_28
+    cd CMSSW_8_0_28/src
+    cmsenv
+    git cms-init
+  else
+    cd CMSSW_8_0_28/src
+    cmsenv
+  fi
 
-  # Build
-  cd $CMSSW_BASE/src
-  scram b -j 30
-  cd ../../
-else
-  cd ../../   
+  if [ ! -d flashgg ]; then
+    cd $CMSSW_BASE/src
+    git clone https://github.com/sam-may/flashgg 
+    cd flashgg
+    git checkout tth_dev_80X
+
+    cd ..
+    source flashgg/setup_8_0_X.sh # ignore the "error: addinfo_cache" messages
+
+    # Build
+    cd $CMSSW_BASE/src
+    scram b -j 30
+    cd ../../
+  else
+    cd ../../   
+  fi
 fi
 
-if [ ! -d CMSSW_9_4_6 ]; then
-  cmsrel CMSSW_9_4_6
-  cd CMSSW_9_4_6/src
-  cmsenv
-  git cms-init
-else
-  cd CMSSW_9_4_6/src
-  cmsenv
+if [ "$CMSSW_VER" = "94X" ]; then
+  # Set up CMSSW 94X
+  export SCRAM_ARCH=slc6_amd64_gcc630
+  if [ ! -d CMSSW_9_4_6 ]; then
+    cmsrel CMSSW_9_4_6
+    cd CMSSW_9_4_6/src
+    cmsenv
+    git cms-init
+  else
+    cd CMSSW_9_4_6/src
+    cmsenv
+  fi
+
+  if [ ! -d flashgg ]; then
+    cd $CMSSW_BASE/src
+    git clone https://github.com/sam-may/flashgg
+    cd flashgg
+    git checkout tth_dev_94X
+
+    cd ..
+    source flashgg/setup_9_4_X.sh 
+
+    # Build
+    cd $CMSSW_BASE/src
+    scram b -j 30
+    source flashgg/afterbuild_9_4_X.sh
+    cd ../../
+  else
+    cd ../../
+  fi
 fi
-
-if [ ! -d flashgg ]; then
-  cd $CMSSW_BASE/src
-  git clone https://github.com/sam-may/flashgg
-  cd flashgg
-  git checkout tth_dev_94X
-
-  cd ..
-  source flashgg/setup_9_4_X.sh 
-
-  # Build
-  cd $CMSSW_BASE/src
-  scram b -j 30
-  source flashgg/afterbuild_9_4_X.sh
-  cd ../../
-else
-  cd ../../
-fi
-
-
 
 if [ ! -d logs ]; then
   mkdir logs
 fi
 
-pushd ~/ProjectMetis # or replace with your metis location
+pushd /home/users/sjmay/ProjectMetis # or replace with your metis location
 source setup.sh
 popd 
