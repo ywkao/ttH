@@ -39,7 +39,7 @@ class BabyMaker {
     int 	label_;
     double	evt_weight_;
     int 	process_id_;
-
+    int		use_for_train_;
     
     int		njets_;
     //int		nbjets_;

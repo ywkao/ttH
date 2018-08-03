@@ -441,11 +441,11 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       if (jet_pt3() != -100)      vProcess[processId]->fill_histogram("hJet3Eta", jet_eta3(), evt_weight, vId);
       if (jet_pt4() != -100)      vProcess[processId]->fill_histogram("hJet4Eta", jet_eta4(), evt_weight, vId);
 
-      if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hbJet1pT", bjet1_pt(), evt_weight, vId);
-      if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hbJet2pT", bjet2_pt(), evt_weight, vId);
+      //if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hbJet1pT", bjet1_pt(), evt_weight, vId);
+      //if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hbJet2pT", bjet2_pt(), evt_weight, vId);
 
-      if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, vId);
-      if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, vId);
+      //if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, vId);
+      //if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, vId);
 
       // Leading Photon
       vProcess[processId]->fill_histogram("hPhotonLeadPt", leadPt(), evt_weight, vId);
