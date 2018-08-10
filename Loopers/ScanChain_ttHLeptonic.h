@@ -70,6 +70,17 @@ double get_lep_pt(double &lep_eta) {
 }
 
 // have to use these ugly functions to make vectors of 4-vectors bc can only store floats in flashgg dumper
+TLorentzVector make_lead_photon() {
+  TLorentzVector pho;
+  pho.SetPtEtaPhiE(leadPt(), leadEta(), leadPhi(), leadEnergy());
+  return pho;
+}
+
+TLorentzVector make_sublead_photon() {
+  TLorentzVector pho;
+  pho.SetPtEtaPhiE(subleadPt(), subleadEta(), subleadPhi(), subleadEnergy());
+  return pho;
+}
 
 vector<TLorentzVector> make_els() {
   vector<TLorentzVector> vEls;
