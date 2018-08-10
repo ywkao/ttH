@@ -1,50 +1,7 @@
-// -*- C++ -*-
-// Usage:
-// > root -b -q doAll.C
+#include "ScanChain_ttHHadronic.h"
 
-#include <iostream>
-#include <vector>
-
-// ROOT
-#include "TBenchmark.h"
-#include "TChain.h"
-#include "TDirectory.h"
-#include "TFile.h"
-#include "TROOT.h"
-#include "TTreeCache.h"
-
-// ttHHadronic
-#include "ttHHadronic.cc"
-#include "ttHLooper.h"
-#include "scale1fb/scale1fb_2016.h"
-#include "scale1fb/scale1fb_2017.h"
-#include "MakeMVAOptimizationBabies.h"
-
-// tmva
-#include "TMVA/Reader.h" 
-
-using namespace std;
-using namespace tas;
-
-const double lumi_2016 = 35.9;
-const double lumi_2017 = 41.5;
-
-const bool evaluate_mva = false;
-
-const vector<double> mva_thresh_2017 = { 0.38, 0.48, 0.56 };
-
-bool pass_2016_mva_presel() {
-  if (mass() < 100)             	return false;
-  if (n_jets() < 3)       		return false;
-  if (diphoMVARes() < 0.4)        	return false;
-  if (leadIDMVA() < -0.9)         	return false;
-  if (subleadIDMVA() < -0.9)         	return false;
-  if (nb_loose() < 1)     		return false;
-  return true;
-}
-
-int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-  TFile* f1 = new TFile(tag + "_histograms.root", "RECREATE");
+int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+  TFile* f1 = new TFile(tag + "_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
   // Benchmark
@@ -168,7 +125,6 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    TString year = currentFileTitle.Contains("2017") ? "2017" : "2016"; 
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -273,8 +229,8 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 
 	mva_value = mva->EvaluateMVA( "BDT" );
 	double reference_mva = tthMVA();
-	bool pass_ref_presel = pass_2016_mva_presel();
-        baby->FillBabyNtuple(label, evt_weight, processId, mass(), mva_value, reference_mva, pass_ref_presel);
+	bool pass_ref_presel = year == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
+        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel);
       }
 
       int mvaCategoryId = mva_value < -0.92 ? 0 : 1;
@@ -372,7 +328,11 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       vProcess[processId]->fill_histogram("hHT", ht_, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hNbJets", nb_loose(), evt_weight, vId); // medium id
+      vProcess[processId]->fill_histogram("hNbLoose", nb_loose(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNbMedium", nb_medium(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNbTight", nb_tight(), evt_weight, vId); 
+
+
       if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("hJet1pT", jet1_pt(), evt_weight, vId);
       if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("hJet2pT", jet2_pt(), evt_weight, vId);
       if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("hJet3pT", jet3_pt(), evt_weight, vId);

@@ -1,40 +1,7 @@
-// -*- C++ -*-
-// Usage:
-// > root -b -q doAll.C
+#include "ScanChain_ttHLeptonic.h"
 
-#include <iostream>
-#include <vector>
-
-// ROOT
-#include "TBenchmark.h"
-#include "TChain.h"
-#include "TDirectory.h"
-#include "TFile.h"
-#include "TROOT.h"
-#include "TTreeCache.h"
-
-// ttHLeptonic
-#include "ttHLeptonic.cc"
-#include "ttHLooper.h"
-#include "scale1fb/scale1fb_2016.h"
-#include "scale1fb/scale1fb_2017.h"
-#include "MakeMVAOptimizationBabies.h"
-
-// tmva
-#include "TMVA/Reader.h"
-
-using namespace std;
-using namespace tas;
-
-const double lumi_2016 = 35.9;
-const double lumi_2017 = 41.5;
-
-const bool evaluate_mva = false;
-
-const vector<double> mva_thresh_2017 = { 0.3, 0.7 };
-
-int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-  TFile* f1 = new TFile(tag+"_histograms.root", "RECREATE");
+int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+  TFile* f1 = new TFile(tag+"_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
   // Benchmark
@@ -93,6 +60,9 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
   float met_;
   float mt_; 
 
+  float lep_pt_;
+  float lep_eta_;
+
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
     mva->AddVariable("njets_", &njets_);
@@ -128,6 +98,9 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
     mva->AddVariable("met_", &met_);
     mva->AddVariable("mt_", &mt_);
 
+    mva->AddVariable("lep_pt_", &lep_pt_);
+    mva->AddVariable("lep_eta_", &lep_eta_);
+
     mva->BookMVA("BDT", "../MVAs/Leptonic_bdt.xml");
   }
 
@@ -147,8 +120,6 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG");
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    TString year = currentFileTitle.Contains("2017") ? "2017" : "2016";
-    
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -253,8 +224,13 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 	met_ = MetPt();
 	mt_ = mT();
 
+	lep_pt_ = n_ele() > 0 ? ele1_pt() : muon1_pt();
+        lep_eta_ = n_ele() > 0 ? ele1_eta() : muon1_eta();
+
 	mva_value = mva->EvaluateMVA( "BDT" );
-	baby->FillBabyNtuple(label, evt_weight, processId, mass(), mva_value, -1, true);
+	double reference_mva = year == "2017" ? tthMVA() : -1;
+        bool pass_ref_presel = year == "2017" ? pass_2017_mva_presel() : true;
+        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel);
       }
 
       int mvaCategoryId = mva_value < -0.92 ? 0 : 1;
@@ -270,6 +246,37 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+      else if (tag == "ttHLeptonicMedium") {
+	if (mass() < 100)       			continue;
+	if (n_jets() < 2)       			continue;
+	if (nb_medium() < 1)				continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadPixelSeed() || subleadPixelSeed())	continue;
+	double lep_pt, lep_eta;
+	if (get_lep_pt(lep_eta) < 15)			continue;
+	//if (MetPt() < 50)				continue;
+      }  
+      else if (tag == "ttHLeptonicTight") {
+        if (mass() < 100)                               continue;
+        if (n_jets() < 2)                               continue;
+        if (nb_tight() < 1)                             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadPixelSeed() || subleadPixelSeed())      continue;
+        double lep_pt, lep_eta;
+        if (get_lep_pt(lep_eta) < 25)                   continue;
+        if (MetPt() < 50)                             continue;
+      }
+      else if (tag == "ttHLeptonicMedTight") {
+	if (mass() < 100)                               continue;
+        if (n_jets() < 2)                               continue;
+	if (nb_medium() < 1)                            continue;
+	if (nb_loose() < 2)				continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadPixelSeed() || subleadPixelSeed())      continue;
+	double lep_pt, lep_eta;
+	if (get_lep_pt(lep_eta) < 20)                   continue;
+      }
+
       else if (tag == "ttHLeptonicCustom") {
         if (mass() < 100)        continue;
         if (n_jets() < 2)       continue;
@@ -375,30 +382,32 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 
       else if (tag == "ttHLeptonic_2017_SR1") {
 	if (!(n_ele() + n_muons() == 1)) continue;
+	if (isData && blind && mass() > 115 && mass() < 135)      continue;
 	if (n_jets() < 1)		continue;
 	if (nb_medium() < 1)		continue;
 	if (leadIDMVA() < -0.2)		continue;
 	if (subleadIDMVA() < -0.2)	continue;
-	//if (!(tthMVA() >= mva_thresh_2017[0] && tthMVA() < mva_thresh_2017[1])) continue;
-	//if (tthMVA() < mva_thresh_2017[1])      continue;
+	if (!(tthMVA() >= mva_thresh_2017[0] && tthMVA() < mva_thresh_2017[1])) continue;
       }
 
       else if (tag == "ttHLeptonic_2017_SR2") {
 	if (!(n_ele() + n_muons() == 1))	continue;
+	if (isData && blind && mass() > 115 && mass() < 135)      continue;
         if (n_jets() < 1)                continue;
         if (nb_medium() < 1)            continue;
         if (leadIDMVA() < -0.2)         continue;
         if (subleadIDMVA() < -0.2)      continue;
-        //if (tthMVA() < mva_thresh_2017[1])      continue;
+        if (tthMVA() < mva_thresh_2017[1])      continue;
       }
 
       else if (tag == "ttHLeptonic_2017_dilep") {
 	if (!(n_ele() + n_muons() >= 2)) continue;
+	if (isData && blind && mass() > 115 && mass() < 135)      continue;
 	if (n_jets() < 1)                continue;
         if (nb_medium() < 1)            continue;
         if (leadIDMVA() < -0.2)         continue;
         if (subleadIDMVA() < -0.2)      continue;
-	//if (tthMVA() < 0.6)		continue;
+	if (tthMVA() < 0.6)		continue;
       }
 
       else {
@@ -407,8 +416,10 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 
 
 
-
-
+      TLorentzVector diphoton_p4 = dipho_p4(leadPt(), leadEta(), leadPhi(), leadEt(), subleadPt(), subleadEta(), subleadPhi(), subleadEt());
+      double pt_h = diphoton_p4.Pt();
+ 
+      vProcess[processId]->fill_histogram("hPtHiggs", pt_h, evt_weight, vId);
 
 
 
@@ -429,7 +440,9 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
       vProcess[processId]->fill_histogram("hHT", ht_, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hNbJets", nb_loose(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNbLoose", nb_loose(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNbMedium", nb_medium(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNbTight", nb_tight(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hMT", mT(), evt_weight, vId);
       if (jet_pt1() != -100)      vProcess[processId]->fill_histogram("hJet1pT", jet_pt1(), evt_weight, vId);
       if (jet_pt2() != -100)      vProcess[processId]->fill_histogram("hJet2pT", jet_pt2(), evt_weight, vId);
@@ -446,6 +459,11 @@ int ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, i
 
       //if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, vId);
       //if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, vId);
+
+      double lep_pt, lep_eta;
+      lep_pt = get_lep_pt(lep_eta);
+      vProcess[processId]->fill_histogram("hLeptonPt", lep_pt, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hLeptonEta", lep_eta, evt_weight, vId);
 
       // Leading Photon
       vProcess[processId]->fill_histogram("hPhotonLeadPt", leadPt(), evt_weight, vId);
