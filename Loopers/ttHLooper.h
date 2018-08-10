@@ -1,3 +1,4 @@
+#include "TLorentzVector.h"
 #include "ttH_process.h"
 
 vector<Process*> generate_processes(TFile* f) {
@@ -35,7 +36,9 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hMT", 50, 0, 500);
 
     v[i]->add_histogram("hNJets", 16, -0.5, 15.5);
-    v[i]->add_histogram("hNbJets", 16, -0.5, 15.5);
+    v[i]->add_histogram("hNbLoose", 16, -0.5, 15.5);
+    v[i]->add_histogram("hNbMedium", 16, -0.5, 15.5);
+    v[i]->add_histogram("hNbTight", 16, -0.5, 15.5);
     v[i]->add_histogram("hJet1pT", 25, 0, 500);
     v[i]->add_histogram("hJet1Eta", 25, -3, 3);
     v[i]->add_histogram("hJet2pT", 25, 0, 500);
@@ -50,6 +53,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hbJet2pT", 25, 0, 500);
     //v[i]->add_histogram("hbJet2Eta", 50, -3, 3);    
 
+    v[i]->add_histogram("hPtHiggs", 25, 0, 400);
+    v[i]->add_histogram("hMinDrDiphoJet", 25, -3, 3);
 
     // Leading photon
     v[i]->add_histogram("hPhotonLeadPt", 25, 0, 350);
@@ -107,6 +112,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hHadronicMVA", 25, -1.0, 1.0);
     v[i]->add_histogram("hLeptonicMVA", 25, -1.0, 1.0);
 
+    v[i]->add_histogram("hLeptonPt", 25, 0, 200);
+    v[i]->add_histogram("hLeptonEta", 25, -3, 3);
 
 
     v[i]->add_histogram("hPhotonMinIDMVA_passPSV", 5, -1, 1);
@@ -251,6 +258,15 @@ double sgn(double x) {
     return 0;
 }
 
+double min_dr(TLorentzVector diphoton, vector<TLorentzVector> jets) {
+  double min = 999;
+  for (int i = 0; i < jets.size(); i++) {
+    double dr = diphoton.DeltaR(jets[i]);
+    min = dr < min ? dr : min;
+  }
+  return min;
+}
+
 const vector<TString> vSamples_2016 = {"DoubleEG", 
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2", 
 			"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8", 
@@ -283,8 +299,9 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 			// No V + gamma samples for 2017 :(
 };
 
+
 void add_samples(TChain* ch, TString year) {
-  TString tag = "v3.11";
+  TString tag = year == "2017" ? "v1.1" : "v3.10";
 
   TString location = "merged_babies";
 

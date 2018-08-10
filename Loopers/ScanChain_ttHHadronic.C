@@ -160,24 +160,13 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
+      vector<TLorentzVector> jets = make_jets();
+      TLorentzVector lead_photon = make_lead_photon();
+      TLorentzVector sublead_photon = make_sublead_photon();
 
-      // have to calculate ht this dumb way :(
       ht_ = 0;
-      ht_ += jet1_pt() > 0 ? jet1_pt() : 0;
-      ht_ += jet2_pt() > 0 ? jet2_pt() : 0;
-      ht_ += jet3_pt() > 0 ? jet3_pt() : 0;
-      ht_ += jet4_pt() > 0 ? jet4_pt() : 0;
-      ht_ += jet5_pt() > 0 ? jet5_pt() : 0;
-      ht_ += jet6_pt() > 0 ? jet6_pt() : 0;
-      ht_ += jet7_pt() > 0 ? jet7_pt() : 0;
-      ht_ += jet8_pt() > 0 ? jet8_pt() : 0;
-      ht_ += jet9_pt() > 0 ? jet9_pt() : 0;
-      ht_ += jet10_pt() > 0 ? jet10_pt() : 0;
-      ht_ += jet11_pt() > 0 ? jet11_pt() : 0;
-      ht_ += jet12_pt() > 0 ? jet12_pt() : 0;
-      ht_ += jet13_pt() > 0 ? jet13_pt() : 0;
-      ht_ += jet14_pt() > 0 ? jet14_pt() : 0;
-      ht_ += jet15_pt() > 0 ? jet15_pt() : 0;
+      for (int i = 0; i < jets.size(); i++)
+        ht_ += jets[i].Pt();
 
       // Evaluate MVA, if we choose
       double mva_value = -999;
@@ -303,8 +292,9 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
 
 
 
-
-
+      TLorentzVector diphoton = lead_photon + sublead_photon;
+      vProcess[processId]->fill_histogram("hHiggsPt", diphoton.Pt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
 
       // Fill histograms //
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   

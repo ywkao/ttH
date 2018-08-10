@@ -162,24 +162,17 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
+      // Make p4 for physics objects
+      vector<TLorentzVector> jets = make_jets();
+      TLorentzVector lead_photon = make_lead_photon();
+      TLorentzVector sublead_photon = make_sublead_photon();
+      vector<TLorentzVector> electrons = make_els();
+      vector<TLorentzVector> muons = make_mus();
 
-      // have to calculate ht this dumb way :(
+
       ht_ = 0;
-      ht_ += jet_pt1() > 0 ? jet_pt1() : 0;
-      ht_ += jet_pt2() > 0 ? jet_pt2() : 0;
-      ht_ += jet_pt3() > 0 ? jet_pt3() : 0;
-      ht_ += jet_pt4() > 0 ? jet_pt4() : 0;
-      ht_ += jet_pt5() > 0 ? jet_pt5() : 0;
-      ht_ += jet_pt6() > 0 ? jet_pt6() : 0;
-      ht_ += jet_pt7() > 0 ? jet_pt7() : 0;
-      ht_ += jet_pt8() > 0 ? jet_pt8() : 0;
-      ht_ += jet_pt9() > 0 ? jet_pt9() : 0;
-      ht_ += jet_pt10() > 0 ? jet_pt10() : 0;
-      ht_ += jet_pt11() > 0 ? jet_pt11() : 0;
-      ht_ += jet_pt12() > 0 ? jet_pt12() : 0;
-      ht_ += jet_pt13() > 0 ? jet_pt13() : 0;
-      ht_ += jet_pt14() > 0 ? jet_pt14() : 0;
-      ht_ += jet_pt15() > 0 ? jet_pt15() : 0;
+      for (int i = 0; i < jets.size(); i++)
+	ht_ += jets[i].Pt();
 
       // Evaluate MVA, if we choose
       double mva_value = -999;
@@ -415,13 +408,9 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
       } 
 
 
-
-      TLorentzVector diphoton_p4 = dipho_p4(leadPt(), leadEta(), leadPhi(), leadEt(), subleadPt(), subleadEta(), subleadPhi(), subleadEt());
-      double pt_h = diphoton_p4.Pt();
- 
-      vProcess[processId]->fill_histogram("hPtHiggs", pt_h, evt_weight, vId);
-
-
+      TLorentzVector diphoton = lead_photon + sublead_photon; 
+      vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
 
       // General
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);
