@@ -160,9 +160,14 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
-      vector<TLorentzVector> jets = make_jets();
-      TLorentzVector lead_photon = make_lead_photon();
-      TLorentzVector sublead_photon = make_sublead_photon();
+      vector<TLorentzVector> jets;
+      TLorentzVector lead_photon;
+      TLorentzVector sublead_photon;
+      if (year == "2017") {
+        jets = make_jets();
+        lead_photon = make_lead_photon();
+        sublead_photon = make_sublead_photon();
+      }
 
       ht_ = 0;
       for (int i = 0; i < jets.size(); i++)
@@ -291,10 +296,11 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
 
 
 
-
-      TLorentzVector diphoton = lead_photon + sublead_photon;
-      vProcess[processId]->fill_histogram("hHiggsPt", diphoton.Pt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+      if (year == "2017") { // need to update 2016 babies at some point to include this info
+	TLorentzVector diphoton = lead_photon + sublead_photon;
+	vProcess[processId]->fill_histogram("hHiggsPt", diphoton.Pt(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+      }
 
       // Fill histograms //
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   

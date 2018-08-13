@@ -326,7 +326,7 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 void add_samples(TChain* ch, TString year) {
   TString tag = year == "2017" ? "v1.1" : "v3.10";
 
-  TString location = "/home/users/sjmay/merged_babies";
+  TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 
   vector<TString> vSamples = year == "2017" ? vSamples_2017 : vSamples_2016;
 

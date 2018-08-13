@@ -50,6 +50,8 @@ with open("cross_sections_flashgg.json") as json_file:
       scale1fb[dataset]["xs"] = cross_sections[ds]["xs"]
       if "br" in cross_sections[ds]:
         scale1fb[dataset]["br"] = cross_sections[ds]["br"]
+    else:
+      print "Did not find cross section for sample: %s" % ds
       #if "kf" in cross_sections[ds]: #FIXME: should we do k-factor?
       #  scale1fb[dataset]["kf"] = cross_sections[ds]["kf"]
 
@@ -63,9 +65,8 @@ for key, info in scale1fb.iteritems():
     scale1fb[key]["scale1fb"] = 0
 
 # Check that things look reasonable
-for key, info in scale1fb.iteritems():
-  print key
-  print info
+with open("scale1fb_%s_log.txt" % args.year, "w") as fout:
+  fout.write(json.dumps(scale1fb))
 
 with open("scale1fb_%s.h" % args.year, "w") as fout:
   fout.write("double scale1fb_%s(TString currentFileTitle) {\n" % args.year)
@@ -76,7 +77,7 @@ with open("scale1fb_%s.h" % args.year, "w") as fout:
   fout.write("\n")
   fout.write('  TObjArray *tx = currentFileTitle.Tokenize("/");\n')
   fout.write("  TString key = ((TObjString *)(tx->At(tx->GetEntries()-2)))->String();\n")
-  fout.write('  TString tag = "v3.11";\n')
+  fout.write('  TString tag = "v1.0";\n')
   fout.write('  TString to_replace = "__ttH_Babies_" + tag + "_%s";\n' % args.year)
   fout.write('  TString replace_with = "";\n')
   fout.write('  key = key.ReplaceAll(to_replace, replace_with);\n')
