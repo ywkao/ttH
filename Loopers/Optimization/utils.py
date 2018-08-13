@@ -33,12 +33,12 @@ def calc_sigma_eff(signal_data, weights, idx, name):
     if not (h.GetBinCenter(i+1) > 120 and h.GetBinCenter(i+1) < 130):
       continue
     y_fit.append(h.GetBinContent(i+1))
-    y_err.append(h.GetBinError(i+1))
-    #y_err.append(h.GetBinError(i+1) if h.GetBinError(i+1) > 0 else 1)
+    #y_err.append(h.GetBinError(i+1))
+    y_err.append(h.GetBinError(i+1) if h.GetBinError(i+1) != 0 else 1)
 
   # fit
-  popt, pcov = curve_fit(gaus, x_fit, y_fit, p0 = [1, 125, 2])
-  #popt, pcov = curve_fit(gaus, x_fit, y_fit, sigma = y_err, p0 = [1, 125, 2])
+  #popt, pcov = curve_fit(gaus, x_fit, y_fit, p0 = [1, 125, 2])
+  popt, pcov = curve_fit(gaus, x_fit, y_fit, sigma = y_err, p0 = [1, 125, 2])
 
   # plot
   x_plot = numpy.linspace(120, 130, 100)
@@ -66,19 +66,23 @@ def fit_exp(data, weights, mean_eff, sigma_eff, idx, name):
   for i in range(len(data)):
     h.Fill(data[i], weights[i])
 
-  x_fit = numpy.append(numpy.linspace(100, 120, 20), numpy.linspace(130, 180, 50))
+  if type == "data":
+    x_fit = numpy.append(numpy.linspace(100, 120, 20), numpy.linspace(130, 180, 50))
+  elif type == "mc":
+    x_fit = numpy.linspace(100, 180, 80)
   y_fit = []
   y_err = []
   for i in range(h.GetNbinsX()):
-    if h.GetBinCenter(i+1) > 120 and h.GetBinCenter(i+1) < 130:
+    if type == "data" and h.GetBinCenter(i+1) > 120 and h.GetBinCenter(i+1) < 130:
       continue
     y_fit.append(h.GetBinContent(i+1))
-    y_err.append(h.GetBinError(i+1))
-    #y_err.append(h.GetBinError(i+1) if h.GetBinError(i+1) > 0 else 1)
+    y_err.append(h.GetBinError(i+1) if h.GetBinContent(i+1) != 0 else 1)
   if type == "data":
+    #popt, pcov = curve_fit(exp, x_fit, y_fit, sigma = y_err, p0 = [10, 0.01])
     popt, pcov = curve_fit(exp, x_fit, y_fit, p0 = [10, 0.01])
   else:
-    popt, pcov = curve_fit(exp, x_fit, y_fit, sigma = y_err, p0 = [10, 0.01])
+    #popt, pcov = curve_fit(exp, x_fit, y_fit, sigma = y_err, p0 = [10, 0.01])
+    popt, pcov = curve_fit(exp, x_fit, y_fit, p0 = [10, 0.01])
 
   bkg_pred = quad(exp, mean_eff - (1.645*sigma_eff), mean_eff + (1.645*sigma_eff), args = (popt[0], popt[1]))[0]
 

@@ -54,7 +54,11 @@ void add_variables(vector<Process*> v, TString tag) {
     //v[i]->add_histogram("hbJet2Eta", 50, -3, 3);    
 
     v[i]->add_histogram("hPtHiggs", 25, 0, 400);
-    v[i]->add_histogram("hMinDrDiphoJet", 25, -3, 3);
+    v[i]->add_histogram("hMinDrDiphoJet", 25, 0, 6);
+    v[i]->add_histogram("hDijetClosestWMass", 25, 0, 50);
+    v[i]->add_histogram("hDijetMass", 50, 0, 500);
+    v[i]->add_histogram("hDeltaRDiphoW", 25, 0, 6);
+
 
     // Leading photon
     v[i]->add_histogram("hPhotonLeadPt", 25, 0, 350);
@@ -267,6 +271,25 @@ double min_dr(TLorentzVector diphoton, vector<TLorentzVector> jets) {
   return min;
 }
 
+const double mW = 80;
+double closest_mW(vector<TLorentzVector> jets, TLorentzVector diphoton, double &deltaR) {
+  double min_diff = 999;
+  int jet1_idx(-1), jet2_idx(-1);
+  for (int i = 0; i < jets.size(); i++) {
+    for (int j = i + 1; j < jets.size(); j++) {
+      TLorentzVector dijet = jets[i] + jets[j];
+      double diff = abs(dijet.M() - mW);
+      if (diff < min_diff) {
+	min_diff = diff;
+	jet1_idx = i;
+	jet2_idx = j;
+      }
+    }
+  }
+  deltaR = jets[jet1_idx].DeltaR(jets[jet2_idx]);
+  return min_diff;
+}
+
 const vector<TString> vSamples_2016 = {"DoubleEG", 
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2", 
 			"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8", 
@@ -303,7 +326,7 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 void add_samples(TChain* ch, TString year) {
   TString tag = year == "2017" ? "v1.1" : "v3.10";
 
-  TString location = "merged_babies";
+  TString location = "/home/users/sjmay/merged_babies";
 
   vector<TString> vSamples = year == "2017" ? vSamples_2017 : vSamples_2016;
 

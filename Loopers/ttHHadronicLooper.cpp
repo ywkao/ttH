@@ -10,5 +10,5 @@ int main(int argc, char* argv[]) {
   TChain *ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 
   add_samples(ch, year);
 
-  ScanChain(ch, tag); 
+  ScanChain(ch, tag, year); 
 }

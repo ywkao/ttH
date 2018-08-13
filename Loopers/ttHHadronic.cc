@@ -19,6 +19,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (leadPt_branch) leadPt_branch->SetAddress(&leadPt_);
   leadEt_branch = tree->GetBranch("leadEt");
   if (leadEt_branch) leadEt_branch->SetAddress(&leadEt_);
+  leadEnergy_branch = tree->GetBranch("leadEnergy");
+  if (leadEnergy_branch) leadEnergy_branch->SetAddress(&leadEnergy_);
   leadEta_branch = tree->GetBranch("leadEta");
   if (leadEta_branch) leadEta_branch->SetAddress(&leadEta_);
   leadPhi_branch = tree->GetBranch("leadPhi");
@@ -43,6 +45,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (subleadPt_branch) subleadPt_branch->SetAddress(&subleadPt_);
   subleadEt_branch = tree->GetBranch("subleadEt");
   if (subleadEt_branch) subleadEt_branch->SetAddress(&subleadEt_);
+  subleadEnergy_branch = tree->GetBranch("subleadEnergy");
+  if (subleadEnergy_branch) subleadEnergy_branch->SetAddress(&subleadEnergy_);
   subleadEta_branch = tree->GetBranch("subleadEta");
   if (subleadEta_branch) subleadEta_branch->SetAddress(&subleadEta_);
   subleadPhi_branch = tree->GetBranch("subleadPhi");
@@ -333,6 +337,36 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet14_udsgdiscriminant_branch) jet14_udsgdiscriminant_branch->SetAddress(&jet14_udsgdiscriminant_);
   jet15_udsgdiscriminant_branch = tree->GetBranch("jet15_udsgdiscriminant");
   if (jet15_udsgdiscriminant_branch) jet15_udsgdiscriminant_branch->SetAddress(&jet15_udsgdiscriminant_);
+  jet1_energy_branch = tree->GetBranch("jet1_energy");
+  if (jet1_energy_branch) jet1_energy_branch->SetAddress(&jet1_energy_);
+  jet2_energy_branch = tree->GetBranch("jet2_energy");
+  if (jet2_energy_branch) jet2_energy_branch->SetAddress(&jet2_energy_);
+  jet3_energy_branch = tree->GetBranch("jet3_energy");
+  if (jet3_energy_branch) jet3_energy_branch->SetAddress(&jet3_energy_);
+  jet4_energy_branch = tree->GetBranch("jet4_energy");
+  if (jet4_energy_branch) jet4_energy_branch->SetAddress(&jet4_energy_);
+  jet5_energy_branch = tree->GetBranch("jet5_energy");
+  if (jet5_energy_branch) jet5_energy_branch->SetAddress(&jet5_energy_);
+  jet6_energy_branch = tree->GetBranch("jet6_energy");
+  if (jet6_energy_branch) jet6_energy_branch->SetAddress(&jet6_energy_);
+  jet7_energy_branch = tree->GetBranch("jet7_energy");
+  if (jet7_energy_branch) jet7_energy_branch->SetAddress(&jet7_energy_);
+  jet8_energy_branch = tree->GetBranch("jet8_energy");
+  if (jet8_energy_branch) jet8_energy_branch->SetAddress(&jet8_energy_);
+  jet9_energy_branch = tree->GetBranch("jet9_energy");
+  if (jet9_energy_branch) jet9_energy_branch->SetAddress(&jet9_energy_);
+  jet10_energy_branch = tree->GetBranch("jet10_energy");
+  if (jet10_energy_branch) jet10_energy_branch->SetAddress(&jet10_energy_);
+  jet11_energy_branch = tree->GetBranch("jet11_energy");
+  if (jet11_energy_branch) jet11_energy_branch->SetAddress(&jet11_energy_);
+  jet12_energy_branch = tree->GetBranch("jet12_energy");
+  if (jet12_energy_branch) jet12_energy_branch->SetAddress(&jet12_energy_);
+  jet13_energy_branch = tree->GetBranch("jet13_energy");
+  if (jet13_energy_branch) jet13_energy_branch->SetAddress(&jet13_energy_);
+  jet14_energy_branch = tree->GetBranch("jet14_energy");
+  if (jet14_energy_branch) jet14_energy_branch->SetAddress(&jet14_energy_);
+  jet15_energy_branch = tree->GetBranch("jet15_energy");
+  if (jet15_energy_branch) jet15_energy_branch->SetAddress(&jet15_energy_);
   bjet1_csv_branch = tree->GetBranch("bjet1_csv");
   if (bjet1_csv_branch) bjet1_csv_branch->SetAddress(&bjet1_csv_);
   bjet2_csv_branch = tree->GetBranch("bjet2_csv");
@@ -369,6 +403,7 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   mass_isLoaded = false;
   leadPt_isLoaded = false;
   leadEt_isLoaded = false;
+  leadEnergy_isLoaded = false;
   leadEta_isLoaded = false;
   leadPhi_isLoaded = false;
   lead_sieie_isLoaded = false;
@@ -381,6 +416,7 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   leadGendeltaR_isLoaded = false;
   subleadPt_isLoaded = false;
   subleadEt_isLoaded = false;
+  subleadEnergy_isLoaded = false;
   subleadEta_isLoaded = false;
   subleadPhi_isLoaded = false;
   sublead_sieie_isLoaded = false;
@@ -526,6 +562,21 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet13_udsgdiscriminant_isLoaded = false;
   jet14_udsgdiscriminant_isLoaded = false;
   jet15_udsgdiscriminant_isLoaded = false;
+  jet1_energy_isLoaded = false;
+  jet2_energy_isLoaded = false;
+  jet3_energy_isLoaded = false;
+  jet4_energy_isLoaded = false;
+  jet5_energy_isLoaded = false;
+  jet6_energy_isLoaded = false;
+  jet7_energy_isLoaded = false;
+  jet8_energy_isLoaded = false;
+  jet9_energy_isLoaded = false;
+  jet10_energy_isLoaded = false;
+  jet11_energy_isLoaded = false;
+  jet12_energy_isLoaded = false;
+  jet13_energy_isLoaded = false;
+  jet14_energy_isLoaded = false;
+  jet15_energy_isLoaded = false;
   bjet1_csv_isLoaded = false;
   bjet2_csv_isLoaded = false;
   tthMVA_isLoaded = false;
@@ -548,6 +599,7 @@ void ttHHadronic::LoadAllBranches() {
   if (mass_branch != 0) mass();
   if (leadPt_branch != 0) leadPt();
   if (leadEt_branch != 0) leadEt();
+  if (leadEnergy_branch != 0) leadEnergy();
   if (leadEta_branch != 0) leadEta();
   if (leadPhi_branch != 0) leadPhi();
   if (lead_sieie_branch != 0) lead_sieie();
@@ -560,6 +612,7 @@ void ttHHadronic::LoadAllBranches() {
   if (leadGendeltaR_branch != 0) leadGendeltaR();
   if (subleadPt_branch != 0) subleadPt();
   if (subleadEt_branch != 0) subleadEt();
+  if (subleadEnergy_branch != 0) subleadEnergy();
   if (subleadEta_branch != 0) subleadEta();
   if (subleadPhi_branch != 0) subleadPhi();
   if (sublead_sieie_branch != 0) sublead_sieie();
@@ -705,6 +758,21 @@ void ttHHadronic::LoadAllBranches() {
   if (jet13_udsgdiscriminant_branch != 0) jet13_udsgdiscriminant();
   if (jet14_udsgdiscriminant_branch != 0) jet14_udsgdiscriminant();
   if (jet15_udsgdiscriminant_branch != 0) jet15_udsgdiscriminant();
+  if (jet1_energy_branch != 0) jet1_energy();
+  if (jet2_energy_branch != 0) jet2_energy();
+  if (jet3_energy_branch != 0) jet3_energy();
+  if (jet4_energy_branch != 0) jet4_energy();
+  if (jet5_energy_branch != 0) jet5_energy();
+  if (jet6_energy_branch != 0) jet6_energy();
+  if (jet7_energy_branch != 0) jet7_energy();
+  if (jet8_energy_branch != 0) jet8_energy();
+  if (jet9_energy_branch != 0) jet9_energy();
+  if (jet10_energy_branch != 0) jet10_energy();
+  if (jet11_energy_branch != 0) jet11_energy();
+  if (jet12_energy_branch != 0) jet12_energy();
+  if (jet13_energy_branch != 0) jet13_energy();
+  if (jet14_energy_branch != 0) jet14_energy();
+  if (jet15_energy_branch != 0) jet15_energy();
   if (bjet1_csv_branch != 0) bjet1_csv();
   if (bjet2_csv_branch != 0) bjet2_csv();
   if (tthMVA_branch != 0) tthMVA();
@@ -807,6 +875,19 @@ const float &ttHHadronic::leadEt() {
     leadEt_isLoaded = true;
   }
   return leadEt_;
+}
+
+const float &ttHHadronic::leadEnergy() {
+  if (not leadEnergy_isLoaded) {
+    if (leadEnergy_branch != 0) {
+      leadEnergy_branch->GetEntry(index);
+    } else {
+      printf("branch leadEnergy_branch does not exist!\n");
+      exit(1);
+    }
+    leadEnergy_isLoaded = true;
+  }
+  return leadEnergy_;
 }
 
 const float &ttHHadronic::leadEta() {
@@ -963,6 +1044,19 @@ const float &ttHHadronic::subleadEt() {
     subleadEt_isLoaded = true;
   }
   return subleadEt_;
+}
+
+const float &ttHHadronic::subleadEnergy() {
+  if (not subleadEnergy_isLoaded) {
+    if (subleadEnergy_branch != 0) {
+      subleadEnergy_branch->GetEntry(index);
+    } else {
+      printf("branch subleadEnergy_branch does not exist!\n");
+      exit(1);
+    }
+    subleadEnergy_isLoaded = true;
+  }
+  return subleadEnergy_;
 }
 
 const float &ttHHadronic::subleadEta() {
@@ -2850,6 +2944,201 @@ const float &ttHHadronic::jet15_udsgdiscriminant() {
   return jet15_udsgdiscriminant_;
 }
 
+const float &ttHHadronic::jet1_energy() {
+  if (not jet1_energy_isLoaded) {
+    if (jet1_energy_branch != 0) {
+      jet1_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet1_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet1_energy_isLoaded = true;
+  }
+  return jet1_energy_;
+}
+
+const float &ttHHadronic::jet2_energy() {
+  if (not jet2_energy_isLoaded) {
+    if (jet2_energy_branch != 0) {
+      jet2_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet2_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet2_energy_isLoaded = true;
+  }
+  return jet2_energy_;
+}
+
+const float &ttHHadronic::jet3_energy() {
+  if (not jet3_energy_isLoaded) {
+    if (jet3_energy_branch != 0) {
+      jet3_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet3_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet3_energy_isLoaded = true;
+  }
+  return jet3_energy_;
+}
+
+const float &ttHHadronic::jet4_energy() {
+  if (not jet4_energy_isLoaded) {
+    if (jet4_energy_branch != 0) {
+      jet4_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet4_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet4_energy_isLoaded = true;
+  }
+  return jet4_energy_;
+}
+
+const float &ttHHadronic::jet5_energy() {
+  if (not jet5_energy_isLoaded) {
+    if (jet5_energy_branch != 0) {
+      jet5_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet5_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet5_energy_isLoaded = true;
+  }
+  return jet5_energy_;
+}
+
+const float &ttHHadronic::jet6_energy() {
+  if (not jet6_energy_isLoaded) {
+    if (jet6_energy_branch != 0) {
+      jet6_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet6_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet6_energy_isLoaded = true;
+  }
+  return jet6_energy_;
+}
+
+const float &ttHHadronic::jet7_energy() {
+  if (not jet7_energy_isLoaded) {
+    if (jet7_energy_branch != 0) {
+      jet7_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet7_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet7_energy_isLoaded = true;
+  }
+  return jet7_energy_;
+}
+
+const float &ttHHadronic::jet8_energy() {
+  if (not jet8_energy_isLoaded) {
+    if (jet8_energy_branch != 0) {
+      jet8_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet8_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet8_energy_isLoaded = true;
+  }
+  return jet8_energy_;
+}
+
+const float &ttHHadronic::jet9_energy() {
+  if (not jet9_energy_isLoaded) {
+    if (jet9_energy_branch != 0) {
+      jet9_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet9_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet9_energy_isLoaded = true;
+  }
+  return jet9_energy_;
+}
+
+const float &ttHHadronic::jet10_energy() {
+  if (not jet10_energy_isLoaded) {
+    if (jet10_energy_branch != 0) {
+      jet10_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet10_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet10_energy_isLoaded = true;
+  }
+  return jet10_energy_;
+}
+
+const float &ttHHadronic::jet11_energy() {
+  if (not jet11_energy_isLoaded) {
+    if (jet11_energy_branch != 0) {
+      jet11_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet11_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet11_energy_isLoaded = true;
+  }
+  return jet11_energy_;
+}
+
+const float &ttHHadronic::jet12_energy() {
+  if (not jet12_energy_isLoaded) {
+    if (jet12_energy_branch != 0) {
+      jet12_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet12_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet12_energy_isLoaded = true;
+  }
+  return jet12_energy_;
+}
+
+const float &ttHHadronic::jet13_energy() {
+  if (not jet13_energy_isLoaded) {
+    if (jet13_energy_branch != 0) {
+      jet13_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet13_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet13_energy_isLoaded = true;
+  }
+  return jet13_energy_;
+}
+
+const float &ttHHadronic::jet14_energy() {
+  if (not jet14_energy_isLoaded) {
+    if (jet14_energy_branch != 0) {
+      jet14_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet14_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet14_energy_isLoaded = true;
+  }
+  return jet14_energy_;
+}
+
+const float &ttHHadronic::jet15_energy() {
+  if (not jet15_energy_isLoaded) {
+    if (jet15_energy_branch != 0) {
+      jet15_energy_branch->GetEntry(index);
+    } else {
+      printf("branch jet15_energy_branch does not exist!\n");
+      exit(1);
+    }
+    jet15_energy_isLoaded = true;
+  }
+  return jet15_energy_;
+}
+
 const float &ttHHadronic::bjet1_csv() {
   if (not bjet1_csv_isLoaded) {
     if (bjet1_csv_branch != 0) {
@@ -3023,6 +3312,7 @@ const float &dipho_cosphi() { return cms3.dipho_cosphi(); }
 const float &mass() { return cms3.mass(); }
 const float &leadPt() { return cms3.leadPt(); }
 const float &leadEt() { return cms3.leadEt(); }
+const float &leadEnergy() { return cms3.leadEnergy(); }
 const float &leadEta() { return cms3.leadEta(); }
 const float &leadPhi() { return cms3.leadPhi(); }
 const float &lead_sieie() { return cms3.lead_sieie(); }
@@ -3035,6 +3325,7 @@ const float &leadPtGen() { return cms3.leadPtGen(); }
 const float &leadGendeltaR() { return cms3.leadGendeltaR(); }
 const float &subleadPt() { return cms3.subleadPt(); }
 const float &subleadEt() { return cms3.subleadEt(); }
+const float &subleadEnergy() { return cms3.subleadEnergy(); }
 const float &subleadEta() { return cms3.subleadEta(); }
 const float &subleadPhi() { return cms3.subleadPhi(); }
 const float &sublead_sieie() { return cms3.sublead_sieie(); }
@@ -3180,6 +3471,21 @@ const float &jet12_udsgdiscriminant() { return cms3.jet12_udsgdiscriminant(); }
 const float &jet13_udsgdiscriminant() { return cms3.jet13_udsgdiscriminant(); }
 const float &jet14_udsgdiscriminant() { return cms3.jet14_udsgdiscriminant(); }
 const float &jet15_udsgdiscriminant() { return cms3.jet15_udsgdiscriminant(); }
+const float &jet1_energy() { return cms3.jet1_energy(); }
+const float &jet2_energy() { return cms3.jet2_energy(); }
+const float &jet3_energy() { return cms3.jet3_energy(); }
+const float &jet4_energy() { return cms3.jet4_energy(); }
+const float &jet5_energy() { return cms3.jet5_energy(); }
+const float &jet6_energy() { return cms3.jet6_energy(); }
+const float &jet7_energy() { return cms3.jet7_energy(); }
+const float &jet8_energy() { return cms3.jet8_energy(); }
+const float &jet9_energy() { return cms3.jet9_energy(); }
+const float &jet10_energy() { return cms3.jet10_energy(); }
+const float &jet11_energy() { return cms3.jet11_energy(); }
+const float &jet12_energy() { return cms3.jet12_energy(); }
+const float &jet13_energy() { return cms3.jet13_energy(); }
+const float &jet14_energy() { return cms3.jet14_energy(); }
+const float &jet15_energy() { return cms3.jet15_energy(); }
 const float &bjet1_csv() { return cms3.bjet1_csv(); }
 const float &bjet2_csv() { return cms3.bjet2_csv(); }
 const float &tthMVA() { return cms3.tthMVA(); }

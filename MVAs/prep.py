@@ -24,7 +24,8 @@ print feature_names
 branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "process_id_"]))
 
 # grab features
-features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != 2') # 0 = signal, 1 = bkg, 2 = data
+train_frac = 0.5
+features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != 2 && rand_ < %.6f' % train_frac) # 0 = signal, 1 = bkg, 2 = data
 
 # organize features
 global_features = [] 

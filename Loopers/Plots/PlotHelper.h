@@ -578,7 +578,8 @@ void Comparison::set_histogram_options(int color1, int color2)
     mVHData[i]->SetMarkerStyle(20);
     mVHData[i]->SetMarkerColor(dataColors[i]);
     mVHData[i]->SetLineColor(dataColors[i]); 
-    mVHData[i]->SetLineWidth(4);
+    mVHData[i]->SetLineWidth(2);
+    mVHData[i]->SetMarkerSize(1.25);
     if (!mVHMC.empty()) {
       mVHData[i]->GetXaxis()->SetLabelOffset(999);
       mVHData[i]->GetXaxis()->SetLabelSize(0);

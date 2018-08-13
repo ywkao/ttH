@@ -163,12 +163,18 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Make p4 for physics objects
-      vector<TLorentzVector> jets = make_jets();
-      TLorentzVector lead_photon = make_lead_photon();
-      TLorentzVector sublead_photon = make_sublead_photon();
-      vector<TLorentzVector> electrons = make_els();
-      vector<TLorentzVector> muons = make_mus();
-
+      vector<TLorentzVector> jets;
+      TLorentzVector lead_photon;
+      TLorentzVector sublead_photon;
+      vector<TLorentzVector> electrons;
+      vector<TLorentzVector> muons;
+      if (year == "2017") {
+	jets = make_jets();
+	lead_photon = make_lead_photon();
+	sublead_photon = make_sublead_photon();
+	electrons = make_els();
+	muons = make_mus();
+      }
 
       ht_ = 0;
       for (int i = 0; i < jets.size(); i++)
@@ -407,10 +413,41 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
         cout << "Did not recognize tag name" << endl;
       } 
 
+      bool make_text_file = false;
+      bool make_2prompts = true;
+      if (make_text_file && year == "2016") {
+	if (currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets")) {
+	  if (make_2prompts && genPhotonId == 2) {
+	    TString name = currentFileTitle.Contains("TTJets") ? "TTJets" : "TTGammaJets";
+	    cout << name << " " << cms3.event() << " " << leadPtGen() << endl;
+	    cout << name << " " << cms3.event() << " " << subleadPtGen() << endl;
+	  }
+	  if (!make_2prompts && genPhotonId == 1) {
+	    TString name = currentFileTitle.Contains("TTJets") ? "TTJets" : "TTGammaJets";
+	    double ptGen = int(leadGenMatch()) == 1 ? leadPtGen() : subleadPtGen();
+	    cout << name << " " << cms3.event() << " " << ptGen << endl;
+	  }
+	}
+        continue;
+      }
 
-      TLorentzVector diphoton = lead_photon + sublead_photon; 
-      vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+      if (year == "2017") { // at some point should remake 2016 babies with this information also
+	TLorentzVector diphoton = lead_photon + sublead_photon; 
+	vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+	double close_mW, deltaR_dipho_W;
+	if (n_ele() + n_muons() == 1) { // only for semileptonic events where we expect W->qq 
+	  close_mW = closest_mW(jets, diphoton, deltaR_dipho_W);
+	  vProcess[processId]->fill_histogram("hDijetClosestWMass", close_mW, evt_weight, vId);
+	  vProcess[processId]->fill_histogram("hDeltaRDiphoW", deltaR_dipho_W, evt_weight, vId);
+	}
+	for (int i = 0; i < jets.size(); i++) {
+	  for (int j = i + 1; j < jets.size(); j++) {
+	    TLorentzVector dijet = jets[i] + jets[j];
+	    vProcess[processId]->fill_histogram("hDijetMass", dijet.M(), evt_weight, vId);
+	  }
+	}
+      }
 
       // General
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);

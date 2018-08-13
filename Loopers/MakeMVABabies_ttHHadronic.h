@@ -39,7 +39,7 @@ class BabyMaker {
     int 	label_;
     double	evt_weight_;
     int 	process_id_;
-    int		use_for_train_;
+    double 	rand_;
     
     int		njets_;
     //int		nbjets_;
@@ -93,6 +93,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("evt_weight_"     	, &evt_weight_  );
   BabyTree_->Branch("label_"     	, &label_       );
   BabyTree_->Branch("process_id_"     	, &process_id_  );
+  BabyTree_->Branch("rand_"            , &rand_       );
 
   BabyTree_->Branch("njets_"     	, &njets_       );
   //BabyTree_->Branch("nbjets_"		, &nbjets_	);
