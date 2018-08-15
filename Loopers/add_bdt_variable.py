@@ -7,7 +7,6 @@ parser.add_argument("type", help = "variable type (e.g. 'double', 'int')", type=
 parser.add_argument("function", help = "function that defines the variable", type=str)
 parser.add_argument("channel", help = "Hadronic or Leptonic", type=str)
 parser.add_argument("--remove", help = "Remove this variable instead of adding it", action="store_true")
-parser.add_argument("--run", help = "Run full workflow after adding/removing your variable", action="store_true")
 args = parser.parse_args()
 
 mva_babymaker_h = "MakeMVABabies_ttH" + args.channel + ".h"
