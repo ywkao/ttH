@@ -29,8 +29,6 @@ using namespace tas;
 const double lumi_2016 = 35.9;
 const double lumi_2017 = 41.5;
 
-const bool evaluate_mva = true;
-
 const vector<double> mva_thresh_2017 = { 0.38, 0.48, 0.56 };
 
 bool pass_2016_mva_presel() {

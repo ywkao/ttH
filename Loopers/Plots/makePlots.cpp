@@ -258,7 +258,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_rat_label("#frac{Signal}{Background}");
     c->set_scale(-1);
     c->set_log_rat();
-    c->set_rat_lim_range({0.03333, 33.3});
+    c->set_rat_lim_range({0.1, 10.0});
   }
   else {
     c = new Comparison(c1, hSig, hBkg);
@@ -312,8 +312,18 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   else if (output.Contains("Hadronic") && output.Contains("Custom")) {
     c->give_info("ttH Hadronic Presel.");
   }
-  else if (output.Contains("LeptonicLoose"))
-    c->give_info("ttH Leptonic Presel.");
+  else if (output.Contains("LeptonicLoose")) {
+    c->give_info("ttH Leptonic");
+    c->give_info("Loose Preselection");
+  }
+  else if (output.Contains("LeptonicMedium")) {
+    c->give_info("ttH Leptonic");
+    c->give_info("Medium Preselection");
+  }
+  else if (output.Contains("LeptonicTight")) {
+    c->give_info("ttH Leptonic");
+    c->give_info("Tight Preselection");
+  }
   else if (output.Contains("ttbarCR")) {
     c->give_info("ttH Leptonic");
     c->give_info("t#bar{t}-Enriched Region");
@@ -476,12 +486,18 @@ int main(int argc, char* argv[])
       make_plot(c1, vFiles[i], vNames[i], "hLeptonEta", "Lepton #eta", vBkgs, 1, type, year);
     }
 
-    if (year == "2017") {
+    if (year == "2017" && tag == "Leptonic") {
       make_plot(c1, vFiles[i], vNames[i], "hPtHiggs", "DiPhoton p_{T} [GeV]", vBkgs, 1, type, year);
       make_plot(c1, vFiles[i], vNames[i], "hMinDrDiphoJet", "Min #Delta R(p_{#gamma#gamma}, jet)", vBkgs, 1, type, year);
       make_plot(c1, vFiles[i], vNames[i], "hDijetClosestWMass", "Min |m_{jj} - m_{W}| [GeV]", vBkgs, 1, type, year);
       make_plot(c1, vFiles[i], vNames[i], "hDijetMass", "m_{jj} (all pairs)", vBkgs, 1, type, year);
       make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoW", "#Delta R(p_{#gamma#gamma}, p_{W})", vBkgs, 1, type, year);
+      make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoLep", "#Delta R(p_{#gamma#gamma}, p_{lep})", vBkgs, 1, type, year);
+      make_plot(c1, vFiles[i], vNames[i], "hTopPt", "Hadronic Top p_{T} [GeV]", vBkgs, 1, type, year);
+      make_plot(c1, vFiles[i], vNames[i], "hTopMass", "Hadronic Top Mass [GeV]", vBkgs, 1, type, year);
+      make_plot(c1, vFiles[i], vNames[i], "hTopEta", "Hadronic Top Eta [GeV]", vBkgs, 1, type, year);
+      make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoTop", "#Delta R(p_{#gamma#gamma}, p_{top (had.)})", vBkgs, 1, type, year);
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonDeltaR", "#Delta R(#gamma_{1}, #gamma_{2})", vBkgs, 1, type, year);
     }
 
     //if (vNames[i] == "ttHHadronicLoose_plots_" + type_s + ".pdf" || vNames[i] == "ttHHadronicCustom_plots_" + type_s + ".pdf")

@@ -1,6 +1,6 @@
 #include "ScanChain_ttHHadronic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
@@ -8,10 +8,12 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
+  bool evaluate_mva = xml_file != "none";
 
   // Make MVA Optimization Baby
   BabyMaker* baby = new BabyMaker();
-  baby->MakeBabyNtuple( Form("%s.root", "Optimization/MVAOptimizationBaby_ttHHadronic"));
+  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_ttHHadronic" + xml_file;
+  baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name));
 
   // Create "process" objects
   vector<Process*> vProcess = generate_processes(f1);

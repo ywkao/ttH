@@ -1,6 +1,6 @@
 #include "ScanChain_ttHLeptonic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag+"_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
@@ -8,9 +8,12 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
+  bool evaluate_mva = xml_file != "none";
+
   // Make MVA Optimization Baby
   BabyMaker* baby = new BabyMaker();
-  baby->MakeBabyNtuple( Form("%s.root", "Optimization/MVAOptimizationBaby_ttHLeptonic"));
+  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_ttHLeptonic" + xml_file;
+  baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name));
 
   // Create "process" objects
   vector<Process*> vProcess = generate_processes(f1);
@@ -24,9 +27,10 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
-  int nLowID = 0;
 
   unique_ptr<TMVA::Reader> mva;
+
+  // Declare BDT vars
   float njets_;
   float ht_;
   float leadptoM_;
@@ -164,16 +168,21 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
 
       // Make p4 for physics objects
       vector<TLorentzVector> jets;
+      vector<double> btag_scores;
+      vector<std::pair<int, double>> btag_scores_sorted;
       TLorentzVector lead_photon;
       TLorentzVector sublead_photon;
       vector<TLorentzVector> electrons;
       vector<TLorentzVector> muons;
+      vector<TLorentzVector> leps;
       if (year == "2017") {
-	jets = make_jets();
+	jets = make_jets(btag_scores);
+	btag_scores_sorted = sortVector(btag_scores);
 	lead_photon = make_lead_photon();
 	sublead_photon = make_sublead_photon();
 	electrons = make_els();
 	muons = make_mus();
+        leps = make_leps(electrons, muons);
       }
 
       ht_ = 0;
@@ -202,7 +211,7 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
 	jet3_eta_ = jet_eta3();
 	jet3_btag_ = jet_bdiscriminant3();
 	jet4_pt_ = jet_pt4();
-	jet4_eta_ = jet_eta4();
+       	jet4_eta_ = jet_eta4();
 	jet4_btag_ = jet_bdiscriminant4();
 	jet5_pt_ = jet_pt5();
 	jet5_eta_ = jet_eta5();
@@ -253,7 +262,6 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
 	if (leadPixelSeed() || subleadPixelSeed())	continue;
 	double lep_pt, lep_eta;
 	if (get_lep_pt(lep_eta) < 15)			continue;
-	//if (MetPt() < 50)				continue;
       }  
       else if (tag == "ttHLeptonicTight") {
         if (mass() < 100)                               continue;
@@ -432,14 +440,29 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
       }
 
       if (year == "2017") { // at some point should remake 2016 babies with this information also
+        vProcess[processId]->fill_histogram("hPhotonDeltaR", lead_photon.DeltaR(sublead_photon), evt_weight, vId);
 	TLorentzVector diphoton = lead_photon + sublead_photon; 
+
 	vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
 	vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hDeltaRDiphoLep", diphoton.DeltaR(leps[0]), evt_weight, vId);
 	double close_mW, deltaR_dipho_W;
 	if (n_ele() + n_muons() == 1) { // only for semileptonic events where we expect W->qq 
+	  // Hadronic W
 	  close_mW = closest_mW(jets, diphoton, deltaR_dipho_W);
 	  vProcess[processId]->fill_histogram("hDijetClosestWMass", close_mW, evt_weight, vId);
 	  vProcess[processId]->fill_histogram("hDeltaRDiphoW", deltaR_dipho_W, evt_weight, vId);
+
+	  // Hadronic top
+	  if (jets.size() >= 3) {
+	    TLorentzVector top = get_hadronic_top(jets, btag_scores_sorted);
+	    if (top.Pt() > 0) {
+	      vProcess[processId]->fill_histogram("hTopPt", top.Pt(), evt_weight, vId);
+	      vProcess[processId]->fill_histogram("hTopEta", top.Eta(), evt_weight, vId);
+	      vProcess[processId]->fill_histogram("hTopMass", top.M(), evt_weight, vId);
+	      vProcess[processId]->fill_histogram("hDeltaRDiphoTop", top.DeltaR(diphoton), evt_weight, vId);
+	    }
+	  }
 	}
 	for (int i = 0; i < jets.size(); i++) {
 	  for (int j = i + 1; j < jets.size(); j++) {
@@ -646,7 +669,6 @@ int ScanChain(TChain* chain, TString tag, TString year, bool blind = true, bool 
   f1->Write();
   f1->Close(); 
  
-  cout << "Number of data events with one photon with ID < -0.9: " << nLowID << endl;
 
   // return
   bmark->Stop("benchmark");

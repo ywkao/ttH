@@ -33,6 +33,7 @@ class BabyMaker {
     TFile *BabyFile_;
     TTree *BabyTree_;
 
+    // Variable names
     vector<string> mva_branches = {"njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "mt_", "lep_pt_", "lep_eta_"};
     
     int 	label_;
@@ -40,8 +41,8 @@ class BabyMaker {
     int 	process_id_;
     double	rand_;
 
+    // Variable declarations
     int		njets_;
-    //int		nbjets_;
     double	ht_;
 
     double	jet1_pt_;
@@ -92,6 +93,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
 
+  // Variable branches
   BabyTree_->Branch("njets_"     	, &njets_       );
   //BabyTree_->Branch("nbjets_"		, &nbjets_	);
   BabyTree_->Branch("ht_"    		, &ht_       	);

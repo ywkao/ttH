@@ -169,7 +169,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
 
       // Variable definitions
       njets_ = n_jets();
-      //nbjets_ = nb_medium();
       jet1_pt_ = jet_pt1();
       jet1_eta_ = jet_eta1();
       jet1_btag_ = jet_bdiscriminant1();

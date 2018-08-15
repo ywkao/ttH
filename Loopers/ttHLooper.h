@@ -54,10 +54,19 @@ void add_variables(vector<Process*> v, TString tag) {
     //v[i]->add_histogram("hbJet2Eta", 50, -3, 3);    
 
     v[i]->add_histogram("hPtHiggs", 25, 0, 400);
+    v[i]->add_histogram("hPhotonDeltaR", 25, 0, 6); 
+
     v[i]->add_histogram("hMinDrDiphoJet", 25, 0, 6);
     v[i]->add_histogram("hDijetClosestWMass", 25, 0, 50);
     v[i]->add_histogram("hDijetMass", 50, 0, 500);
     v[i]->add_histogram("hDeltaRDiphoW", 25, 0, 6);
+    v[i]->add_histogram("hDeltaRDiphoLep", 25, 0, 6);
+    v[i]->add_histogram("hDeltaRDiphoTop", 25, 0, 6);
+    v[i]->add_histogram("hTopPt", 25, 0, 400);
+    v[i]->add_histogram("hTopMass", 25, 0, 400);
+    v[i]->add_histogram("hTopEta", 25, -3, 3);
+
+    
 
 
     // Leading photon
@@ -260,6 +269,47 @@ double sgn(double x) {
     return 1;
   else 
     return 0;
+}
+
+bool sortByValue(const std::pair<int,double>& pair1, const std::pair<int,double>& pair2 ) {
+  return pair1.second > pair2.second;
+}
+
+vector<std::pair<int, double>> sortVector(const vector<double> v) {
+  vector<std::pair<int, double>> v2;
+  for (int i = 0; i < v.size(); i++)
+    v2.push_back(std::pair<int, double>(i, v[i]));
+  std::sort(v2.begin(), v2.end(), sortByValue);
+  return v2;
+}
+
+const double m_top = 172.44;
+TLorentzVector get_hadronic_top(vector<TLorentzVector> jets, vector<std::pair<int, double>> btag_scores_sorted) {
+  int idx_btag_1 = btag_scores_sorted[0].first;
+  int idx_btag_2 = btag_scores_sorted[1].first;
+  TLorentzVector b_candidate_1 = jets[idx_btag_1];
+  TLorentzVector b_candidate_2 = jets[idx_btag_2];
+  TLorentzVector top_candidate;
+  double min_diff = 9999;
+  for (int i = 0; i < jets.size(); i++) {
+    if (i == idx_btag_1 || i == idx_btag_2)
+      continue;
+    for (int j = i + 1; j < jets.size(); j++) {
+      if (j == idx_btag_1 || j == idx_btag_2)
+	continue;
+      TLorentzVector top_candidate_1 = b_candidate_1 + jets[i] + jets[j];
+      TLorentzVector top_candidate_2 = b_candidate_2 + jets[i] + jets[j];
+      if (abs(top_candidate_1.M() - m_top) < min_diff) {
+	top_candidate = top_candidate_1;
+	min_diff = abs(top_candidate_1.M() - m_top);
+      }
+      if (abs(top_candidate_2.M() - m_top) < min_diff) {
+        top_candidate = top_candidate_2;
+        min_diff = abs(top_candidate_2.M() - m_top);
+      }
+    }
+  }
+  return top_candidate;
 }
 
 double min_dr(TLorentzVector diphoton, vector<TLorentzVector> jets) {
