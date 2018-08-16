@@ -24,8 +24,8 @@ Note: This is a slightly modified version of `makeCMS3ClassFiles.C` that checks 
     2. Convert `.root` file to `.hdf5` file for `xgboost`: `cd ../MVAs ; python prep.py Hadronic`
     3. Train BDT: `python train.py Hadronic <training_tag>`
     4. Evaluate BDT, fill histograms, and create `.root` file for optimization studies: `cd ../Loopers ; ./ttHHadronicLooper Hadronic <selection> <year> <xml_file>`
-  5. Evaluate significance based on BDT: `cd Optmization ; python estimate_significance.py <optimization_baby>`
+    5. Evaluate significance based on BDT: `cd Optmization ; python estimate_significance.py <optimization_baby>`
 3. To add a variable to the BDT: `python add_bdt_variable.py <var_name> <var_type> <var_definition> <channel>`
-  * Note: if you try adding a variable twice, the script is not yet smart enough to recognize and protect against redeclaration of variables, etc.
+    * Note: if you try adding a variable twice, the script is not yet smart enough to recognize and protect against redeclaration of variables, etc.
 4. To remove a variable from the BDT: `python add_bdt_variable.py <var_name> <var_type> <var_definition> <channel> --remove`
 
