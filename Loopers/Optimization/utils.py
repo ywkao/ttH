@@ -81,8 +81,8 @@ def fit_exp(data, weights, mean_eff, sigma_eff, idx, name):
     #popt, pcov = curve_fit(exp, x_fit, y_fit, sigma = y_err, p0 = [10, 0.01])
     popt, pcov = curve_fit(exp, x_fit, y_fit, p0 = [10, 0.01])
   else:
-    #popt, pcov = curve_fit(exp, x_fit, y_fit, sigma = y_err, p0 = [10, 0.01])
-    popt, pcov = curve_fit(exp, x_fit, y_fit, p0 = [10, 0.01])
+    popt, pcov = curve_fit(exp, x_fit, y_fit, sigma = y_err, p0 = [10, 0.01])
+    #popt, pcov = curve_fit(exp, x_fit, y_fit, p0 = [10, 0.01])
 
   bkg_pred = quad(exp, mean_eff - (1.645*sigma_eff), mean_eff + (1.645*sigma_eff), args = (popt[0], popt[1]))[0]
 

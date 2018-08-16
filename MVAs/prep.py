@@ -6,11 +6,11 @@ import root_numpy
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("tag", help = "e.g. Hadronic or Leptonic", type=str)
+parser.add_argument("channel", help = "e.g. Hadronic or Leptonic", type=str)
 args = parser.parse_args()
 
-baby_file = "../Loopers/MVABaby_ttH" + args.tag + ".root"
-output_file = "ttH" + args.tag + "_features.hdf5"
+baby_file = "../Loopers/MVABaby_ttH" + args.channel + ".root"
+output_file = "ttH" + args.channel + "_features.hdf5"
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")

@@ -4,3 +4,6 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 cd /cvmfs/cms.cern.ch/$SCRAM_ARCH/cms/cmssw/$CMSSW_VERSION/src
 eval `scramv1 runtime -sh`
 cd -
+
+export PYTHONPATH=/home/users/namin/2017/fourtop/analysis/bdt/xgboost/python-package/lib/python2.7/site-packages/:$PYTHONPATH
+export PYTHONPATH=/home/users/namin/2017/fourtop/analysis/bdt/xgboost/python-package/:$PYTHONPATH

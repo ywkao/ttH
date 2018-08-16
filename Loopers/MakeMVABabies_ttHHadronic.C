@@ -1,31 +1,5 @@
-// -*- C++ -*-
-// Usage:
-// > root -b -q doAll.C
-
-#include <iostream>
-#include <vector>
-
-// ROOT
-#include "TBenchmark.h"
-#include "TChain.h"
-#include "TDirectory.h"
-#include "TFile.h"
-#include "TROOT.h"
-#include "TTreeCache.h"
-#include "TRandom.h"
-
-// ttHHadronic
-#include "ttHHadronic.cc"
-#include "ttHLooper.h"
-#include "scale1fb/scale1fb_2016.h"
-#include "scale1fb/scale1fb_2017.h"
 #include "MakeMVABabies_ttHHadronic.h"
-
-using namespace std;
-using namespace tas;
-
-const double lumi_2016 = 35.9; 
-const double lumi_2017 = 41.5;
+#include "ScanChain_ttHHadronic.h"
 
 void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
@@ -105,6 +79,16 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       // Decide what type of sample this is
       process_id_ = categorize_process(currentFileTitle);
 
+      vector<TLorentzVector> jets;
+      TLorentzVector lead_photon;
+      TLorentzVector sublead_photon;
+      if (year == "2017") {
+        jets = make_jets();
+        lead_photon = make_lead_photon();
+        sublead_photon = make_sublead_photon();
+      } 
+      TLorentzVector diphoton = lead_photon + sublead_photon;
+
       // Fill histograms //
       evt_weight_ = 1.;
       if (!isData && !isSignal) {
@@ -120,23 +104,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
-      ht_ = 0;
-      ht_ += jet1_pt() > 0 ? jet1_pt() : 0;
-      ht_ += jet2_pt() > 0 ? jet2_pt() : 0;
-      ht_ += jet3_pt() > 0 ? jet3_pt() : 0;
-      ht_ += jet4_pt() > 0 ? jet4_pt() : 0;
-      ht_ += jet5_pt() > 0 ? jet5_pt() : 0;
-      ht_ += jet6_pt() > 0 ? jet6_pt() : 0;
-      ht_ += jet7_pt() > 0 ? jet7_pt() : 0;
-      ht_ += jet8_pt() > 0 ? jet8_pt() : 0;
-      ht_ += jet9_pt() > 0 ? jet9_pt() : 0;
-      ht_ += jet10_pt() > 0 ? jet10_pt() : 0;
-      ht_ += jet11_pt() > 0 ? jet11_pt() : 0;
-      ht_ += jet12_pt() > 0 ? jet12_pt() : 0;
-      ht_ += jet13_pt() > 0 ? jet13_pt() : 0;
-      ht_ += jet14_pt() > 0 ? jet14_pt() : 0;
-      ht_ += jet15_pt() > 0 ? jet15_pt() : 0;
-
+      // Variable definitions
+      ht_ = get_ht(jets);
       njets_ = n_jets();
       //nbjets_ = nb_medium();
       jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
@@ -202,31 +171,3 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
   delete bmark;
   return;
 }
-
-/*
-void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
-  BabyFile_ = new TFile(Form("%s", BabyFilename), "RECREATE");
-  BabyFile_->cd();
-  BabyTree_ = new TTree("t", "A Baby Ntuple");
-
-  BabyTree_->Branch("njets"	, &njets	);
-
-  return;
-}
-
-void BabyMaker::InitBabyNtuple () {
-  return;
-}
-
-void BabyMaker::FillBabyNtuple(){
-  BabyTree_->Fill();
-  return;
-}
-
-void BabyMaker::CloseBabyNtuple(){
-  BabyFile_->cd();
-  BabyTree_->Write();
-  BabyFile_->Close();
-  return;
-}
-*/

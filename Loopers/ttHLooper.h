@@ -47,6 +47,10 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hJet3Eta", 25, -3, 3);
     v[i]->add_histogram("hJet4pT", 25, 0, 500);
     v[i]->add_histogram("hJet4Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet5pT", 25, 0, 500);
+    v[i]->add_histogram("hJet5Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet6pT", 25, 0, 500);
+    v[i]->add_histogram("hJet6Eta", 25, -3, 3);
 
     v[i]->add_histogram("hbJet1pT", 25, 0, 500);
     //v[i]->add_histogram("hbJet1Eta", 25, -3, 3);
@@ -338,6 +342,31 @@ double closest_mW(vector<TLorentzVector> jets, TLorentzVector diphoton, double &
   }
   deltaR = jets[jet1_idx].DeltaR(jets[jet2_idx]);
   return min_diff;
+}
+
+double deltaR_Higgs_W(vector<TLorentzVector> jets, TLorentzVector diphoton) {
+  double min_diff = 999;
+  int jet1_idx(-1), jet2_idx(-1);
+  for (int i = 0; i < jets.size(); i++) {
+    for (int j = i + 1; j < jets.size(); j++) {
+      TLorentzVector dijet = jets[i] + jets[j];
+      double diff = abs(dijet.M() - mW);
+      if (diff < min_diff) {
+        min_diff = diff;
+        jet1_idx = i;
+        jet2_idx = j;
+      }
+    }
+  }
+  return jets[jet1_idx].DeltaR(jets[jet2_idx]);
+}
+
+double get_ht(vector<TLorentzVector> jets) {
+  double ht = 0;
+  for (int i = 0; i < jets.size(); i++) {
+    ht += jets[i].Pt();
+  }
+  return ht;
 }
 
 const vector<TString> vSamples_2016 = {"DoubleEG", 

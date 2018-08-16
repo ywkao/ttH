@@ -13,11 +13,12 @@ import tmva_utils
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("tag", help = "e.g. Hadronic or Leptonic", type=str)
+parser.add_argument("channel", help = "e.g. Hadronic or Leptonic", type=str)
+parser.add_argument("tag", help = "tag to identify this training", type=str)
 args = parser.parse_args()
 
 # Read features
-f = h5py.File("ttH" + args.tag + "_features.hdf5")
+f = h5py.File("ttH" + args.channel + "_features.hdf5")
 
 global_features = f['global']
 feature_names = f['feature_names']
@@ -59,7 +60,7 @@ param = {
 	'colsample_bytree': 1.0,
 	}
 
-n_round = 500
+n_round = 150
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -69,7 +70,7 @@ progress = {}
 #model.fit(x_train, y_train)
 bdt = xgboost.train(param, d_train, n_round, evallist, evals_result = progress)	
 
-bdt.save_model(args.tag + "_bdt.xgb")
+bdt.save_model(args.channel + args.tag + "_bdt.xgb")
 model = bdt.get_dump()
 
 # save to json format a la Nick
@@ -79,7 +80,7 @@ model = bdt.get_dump()
 input_variables = []
 for name in feature_names:
   input_variables.append((name, 'F'))
-tmva_utils.convert_model(model, input_variables = input_variables, output_xml = args.tag + '_bdt.xml')
+tmva_utils.convert_model(model, input_variables = input_variables, output_xml = args.channel + "_" + args.tag + '_bdt.xml')
 
 # predict
 pred_train = bdt.predict(d_train)
@@ -106,7 +107,7 @@ import matplotlib.pyplot as plt
 fig = plt.figure()
 xgboost.plot_importance(bdt)
 plt.tight_layout()
-plt.savefig('feature_importance_' + args.tag + '.pdf')
+plt.savefig('feature_importance_' + args.channel + '.pdf')
 
 # make ROC curve #
 fig = plt.figure()
@@ -125,4 +126,4 @@ plt.ylim([0.3, 1.05])
 plt.xlabel('False Positive Rate (background efficiency)')
 plt.ylabel('True Positive Rate (signal efficiency)')
 plt.legend(loc='lower right')
-plt.savefig('roc' + args.tag + '.pdf', bbox_inches='tight')
+plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')

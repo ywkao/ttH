@@ -11,9 +11,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   bool evaluate_mva = xml_file != "none";
 
   // Make MVA Optimization Baby
-  BabyMaker* baby = new BabyMaker();
-  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_ttHHadronic" + xml_file;
-  baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name));
+  OptimizationBabyMaker* baby = new OptimizationBabyMaker();
+  TString xml_file_noExt = xml_file;
+  xml_file_noExt.ReplaceAll(".xml", "");
+  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + xml_file_noExt;
+  baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
 
   // Create "process" objects
   vector<Process*> vProcess = generate_processes(f1);
@@ -28,6 +30,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   TFile *currentFile = 0;
 
   unique_ptr<TMVA::Reader> mva;
+
+  // Declare BDT vars
   float njets_;
   //float nbjets_;
   float ht_;
@@ -108,7 +112,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
     mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
     mva->AddVariable("met_", &met_);
 
-    mva->BookMVA("BDT", "../MVAs/Hadronic_bdt.xml");
+    mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }
 
 
@@ -170,70 +174,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
         lead_photon = make_lead_photon();
         sublead_photon = make_sublead_photon();
       }
-
-      ht_ = 0;
-      for (int i = 0; i < jets.size(); i++)
-        ht_ += jets[i].Pt();
-
-      // Evaluate MVA, if we choose
-      double mva_value = -999;
-      if (evaluate_mva) {
-	// Apply preselection before calculating MVA value
-	if (mass() < 100)                continue;
-	if (n_jets() < 3)               continue;
-	if (nb_loose() < 1)             continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-
-	// Calculate MVA value
-	njets_ = n_jets();
-	//nbjets_ = nb_medium();
-	jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
-	jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
-	jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
-	jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
-	jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
-	jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
-	jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
-	jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
-	jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
-	jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
-	jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
-	jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;
-	jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
-	jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
-	jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
-	jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
-	jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
-	jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
-
-	max1_btag_ = bjet1_csv();
-	max2_btag_ = bjet2_csv();
-
-	leadptoM_ = lead_ptoM();
-	subleadptoM_ = sublead_ptoM();
-	leadIDMVA_ = leadIDMVA();
-	subleadIDMVA_ = subleadIDMVA();
-	lead_eta_ = leadEta();
-	sublead_eta_ = subleadEta();
-
-	leadPSV_ = leadPixelSeed();
-	subleadPSV_ = subleadPixelSeed();
-
-	dipho_cosphi_ = dipho_cosphi();
-	dipho_rapidity_ = dipho_rapidity();
-	met_ = MetPt();
-
-	mva_value = mva->EvaluateMVA( "BDT" );
-	double reference_mva = tthMVA();
-	bool pass_ref_presel = year == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
-        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel);
-      }
-
-      int mvaCategoryId = mva_value < -0.92 ? 0 : 1;
-      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
-
-
-
+      TLorentzVector diphoton = lead_photon + sublead_photon;
 
 
       // Selection
@@ -257,7 +198,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
         if (n_jets() < 3)               continue;
         if (nb_loose() < 1)             continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (mva_value < -0.9)		continue;
+	//if (mva_value < -0.9)		continue;
       }
       else if (tag == "2017MVAPreSel") {
         if (mass() < 100)       continue;
@@ -297,6 +238,60 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
  
 
 
+      // Evaluate MVA, if we choose
+      double mva_value = -999;
+      if (evaluate_mva) {
+
+        // Calculate MVA value
+        ht_ = get_ht(jets);
+        njets_ = n_jets();
+        //nbjets_ = nb_medium();
+        jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
+        jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
+        jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
+        jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
+        jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
+        jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
+        jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
+        jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
+        jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
+        jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
+        jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
+        jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;
+        jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
+        jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
+        jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
+        jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
+        jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
+        jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
+
+        max1_btag_ = bjet1_csv();
+        max2_btag_ = bjet2_csv();
+
+        leadptoM_ = lead_ptoM();
+        subleadptoM_ = sublead_ptoM();
+        leadIDMVA_ = leadIDMVA();
+        subleadIDMVA_ = subleadIDMVA();
+        lead_eta_ = leadEta();
+        sublead_eta_ = subleadEta();
+
+        leadPSV_ = leadPixelSeed();
+        subleadPSV_ = subleadPixelSeed();
+
+        dipho_cosphi_ = dipho_cosphi();
+        dipho_rapidity_ = dipho_rapidity();
+        met_ = MetPt();
+
+        mva_value = mva->EvaluateMVA( "BDT" );
+        double reference_mva = tthMVA();
+        bool pass_ref_presel = year == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
+        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel);
+      }
+
+      int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
+      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
+ 
+
 
       if (year == "2017") { // need to update 2016 babies at some point to include this info
 	TLorentzVector diphoton = lead_photon + sublead_photon;
@@ -323,7 +318,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
       vProcess[processId]->fill_histogram("hNVtx", nvtx(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hMetPt", MetPt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hHT", ht_, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hHT", get_ht(jets), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hNbLoose", nb_loose(), evt_weight, vId);

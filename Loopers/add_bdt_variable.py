@@ -4,7 +4,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("name", help = "name of variable to add/remove from BDT", type=str)
 parser.add_argument("type", help = "variable type (e.g. 'double', 'int')", type=str)
-parser.add_argument("function", help = "function that defines the variable", type=str)
+parser.add_argument("function", help = "function that defines the variable (should include arguments if it accepts any)", type=str)
 parser.add_argument("channel", help = "Hadronic or Leptonic", type=str)
 parser.add_argument("--remove", help = "Remove this variable instead of adding it", action="store_true")
 args = parser.parse_args()
@@ -65,11 +65,11 @@ def modify_src(lines, add):
   if add:
     for i, line in enumerate(lines):
       if "// Variable definitions" in line:
-	line_to_insert = "      %s = %s();\n" % (args.name, args.function)
+	line_to_insert = "      %s = %s;\n" % (args.name, args.function)
 	insert_line(i+1, line_to_insert, lines)
   else:
     for i, line in enumerate(lines):
-      if "%s = %s();" % (args.name, args.function) in line:
+      if "%s = %s;" % (args.name, args.function) in line:
 	remove_line(i, lines)
   print "\n\n\n"
   return lines
@@ -79,21 +79,21 @@ def modify_scanchain(lines, add):
   if add:
     for i, line in enumerate(lines):
       if "// Declare BDT vars" in line:
-	line_to_insert = '  %s %s;\n' % (args.type, args.name)
+	line_to_insert = '  %s %s;\n' % ("float", args.name) # for some reason TMVA wants everything to be a float :/
 	insert_line(i+1, line_to_insert, lines)
       if 'mva.reset(new TMVA::Reader( "!Color:Silent" ));' in line:
 	line_to_insert = '    mva->AddVariable("%s", &%s);\n' % (args.name, args.name)
 	insert_line(i+1, line_to_insert, lines)
       if "// Calculate MVA value" in line:
-	line_to_insert = '        %s = %s();\n' % (args.name, args.function)
+	line_to_insert = '        %s = %s;\n' % (args.name, args.function)
 	insert_line(i+1, line_to_insert, lines)
   else:
     for i, line in enumerate(lines):
-      if "%s %s;" % (args.type, args.name) in line:
+      if "%s %s;" % ("float", args.name) in line: # for some reason TMVA wants everything to be a float :/
 	remove_line(i, lines)
       if 'mva->AddVariable("%s", &%s);' % (args.name, args.name) in line:
 	remove_line(i, lines)
-      if '%s = %s();' % (args.name, args.function) in line:
+      if '%s = %s;' % (args.name, args.function) in line:
 	remove_line(i, lines)
   print "\n\n\n"
   return lines
@@ -103,14 +103,12 @@ def modify_scanchain(lines, add):
 
 lines = read_file(mva_babymaker_h) 
 lines = modify_header(lines, not args.remove)
-write_file("test.h", lines)
+write_file(mva_babymaker_h, lines)
 
 lines = read_file(mva_babymaker_C) 
 lines = modify_src(lines, not args.remove)
-
-write_file("test.C", lines)
+write_file(mva_babymaker_C, lines)
 
 lines = read_file(scanchain)
 lines = modify_scanchain(lines, not args.remove)
-
-write_file("test_scanchain.C", lines)
+write_file(scanchain, lines)

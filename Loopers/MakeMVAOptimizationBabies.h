@@ -15,10 +15,10 @@
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
-class BabyMaker {
+class OptimizationBabyMaker {
   public:
-    BabyMaker() {};
-    ~BabyMaker() {
+    OptimizationBabyMaker() {};
+    ~OptimizationBabyMaker() {
       if (BabyFile_) delete BabyFile_;
       if (BabyTree_) delete BabyTree_;
     }
@@ -45,7 +45,7 @@ class BabyMaker {
 };
 
 inline
-void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
+void OptimizationBabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyFile_ = new TFile(Form("%s", BabyFilename), "RECREATE");
   BabyFile_->cd();
   BabyTree_ = new TTree("t", "A Baby Ntuple");
@@ -63,12 +63,12 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 }
 
 inline
-void BabyMaker::InitBabyNtuple () {
+void OptimizationBabyMaker::InitBabyNtuple () {
   return;
 }
 
 inline
-void BabyMaker::FillBabyNtuple(int label, double evt_weight, int process_id, double rand, double mass, double mva_score, double reference_mva, bool pass_ref_presel){
+void OptimizationBabyMaker::FillBabyNtuple(int label, double evt_weight, int process_id, double rand, double mass, double mva_score, double reference_mva, bool pass_ref_presel){
   label_ = label;
   evt_weight_ = evt_weight;
   process_id_ = process_id;
@@ -84,7 +84,7 @@ void BabyMaker::FillBabyNtuple(int label, double evt_weight, int process_id, dou
 }
 
 inline
-void BabyMaker::CloseBabyNtuple(){
+void OptimizationBabyMaker::CloseBabyNtuple(){
   BabyFile_->cd();
   BabyTree_->Write();
   BabyFile_->Close();

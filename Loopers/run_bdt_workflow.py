@@ -15,9 +15,10 @@ if build_success != 0:
 
 os.system("./ttH%sMVABabyMaker %s %s" % (args.channel, args.selection, args.year))
 os.chdir("../MVAs")
-os.system("source setup.sh")
 os.system("python prep.py %s" % args.channel)
-os.system("python train.py %s" % args.channel)
+os.system("python train.py %s %s" % (args.channel, args.tag))
 os.chdir("../Loopers")
-os.system("source setup.sh")
-os.system("./ttH%sLooper %s %s" % (args.channel, args.selection, args.year))
+os.system("./ttH%sLooper %s %s %s" % (args.channel, args.selection, args.year, args.channel + "_" + args.tag + '_bdt.xml'))
+
+os.chdir("Optimization")
+os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_bdt.root" % (args.channel, args.tag))

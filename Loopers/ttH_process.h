@@ -151,7 +151,7 @@ inline void Process::fill_histogram(TString name, double value, double weight, i
   if (photonLocationId >= 0)
     mHPhotonLocations[idx][photonLocationId]->Fill(value, weight);
   if (mvaCategoryId >= 0)
-    mHPhotonLocations[idx][mvaCategoryId]->Fill(value, weight);  
+    mHMVACategories[idx][mvaCategoryId]->Fill(value, weight);  
 }
 
 inline void Process::fill_histogram(TString name, double value, double weight, vector<int> vId)
@@ -174,7 +174,7 @@ inline void Process::fill_histogram(TString name, double value, double weight, v
   if (photonLocationId >= 0)
     mHPhotonLocations[idx][photonLocationId]->Fill(value, weight);
   if (mvaCategoryId >= 0)
-    mHPhotonLocations[idx][mvaCategoryId]->Fill(value, weight);
+    mHMVACategories[idx][mvaCategoryId]->Fill(value, weight);
 }
 
 #endif // _TTH_PROCESS_H_

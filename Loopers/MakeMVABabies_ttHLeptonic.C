@@ -1,57 +1,5 @@
-// -*- C++ -*-
-// Usage:
-// > root -b -q doAll.C
-
-#include <iostream>
-#include <vector>
-
-// ROOT
-#include "TBenchmark.h"
-#include "TChain.h"
-#include "TDirectory.h"
-#include "TFile.h"
-#include "TROOT.h"
-#include "TTreeCache.h"
-
-// ttHLeptonic
-#include "ttHLeptonic.cc"
-#include "ttHLooper.h"
-#include "scale1fb/scale1fb_2016.h"
-#include "scale1fb/scale1fb_2017.h"
 #include "MakeMVABabies_ttHLeptonic.h"
-
-using namespace std;
-using namespace tas;
-
-const double lumi_2016 = 35.9; 
-const double lumi_2017 = 41.5;
-
-double get_lep_pt(double &lep_eta) {
-  if (n_ele() + n_muons() == 1) {
-    lep_eta = n_ele() == 1 ? ele1_eta() : muon1_eta();
-    return n_ele() == 1 ? ele1_pt() : muon1_pt();
-  }
-  else {
-    double highest_pt = 0;
-    if (ele1_pt() > highest_pt) {
-      highest_pt = ele1_pt();
-      lep_eta = ele1_eta();
-    }
-    if (ele2_pt() > highest_pt) {
-      highest_pt = ele2_pt();
-      lep_eta = ele2_eta();
-    }
-    if (muon1_pt() > highest_pt) {
-      highest_pt = muon1_pt();
-      lep_eta = muon1_eta();
-    }
-    if (muon2_pt() > highest_pt) {
-      highest_pt = muon2_pt();
-      lep_eta = muon2_eta();
-    }
-    return highest_pt;
-  }
-}
+#include "ScanChain_ttHLeptonic.h"
 
 void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
@@ -116,6 +64,27 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
+      else if (tag == "ttHLeptonicMedium") {
+        if (mass() < 100)                               continue;
+        if (n_jets() < 2)                               continue;
+        if (nb_medium() < 1)                            continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadPixelSeed() || subleadPixelSeed())      continue;
+        double lep_pt, lep_eta;
+        if (get_lep_pt(lep_eta) < 15)                   continue;
+      }
+      else if (tag == "ttHLeptonicTight") {
+        if (mass() < 100)                               continue;
+        if (n_jets() < 2)                               continue;
+        if (nb_tight() < 1)                             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadPixelSeed() || subleadPixelSeed())      continue;
+        double lep_pt, lep_eta;
+        if (get_lep_pt(lep_eta) < 25)                   continue;
+        if (MetPt() < 50)                             continue;
+      }
+
+
       else if (tag == "ttHLeptonicPresel_v2") {
         if (mass() < 100)                               continue;
         if (n_jets() < 2)                               continue;
@@ -134,6 +103,26 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       // Decide what type of sample this is
       process_id_ = categorize_process(currentFileTitle);
 
+      // Make p4 for physics objects
+      vector<TLorentzVector> jets;
+      vector<double> btag_scores;
+      vector<std::pair<int, double>> btag_scores_sorted;
+      TLorentzVector lead_photon;
+      TLorentzVector sublead_photon;
+      vector<TLorentzVector> electrons;
+      vector<TLorentzVector> muons;
+      vector<TLorentzVector> leps;
+      if (year == "2017") {
+        jets = make_jets(btag_scores);
+        btag_scores_sorted = sortVector(btag_scores);
+        lead_photon = make_lead_photon();
+        sublead_photon = make_sublead_photon();
+        electrons = make_els();
+        muons = make_mus();
+        leps = make_leps(electrons, muons);
+      } 
+      TLorentzVector diphoton = lead_photon + sublead_photon;
+
       // Fill histograms //
       evt_weight_ = 1.;
       if (!isData && !isSignal) {
@@ -149,46 +138,33 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
-      ht_ = 0;
-      ht_ += jet_pt1() > 0 ? jet_pt1() : 0;
-      ht_ += jet_pt2() > 0 ? jet_pt2() : 0;
-      ht_ += jet_pt3() > 0 ? jet_pt3() : 0;
-      ht_ += jet_pt4() > 0 ? jet_pt4() : 0;
-      ht_ += jet_pt5() > 0 ? jet_pt5() : 0;
-      ht_ += jet_pt6() > 0 ? jet_pt6() : 0;
-      ht_ += jet_pt7() > 0 ? jet_pt7() : 0;
-      ht_ += jet_pt8() > 0 ? jet_pt8() : 0;
-      ht_ += jet_pt9() > 0 ? jet_pt9() : 0;
-      ht_ += jet_pt10() > 0 ? jet_pt10() : 0;
-      ht_ += jet_pt11() > 0 ? jet_pt11() : 0;
-      ht_ += jet_pt12() > 0 ? jet_pt12() : 0;
-      ht_ += jet_pt13() > 0 ? jet_pt13() : 0;
-      ht_ += jet_pt14() > 0 ? jet_pt14() : 0;
-      ht_ += jet_pt15() > 0 ? jet_pt15() : 0;
-
-
       // Variable definitions
+      lep_pt_ = leps[0].Pt();
+      lep_eta_ = leps[0].Eta();
+      nb_loose_ = nb_loose();
+      max2_btag_ = btag_scores_sorted[1].second;
+      max1_btag_ = btag_scores_sorted[0].second;
+      dR_higgs_lep = diphoton.DeltaR(leps[0]);
+      dR_higgs_W = deltaR_Higgs_W(jets, diphoton);
+      pt_higgs = diphoton.Pt();
+      dipho_deltaR = lead_photon.DeltaR(sublead_photon);
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      ht_ = get_ht(jets);      
       njets_ = n_jets();
       jet1_pt_ = jet_pt1();
       jet1_eta_ = jet_eta1();
-      jet1_btag_ = jet_bdiscriminant1();
       jet2_pt_ = jet_pt2();
       jet2_eta_ = jet_eta2();
-      jet2_btag_ = jet_bdiscriminant2();
       jet3_pt_ = jet_pt3();
       jet3_eta_ = jet_eta3();
-      jet3_btag_ = jet_bdiscriminant3();
       jet4_pt_ = jet_pt4();
       jet4_eta_ = jet_eta4();
-      jet4_btag_ = jet_bdiscriminant4();
       jet5_pt_ = jet_pt5();
       jet5_eta_ = jet_eta5();
-      jet5_btag_ = jet_bdiscriminant5();
 
       leadptoM_ = lead_ptoM();
       subleadptoM_ = sublead_ptoM();
-      leadIDMVA_ = leadIDMVA(); 
-      subleadIDMVA_ = subleadIDMVA();
       lead_eta_ = leadEta();
       sublead_eta_ = subleadEta();
 
@@ -199,9 +175,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       dipho_rapidity_ = dipho_rapidity();
       met_ = MetPt();
       mt_ = mT();
-
-      lep_pt_ = n_ele() > 0 ? ele1_pt() : muon1_pt();
-      lep_eta_ = n_ele() > 0 ? ele1_eta() : muon1_eta();
 
       rand_ = cms3.rand();
 
@@ -230,31 +203,3 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
   delete bmark;
   return;
 }
-
-/*
-void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
-  BabyFile_ = new TFile(Form("%s", BabyFilename), "RECREATE");
-  BabyFile_->cd();
-  BabyTree_ = new TTree("t", "A Baby Ntuple");
-
-  BabyTree_->Branch("njets"	, &njets	);
-
-  return;
-}
-
-void BabyMaker::InitBabyNtuple () {
-  return;
-}
-
-void BabyMaker::FillBabyNtuple(){
-  BabyTree_->Fill();
-  return;
-}
-
-void BabyMaker::CloseBabyNtuple(){
-  BabyFile_->cd();
-  BabyTree_->Write();
-  BabyFile_->Close();
-  return;
-}
-*/
