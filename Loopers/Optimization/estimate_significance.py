@@ -132,11 +132,14 @@ for i in range(len(quantiles)):
   selection_base = "mva_score_ >= %.10f" % mva_cut[i][0]
   calc_significance(selection_base, quants_mc, n_sig_mc, sig_mc, quants_data, n_sig_data, sig_data, name)
 
-#print "Significance estimates for reference BDT: s, b_mc, b_data, z_mc, z_data"
-# Calculate for reference BDT
-#for i in range(len(quantiles_ref)):
-#  selection_base = "reference_mva_ >= %.10f && pass_ref_presel_ == 1" % mva_cut_ref[i][0]
-#  calc_significance(selection_base, quants_mc_ref, n_sig_mc_ref, sig_mc_ref, quants_data_ref, n_sig_data_ref, sig_data_ref, name + "_ref")
+do_reference_bdt = False
+
+if do_reference_bdt:
+  print "Significance estimates for reference BDT: s, b_mc, b_data, z_mc, z_data"
+  # Calculate for reference BDT
+  for i in range(len(quantiles_ref)):
+    selection_base = "reference_mva_ >= %.10f && pass_ref_presel_ == 1" % mva_cut_ref[i][0]
+    calc_significance(selection_base, quants_mc_ref, n_sig_mc_ref, sig_mc_ref, quants_data_ref, n_sig_data_ref, sig_data_ref, name + "_ref")
   
 ### Make diagnostic plots ###
 import matplotlib
@@ -146,8 +149,9 @@ import matplotlib.pyplot as plt
 fig = plt.figure()
 plt.plot(n_sig_mc, sig_mc, label='Our BDT (MC)', color = 'blue')
 plt.plot(n_sig_data, sig_data, label='Our BDT (data)', color = 'green')
-#plt.plot(n_sig_mc_ref, sig_mc_ref, label='2017 ttH BDT (MC)', color = 'blue', linestyle = '--')
-#plt.plot(n_sig_data_ref, sig_data_ref, label='2017 ttH BDT (data)', color = 'green', linestyle = '--')
+if do_reference_bdt:
+  plt.plot(n_sig_mc_ref, sig_mc_ref, label='2017 ttH BDT (MC)', color = 'blue', linestyle = '--')
+  plt.plot(n_sig_data_ref, sig_data_ref, label='2017 ttH BDT (data)', color = 'green', linestyle = '--')
 plt.xlabel('# Signal Events')
 plt.ylabel('Significance (Z_A)')
 plt.ylim([0.0, 3.0])

@@ -32,6 +32,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
+  float dipho_delta_R;
   float njets_;
   //float nbjets_;
   float ht_;
@@ -73,6 +74,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
+    mva->AddVariable("dipho_delta_R", &dipho_delta_R);
     mva->AddVariable("njets_", &njets_);
     //mva->AddVariable("nbjets_", &nbjets_);
     mva->AddVariable("ht_", &ht_);
@@ -122,6 +124,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
     // Get File Content
     TString currentFileTitle = currentFile->GetTitle();
+
     TFile file(currentFileTitle);
     TTree *tree = (TTree*)file.Get("tthHadronicTagDumper/trees/tth_13TeV_all");
     if (fast) TTreeCache::SetLearnEntries(10);
@@ -243,6 +246,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       if (evaluate_mva) {
 
         // Calculate MVA value
+        dipho_delta_R = lead_photon.DeltaR(sublead_photon);
         ht_ = get_ht(jets);
         njets_ = n_jets();
         //nbjets_ = nb_medium();
@@ -294,8 +298,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
 
       if (year == "2017") { // need to update 2016 babies at some point to include this info
-	TLorentzVector diphoton = lead_photon + sublead_photon;
-	vProcess[processId]->fill_histogram("hHiggsPt", diphoton.Pt(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
 	vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
       }
 

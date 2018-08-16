@@ -105,6 +105,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Variable definitions
+      dipho_delta_R = lead_photon.DeltaR(sublead_photon);
       ht_ = get_ht(jets);
       njets_ = n_jets();
       //nbjets_ = nb_medium();

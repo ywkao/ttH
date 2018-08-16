@@ -36,7 +36,7 @@ class BabyMaker {
     TTree *BabyTree_;
 
     // Variable names
-    vector<string> mva_branches = {"njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"};
+    vector<string> mva_branches = {"dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"};
     
 
     int 	label_;
@@ -45,6 +45,7 @@ class BabyMaker {
     double 	rand_;
 
     // Variable declarations
+    float           dipho_delta_R;
     int		njets_;
     //int		nbjets_;
     double	ht_;
@@ -99,6 +100,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
 
+  // Variable branches
+  BabyTree_->Branch("dipho_delta_R" ,&dipho_delta_R);
   BabyTree_->Branch("njets_"     	, &njets_       );
   //BabyTree_->Branch("nbjets_"		, &nbjets_	);
   BabyTree_->Branch("ht_"    		, &ht_       	);

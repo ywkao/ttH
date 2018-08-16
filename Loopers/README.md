@@ -15,4 +15,17 @@ Note: This is a slightly modified version of `makeCMS3ClassFiles.C` that checks 
 ### Making Plots/Tables
 1. `source setup.sh ; cd Plots ; make`
 2. To make data/MC plots: `./makePlots <plot_type> <input_file>`. The supported options for `<plot_type>` are "std" (makes regular data/MC plots), "shape" (makes normalized signal/MC shape comparisons), "genPhoton" (makes signal/MC plots with MC split by gen photon type), and "genLepton" (makes signal/MC plots with MC split by gen lepton type). You can change the list of background MC that are plotted by changing `vBkgs` in `makePlots.cpp`.
-3. To make data/signal/MC tables: `./makeTables <input_file>`. This will make yield tables for data/signal/background MC including inclusive yields for each sample, yields split by gen photon type, gen lepton type, and diphoton pair location. 
+3. To make data/signal/MC tables: `./makeTables <input_file>`. This will make yield tables for data/signal/background MC including inclusive yields for each sample, yields split by gen photon type, gen lepton type, and diphoton pair location.
+
+### Training BDTs + Evaluating Performance
+1. `source setup.sh ; make`
+2. The full BDT workflow can be run with `python run_bdt_workflow.py <channel> <selection> <year> <training_tag>` This is a wrapper to the following steps (shown below for Hadronic)
+  1. Make root baby with all needed branches: `./ttHHadronicMVABabyMaker Hadronic <selection> <year>`
+  2. Convert `.root` file to `.hdf5` file for `xgboost`: `cd ../MVAs ; python prep.py Hadronic`
+  3. Train BDT: `python train.py Hadronic <training_tag>`
+  4. Evaluate BDT, fill histograms, and create `.root` file for optimization studies: `cd ../Loopers ; ./ttHHadronicLooper Hadronic <selection> <year> <xml_file>`
+  5. Evaluate significance based on BDT: `cd Optmization ; python estimate_significance.py <optimization_baby>`
+3. To add a variable to the BDT: `python add_bdt_variable.py <var_name> <var_type> <var_definition> <channel>`
+  * Note: if you try adding a variable twice, the script is not yet smart enough to recognize and protect against redeclaration of variables, etc.
+4. To remove a variable from the BDT: `python add_bdt_variable.py <var_name> <var_type> <var_definition> <channel> --remove`
+
