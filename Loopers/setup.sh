@@ -8,10 +8,6 @@ cd -
 export PYTHONPATH=/home/users/namin/2017/fourtop/analysis/bdt/xgboost/python-package/lib/python2.7/site-packages/:$PYTHONPATH
 export PYTHONPATH=/home/users/namin/2017/fourtop/analysis/bdt/xgboost/python-package/:$PYTHONPATH
 
-if [ ! -d Optimization/weights ]; then
-  mkdir Optimization/weights
-fi
-if [ ! -d Optimization/ROCs ]; then
-  mkdir Optimization/ROCs
-fi
-
+if [ ! -d Optimization/bkg_fits ]; then
+  mkdir Optimization/bkg_fits
+fi 
