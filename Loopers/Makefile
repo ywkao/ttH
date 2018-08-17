@@ -7,14 +7,14 @@ TARGET = ttHHadronicLooper ttHLeptonicLooper ttHHadronicMVABabyMaker ttHLeptonic
 
 all: $(TARGET)
 
-ttHHadronicLooper: ScanChain_ttHHadronic.h ScanChain_ttHHadronic.C ttHHadronicLooper.cpp scale1fb/scale1fb.h ttHLooper.h
+ttHHadronicLooper: ScanChain_ttHHadronic.h ScanChain_ttHHadronic.C ttHHadronicLooper.cpp scale1fb/scale1fb_2016.h scale1fb/scale1fb_2017.h ttHLooper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o ttHHadronicLooper ttHHadronicLooper.cpp $(ROOTLIBS)
 
-ttHLeptonicLooper: ScanChain_ttHLeptonic.h ScanChain_ttHLeptonic.C ttHLeptonicLooper.cpp scale1fb/scale1fb.h ttHLooper.h
+ttHLeptonicLooper: ScanChain_ttHLeptonic.h ScanChain_ttHLeptonic.C ttHLeptonicLooper.cpp scale1fb/scale1fb_2016.h scale1fb/scale1fb_2017.h ttHLooper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o ttHLeptonicLooper ttHLeptonicLooper.cpp $(ROOTLIBS)
 
-ttHHadronicMVABabyMaker: ttHHadronicMVABabyMaker.cpp MakeMVABabies_ttHHadronic.C MakeMVABabies_ttHHadronic.h scale1fb/scale1fb.h ttHLooper.h
+ttHHadronicMVABabyMaker: ttHHadronicMVABabyMaker.cpp MakeMVABabies_ttHHadronic.C MakeMVABabies_ttHHadronic.h scale1fb/scale1fb_2016.h scale1fb/scale1fb_2017.h ttHLooper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o ttHHadronicMVABabyMaker ttHHadronicMVABabyMaker.cpp $(ROOTLIBS)
 
-ttHLeptonicMVABabyMaker: ttHLeptonicMVABabyMaker.cpp MakeMVABabies_ttHLeptonic.C MakeMVABabies_ttHLeptonic.h scale1fb/scale1fb.h ttHLooper.h
+ttHLeptonicMVABabyMaker: ttHLeptonicMVABabyMaker.cpp MakeMVABabies_ttHLeptonic.C MakeMVABabies_ttHLeptonic.h scale1fb/scale1fb_2016.h scale1fb/scale1fb_2017.h ttHLooper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o ttHLeptonicMVABabyMaker ttHLeptonicMVABabyMaker.cpp $(ROOTLIBS)
