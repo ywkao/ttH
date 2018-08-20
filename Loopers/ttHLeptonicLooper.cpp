@@ -14,7 +14,13 @@ int main(int argc, char* argv[]) {
     cout << "Not evaluating BDT" << endl;
 
   TChain *ch = new TChain("tthLeptonicTagDumper/trees/tth_13TeV_all"); 
-  add_samples(ch, year);
+
+  if (year == "All") {
+    add_samples(ch, "2016");
+    add_samples(ch, "2017");
+  }
+  else
+    add_samples(ch, year);
 
   ScanChain(ch, tag, year, xml_file); 
 }

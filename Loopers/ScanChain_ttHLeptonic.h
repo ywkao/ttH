@@ -28,6 +28,7 @@ using namespace tas;
 
 const double lumi_2016 = 35.9;
 const double lumi_2017 = 41.5;
+const double lumi_all = lumi_2016 + lumi_2017;
 
 const vector<double> mva_thresh_2017 = { 0.3, 0.7 };
 

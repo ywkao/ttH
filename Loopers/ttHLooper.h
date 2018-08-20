@@ -316,15 +316,6 @@ TLorentzVector get_hadronic_top(vector<TLorentzVector> jets, vector<std::pair<in
   return top_candidate;
 }
 
-double min_dr(TLorentzVector diphoton, vector<TLorentzVector> jets) {
-  double min = 999;
-  for (int i = 0; i < jets.size(); i++) {
-    double dr = diphoton.DeltaR(jets[i]);
-    min = dr < min ? dr : min;
-  }
-  return min;
-}
-
 const double mW = 80;
 double closest_mW(vector<TLorentzVector> jets, TLorentzVector diphoton, double &deltaR) {
   double min_diff = 999;
@@ -367,6 +358,15 @@ double get_ht(vector<TLorentzVector> jets) {
     ht += jets[i].Pt();
   }
   return ht;
+}
+
+double min_dr(TLorentzVector target, vector<TLorentzVector> objects) {
+  double min = 999;
+  for (int i = 0; i < objects.size(); i++) {
+    double dr = target.DeltaR(objects[i]);
+    min = dr < min ? dr : min;
+  }
+  return min;
 }
 
 const vector<TString> vSamples_2016 = {"DoubleEG", 

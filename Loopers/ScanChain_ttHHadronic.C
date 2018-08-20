@@ -134,6 +134,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
+    year = currentFileTitle.Contains("2016") ? "2016" : "2017";
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;

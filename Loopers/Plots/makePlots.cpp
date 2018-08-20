@@ -93,7 +93,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   vector<int> vColors;
 
   if (type =="std") {
-    vLegendLabels = {year + " Data", "ttH (M125)"};
+    if (year != "All")
+      vLegendLabels = {year + " Data", "ttH (M125)"};
+    else
+      vLegendLabels = {"2016 + 2017 Data", "ttH (M125)"};
     for (int i = 0; i < vBkgs.size(); i++) {
       hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + mva_category));
       vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
@@ -276,7 +279,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   c->set_x_label(x_label);
   c->set_y_label("Events");
   TString output = output_name;
-  double lumi = year == "2017" ? 41.5 : 35.9;
+  double lumi = year == "All" ? 77.4 : (year == "2017" ? 41.5 : 35.9);
   c->set_lumi(lumi);
   if (hist_name == "hMassAN") {
     c->set_no_flow();
@@ -369,7 +372,7 @@ int main(int argc, char* argv[])
   TString type_s = argv[1];
 
   TString file_path = argv[2];
-  TString year = file_path.Contains("2017") ? "2017" : "2016";
+  TString year = file_path.Contains("All") ? "All" : (file_path.Contains("2017") ? "2017" : "2016");
   TString tag = file_path.Contains("Hadronic") ? "Hadronic" : "Leptonic";
 
   bool loose_mva_cut = argc > 3;
@@ -391,6 +394,8 @@ int main(int argc, char* argv[])
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
     if (year == "2017")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
+    if (year == "All")
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
   }
   else if (type == "genPhoton") {
     //vBkgs = {"DiPhoton", "GammaJets", "QCD"};

@@ -33,6 +33,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
+  float n_leps_;
   float lep_pt_;
   float lep_eta_;
   float nb_loose_;
@@ -73,6 +74,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
+    mva->AddVariable("n_leps_", &n_leps_);
     mva->AddVariable("lep_pt_", &lep_pt_);
     mva->AddVariable("lep_eta_", &lep_eta_);
     mva->AddVariable("nb_loose_", &nb_loose_);
@@ -130,6 +132,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG");
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
+    year = currentFileTitle.Contains("2016") ? "2016" : "2017";
+
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -191,11 +195,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
         leps = make_leps(electrons, muons);
       }
       TLorentzVector diphoton = lead_photon + sublead_photon;
-
+      vector<TLorentzVector> objects;
+      for (int i = 0; i < jets.size(); i++)
+        objects.push_back(jets[i]);
+      for (int i = 0; i < leps.size(); i++)
+        objects.push_back(leps[i]);
 
       // Selection
       if (tag == "ttHLeptonicLoose") {
-        if (mass() < 100)        continue;
+        if (mass() < 90)        continue;
 	if (n_jets() < 2)	continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
@@ -372,6 +380,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       if (evaluate_mva) {
 
         // Calculate MVA value
+        n_leps_ = leps.size();
         lep_pt_ = leps[0].Pt();
         lep_eta_ = leps[0].Eta();
         nb_loose_ = nb_loose();
@@ -503,8 +512,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       if (jet_pt5() != -100)      vProcess[processId]->fill_histogram("hJet5Eta", jet_eta5(), evt_weight, vId);
       if (jet_pt6() != -100)      vProcess[processId]->fill_histogram("hJet6Eta", jet_eta6(), evt_weight, vId);
 
-      vProcess[processId]->fill_histogram("hMaxBTag", btag_scores_sorted[0].second, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hSecondMaxBTag", btag_scores_sorted[1].second, evt_weight, vId);
+      if (year == "2017") {
+	vProcess[processId]->fill_histogram("hMaxBTag", btag_scores_sorted[0].second, evt_weight, vId);
+	vProcess[processId]->fill_histogram("hSecondMaxBTag", btag_scores_sorted[1].second, evt_weight, vId);
+      }
 
       //if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hbJet1pT", bjet1_pt(), evt_weight, vId);
       //if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hbJet2pT", bjet2_pt(), evt_weight, vId);

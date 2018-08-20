@@ -122,6 +122,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
         leps = make_leps(electrons, muons);
       } 
       TLorentzVector diphoton = lead_photon + sublead_photon;
+      vector<TLorentzVector> objects;
+      for (int i = 0; i < jets.size(); i++)
+	objects.push_back(jets[i]);
+      for (int i = 0; i < leps.size(); i++)
+        objects.push_back(leps[i]);
+
 
       // Fill histograms //
       evt_weight_ = 1.;
@@ -139,6 +145,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Variable definitions
+      n_leps_ = leps.size();
       lep_pt_ = leps[0].Pt();
       lep_eta_ = leps[0].Eta();
       nb_loose_ = nb_loose();
