@@ -55,3 +55,6 @@ Submitting ttH Babies version v1.1 using skims in /hadoop/cms/store/user/bemarsh
 Date: 2018-08-20 13:12:22.513402 
 Submitting ttH Babies version v3.12 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit 7b7378c8bebe2c6b50b069bfcc3320d9a06969e4 of tth_dev_80X branch of flashgg
 
+Date: 2018-08-21 12:58:39.951583 
+Submitting ttH Babies version v3.13 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit e95eeafb7f94821e6b453c4092dd08eb4e31924f of tth_dev_80X branch of flashgg
+# Note: starting with v3.13, I changed the lepton pT cuts for 2016 to match those for 2017. Due to exclusivity of categories, this means that some events have migrated from ttH Hadronic to ttH Leptonic. So, in order to sync with any official 2016 results, use v3.12 of 2016 babies
