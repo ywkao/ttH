@@ -498,7 +498,7 @@ int main(int argc, char* argv[])
       make_plot(c1, vFiles[i], vNames[i], "hLeptonEta", "Lepton #eta", vBkgs, 1, type, year, loose_mva_cut);
     }
 
-    if (year == "2017" && tag == "Leptonic") {
+    if (tag == "Leptonic") {
       make_plot(c1, vFiles[i], vNames[i], "hPtHiggs", "DiPhoton p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut);
       make_plot(c1, vFiles[i], vNames[i], "hMinDrDiphoJet", "Min #Delta R(p_{#gamma#gamma}, jet)", vBkgs, 1, type, year, loose_mva_cut);
       make_plot(c1, vFiles[i], vNames[i], "hDijetClosestWMass", "Min |m_{jj} - m_{W}| [GeV]", vBkgs, 1, type, year, loose_mva_cut);

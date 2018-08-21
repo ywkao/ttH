@@ -82,11 +82,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       vector<TLorentzVector> jets;
       TLorentzVector lead_photon;
       TLorentzVector sublead_photon;
-      if (year == "2017") {
-        jets = make_jets();
-        lead_photon = make_lead_photon();
-        sublead_photon = make_sublead_photon();
-      } 
+      jets = make_jets();
+      lead_photon = make_lead_photon();
+      sublead_photon = make_sublead_photon();
       TLorentzVector diphoton = lead_photon + sublead_photon;
 
       // Fill histograms //

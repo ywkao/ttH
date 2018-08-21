@@ -185,15 +185,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       vector<TLorentzVector> electrons;
       vector<TLorentzVector> muons;
       vector<TLorentzVector> leps;
-      if (year == "2017") {
-	jets = make_jets(btag_scores);
-	btag_scores_sorted = sortVector(btag_scores);
-	lead_photon = make_lead_photon();
-	sublead_photon = make_sublead_photon();
-	electrons = make_els();
-	muons = make_mus();
-        leps = make_leps(electrons, muons);
-      }
+      jets = make_jets(btag_scores);
+      btag_scores_sorted = sortVector(btag_scores);
+      lead_photon = make_lead_photon();
+      sublead_photon = make_sublead_photon();
+      electrons = make_els();
+      muons = make_mus();
+      leps = make_leps(electrons, muons);
       TLorentzVector diphoton = lead_photon + sublead_photon;
       vector<TLorentzVector> objects;
       for (int i = 0; i < jets.size(); i++)
@@ -445,35 +443,33 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
         continue;
       }
 
-      if (year == "2017") { // at some point should remake 2016 babies with this information also
-        vProcess[processId]->fill_histogram("hPhotonDeltaR", lead_photon.DeltaR(sublead_photon), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonDeltaR", lead_photon.DeltaR(sublead_photon), evt_weight, vId);
 
-	vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
-	vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
-	vProcess[processId]->fill_histogram("hDeltaRDiphoLep", diphoton.DeltaR(leps[0]), evt_weight, vId);
-	double close_mW, deltaR_dipho_W;
-	if (n_ele() + n_muons() == 1) { // only for semileptonic events where we expect W->qq 
-	  // Hadronic W
-	  close_mW = closest_mW(jets, diphoton, deltaR_dipho_W);
-	  vProcess[processId]->fill_histogram("hDijetClosestWMass", close_mW, evt_weight, vId);
-	  vProcess[processId]->fill_histogram("hDeltaRDiphoW", deltaR_dipho_W, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hDeltaRDiphoLep", diphoton.DeltaR(leps[0]), evt_weight, vId);
+      double close_mW, deltaR_dipho_W;
+      if (n_ele() + n_muons() == 1) { // only for semileptonic events where we expect W->qq 
+	// Hadronic W
+	close_mW = closest_mW(jets, diphoton, deltaR_dipho_W);
+	vProcess[processId]->fill_histogram("hDijetClosestWMass", close_mW, evt_weight, vId);
+	vProcess[processId]->fill_histogram("hDeltaRDiphoW", deltaR_dipho_W, evt_weight, vId);
 
-	  // Hadronic top
-	  if (jets.size() >= 3) {
-	    TLorentzVector top = get_hadronic_top(jets, btag_scores_sorted);
-	    if (top.Pt() > 0) {
-	      vProcess[processId]->fill_histogram("hTopPt", top.Pt(), evt_weight, vId);
-	      vProcess[processId]->fill_histogram("hTopEta", top.Eta(), evt_weight, vId);
-	      vProcess[processId]->fill_histogram("hTopMass", top.M(), evt_weight, vId);
-	      vProcess[processId]->fill_histogram("hDeltaRDiphoTop", top.DeltaR(diphoton), evt_weight, vId);
-	    }
+	// Hadronic top
+	if (jets.size() >= 3) {
+	  TLorentzVector top = get_hadronic_top(jets, btag_scores_sorted);
+	  if (top.Pt() > 0) {
+	    vProcess[processId]->fill_histogram("hTopPt", top.Pt(), evt_weight, vId);
+	    vProcess[processId]->fill_histogram("hTopEta", top.Eta(), evt_weight, vId);
+	    vProcess[processId]->fill_histogram("hTopMass", top.M(), evt_weight, vId);
+	    vProcess[processId]->fill_histogram("hDeltaRDiphoTop", top.DeltaR(diphoton), evt_weight, vId);
 	  }
 	}
-	for (int i = 0; i < jets.size(); i++) {
-	  for (int j = i + 1; j < jets.size(); j++) {
-	    TLorentzVector dijet = jets[i] + jets[j];
-	    vProcess[processId]->fill_histogram("hDijetMass", dijet.M(), evt_weight, vId);
-	  }
+      }
+      for (int i = 0; i < jets.size(); i++) {
+	for (int j = i + 1; j < jets.size(); j++) {
+	  TLorentzVector dijet = jets[i] + jets[j];
+	  vProcess[processId]->fill_histogram("hDijetMass", dijet.M(), evt_weight, vId);
 	}
       }
 
@@ -512,16 +508,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       if (jet_pt5() != -100)      vProcess[processId]->fill_histogram("hJet5Eta", jet_eta5(), evt_weight, vId);
       if (jet_pt6() != -100)      vProcess[processId]->fill_histogram("hJet6Eta", jet_eta6(), evt_weight, vId);
 
-      if (year == "2017") {
-	vProcess[processId]->fill_histogram("hMaxBTag", btag_scores_sorted[0].second, evt_weight, vId);
-	vProcess[processId]->fill_histogram("hSecondMaxBTag", btag_scores_sorted[1].second, evt_weight, vId);
-      }
+      vProcess[processId]->fill_histogram("hMaxBTag", btag_scores_sorted[0].second, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hSecondMaxBTag", btag_scores_sorted[1].second, evt_weight, vId);
 
-      //if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hbJet1pT", bjet1_pt(), evt_weight, vId);
-      //if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hbJet2pT", bjet2_pt(), evt_weight, vId);
-
-      //if (n_bjets() >= 1)     vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, vId);
-      //if (n_bjets() >= 2)     vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, vId);
 
       double lep_pt, lep_eta;
       lep_pt = get_lep_pt(lep_eta);

@@ -112,15 +112,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       vector<TLorentzVector> electrons;
       vector<TLorentzVector> muons;
       vector<TLorentzVector> leps;
-      if (year == "2017") {
-        jets = make_jets(btag_scores);
-        btag_scores_sorted = sortVector(btag_scores);
-        lead_photon = make_lead_photon();
-        sublead_photon = make_sublead_photon();
-        electrons = make_els();
-        muons = make_mus();
-        leps = make_leps(electrons, muons);
-      } 
+      jets = make_jets(btag_scores);
+      btag_scores_sorted = sortVector(btag_scores);
+      lead_photon = make_lead_photon();
+      sublead_photon = make_sublead_photon();
+      electrons = make_els();
+      muons = make_mus();
+      leps = make_leps(electrons, muons);
       TLorentzVector diphoton = lead_photon + sublead_photon;
       vector<TLorentzVector> objects;
       for (int i = 0; i < jets.size(); i++)
