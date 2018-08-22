@@ -36,7 +36,7 @@ class BabyMaker {
     TTree *BabyTree_;
 
     // Variable names
-    vector<string> mva_branches = {"n_leps_", "lep_pt_", "lep_eta_", "nb_loose_", "max2_btag_", "max1_btag_", "dR_higgs_lep", "dR_higgs_W", "pt_higgs", "dipho_deltaR", "maxIDMVA_", "minIDMVA_", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet2_pt_", "jet2_eta_", "jet3_pt_", "jet3_eta_", "jet4_pt_", "jet4_eta_", "jet5_pt_", "jet5_eta_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "mt_"};
+    vector<string> mva_branches = {"abs_cos_helicity", "sublead_pho_min_dr", "lead_pho_min_dr", "n_leps_", "lep_pt_", "lep_eta_", "nb_loose_", "max2_btag_", "max1_btag_", "dR_higgs_lep", "dR_higgs_W", "pt_higgs", "dipho_deltaR", "maxIDMVA_", "minIDMVA_", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet2_pt_", "jet2_eta_", "jet3_pt_", "jet3_eta_", "jet4_pt_", "jet4_eta_", "jet5_pt_", "jet5_eta_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "mt_"};
     
     int 	label_;
     double	evt_weight_;
@@ -44,6 +44,9 @@ class BabyMaker {
     double	rand_;
 
     // Variable declarations
+    double           abs_cos_helicity;
+    double           sublead_pho_min_dr;
+    double           lead_pho_min_dr;
     int           n_leps_;
     double           lep_pt_;
     double           lep_eta_;
@@ -99,6 +102,9 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("rand_"            , &rand_       );
 
   // Variable branches
+  BabyTree_->Branch("abs_cos_helicity" ,&abs_cos_helicity);
+  BabyTree_->Branch("sublead_pho_min_dr" ,&sublead_pho_min_dr);
+  BabyTree_->Branch("lead_pho_min_dr" ,&lead_pho_min_dr);
   BabyTree_->Branch("n_leps_" ,&n_leps_);
   BabyTree_->Branch("lep_pt_" ,&lep_pt_);
   BabyTree_->Branch("lep_eta_" ,&lep_eta_);

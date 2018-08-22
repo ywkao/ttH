@@ -70,8 +70,10 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hTopMass", 25, 0, 400);
     v[i]->add_histogram("hTopEta", 25, -3, 3);
 
+    v[i]->add_histogram("hLeadMinDr", 25, 0, 6);
+    v[i]->add_histogram("hSubleadMinDr", 25, 0, 6);
     
-
+    v[i]->add_histogram("hAbsCosHelicity", 25, 0, 1);
 
     // Leading photon
     v[i]->add_histogram("hPhotonLeadPt", 25, 0, 350);
@@ -288,7 +290,7 @@ vector<std::pair<int, double>> sortVector(const vector<double> v) {
 }
 
 const double m_top = 172.44;
-TLorentzVector get_hadronic_top(vector<TLorentzVector> jets, vector<std::pair<int, double>> btag_scores_sorted) {
+TLorentzVector get_hadronic_top(const vector<TLorentzVector> jets, const vector<std::pair<int, double>> btag_scores_sorted) {
   int idx_btag_1 = btag_scores_sorted[0].first;
   int idx_btag_2 = btag_scores_sorted[1].first;
   TLorentzVector b_candidate_1 = jets[idx_btag_1];
@@ -317,7 +319,7 @@ TLorentzVector get_hadronic_top(vector<TLorentzVector> jets, vector<std::pair<in
 }
 
 const double mW = 80;
-double closest_mW(vector<TLorentzVector> jets, TLorentzVector diphoton, double &deltaR) {
+double closest_mW(const vector<TLorentzVector> jets, const TLorentzVector diphoton, double &deltaR) {
   double min_diff = 999;
   int jet1_idx(-1), jet2_idx(-1);
   for (int i = 0; i < jets.size(); i++) {
@@ -335,7 +337,7 @@ double closest_mW(vector<TLorentzVector> jets, TLorentzVector diphoton, double &
   return min_diff;
 }
 
-double deltaR_Higgs_W(vector<TLorentzVector> jets, TLorentzVector diphoton) {
+double deltaR_Higgs_W(const vector<TLorentzVector> jets, const TLorentzVector diphoton) {
   double min_diff = 999;
   int jet1_idx(-1), jet2_idx(-1);
   for (int i = 0; i < jets.size(); i++) {
@@ -360,13 +362,28 @@ double get_ht(vector<TLorentzVector> jets) {
   return ht;
 }
 
-double min_dr(TLorentzVector target, vector<TLorentzVector> objects) {
+double min_dr(const TLorentzVector target, const vector<TLorentzVector> objects) {
   double min = 999;
   for (int i = 0; i < objects.size(); i++) {
     double dr = target.DeltaR(objects[i]);
     min = dr < min ? dr : min;
   }
   return min;
+}
+
+double helicity(const TLorentzVector particle_1, const TLorentzVector particle_2) {
+  TLorentzVector p1 = particle_1;
+  TLorentzVector parent = particle_1 + particle_2;
+  
+  TVector3 boost_to_parent = -(parent.BoostVector());
+  p1.Boost(boost_to_parent);
+
+  TVector3 v1 = p1.Vect();
+  TVector3 vParent = parent.Vect();
+
+  double cos_theta_1 = (v1.Dot(vParent)) / (v1.Mag() * vParent.Mag());
+
+  return abs(cos_theta_1);  
 }
 
 const vector<TString> vSamples_2016 = {"DoubleEG", 

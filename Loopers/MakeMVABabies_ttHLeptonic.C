@@ -143,6 +143,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Variable definitions
+      abs_cos_helicity = helicity(lead_photon, sublead_photon);
+      sublead_pho_min_dr = min_dr(sublead_photon, objects);
+      lead_pho_min_dr = min_dr(lead_photon, objects);
       n_leps_ = leps.size();
       lep_pt_ = leps[0].Pt();
       lep_eta_ = leps[0].Eta();

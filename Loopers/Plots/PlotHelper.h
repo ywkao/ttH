@@ -850,14 +850,14 @@ void Comparison::draw_2D_histograms(int idx)
 inline
 void Comparison::annotate_plot()
 {
-  TLatex* cms = new TLatex(0.20, 0.93, "CMS Preliminary");
+  TLatex* cms = new TLatex(0.15, 0.93, "CMS Preliminary");
   cms->SetTextSize(fs);
   cms->SetNDC(kTRUE);
   cms->Draw("SAME");
 
   TLatex* lumi;
   if (mLumi != -1) {
-    TString lumiText = Form("%.2f",mLumi);
+    TString lumiText = Form("%.1f",mLumi);
     lumiText += " fb^{-1} (13 TeV)";
     lumi = new TLatex(0.66, 0.93, lumiText.Data());
     lumi->SetTextSize(fs);

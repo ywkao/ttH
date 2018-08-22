@@ -295,10 +295,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
  
 
-
-      vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
-
       // Fill histograms //
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   
       vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
@@ -310,6 +306,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
 
       // Fill rest of histograms //
+      double helic = helicity(lead_photon, sublead_photon);
+      vProcess[processId]->fill_histogram("hAbsCosHelicity", helic, evt_weight, vId);
+
+      vProcess[processId]->fill_histogram("hLeadMinDr", min_dr(lead_photon, jets), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hSubleadMinDr", min_dr(sublead_photon, jets), evt_weight, vId);
+
+      vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+
       vProcess[processId]->fill_histogram("hHadronicMVA", mva_value, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);

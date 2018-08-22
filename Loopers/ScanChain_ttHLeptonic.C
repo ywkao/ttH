@@ -33,6 +33,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
+  float abs_cos_helicity;
+  float sublead_pho_min_dr;
+  float lead_pho_min_dr;
   float n_leps_;
   float lep_pt_;
   float lep_eta_;
@@ -74,6 +77,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
+    mva->AddVariable("abs_cos_helicity", &abs_cos_helicity);
+    mva->AddVariable("sublead_pho_min_dr", &sublead_pho_min_dr);
+    mva->AddVariable("lead_pho_min_dr", &lead_pho_min_dr);
     mva->AddVariable("n_leps_", &n_leps_);
     mva->AddVariable("lep_pt_", &lep_pt_);
     mva->AddVariable("lep_eta_", &lep_eta_);
@@ -378,6 +384,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       if (evaluate_mva) {
 
         // Calculate MVA value
+        abs_cos_helicity = helicity(lead_photon, sublead_photon);
+        sublead_pho_min_dr = min_dr(sublead_photon, objects);
+        lead_pho_min_dr = min_dr(lead_photon, objects);
         n_leps_ = leps.size();
         lep_pt_ = leps[0].Pt();
         lep_eta_ = leps[0].Eta();
@@ -443,6 +452,25 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
         continue;
       }
 
+      //////////////////////////////
+      // Start filling histograms //
+      //////////////////////////////
+
+      // General
+      vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
+
+      // Skip blinded region for MC after filling mass histogram
+      if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
+
+
+      double helic = helicity(lead_photon, sublead_photon);
+      // Fill histograms
+      vProcess[processId]->fill_histogram("hAbsCosHelicity", helic, evt_weight, vId);
+
+      vProcess[processId]->fill_histogram("hLeadMinDr", min_dr(lead_photon, objects), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hSubleadMinDr", min_dr(sublead_photon, objects), evt_weight, vId);
+
       vProcess[processId]->fill_histogram("hPhotonDeltaR", lead_photon.DeltaR(sublead_photon), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
@@ -472,13 +500,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 	  vProcess[processId]->fill_histogram("hDijetMass", dijet.M(), evt_weight, vId);
 	}
       }
-
-      // General
-      vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
-
-      // Skip blinded region for MC after filling mass histogram
-      if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
 
       vProcess[processId]->fill_histogram("hLeptonicMVA", mva_value, evt_weight, vId);
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
