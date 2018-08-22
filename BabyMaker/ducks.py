@@ -23,10 +23,6 @@ exec_path = "condor_exe.sh"
 tar_path = "package.tar.gz"
 hadoop_path = "ttH"
 
-if not args.soft_rerun:
-  os.system("rm -rf tasks/*" + args.tag + "_" + args.year)
-  os.system("rm package.tar.gz")
-
 if args.year == "2016":
   cmssw_ver = "CMSSW_8_0_28"
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
@@ -35,16 +31,21 @@ elif args.year == "2017":
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
 
 if not args.soft_rerun:
-  os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' %s" % cmssw_ver)
+  os.system("rm -rf tasks/*" + args.tag + "_" + args.year)
+  os.system("rm package.tar.gz")
 
-with open("versions.txt", "a") as fout:
-  os.chdir("%s/src/flashgg/" % cmssw_ver)
-  commit = os.popen("git log -n 1 --pretty=format:'%H'").read()
-  branch = "tth_dev" + ((os.popen("git branch").read()).strip("\n")).split("tth_dev")[-1]
-  os.chdir("../../..")
-  fout.write("Date: %s \n" % datetime.datetime.now())
-  fout.write("Submitting ttH Babies version %s using skims in %s and commit %s of %s branch of flashgg\n" % (args.tag, base_path, commit, branch))
-  fout.write("\n")
+  #os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.cc' --exclude='*.h' --exclude-vcs %s" % cmssw_ver)
+
+  os.system("XZ_OPT=-9 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.cc' --exclude='*.h' --exclude-vcs --exclude='*.C' -f package.tar.gz %s" % cmssw_ver) 
+
+  with open("versions.txt", "a") as fout:
+    os.chdir("%s/src/flashgg/" % cmssw_ver)
+    commit = os.popen("git log -n 1 --pretty=format:'%H'").read()
+    branch = "tth_dev" + ((os.popen("git branch").read()).strip("\n")).split("tth_dev")[-1]
+    os.chdir("../../..")
+    fout.write("Date: %s \n" % datetime.datetime.now())
+    fout.write("Submitting ttH Babies version %s using skims in %s and commit %s of %s branch of flashgg\n" % (args.tag, base_path, commit, branch))
+    fout.write("\n")
 
 subdir_map = { 	"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 		"WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
@@ -78,10 +79,12 @@ for sample in samples:
     nFilesPerOutput = 25
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
   elif not args.year == "2016": # in 2016 there are some samples we want to exclude. For 2017, use everything that is there (usually there is only one subdirectory, but e.g. for DY, there is a nominal sample and an ext1 sample and we want to use both)
-    if "ttH" in name or "DiPhoton" in name or "TTGG" in name:
+    if "ttH" in name:
       nFilesPerOutput = 1
+    elif "DiPhoton" in name or "TTGG" in name:
+      nFilesPerOutput = 5
     else:
-      nFilesPerOutput = 25
+      nFilesPerOutput = 100
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
   elif not args.data_only:
     if "ttH" in name or "DiPhoton" in name or "TTGG" in name:
