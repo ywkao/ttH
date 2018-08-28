@@ -58,3 +58,19 @@ Submitting ttH Babies version v3.12 using skims in /hadoop/cms/store/user/bemars
 Date: 2018-08-21 12:58:39.951583 
 Submitting ttH Babies version v3.13 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit e95eeafb7f94821e6b453c4092dd08eb4e31924f of tth_dev_80X branch of flashgg
 # Note: starting with v3.13, I changed the lepton pT cuts for 2016 to match those for 2017. Due to exclusivity of categories, this means that some events have migrated from ttH Hadronic to ttH Leptonic. So, in order to sync with any official 2016 results, use v3.12 of 2016 babies
+Date: 2018-08-22 16:23:25.603059 
+Submitting ttH Babies version v3.14 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit e95eeafb7f94821e6b453c4092dd08eb4e31924f of tth_dev_80X branch of flashgg
+
+Date: 2018-08-23 12:56:53.891895 
+Submitting ttH Babies version v3.15 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit e95eeafb7f94821e6b453c4092dd08eb4e31924f of tth_dev_80X branch of flashgg
+
+# Note: starting with v3.16 (2016) and v1.2 (2017), there was a bug fix in deltaR calculation for gen-matching that resulted in a small number of photons matched to prompt electrons being misclassified
+
+Date: 2018-08-27 16:09:02.521230 
+Submitting ttH Babies version v3.16 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20 and commit 77667c3420fbcf361183774d0f345913b351a9b4 of tth_dev_80X branch of flashgg
+
+# Note: starting with v1.2, there was a bug fix in some tt+gg events being double-counted
+
+Date: 2018-08-27 17:41:49.245189 
+Submitting ttH Babies version v1.2 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1 and commit 5d63aa951d83712c35d8e4f03f7155db71c0ac14 of tth_dev_94X branch of flashgg
+
