@@ -160,6 +160,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
+      if ((currentFileTitle.Contains("DiPhoton") || currentFileTitle.Contains("QCD")) && !useEventForTemplate(currentFileTitle, genPhotonId) ) continue;
+      if (currentFileTitle.Contains("GJet")) continue;
+
       double evt_weight = 1.;
       if (!isData) {
         if (year == "2016")

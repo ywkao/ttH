@@ -204,6 +204,20 @@ int categorize_process(TString currentFileTitle) {
   }
 }
 
+
+bool useEventForTemplate(TString currentFileName, int diPhotonType) {
+
+  bool useThisEvent = false;
+
+  // this is only for Sam's option B
+  // http://www.t2.ucsd.edu/tastwiki/pub/CMS/TthAgenda20180711/ttHUpdate_10Jul2018.pdf 
+  if (currentFileName.Contains("DiPhoton") && diPhotonType == 2) useThisEvent = true;
+  if (currentFileName.Contains("QCD") && diPhotonType == 1) useThisEvent = true;
+  if (currentFileName.Contains("QCD") && diPhotonType == 0) useThisEvent = true;
+
+  return useThisEvent;
+}
+
 int categorize_photons(int leadGenMatch, int subleadGenMatch) {
   if (leadGenMatch != 1 && subleadGenMatch != 1)
     return 0; // fake-fake
@@ -371,20 +385,25 @@ double min_dr(TLorentzVector target, vector<TLorentzVector> objects) {
 
 const vector<TString> vSamples_2016 = {"DoubleEG", 
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2", 
-			"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8", 
+//			"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8", 
 			"DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa", 
+/*
 			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", 
 			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8", 
 			"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", 
+*/
 			"QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", 
 			"QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8", 
 			"QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", 
+/*
 			"TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8",
 			"TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8",		
 			"WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
 			"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
 			"TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"				
+*/
 };
+
 const vector<TString> vSamples_2017 = {"DoubleEG",
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8",
 			"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
@@ -403,9 +422,9 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 
 
 void add_samples(TChain* ch, TString year) {
-  TString tag = year == "2017" ? "v1.1" : "v3.12";
+  TString tag = year == "2017" ? "v3_2_0_overlapRemove_v1" : "v3.12";
 
-  TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
+  TString location = "/home/users/hmei/ttH2/ttH/Loopers/merged_babies";
 
   vector<TString> vSamples = year == "2017" ? vSamples_2017 : vSamples_2016;
 

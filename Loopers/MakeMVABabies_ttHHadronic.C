@@ -96,6 +96,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
           evt_weight_ = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
       }
 
+      int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
+      if ((currentFileTitle.Contains("DiPhoton") || currentFileTitle.Contains("QCD")) && !useEventForTemplate(currentFileTitle, genPhotonId) ) continue;
+      if (currentFileTitle.Contains("GJet")) continue;
+      if (currentFileTitle.Contains("DiPhoton")) evt_weight_ *= 0.32;
+      if (currentFileTitle.Contains("QCD") && genPhotonId == 1) evt_weight_ *= 0.96;
+      if (currentFileTitle.Contains("QCD") && genPhotonId == 0) evt_weight_ *= 1.52;
+
       // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
