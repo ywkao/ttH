@@ -73,7 +73,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hLeadMinDr", 25, 0, 6);
     v[i]->add_histogram("hSubleadMinDr", 25, 0, 6);
     
-    v[i]->add_histogram("hAbsCosHelicity", 25, 0, 1);
+    v[i]->add_histogram("hAbsCosHelicity", 10, 0, 1);
 
     // Leading photon
     v[i]->add_histogram("hPhotonLeadPt", 25, 0, 350);
@@ -420,7 +420,7 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 
 
 void add_samples(TChain* ch, TString year) {
-  TString tag = year == "2017" ? "v1.1" : "v3.12";
+  TString tag = year == "2017" ? "v1.2" : "v3.16";
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 
