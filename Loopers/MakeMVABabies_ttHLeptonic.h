@@ -36,17 +36,18 @@ class BabyMaker {
     TTree *BabyTree_;
 
     // Variable names
-    vector<string> mva_branches = {"abs_cos_helicity", "sublead_pho_min_dr", "lead_pho_min_dr", "n_leps_", "lep_pt_", "lep_eta_", "nb_loose_", "max2_btag_", "max1_btag_", "dR_higgs_lep", "dR_higgs_W", "pt_higgs", "dipho_deltaR", "maxIDMVA_", "minIDMVA_", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet2_pt_", "jet2_eta_", "jet3_pt_", "jet3_eta_", "jet4_pt_", "jet4_eta_", "jet5_pt_", "jet5_eta_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "mt_"};
+    vector<string> mva_branches = {"helic", "min_dr_sublead_photon", "min_dr_lead_photon", "n_leps_", "lep_pt_", "lep_eta_", "nb_loose_", "max2_btag_", "max1_btag_", "dR_higgs_lep", "dR_higgs_W", "pt_higgs", "dipho_deltaR", "maxIDMVA_", "minIDMVA_", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet2_pt_", "jet2_eta_", "jet3_pt_", "jet3_eta_", "jet4_pt_", "jet4_eta_", "jet5_pt_", "jet5_eta_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "mt_"};
     
     int 	label_;
     double	evt_weight_;
     int 	process_id_;
     double	rand_;
+    double 	super_rand_;
 
     // Variable declarations
-    double           abs_cos_helicity;
-    double           sublead_pho_min_dr;
-    double           lead_pho_min_dr;
+    double           helic;
+    double           min_dr_sublead_photon;
+    double           min_dr_lead_photon;
     int           n_leps_;
     double           lep_pt_;
     double           lep_eta_;
@@ -100,11 +101,12 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("label_"     	, &label_       );
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
+  BabyTree_->Branch("super_rand_"            , &super_rand_       );
 
   // Variable branches
-  BabyTree_->Branch("abs_cos_helicity" ,&abs_cos_helicity);
-  BabyTree_->Branch("sublead_pho_min_dr" ,&sublead_pho_min_dr);
-  BabyTree_->Branch("lead_pho_min_dr" ,&lead_pho_min_dr);
+  BabyTree_->Branch("helic" ,&helic);
+  BabyTree_->Branch("min_dr_sublead_photon" ,&min_dr_sublead_photon);
+  BabyTree_->Branch("min_dr_lead_photon" ,&min_dr_lead_photon);
   BabyTree_->Branch("n_leps_" ,&n_leps_);
   BabyTree_->Branch("lep_pt_" ,&lep_pt_);
   BabyTree_->Branch("lep_eta_" ,&lep_eta_);

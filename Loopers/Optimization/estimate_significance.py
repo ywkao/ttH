@@ -10,6 +10,7 @@ import utils
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("file", help = "input root file", type=str)
+parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
 #parser.add_argument("file2", help = "second input root file (for comparing two different bdts)", type=str, required=False)
 #parser.add_argument("file3", help = "third input root file (for comparing three different bdts)", type=str, required=False)
 args = parser.parse_args()
@@ -44,8 +45,9 @@ f = ROOT.TFile(args.file)
 tree = f.Get("t")
 
 train_frac = 0.5
-selection_signal = "label_ == 1 && rand_ > %.10f" % train_frac
-selection_bkg = "label_ == 0 && rand_ > %.10f" % train_frac
+rand_branch = "super_rand_" if args.randomize else "rand_"
+selection_signal = "label_ == 1 && %s > %.10f" % (rand_branch, train_frac)
+selection_bkg = "label_ == 0 && %s > %.10f" % (rand_branch, train_frac)
 selection_data = "label_ == 2 && mass_ >= 100 && mass_ <= 180"
 selection_sideband = "mass_ >= 100 && mass_ <= 180"
 
@@ -79,6 +81,8 @@ sig_data_ref = []
 
 # for each signal efficiency between 0-100%, calculate Z_A
 
+do_simple_estimate = True # estimate background as a constant rather than an expontential fit
+
 # helper function to calculate Z_A
 def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, quants_data, n_sig_data, n_bkg_data, sig_data, name):
   sig_mass = root_numpy.tree2array(tree, branches = "mass_", selection = selection_signal + " && " + selection_base)
@@ -100,12 +104,15 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
 
   #b_mc = (1 / (1 - train_frac)) * numpy.sum(bkg_weights)
 
+  if do_simple_estimate:
+    b_mc = utils.constant_estimate(bkg_events, bkg_weights, mean_eff, sigma_eff)
 
-  try:
-    b_mc = (1 / (1 - train_frac)) * utils.fit_exp(bkg_events, bkg_weights, mean_eff, sigma_eff, i, name)
-  except:
-    print ("error in fit, continuing")
-    return
+  else:
+    try:
+      b_mc = (1 / (1 - train_frac)) * utils.fit_exp(bkg_events, bkg_weights, mean_eff, sigma_eff, i, name)
+    except:
+      print ("error in fit, continuing")
+      return
 
   z_mc = Z_A(s, b_mc)
   quants_mc.append(quantiles[i])
@@ -116,13 +123,18 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
   # calculate b from fit to data sidebands
   data_events = root_numpy.tree2array(tree, branches = "mass_", selection = selection_data + " && " + selection_base)
   if len(data_events) < 4:
+    #b_data = -1 
     return # fit doesn't seem to work with less than 5 events
 
-  try: 
-    b_data = utils.fit_exp(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, i, name)
-  except:
-    print ("error in fit, continuing")
-    return
+  elif do_simple_estimate:
+    b_data = utils.constant_estimate(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff)
+
+  else:
+    try: 
+      b_data = utils.fit_exp(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, i, name)
+    except:
+      print ("error in fit, continuing")
+      return
 
   z_data = Z_A(s, b_data)
 
@@ -149,6 +161,8 @@ if do_reference_bdt:
   for i in range(len(quantiles_ref)):
     selection_base = "reference_mva_ >= %.10f && pass_ref_presel_ == 1" % mva_cut_ref[i][0]
     calc_significance(selection_base, quants_mc_ref, n_sig_mc_ref, n_bkg_mc_ref, sig_mc_ref, quants_data_ref, n_sig_data_ref, n_bkg_data_ref, sig_data_ref, name + "_ref")
+
+numpy.savez('ZA_curves/%s' % args.file.replace(".root", ""), za_mc = sig_mc, za_data = sig_data, n_sig_mc = n_sig_mc, n_sig_data = n_sig_data, n_bkg_mc = n_bkg_mc, n_bkg_data = n_bkg_data)
   
 ### Make diagnostic plots ###
 import matplotlib

@@ -7,6 +7,7 @@ import root_numpy
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("channel", help = "e.g. Hadronic or Leptonic", type=str)
+parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
 args = parser.parse_args()
 
 baby_file = "../Loopers/MVABaby_ttH" + args.channel + ".root"
@@ -25,8 +26,9 @@ branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "process_
 
 # grab features
 train_frac = 0.5
-features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != 2 && rand_ < %.6f' % train_frac) # 0 = signal, 1 = bkg, 2 = data
-features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != 2 && rand_ > %.6f' % train_frac)
+rand_branch = "super_rand_" if args.randomize else "rand_"
+features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != 2 && %s < %.6f' % (rand_branch, train_frac)) # 0 = signal, 1 = bkg, 2 = data
+features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != 2 && %s > %.6f' % (rand_branch, train_frac))
 
 
 

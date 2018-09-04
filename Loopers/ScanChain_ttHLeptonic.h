@@ -19,6 +19,7 @@
 #include "scale1fb/scale1fb_2016.h"
 #include "scale1fb/scale1fb_2017.h"
 #include "MakeMVAOptimizationBabies.h"
+#include "Utils/RandomMap.h"
 
 // tmva
 #include "TMVA/Reader.h"

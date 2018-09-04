@@ -21,6 +21,9 @@ def exp(x, a, b):
 def gaus(x, a, b, c):
   return a * numpy.exp(-0.5 * (( (x - b) / c ) ** 2))
 
+def constant_estimate(data, weights, mean_eff, sigma_eff):
+  return numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+
 def calc_sigma_eff(signal_data, weights, idx, name):
   h = ROOT.TH1D("h_sig", "", 80, 100, 180)
   for i in range(len(signal_data)):
@@ -33,8 +36,8 @@ def calc_sigma_eff(signal_data, weights, idx, name):
     if not (h.GetBinCenter(i+1) > 120 and h.GetBinCenter(i+1) < 130):
       continue
     y_fit.append(h.GetBinContent(i+1))
-    #y_err.append(h.GetBinError(i+1))
-    y_err.append(h.GetBinError(i+1) if h.GetBinError(i+1) != 0 else 1)
+    y_err.append(h.GetBinError(i+1))
+    #y_err.append(h.GetBinError(i+1) if h.GetBinError(i+1) != 0 else 1)
 
   # fit
   #popt, pcov = curve_fit(gaus, x_fit, y_fit, p0 = [1, 125, 2])
@@ -55,7 +58,6 @@ def calc_sigma_eff(signal_data, weights, idx, name):
   del h
   return popt[1], popt[2] 
    
-
 def fit_exp(data, weights, mean_eff, sigma_eff, idx, name):
   if all_ones(weights):
     type = "data"
@@ -92,7 +94,8 @@ def fit_exp(data, weights, mean_eff, sigma_eff, idx, name):
     if type == "data" and h.GetBinCenter(i+1) > 120 and h.GetBinCenter(i+1) < 130:
       continue
     y_fit.append(h.GetBinContent(i+1))
-    y_err.append(h.GetBinError(i+1) if h.GetBinContent(i+1) != 0 else 1)
+    y_err.append(h.GetBinError(i+1))
+    #y_err.append(h.GetBinError(i+1) if h.GetBinContent(i+1) != 0 else 1)
   if type == "data":
     #popt, pcov = curve_fit(exp, x_fit, y_fit, sigma = y_err, p0 = [10, 0.01])
     popt, pcov = curve_fit(exp, x_fit, y_fit, p0 = [10, 0.01])

@@ -31,6 +31,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);
 
+    // Initialize map of evt_run_lumi -> rand
+    RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic.txt");
+
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
@@ -143,9 +146,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Variable definitions
-      abs_cos_helicity = helicity(lead_photon, sublead_photon);
-      sublead_pho_min_dr = min_dr(sublead_photon, objects);
-      lead_pho_min_dr = min_dr(lead_photon, objects);
+      helic = helicity(lead_photon, sublead_photon);
+      min_dr_sublead_photon = min_dr(sublead_photon, objects);
+      min_dr_lead_photon = min_dr(lead_photon, objects);
       n_leps_ = leps.size();
       lep_pt_ = leps[0].Pt();
       lep_eta_ = leps[0].Eta();
@@ -185,6 +188,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       mt_ = mT();
 
       rand_ = cms3.rand();
+      super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
 
       FillBabyNtuple();
 

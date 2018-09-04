@@ -580,6 +580,9 @@ void Comparison::set_histogram_options(int color1, int color2)
     mVHData[i]->SetLineColor(dataColors[i]); 
     mVHData[i]->SetLineWidth(2);
     mVHData[i]->SetMarkerSize(1.25);
+    mVHData[i]->GetYaxis()->SetTitle(mYLabel);
+    mVHData[i]->GetYaxis()->SetTitleSize(mYLabelFontSize);
+    mVHData[i]->GetYaxis()->SetTitleOffset(1.2);
     if (!mVHMC.empty()) {
       mVHData[i]->GetXaxis()->SetLabelOffset(999);
       mVHData[i]->GetXaxis()->SetLabelSize(0);

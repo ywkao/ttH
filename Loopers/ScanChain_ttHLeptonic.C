@@ -29,13 +29,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
+  // Initialize map of evt_run_lumi -> rand
+  RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic.txt");
 
+  // MVA Business
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
-  float abs_cos_helicity;
-  float sublead_pho_min_dr;
-  float lead_pho_min_dr;
+  float helic;
+  float min_dr_sublead_photon;
+  float min_dr_lead_photon;
   float n_leps_;
   float lep_pt_;
   float lep_eta_;
@@ -77,9 +80,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
-    mva->AddVariable("abs_cos_helicity", &abs_cos_helicity);
-    mva->AddVariable("sublead_pho_min_dr", &sublead_pho_min_dr);
-    mva->AddVariable("lead_pho_min_dr", &lead_pho_min_dr);
+    mva->AddVariable("helic", &helic);
+    mva->AddVariable("min_dr_sublead_photon", &min_dr_sublead_photon);
+    mva->AddVariable("min_dr_lead_photon", &min_dr_lead_photon);
     mva->AddVariable("n_leps_", &n_leps_);
     mva->AddVariable("lep_pt_", &lep_pt_);
     mva->AddVariable("lep_eta_", &lep_eta_);
@@ -207,7 +210,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
       // Selection
       if (tag == "ttHLeptonicLoose") {
-        if (mass() < 90)        continue;
+        if (mass() < 100)        continue;
 	if (n_jets() < 2)	continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
@@ -384,9 +387,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       if (evaluate_mva) {
 
         // Calculate MVA value
-        abs_cos_helicity = helicity(lead_photon, sublead_photon);
-        sublead_pho_min_dr = min_dr(sublead_photon, objects);
-        lead_pho_min_dr = min_dr(lead_photon, objects);
+        helic = helicity(lead_photon, sublead_photon);
+        min_dr_sublead_photon = min_dr(sublead_photon, objects);
+        min_dr_lead_photon = min_dr(lead_photon, objects);
         n_leps_ = leps.size();
         lep_pt_ = leps[0].Pt();
         lep_eta_ = leps[0].Eta();
@@ -428,8 +431,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
         mva_value = mva->EvaluateMVA( "BDT" );
         double reference_mva = year == "2017" ? tthMVA() : -1;
         bool pass_ref_presel = year == "2017" ? pass_2017_mva_presel() : true;
-        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel);
+	//double rand = use_random_test_train_split ? rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi()) : cms3.rand();
+	double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
+        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
       }
+
 
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId}; 
@@ -463,9 +469,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       // Skip blinded region for MC after filling mass histogram
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
 
-
-      double helic = helicity(lead_photon, sublead_photon);
-      // Fill histograms
+      double helic = helicity(sublead_photon, sublead_photon);
       vProcess[processId]->fill_histogram("hAbsCosHelicity", helic, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hLeadMinDr", min_dr(lead_photon, objects), evt_weight, vId);
@@ -689,6 +693,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
  
   baby->CloseBabyNtuple();
  
+  delete rand_map;
+
   // Example Histograms
   f1->Write();
   f1->Close(); 
