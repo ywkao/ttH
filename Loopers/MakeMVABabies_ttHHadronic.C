@@ -1,14 +1,14 @@
 #include "MakeMVABabies_ttHHadronic.h"
 #include "ScanChain_ttHHadronic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
   // Make baby ntuple
-  MakeBabyNtuple( Form("%s.root", "MVABaby_ttHHadronic"));
+  MakeBabyNtuple( Form("%s.root", ("MVABaby_ttHHadronic_" + ext).Data()));
 
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;
@@ -30,6 +30,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
     if (fast) TTreeCache::SetLearnEntries(10);
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);
+
+    // Initialize map of evt_run_lumi -> rand
+    RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
@@ -144,6 +147,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       met_ = MetPt();
 
       rand_ = cms3.rand();
+      super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
 
       FillBabyNtuple();
 

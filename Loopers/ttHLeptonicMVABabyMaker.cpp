@@ -7,6 +7,9 @@ int main(int argc, char* argv[]) {
   TString year = argc <= 2 ? "2016" : argv[2];
   cout << "Running for year: " << year << endl;
 
+  TString ext = argc <= 3 ? "" : argv[3];
+  cout << "Saving output files with tag: " << ext << endl;
+
   TChain *ch = new TChain("tthLeptonicTagDumper/trees/tth_13TeV_all");
 
   if (year == "All") {
@@ -17,6 +20,6 @@ int main(int argc, char* argv[]) {
     add_samples(ch, year);
 
   BabyMaker *looper = new BabyMaker();
-  looper->ScanChain(ch, tag);
+  looper->ScanChain(ch, tag, ext);
   return 0; 
 }

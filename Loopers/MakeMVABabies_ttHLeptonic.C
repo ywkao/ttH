@@ -1,14 +1,14 @@
 #include "MakeMVABabies_ttHLeptonic.h"
 #include "ScanChain_ttHLeptonic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
   // Make baby ntuple
-  MakeBabyNtuple( Form("%s.root", "MVABaby_ttHLeptonic"));
+  MakeBabyNtuple( Form("%s.root", ("MVABaby_ttHLeptonic_" + ext).Data()));
 
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;

@@ -1,7 +1,7 @@
 #include "ScanChain_ttHLeptonic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-  TFile* f1 = new TFile(tag+"_histograms" + year + ".root", "RECREATE");
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+  TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
   // Benchmark
@@ -14,7 +14,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   OptimizationBabyMaker* baby = new OptimizationBabyMaker();
   TString xml_file_noExt = xml_file;
   xml_file_noExt.ReplaceAll(".xml", "");
-  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + xml_file_noExt;
+  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt;
   baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
 
   // Create "process" objects
@@ -30,7 +30,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   TFile *currentFile = 0;
 
   // Initialize map of evt_run_lumi -> rand
-  RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic.txt");
+  RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic_" + ext + ".txt");
 
   // MVA Business
   unique_ptr<TMVA::Reader> mva;
