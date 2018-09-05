@@ -32,7 +32,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     cms3.Init(tree);
 
     // Initialize map of evt_run_lumi -> rand
-    RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic.txt");
+    RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic_" + ext + ".txt");
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
