@@ -17,7 +17,9 @@ if build_success != 0:
 
 if args.randomize:
   os.chdir("Utils")
-  os.system("python generate_random_map.py %s %s" % (args.channel, args.ext))
+  random_map = "random_map_%s_%s.txt" % (args.channel, args.ext)
+  if not os.path.exists(random_map): # only generate random map if it doesn't already exist 
+    os.system("python generate_random_map.py %s %s" % (args.channel, args.ext))
   os.chdir("../")
 
 os.system("./ttH%sMVABabyMaker %s %s %s" % (args.channel, args.selection, args.year, args.ext))
@@ -44,4 +46,4 @@ else:
 os.chdir("../")
 os.system("rm MVABaby_ttH%s_%s.root" % (args.channel, args.ext))
 os.system("rm ../MVAs/ttH%s_%s_features.hdf5" % (args.channel, args.ext))
-os.system("rm Utils/random_map_%s_%s.txt" % (args.channel, args.ext)) 
+#os.system("rm Utils/random_map_%s_%s.txt" % (args.channel, args.ext))  # save random maps so that we can train multiple BDTs with the same test/train splits
