@@ -101,7 +101,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
-      if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 

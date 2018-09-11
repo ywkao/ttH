@@ -86,7 +86,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (get_lep_pt(lep_eta) < 25)                   continue;
         if (MetPt() < 50)                             continue;
       }
-
+      else if (tag == "ttHLeptonicLoose_tightPhoIDMVA") {
+        if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < -0.2)         continue;
+        if (subleadIDMVA() < -0.2)         continue;
+      }
 
       else if (tag == "ttHLeptonicPresel_v2") {
         if (mass() < 100)                               continue;
@@ -132,7 +139,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       // Fill histograms //
       evt_weight_ = 1.;
-      if (!isData && !isSignal) {
+      if (!no_weights && !isData && !isSignal) {
 	if (year == "2016")
           evt_weight_ = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
         else if (year == "2017")
@@ -141,7 +148,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
-      if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
