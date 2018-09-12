@@ -60,6 +60,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
       // Selection
+      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
         if (n_jets() < 2)       continue;
@@ -112,6 +114,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
  
       // Decide what type of sample this is
       process_id_ = categorize_process(currentFileTitle);
+      //if (is_low_stats_process(currentFileTitle))	continue;
 
       // Make p4 for physics objects
       vector<TLorentzVector> jets;
@@ -146,8 +149,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
           evt_weight_ = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
       }
 
-      // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
+
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 

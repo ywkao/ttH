@@ -143,7 +143,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
     year = currentFileTitle.Contains("2016") ? "2016" : "2017";
 
-
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
@@ -176,7 +175,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
       double evt_weight = 1.;
-      if (!isData) {
+      if (!no_weights && !isData) {
         if (year == "2016")
           evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
         else if (year == "2017")
@@ -209,6 +208,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         objects.push_back(leps[i]);
 
       // Selection
+      // NOTE: need to implement overlap removal for all microAOD at some point
+      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))		continue;
+
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
 	if (n_jets() < 2)	continue;
@@ -234,6 +236,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (get_lep_pt(lep_eta) < 25)                   continue;
         if (MetPt() < 50)                             continue;
       }
+      else if (tag == "ttHLeptonicLoose_tightPhoIDMVA") {
+        if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() < -0.2)         continue;
+        if (subleadIDMVA() < -0.2)         continue;	
+      }
+
       else if (tag == "ttHLeptonicMedTight") {
 	if (mass() < 100)                               continue;
         if (n_jets() < 2)                               continue;
@@ -243,6 +254,19 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (leadPixelSeed() || subleadPixelSeed())      continue;
 	double lep_pt, lep_eta;
 	if (get_lep_pt(lep_eta) < 20)                   continue;
+      }
+
+      else if (tag == "ttHLeptonicTT") {
+	if (mass() < 100)                               continue;
+	if (n_jets() < 2)                               continue;
+	if (nb_tight() < 1)                             continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadPixelSeed() || subleadPixelSeed())      continue;
+        double lep_pt, lep_eta;
+        if (get_lep_pt(lep_eta) < 20)                   continue;
+        if (MetPt() < 40)                             continue;
+	if (leadIDMVA() < -0.2)         continue;
+        if (subleadIDMVA() < -0.2)         continue;	
       }
 
       else if (tag == "ttHLeptonicCustom") {

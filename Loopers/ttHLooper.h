@@ -206,6 +206,20 @@ int categorize_process(TString currentFileTitle) {
   }
 }
 
+bool has_ttX_overlap(TString currentFileTitle, int lead_prompt, int sublead_prompt) {
+  if (!(currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets")))
+    return false;
+  else if (lead_prompt != 0 && sublead_prompt != 0)
+    return false;
+  return true;
+}
+
+bool is_low_stats_process(TString currentFileTitle) {
+  if (currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("QCD"))
+    return true;
+  return false;
+}
+
 int categorize_photons(int leadGenMatch, int subleadGenMatch) {
   if (leadGenMatch != 1 && subleadGenMatch != 1)
     return 0; // fake-fake

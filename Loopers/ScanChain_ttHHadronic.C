@@ -184,6 +184,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
 
       // Selection
+      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
