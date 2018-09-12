@@ -25,10 +25,12 @@ hadoop_path = "ttH"
 
 if args.year == "2016":
   cmssw_ver = "CMSSW_8_0_28"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
+  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
 elif args.year == "2017":
   cmssw_ver = "CMSSW_9_4_6"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
+  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
 
 if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "_" + args.year)
@@ -52,7 +54,8 @@ subdir_map = { 	"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_
 		"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
 		"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-BS2016_BSandPUSummer16_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 		"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1",
-		"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8" : "RunIIFall17-3_1_0-3_1_0-v1-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2",
+		#"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8" : "RunIIFall17-3_1_0-3_1_0-v1-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2",
+		"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8" : "RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2",
 }
 default_subdir = "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1"
 
@@ -90,13 +93,16 @@ for sample in samples:
   else:
       nFilesPerOutput = 100
 
-  if args.year == "2016":
+  if args.year == "2016" and "test" not in base_path:
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
   elif args.year == "2017":
     if "TTGG" in name:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
     else:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])    
+  else:
+    dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput]) 
+
 
   #if "DoubleEG" in name:
   #  nFilesPerOutput = 25
@@ -122,6 +128,7 @@ total_summary = {}
 while True:
     allcomplete = True
     for ds,loc,fpo in dslocs:
+	print loc
         sample = DirectorySample( dataset=ds, location=loc )
         #files = [f.name for f in sample.get_files()]
         task = CondorTask(
