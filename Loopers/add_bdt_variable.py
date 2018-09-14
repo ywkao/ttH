@@ -53,7 +53,7 @@ def modify_header(lines, add):
       if "// Variable names" in line:
 	new_line = lines[i+1].replace('"%s", ' % args.name, '')
 	modify_line(i+1, lines[i+1], new_line, lines)
-      if args.type in line and args.name + ";" in line:
+      if args.type in line and " " + args.name + ";" in line:
 	remove_line(i, lines)
       if 'BabyTree_->Branch("%s"' % args.name in line:
 	remove_line(i, lines)
