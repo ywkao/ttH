@@ -130,22 +130,67 @@ cats = {
 
 
 
-do_baseline = False
-do_individual_vars = False
-do_categories = False
+do_baseline = True
+do_individual_vars = True
+do_categories = True
 
+# First, remove all variables and then add them all back in so we know we are starting with all variables
+for var, info in vars.iteritems():
+    print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
+    os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
+
+for var, info in vars.iteritems():
+  print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+  os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
+
+
+os.system("exit (1)")
+
+n_baseline = 1000
 tag = "37var_14Sep2018"
 if do_baseline:
-  # Train BDT
-  print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, 1000)
-  os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, 1000))
+  build_success = os.system("make")
+  if build_success != 0:
+    print "Errors building, will not run rest of workflow"
+    os.system("exit(1)")
 
-  baseline_results = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_baseline_%s_*_bdt.npz" % (args.channel, tag))
-  mean_data = baseline_results["mean_data"]
-  mean_mc = baseline_results["mean_mc"]
-  unc_data = baseline_results["std_dev_data"]
-  unc_mc = baseline_results["std_dev_mc"] 
-  
+  if not args.dry_run:
+    # Train BDT
+    print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline)
+    os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline))
+
+    baseline_results = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_baseline_%s_*_bdt.npz" % (args.channel, tag))
+    mean_data = baseline_results["mean_data"]
+    mean_mc = baseline_results["mean_mc"]
+    unc_data = baseline_results["std_dev_data"]
+    unc_mc = baseline_results["std_dev_mc"] 
+
+with open("baseline_results.txt", "w") as fout:
+  fout.write(json.dumps(baseline_results))   
+
+if do_categories:
+  for cat, list in cats.iteritems():
+    # First, remove all variables from bdt
+    for info in list["features"]:
+      print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
+      os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
+    # Then, make
+    build_success = os.system("make")
+    if build_success != 0:
+      print "Errors building, will not run rest of workflow"
+      os.system("exit(1)")
+
+    if not args.dry_run:
+      # Then, train the bdt
+      print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % cat, args.n_trainings)
+      os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % cat, args.n_trainings))
+      # Then, calculate <Max Z_A>_N and estimated uncertainty 
+      list["results"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, cat))
+
+    # Now, add all the variables back into the BDT
+    for info in list["features"]:
+      print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+      os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 
 if do_individual_vars:
   for var, info in vars.iteritems():
@@ -169,34 +214,11 @@ if do_individual_vars:
     print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
     os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 
-if do_categories:
-  for cat, list in cats.iteritems():
-    # First, remove all variables from bdt
-    for info in list["features"]:
-      print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
-      os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
-    # Then, make
-    build_success = os.system("make")
-    if build_success != 0:
-      print "Errors building, will not run rest of workflow"
-      os.system("exit(1)")
-
-    if not args.dry_run:
-      # Then, train the bdt
-      print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % cat, args.n_trainings)
-      os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % cat, args.n_trainings))
-      # Then, calculate <Max Z_A>_N and estimated uncertainty 
-      list["results"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, cat)) 
-
-    # Now, add all the variables back into the BDT
-    for info in list["features"]:
-      print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
-      os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
-
 # Now print out results all nicely
 with open("var_rankings.txt", "w") as fout:
-  fout.write("Mean Z_A (mc): %.4f\n" % mean_mc)
+  fout.write("Mean Z_A (mc): %.4f +/- %.4f\n" % (mean_mc, unc_mc / (float(n_baseline) ** 0.5)))
   fout.write("Std Dev in Z_A (mc): %.4f\n" % unc_mc)
-  fout.write("Mean Z_A (data): %.4f\n" % mean_data)
+  fout.write("Mean Z_A (data): %.4f +/- %.4f\n" % (mean_data, unc_data / (float(n_baseline) ** 0.5)))
   fout.write("Std Dev in Z_A (data): %.4f\n" % unc_data)
   fout.write(json.dumps(vars))
+  fout.write(json.dumps(cats))
