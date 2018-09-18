@@ -159,6 +159,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       // Blinded region 
       if (isData && blind && mass() > 120 && mass() < 130)        continue;
 
+      //if (currentFileTitle.Contains("TTGJet") && (lead_Prompt() == 0 || sublead_Prompt() == 0) ) continue;
+      //if (currentFileTitle.Contains("TTJet") && (lead_Prompt() == 0 || sublead_Prompt() == 0) ) continue;
+      
+//      if (currentFileTitle.Contains("TTGG" && !(lead_Prompt() == 1 && sublead_Prompt() == 1 ) ) )continue;
+//      if (currentFileTitle.Contains("TTGJet" && !(lead_Prompt() + sublead_Prompt() == -998 ) ) )continue;
+//      if (currentFileTitle.Contains("TTJet" && !(lead_Prompt() == -999 && sublead_Prompt() == -999 ) ) ) continue;
+      
+
       // Fill mva baby before any selections
       int processId = categorize_process(currentFileTitle);
       int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
@@ -201,10 +209,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
       // Selection
       if (tag == "ttHLeptonicLoose") {
-        if (mass() < 90)        continue;
+        if (mass() < 100)        continue;
 	if (n_jets() < 2)	continue;
-	if (nb_loose() < 1)		continue;
+	if (nb_tight() < 1)		continue;
+        double lep_pt, lep_eta;
+        if (get_lep_pt(lep_eta) < 20)                   continue;
+        if (MetPt() < 40)                             continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadPixelSeed() || subleadPixelSeed())      continue;
+        if (leadIDMVA() < 0 || subleadIDMVA() <0 ) continue;
       }
       else if (tag == "ttHLeptonicMedium") {
 	if (mass() < 100)       			continue;

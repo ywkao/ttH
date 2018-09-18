@@ -160,6 +160,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
+      //if ((currentFileTitle.Contains("DiPhoton") || currentFileTitle.Contains("QCD")) && !useEventForTemplate(currentFileTitle, genPhotonId) ) continue;
+      //if (currentFileTitle.Contains("GJet")) continue;
+     
       if ((currentFileTitle.Contains("DiPhoton") || currentFileTitle.Contains("QCD")) && !useEventForTemplate(currentFileTitle, genPhotonId) ) continue;
       if (currentFileTitle.Contains("GJet")) continue;
 
@@ -170,6 +173,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
         else if (year == "2017")
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
       }
+
+      if (currentFileTitle.Contains("DiPhoton")) evt_weight *= 0.32;
+      if (currentFileTitle.Contains("QCD") && genPhotonId == 1) evt_weight *= 0.96;
+      if (currentFileTitle.Contains("QCD") && genPhotonId == 0) evt_weight *= 1.52;
 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
