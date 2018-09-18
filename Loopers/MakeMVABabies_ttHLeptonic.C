@@ -1,14 +1,14 @@
 #include "MakeMVABabies_ttHLeptonic.h"
 #include "ScanChain_ttHLeptonic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
   // Make baby ntuple
-  MakeBabyNtuple( Form("%s.root", "MVABaby_ttHLeptonic"));
+  MakeBabyNtuple( Form("%s.root", ("MVABaby_ttHLeptonic_" + ext).Data()));
 
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;
@@ -30,6 +30,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
     if (fast) TTreeCache::SetLearnEntries(10);
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);
+
+    // Initialize map of evt_run_lumi -> rand
+    RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic_" + ext + ".txt");
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
@@ -57,6 +60,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
       // Selection
+      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
         if (n_jets() < 2)       continue;
@@ -83,7 +88,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
         if (get_lep_pt(lep_eta) < 25)                   continue;
         if (MetPt() < 50)                             continue;
       }
-
+      else if (tag == "ttHLeptonicLoose_tightPhoIDMVA") {
+        if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < -0.2)         continue;
+        if (subleadIDMVA() < -0.2)         continue;
+      }
 
       else if (tag == "ttHLeptonicPresel_v2") {
         if (mass() < 100)                               continue;
@@ -102,6 +114,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
  
       // Decide what type of sample this is
       process_id_ = categorize_process(currentFileTitle);
+      //if (is_low_stats_process(currentFileTitle))	continue;
 
       // Make p4 for physics objects
       vector<TLorentzVector> jets;
@@ -129,20 +142,22 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
 
       // Fill histograms //
       evt_weight_ = 1.;
-      if (!isData && !isSignal) {
+      if (!no_weights && !isData && !isSignal) {
 	if (year == "2016")
           evt_weight_ = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
         else if (year == "2017")
           evt_weight_ = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
       }
 
-      // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
-      if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
+
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Variable definitions
+      helic = helicity(lead_photon, sublead_photon);
+      min_dr_sublead_photon = min_dr(sublead_photon, objects);
+      min_dr_lead_photon = min_dr(lead_photon, objects);
       n_leps_ = leps.size();
       lep_pt_ = leps[0].Pt();
       lep_eta_ = leps[0].Eta();
@@ -182,6 +197,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       mt_ = mT();
 
       rand_ = cms3.rand();
+      super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
 
       FillBabyNtuple();
 

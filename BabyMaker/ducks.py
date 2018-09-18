@@ -26,19 +26,19 @@ hadoop_path = "ttH"
 
 if args.year == "2016":
   cmssw_ver = "CMSSW_8_0_28"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
+  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
 elif args.year == "2017":
   cmssw_ver = "CMSSW_9_4_6"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
+  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
 
 if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "_" + args.year)
   os.system("rm package.tar.gz")
 
   #os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.cc' --exclude='*.h' --exclude-vcs %s" % cmssw_ver)
-
   os.system("XZ_OPT=-9 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' -f package.tar.gz %s" % cmssw_ver) 
-
   with open("versions.txt", "a") as fout:
     os.chdir("%s/src/flashgg/" % cmssw_ver)
     commit = os.popen("git log -n 1 --pretty=format:'%H'").read()
@@ -91,13 +91,15 @@ for sample in samples:
   else:
       nFilesPerOutput = 100
 
-  if args.year == "2016":
+  if args.year == "2016" and "test" not in base_path:
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
   elif args.year == "2017":
     if "TTGG" in name:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
     else:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])    
+  else:
+    dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput]) 
 
   #if "DoubleEG" in name:
   #  nFilesPerOutput = 25
@@ -123,6 +125,7 @@ total_summary = {}
 while True:
     allcomplete = True
     for ds,loc,fpo in dslocs:
+	print loc
         sample = DirectorySample( dataset=ds, location=loc )
         #files = [f.name for f in sample.get_files()]
         task = CondorTask(

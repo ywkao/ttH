@@ -115,6 +115,54 @@ void ttHLeptonic::Init(TTree *tree) {
   if (lead_closest_gen_dR_branch) lead_closest_gen_dR_branch->SetAddress(&lead_closest_gen_dR_);
   sublead_closest_gen_dR_branch = tree->GetBranch("sublead_closest_gen_dR");
   if (sublead_closest_gen_dR_branch) sublead_closest_gen_dR_branch->SetAddress(&sublead_closest_gen_dR_);
+  lead_PhoGenPt_branch = tree->GetBranch("lead_PhoGenPt");
+  if (lead_PhoGenPt_branch) lead_PhoGenPt_branch->SetAddress(&lead_PhoGenPt_);
+  lead_PhoGenEta_branch = tree->GetBranch("lead_PhoGenEta");
+  if (lead_PhoGenEta_branch) lead_PhoGenEta_branch->SetAddress(&lead_PhoGenEta_);
+  lead_PhoGenPhi_branch = tree->GetBranch("lead_PhoGenPhi");
+  if (lead_PhoGenPhi_branch) lead_PhoGenPhi_branch->SetAddress(&lead_PhoGenPhi_);
+  lead_Prompt_branch = tree->GetBranch("lead_Prompt");
+  if (lead_Prompt_branch) lead_Prompt_branch->SetAddress(&lead_Prompt_);
+  lead_Mad_branch = tree->GetBranch("lead_Mad");
+  if (lead_Mad_branch) lead_Mad_branch->SetAddress(&lead_Mad_);
+  lead_Pythia_branch = tree->GetBranch("lead_Pythia");
+  if (lead_Pythia_branch) lead_Pythia_branch->SetAddress(&lead_Pythia_);
+  lead_SimpleMomID_branch = tree->GetBranch("lead_SimpleMomID");
+  if (lead_SimpleMomID_branch) lead_SimpleMomID_branch->SetAddress(&lead_SimpleMomID_);
+  lead_SimpleMomStatus_branch = tree->GetBranch("lead_SimpleMomStatus");
+  if (lead_SimpleMomStatus_branch) lead_SimpleMomStatus_branch->SetAddress(&lead_SimpleMomStatus_);
+  lead_MomID_branch = tree->GetBranch("lead_MomID");
+  if (lead_MomID_branch) lead_MomID_branch->SetAddress(&lead_MomID_);
+  lead_MomMomID_branch = tree->GetBranch("lead_MomMomID");
+  if (lead_MomMomID_branch) lead_MomMomID_branch->SetAddress(&lead_MomMomID_);
+  lead_PassFrix_branch = tree->GetBranch("lead_PassFrix");
+  if (lead_PassFrix_branch) lead_PassFrix_branch->SetAddress(&lead_PassFrix_);
+  lead_SmallestDr_branch = tree->GetBranch("lead_SmallestDr");
+  if (lead_SmallestDr_branch) lead_SmallestDr_branch->SetAddress(&lead_SmallestDr_);
+  sublead_PhoGenPt_branch = tree->GetBranch("sublead_PhoGenPt");
+  if (sublead_PhoGenPt_branch) sublead_PhoGenPt_branch->SetAddress(&sublead_PhoGenPt_);
+  sublead_PhoGenEta_branch = tree->GetBranch("sublead_PhoGenEta");
+  if (sublead_PhoGenEta_branch) sublead_PhoGenEta_branch->SetAddress(&sublead_PhoGenEta_);
+  sublead_PhoGenPhi_branch = tree->GetBranch("sublead_PhoGenPhi");
+  if (sublead_PhoGenPhi_branch) sublead_PhoGenPhi_branch->SetAddress(&sublead_PhoGenPhi_);
+  sublead_Prompt_branch = tree->GetBranch("sublead_Prompt");
+  if (sublead_Prompt_branch) sublead_Prompt_branch->SetAddress(&sublead_Prompt_);
+  sublead_Mad_branch = tree->GetBranch("sublead_Mad");
+  if (sublead_Mad_branch) sublead_Mad_branch->SetAddress(&sublead_Mad_);
+  sublead_Pythia_branch = tree->GetBranch("sublead_Pythia");
+  if (sublead_Pythia_branch) sublead_Pythia_branch->SetAddress(&sublead_Pythia_);
+  sublead_SimpleMomID_branch = tree->GetBranch("sublead_SimpleMomID");
+  if (sublead_SimpleMomID_branch) sublead_SimpleMomID_branch->SetAddress(&sublead_SimpleMomID_);
+  sublead_SimpleMomStatus_branch = tree->GetBranch("sublead_SimpleMomStatus");
+  if (sublead_SimpleMomStatus_branch) sublead_SimpleMomStatus_branch->SetAddress(&sublead_SimpleMomStatus_);
+  sublead_MomID_branch = tree->GetBranch("sublead_MomID");
+  if (sublead_MomID_branch) sublead_MomID_branch->SetAddress(&sublead_MomID_);
+  sublead_MomMomID_branch = tree->GetBranch("sublead_MomMomID");
+  if (sublead_MomMomID_branch) sublead_MomMomID_branch->SetAddress(&sublead_MomMomID_);
+  sublead_PassFrix_branch = tree->GetBranch("sublead_PassFrix");
+  if (sublead_PassFrix_branch) sublead_PassFrix_branch->SetAddress(&sublead_PassFrix_);
+  sublead_SmallestDr_branch = tree->GetBranch("sublead_SmallestDr");
+  if (sublead_SmallestDr_branch) sublead_SmallestDr_branch->SetAddress(&sublead_SmallestDr_);
   n_ele_branch = tree->GetBranch("n_ele");
   if (n_ele_branch) n_ele_branch->SetAddress(&n_ele_);
   ele1_pt_branch = tree->GetBranch("ele1_pt");
@@ -531,6 +579,30 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   sublead_closest_gen_Pt_isLoaded = false;
   lead_closest_gen_dR_isLoaded = false;
   sublead_closest_gen_dR_isLoaded = false;
+  lead_PhoGenPt_isLoaded = false;
+  lead_PhoGenEta_isLoaded = false;
+  lead_PhoGenPhi_isLoaded = false;
+  lead_Prompt_isLoaded = false;
+  lead_Mad_isLoaded = false;
+  lead_Pythia_isLoaded = false;
+  lead_SimpleMomID_isLoaded = false;
+  lead_SimpleMomStatus_isLoaded = false;
+  lead_MomID_isLoaded = false;
+  lead_MomMomID_isLoaded = false;
+  lead_PassFrix_isLoaded = false;
+  lead_SmallestDr_isLoaded = false;
+  sublead_PhoGenPt_isLoaded = false;
+  sublead_PhoGenEta_isLoaded = false;
+  sublead_PhoGenPhi_isLoaded = false;
+  sublead_Prompt_isLoaded = false;
+  sublead_Mad_isLoaded = false;
+  sublead_Pythia_isLoaded = false;
+  sublead_SimpleMomID_isLoaded = false;
+  sublead_SimpleMomStatus_isLoaded = false;
+  sublead_MomID_isLoaded = false;
+  sublead_MomMomID_isLoaded = false;
+  sublead_PassFrix_isLoaded = false;
+  sublead_SmallestDr_isLoaded = false;
   n_ele_isLoaded = false;
   ele1_pt_isLoaded = false;
   ele2_pt_isLoaded = false;
@@ -767,6 +839,30 @@ void ttHLeptonic::LoadAllBranches() {
   if (sublead_closest_gen_Pt_branch != 0) sublead_closest_gen_Pt();
   if (lead_closest_gen_dR_branch != 0) lead_closest_gen_dR();
   if (sublead_closest_gen_dR_branch != 0) sublead_closest_gen_dR();
+  if (lead_PhoGenPt_branch != 0) lead_PhoGenPt();
+  if (lead_PhoGenEta_branch != 0) lead_PhoGenEta();
+  if (lead_PhoGenPhi_branch != 0) lead_PhoGenPhi();
+  if (lead_Prompt_branch != 0) lead_Prompt();
+  if (lead_Mad_branch != 0) lead_Mad();
+  if (lead_Pythia_branch != 0) lead_Pythia();
+  if (lead_SimpleMomID_branch != 0) lead_SimpleMomID();
+  if (lead_SimpleMomStatus_branch != 0) lead_SimpleMomStatus();
+  if (lead_MomID_branch != 0) lead_MomID();
+  if (lead_MomMomID_branch != 0) lead_MomMomID();
+  if (lead_PassFrix_branch != 0) lead_PassFrix();
+  if (lead_SmallestDr_branch != 0) lead_SmallestDr();
+  if (sublead_PhoGenPt_branch != 0) sublead_PhoGenPt();
+  if (sublead_PhoGenEta_branch != 0) sublead_PhoGenEta();
+  if (sublead_PhoGenPhi_branch != 0) sublead_PhoGenPhi();
+  if (sublead_Prompt_branch != 0) sublead_Prompt();
+  if (sublead_Mad_branch != 0) sublead_Mad();
+  if (sublead_Pythia_branch != 0) sublead_Pythia();
+  if (sublead_SimpleMomID_branch != 0) sublead_SimpleMomID();
+  if (sublead_SimpleMomStatus_branch != 0) sublead_SimpleMomStatus();
+  if (sublead_MomID_branch != 0) sublead_MomID();
+  if (sublead_MomMomID_branch != 0) sublead_MomMomID();
+  if (sublead_PassFrix_branch != 0) sublead_PassFrix();
+  if (sublead_SmallestDr_branch != 0) sublead_SmallestDr();
   if (n_ele_branch != 0) n_ele();
   if (ele1_pt_branch != 0) ele1_pt();
   if (ele2_pt_branch != 0) ele2_pt();
@@ -1659,6 +1755,318 @@ const float &ttHLeptonic::sublead_closest_gen_dR() {
     sublead_closest_gen_dR_isLoaded = true;
   }
   return sublead_closest_gen_dR_;
+}
+
+const float &ttHLeptonic::lead_PhoGenPt() {
+  if (not lead_PhoGenPt_isLoaded) {
+    if (lead_PhoGenPt_branch != 0) {
+      lead_PhoGenPt_branch->GetEntry(index);
+    } else {
+      printf("branch lead_PhoGenPt_branch does not exist!\n");
+      exit(1);
+    }
+    lead_PhoGenPt_isLoaded = true;
+  }
+  return lead_PhoGenPt_;
+}
+
+const float &ttHLeptonic::lead_PhoGenEta() {
+  if (not lead_PhoGenEta_isLoaded) {
+    if (lead_PhoGenEta_branch != 0) {
+      lead_PhoGenEta_branch->GetEntry(index);
+    } else {
+      printf("branch lead_PhoGenEta_branch does not exist!\n");
+      exit(1);
+    }
+    lead_PhoGenEta_isLoaded = true;
+  }
+  return lead_PhoGenEta_;
+}
+
+const float &ttHLeptonic::lead_PhoGenPhi() {
+  if (not lead_PhoGenPhi_isLoaded) {
+    if (lead_PhoGenPhi_branch != 0) {
+      lead_PhoGenPhi_branch->GetEntry(index);
+    } else {
+      printf("branch lead_PhoGenPhi_branch does not exist!\n");
+      exit(1);
+    }
+    lead_PhoGenPhi_isLoaded = true;
+  }
+  return lead_PhoGenPhi_;
+}
+
+const float &ttHLeptonic::lead_Prompt() {
+  if (not lead_Prompt_isLoaded) {
+    if (lead_Prompt_branch != 0) {
+      lead_Prompt_branch->GetEntry(index);
+    } else {
+      printf("branch lead_Prompt_branch does not exist!\n");
+      exit(1);
+    }
+    lead_Prompt_isLoaded = true;
+  }
+  return lead_Prompt_;
+}
+
+const float &ttHLeptonic::lead_Mad() {
+  if (not lead_Mad_isLoaded) {
+    if (lead_Mad_branch != 0) {
+      lead_Mad_branch->GetEntry(index);
+    } else {
+      printf("branch lead_Mad_branch does not exist!\n");
+      exit(1);
+    }
+    lead_Mad_isLoaded = true;
+  }
+  return lead_Mad_;
+}
+
+const float &ttHLeptonic::lead_Pythia() {
+  if (not lead_Pythia_isLoaded) {
+    if (lead_Pythia_branch != 0) {
+      lead_Pythia_branch->GetEntry(index);
+    } else {
+      printf("branch lead_Pythia_branch does not exist!\n");
+      exit(1);
+    }
+    lead_Pythia_isLoaded = true;
+  }
+  return lead_Pythia_;
+}
+
+const float &ttHLeptonic::lead_SimpleMomID() {
+  if (not lead_SimpleMomID_isLoaded) {
+    if (lead_SimpleMomID_branch != 0) {
+      lead_SimpleMomID_branch->GetEntry(index);
+    } else {
+      printf("branch lead_SimpleMomID_branch does not exist!\n");
+      exit(1);
+    }
+    lead_SimpleMomID_isLoaded = true;
+  }
+  return lead_SimpleMomID_;
+}
+
+const float &ttHLeptonic::lead_SimpleMomStatus() {
+  if (not lead_SimpleMomStatus_isLoaded) {
+    if (lead_SimpleMomStatus_branch != 0) {
+      lead_SimpleMomStatus_branch->GetEntry(index);
+    } else {
+      printf("branch lead_SimpleMomStatus_branch does not exist!\n");
+      exit(1);
+    }
+    lead_SimpleMomStatus_isLoaded = true;
+  }
+  return lead_SimpleMomStatus_;
+}
+
+const float &ttHLeptonic::lead_MomID() {
+  if (not lead_MomID_isLoaded) {
+    if (lead_MomID_branch != 0) {
+      lead_MomID_branch->GetEntry(index);
+    } else {
+      printf("branch lead_MomID_branch does not exist!\n");
+      exit(1);
+    }
+    lead_MomID_isLoaded = true;
+  }
+  return lead_MomID_;
+}
+
+const float &ttHLeptonic::lead_MomMomID() {
+  if (not lead_MomMomID_isLoaded) {
+    if (lead_MomMomID_branch != 0) {
+      lead_MomMomID_branch->GetEntry(index);
+    } else {
+      printf("branch lead_MomMomID_branch does not exist!\n");
+      exit(1);
+    }
+    lead_MomMomID_isLoaded = true;
+  }
+  return lead_MomMomID_;
+}
+
+const float &ttHLeptonic::lead_PassFrix() {
+  if (not lead_PassFrix_isLoaded) {
+    if (lead_PassFrix_branch != 0) {
+      lead_PassFrix_branch->GetEntry(index);
+    } else {
+      printf("branch lead_PassFrix_branch does not exist!\n");
+      exit(1);
+    }
+    lead_PassFrix_isLoaded = true;
+  }
+  return lead_PassFrix_;
+}
+
+const float &ttHLeptonic::lead_SmallestDr() {
+  if (not lead_SmallestDr_isLoaded) {
+    if (lead_SmallestDr_branch != 0) {
+      lead_SmallestDr_branch->GetEntry(index);
+    } else {
+      printf("branch lead_SmallestDr_branch does not exist!\n");
+      exit(1);
+    }
+    lead_SmallestDr_isLoaded = true;
+  }
+  return lead_SmallestDr_;
+}
+
+const float &ttHLeptonic::sublead_PhoGenPt() {
+  if (not sublead_PhoGenPt_isLoaded) {
+    if (sublead_PhoGenPt_branch != 0) {
+      sublead_PhoGenPt_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_PhoGenPt_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_PhoGenPt_isLoaded = true;
+  }
+  return sublead_PhoGenPt_;
+}
+
+const float &ttHLeptonic::sublead_PhoGenEta() {
+  if (not sublead_PhoGenEta_isLoaded) {
+    if (sublead_PhoGenEta_branch != 0) {
+      sublead_PhoGenEta_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_PhoGenEta_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_PhoGenEta_isLoaded = true;
+  }
+  return sublead_PhoGenEta_;
+}
+
+const float &ttHLeptonic::sublead_PhoGenPhi() {
+  if (not sublead_PhoGenPhi_isLoaded) {
+    if (sublead_PhoGenPhi_branch != 0) {
+      sublead_PhoGenPhi_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_PhoGenPhi_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_PhoGenPhi_isLoaded = true;
+  }
+  return sublead_PhoGenPhi_;
+}
+
+const float &ttHLeptonic::sublead_Prompt() {
+  if (not sublead_Prompt_isLoaded) {
+    if (sublead_Prompt_branch != 0) {
+      sublead_Prompt_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_Prompt_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_Prompt_isLoaded = true;
+  }
+  return sublead_Prompt_;
+}
+
+const float &ttHLeptonic::sublead_Mad() {
+  if (not sublead_Mad_isLoaded) {
+    if (sublead_Mad_branch != 0) {
+      sublead_Mad_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_Mad_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_Mad_isLoaded = true;
+  }
+  return sublead_Mad_;
+}
+
+const float &ttHLeptonic::sublead_Pythia() {
+  if (not sublead_Pythia_isLoaded) {
+    if (sublead_Pythia_branch != 0) {
+      sublead_Pythia_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_Pythia_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_Pythia_isLoaded = true;
+  }
+  return sublead_Pythia_;
+}
+
+const float &ttHLeptonic::sublead_SimpleMomID() {
+  if (not sublead_SimpleMomID_isLoaded) {
+    if (sublead_SimpleMomID_branch != 0) {
+      sublead_SimpleMomID_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_SimpleMomID_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_SimpleMomID_isLoaded = true;
+  }
+  return sublead_SimpleMomID_;
+}
+
+const float &ttHLeptonic::sublead_SimpleMomStatus() {
+  if (not sublead_SimpleMomStatus_isLoaded) {
+    if (sublead_SimpleMomStatus_branch != 0) {
+      sublead_SimpleMomStatus_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_SimpleMomStatus_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_SimpleMomStatus_isLoaded = true;
+  }
+  return sublead_SimpleMomStatus_;
+}
+
+const float &ttHLeptonic::sublead_MomID() {
+  if (not sublead_MomID_isLoaded) {
+    if (sublead_MomID_branch != 0) {
+      sublead_MomID_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_MomID_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_MomID_isLoaded = true;
+  }
+  return sublead_MomID_;
+}
+
+const float &ttHLeptonic::sublead_MomMomID() {
+  if (not sublead_MomMomID_isLoaded) {
+    if (sublead_MomMomID_branch != 0) {
+      sublead_MomMomID_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_MomMomID_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_MomMomID_isLoaded = true;
+  }
+  return sublead_MomMomID_;
+}
+
+const float &ttHLeptonic::sublead_PassFrix() {
+  if (not sublead_PassFrix_isLoaded) {
+    if (sublead_PassFrix_branch != 0) {
+      sublead_PassFrix_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_PassFrix_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_PassFrix_isLoaded = true;
+  }
+  return sublead_PassFrix_;
+}
+
+const float &ttHLeptonic::sublead_SmallestDr() {
+  if (not sublead_SmallestDr_isLoaded) {
+    if (sublead_SmallestDr_branch != 0) {
+      sublead_SmallestDr_branch->GetEntry(index);
+    } else {
+      printf("branch sublead_SmallestDr_branch does not exist!\n");
+      exit(1);
+    }
+    sublead_SmallestDr_isLoaded = true;
+  }
+  return sublead_SmallestDr_;
 }
 
 const float &ttHLeptonic::n_ele() {
@@ -4040,6 +4448,30 @@ const float &lead_closest_gen_Pt() { return cms3.lead_closest_gen_Pt(); }
 const float &sublead_closest_gen_Pt() { return cms3.sublead_closest_gen_Pt(); }
 const float &lead_closest_gen_dR() { return cms3.lead_closest_gen_dR(); }
 const float &sublead_closest_gen_dR() { return cms3.sublead_closest_gen_dR(); }
+const float &lead_PhoGenPt() { return cms3.lead_PhoGenPt(); }
+const float &lead_PhoGenEta() { return cms3.lead_PhoGenEta(); }
+const float &lead_PhoGenPhi() { return cms3.lead_PhoGenPhi(); }
+const float &lead_Prompt() { return cms3.lead_Prompt(); }
+const float &lead_Mad() { return cms3.lead_Mad(); }
+const float &lead_Pythia() { return cms3.lead_Pythia(); }
+const float &lead_SimpleMomID() { return cms3.lead_SimpleMomID(); }
+const float &lead_SimpleMomStatus() { return cms3.lead_SimpleMomStatus(); }
+const float &lead_MomID() { return cms3.lead_MomID(); }
+const float &lead_MomMomID() { return cms3.lead_MomMomID(); }
+const float &lead_PassFrix() { return cms3.lead_PassFrix(); }
+const float &lead_SmallestDr() { return cms3.lead_SmallestDr(); }
+const float &sublead_PhoGenPt() { return cms3.sublead_PhoGenPt(); }
+const float &sublead_PhoGenEta() { return cms3.sublead_PhoGenEta(); }
+const float &sublead_PhoGenPhi() { return cms3.sublead_PhoGenPhi(); }
+const float &sublead_Prompt() { return cms3.sublead_Prompt(); }
+const float &sublead_Mad() { return cms3.sublead_Mad(); }
+const float &sublead_Pythia() { return cms3.sublead_Pythia(); }
+const float &sublead_SimpleMomID() { return cms3.sublead_SimpleMomID(); }
+const float &sublead_SimpleMomStatus() { return cms3.sublead_SimpleMomStatus(); }
+const float &sublead_MomID() { return cms3.sublead_MomID(); }
+const float &sublead_MomMomID() { return cms3.sublead_MomMomID(); }
+const float &sublead_PassFrix() { return cms3.sublead_PassFrix(); }
+const float &sublead_SmallestDr() { return cms3.sublead_SmallestDr(); }
 const float &n_ele() { return cms3.n_ele(); }
 const float &ele1_pt() { return cms3.ele1_pt(); }
 const float &ele2_pt() { return cms3.ele2_pt(); }

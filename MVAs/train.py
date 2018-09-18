@@ -20,24 +20,41 @@ args = parser.parse_args()
 # Read features
 f = h5py.File("ttH" + args.channel + "_features.hdf5")
 
-global_features = f['global']
 feature_names = f['feature_names']
+
+global_features = f['global']
 label = f['label']
 weights = f['weights']
+
+global_features_validation = f['global_validation']
+label_validation = f['label_validation']
+weights_validation = f['weights_validation']
 
 global_features = numpy.asarray(global_features)
 label = numpy.asarray(label)
 weights = numpy.asarray(weights)
+
+global_features_validation = numpy.asarray(global_features_validation)
+label_validation = numpy.asarray(label_validation)
+weights_validation = numpy.asarray(weights_validation)
+
 feature_names = numpy.asarray(feature_names)
 
-train_frac = 0.95 # use this fraction of data for training, use 1-train_frac for testing
+train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
 nTrain = int(len(label)*train_frac)
 
 print global_features.shape
 print label.shape
 print weights.shape
 
-x_train, x_test, y_train, y_test, weights_train, weights_test = train_test_split(global_features, label, weights, test_size = 1 - train_frac)
+print global_features_validation.shape
+print label_validation.shape
+print weights_validation.shape
+
+x_train, y_train, weights_train = global_features, label, weights
+x_test, y_test, weights_test  = global_features_validation, label_validation, weights_validation
+
+#x_train, x_test, y_train, y_test, weights_train, weights_test = train_test_split(global_features, label, weights, test_size = 1 - train_frac)
 
 X_train = pandas.DataFrame(data=x_train, columns = feature_names)
 X_test = pandas.DataFrame(data=x_test, columns = feature_names)
@@ -52,12 +69,13 @@ print sum_pos_weights, sum_neg_weights
 
 # Define BDT parameters
 param = { 
-    	'max_depth': 5,
+    	'max_depth': 8,
 	'eta': 0.2,
 	'objective': 'binary:logistic',
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
+	'nthread' : 8,
 	}
 
 n_round = 150
@@ -65,17 +83,10 @@ evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
 # train
-#model = xgboost.XGBClassifier()
-#model.train(param, d_train, n_round, evallist, evals_result = progress)
-#model.fit(x_train, y_train)
 bdt = xgboost.train(param, d_train, n_round, evallist, evals_result = progress)	
 
 bdt.save_model(args.channel + args.tag + "_bdt.xgb")
 model = bdt.get_dump()
-
-# save to json format a la Nick
-#with open("model.json", "w") as fhout:
-#    fhout.write("[\n"+",\n".join(bdt.get_dump(dump_format="json"))+"\n]")
 
 input_variables = []
 for name in feature_names:

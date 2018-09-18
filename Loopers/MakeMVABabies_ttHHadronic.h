@@ -24,7 +24,7 @@ class BabyMaker {
       if (BabyFile_) delete BabyFile_;
       if (BabyTree_) delete BabyTree_;
     }
-    void ScanChain(TChain* chain, TString tag, bool blind, bool fast, int nEvents, string skimFilePrefix);
+    void ScanChain(TChain* chain, TString tag, TString ext, bool blind, bool fast, int nEvents, string skimFilePrefix);
     void MakeBabyNtuple(const char *);
     void InitBabyNtuple();
     void FillBabyNtuple();
@@ -43,6 +43,7 @@ class BabyMaker {
     double	evt_weight_;
     int 	process_id_;
     double 	rand_;
+    double      super_rand_;
 
     // Variable declarations
     float           dipho_delta_R;
@@ -99,6 +100,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("label_"     	, &label_       );
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
+  BabyTree_->Branch("super_rand_"            , &super_rand_       );
 
   // Variable branches
   BabyTree_->Branch("dipho_delta_R" ,&dipho_delta_R);

@@ -1,14 +1,14 @@
 #include "MakeMVABabies_ttHHadronic.h"
 #include "ScanChain_ttHHadronic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
   // Make baby ntuple
-  MakeBabyNtuple( Form("%s.root", "MVABaby_ttHHadronic"));
+  MakeBabyNtuple( Form("%s.root", ("MVABaby_ttHHadronic_" + ext).Data()));
 
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;
@@ -30,6 +30,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
     if (fast) TTreeCache::SetLearnEntries(10);
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);
+
+    // Initialize map of evt_run_lumi -> rand
+    RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
@@ -57,6 +60,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
       // Selection
+      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
@@ -105,7 +110,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
 
       // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
-      if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
@@ -151,6 +155,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, bool blind = true, bool fa
       met_ = MetPt();
 
       rand_ = cms3.rand();
+      super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
 
       FillBabyNtuple();
 

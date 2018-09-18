@@ -1,7 +1,7 @@
 #include "ScanChain_ttHHadronic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-  TFile* f1 = new TFile(tag + "_histograms" + year + ".root", "RECREATE");
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+  TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
   // Benchmark
@@ -14,7 +14,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   OptimizationBabyMaker* baby = new OptimizationBabyMaker();
   TString xml_file_noExt = xml_file;
   xml_file_noExt.ReplaceAll(".xml", "");
-  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + xml_file_noExt;
+  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt;
   baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
 
   // Create "process" objects
@@ -29,6 +29,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
+  // Initialize map of evt_run_lumi -> rand
+  RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
+
+  // MVA Business
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
@@ -190,6 +194,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
 
       // Selection
+      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
@@ -298,16 +304,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
         mva_value = mva->EvaluateMVA( "BDT" );
         double reference_mva = tthMVA();
         bool pass_ref_presel = year == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
-        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel);
+	double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
+        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
       }
 
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
  
-
-
-      vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
 
       // Fill histograms //
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   
@@ -320,6 +323,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
 
 
       // Fill rest of histograms //
+      double helic = helicity(lead_photon, sublead_photon);
+      vProcess[processId]->fill_histogram("hAbsCosHelicity", helic, evt_weight, vId);
+
+      vProcess[processId]->fill_histogram("hLeadMinDr", min_dr(lead_photon, jets), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hSubleadMinDr", min_dr(sublead_photon, jets), evt_weight, vId);
+
+      vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+
       vProcess[processId]->fill_histogram("hHadronicMVA", mva_value, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
@@ -427,7 +439,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString xml_file, bool b
   }
  
   baby->CloseBabyNtuple();
- 
+
+  delete rand_map;
+
   // Example Histograms
   f1->Write();
   f1->Close(); 
