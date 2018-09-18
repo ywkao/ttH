@@ -453,11 +453,7 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 
 
 void add_samples(TChain* ch, TString year) {
-<<<<<<< HEAD
-  TString tag = year == "2017" ? "v3_2_0_overlapRemove_v1" : "v3.12";
-=======
   TString tag = year == "2017" ? "v1.2" : "v3.16";
->>>>>>> 7959d7b3399715b5e2f426e36cf6a6e9e5a98863
 
   TString location = "/home/users/hmei/ttH2/ttH/Loopers/merged_babies";
 
