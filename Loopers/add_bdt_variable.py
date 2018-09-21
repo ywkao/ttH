@@ -40,8 +40,11 @@ def modify_header(lines, add):
     for i, line in enumerate(lines):
       if "// Variable names" in line:
 	index = lines[i+1].find("{") + 1
-	new_line = lines[i+1][:index] + '"' + args.name + '", ' + lines[i+1][index:]
-	modify_line(i+1, lines[i+1], new_line, lines)
+	if '"' + args.name + '"' not in lines[i+1]:
+	  new_line = lines[i+1][:index] + '"' + args.name + '", ' + lines[i+1][index:]
+	  modify_line(i+1, lines[i+1], new_line, lines)
+	else:
+	  print "No need to remove"
       if "// Variable declarations" in line:
 	line_to_insert = "    %s           %s;\n" % (args.type, args.name)
 	insert_line(i+1, line_to_insert, lines)
@@ -52,6 +55,7 @@ def modify_header(lines, add):
     for i, line in enumerate(lines):
       if "// Variable names" in line:
 	new_line = lines[i+1].replace('"%s", ' % args.name, '')
+	new_line = new_line.replace('"%s"' % args.name, '')
 	modify_line(i+1, lines[i+1], new_line, lines)
       if args.type in line and " " + args.name + ";" in line:
 	remove_line(i, lines)

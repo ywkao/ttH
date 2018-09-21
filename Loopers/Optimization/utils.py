@@ -3,7 +3,7 @@ import numpy
 import math
 from scipy.optimize import curve_fit
 from scipy.integrate import quad
-
+import random
 
 import matplotlib
 matplotlib.use('Agg')
@@ -21,8 +21,42 @@ def exp(x, a, b):
 def gaus(x, a, b, c):
   return a * numpy.exp(-0.5 * (( (x - b) / c ) ** 2))
 
-def constant_estimate(data, weights, mean_eff, sigma_eff):
-  return numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+def constant_estimate(data, weights, mean_eff, sigma_eff, smear):
+  if smear == 0:
+    return numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  else:
+    h = ROOT.TH1D("h_sig", "", 1, 100, 180)
+    for i in range(len(data)):
+      h.Fill(data[i], weights[i])
+    mc_yield = h.GetBinContent(1)
+    mc_unc = h.GetBinError(1)
+    if smear == -1:
+      mc_yield += -mc_unc
+    elif smear == 1:
+      mc_yield += mc_unc
+    return mc_yield * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+    #smear = random.gauss(0, mc_unc)
+    #print numpy.sum(weights), mc_yield, mc_yield + smear
+    #return mc_yield + smear
+
+    #return -1
+    #h = ROOT.TH1D("h_sig", "", 10, 100, 180)
+    #for i in range(len(data)):
+    #  h.Fill(data[i], weights[i])
+    #for i in range(h.GetNbinsX()):
+    #  smear = h.GetBinError(i+1)
+    #  rand = random.randint(1,3)
+    #  if rand == 1: # no smear
+    #    smear = 0
+    #  elif rand ==2: # smear down
+    #    smear *= -1
+    #  print "Bin content before smear", h.GetBinContent(i+1)
+    #  h.SetBinContent(i+1, h.GetBinContent(i+1) + smear)
+    #  print "Bin content after smear", h.GetBinContent(i+1)
+    #
+    #print "Total yield before smear: " 
+
+    
 
 def calc_sigma_eff(signal_data, weights, idx, name):
   h = ROOT.TH1D("h_sig", "", 80, 100, 180)

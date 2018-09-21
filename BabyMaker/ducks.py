@@ -64,6 +64,7 @@ def important_sample(name):
   for sample in important_samples:
     if sample in name:
       return True
+
   return False
  
 samples = glob.glob(base_path + "/*")

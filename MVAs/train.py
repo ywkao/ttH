@@ -14,11 +14,14 @@ import tmva_utils
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("channel", help = "e.g. Hadronic or Leptonic", type=str)
+parser.add_argument("input", help = "input hdf5 file", type=str)
+parser.add_argument("ext", help = "extension, e.g. '1'", type=str)
 parser.add_argument("tag", help = "tag to identify this training", type=str)
 args = parser.parse_args()
 
 # Read features
-f = h5py.File("ttH" + args.channel + "_features.hdf5")
+#f = h5py.File("ttH" + args.channel + "_features.hdf5")
+f = h5py.File(args.input.replace(".hdf5", "") + ".hdf5", "r")
 
 feature_names = f['feature_names']
 
@@ -75,7 +78,7 @@ param = {
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
-	'nthread' : 8,
+	'nthread' : 1,
 	}
 
 n_round = 150
@@ -85,13 +88,13 @@ progress = {}
 # train
 bdt = xgboost.train(param, d_train, n_round, evallist, evals_result = progress)	
 
-bdt.save_model(args.channel + args.tag + "_bdt.xgb")
+bdt.save_model(args.channel + "_" + args.tag + "_" + args.ext + "_bdt.xgb")
 model = bdt.get_dump()
 
 input_variables = []
 for name in feature_names:
   input_variables.append((name, 'F'))
-tmva_utils.convert_model(model, input_variables = input_variables, output_xml = args.channel + "_" + args.tag + '_bdt.xml')
+tmva_utils.convert_model(model, input_variables = input_variables, output_xml = args.channel + "_" + args.tag + "_" + args.ext + '_bdt.xml')
 
 # predict
 pred_train = bdt.predict(d_train)

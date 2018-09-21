@@ -114,7 +114,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
  
       // Decide what type of sample this is
       process_id_ = categorize_process(currentFileTitle);
-      //if (is_low_stats_process(currentFileTitle))	continue;
+      if (is_low_stats_process(currentFileTitle))	continue;
 
       // Make p4 for physics objects
       vector<TLorentzVector> jets;
@@ -155,46 +155,46 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Variable definitions
-      helic = helicity(lead_photon, sublead_photon);
-      min_dr_sublead_photon = min_dr(sublead_photon, objects);
-      min_dr_lead_photon = min_dr(lead_photon, objects);
-      n_leps_ = leps.size();
-      lep_pt_ = leps[0].Pt();
-      lep_eta_ = leps[0].Eta();
-      nb_loose_ = nb_loose();
+      lead_eta_ = leadEta();
+      jet4_pt_ = jet_pt4();
+      jet1_eta_ = jet_eta1();
+      jet5_pt_ = jet_pt5();
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      dipho_deltaR = lead_photon.DeltaR(sublead_photon);
+      jet5_eta_ = jet_eta5();
       max2_btag_ = btag_scores_sorted[1].second;
-      max1_btag_ = btag_scores_sorted[0].second;
       dR_higgs_lep = diphoton.DeltaR(leps[0]);
       dR_higgs_W = deltaR_Higgs_W(jets, diphoton);
-      pt_higgs = diphoton.Pt();
-      dipho_deltaR = lead_photon.DeltaR(sublead_photon);
-      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      ht_ = get_ht(jets);      
-      njets_ = n_jets();
-      jet1_pt_ = jet_pt1();
-      jet1_eta_ = jet_eta1();
-      jet2_pt_ = jet_pt2();
-      jet2_eta_ = jet_eta2();
-      jet3_pt_ = jet_pt3();
-      jet3_eta_ = jet_eta3();
-      jet4_pt_ = jet_pt4();
-      jet4_eta_ = jet_eta4();
-      jet5_pt_ = jet_pt5();
-      jet5_eta_ = jet_eta5();
-
-      leadptoM_ = lead_ptoM();
-      subleadptoM_ = sublead_ptoM();
-      lead_eta_ = leadEta();
       sublead_eta_ = subleadEta();
-
-      leadPSV_ = leadPixelSeed();
+      lep_eta_ = leps[0].Eta();
+      lep_pt_ = leps[0].Pt();
       subleadPSV_ = subleadPixelSeed();
-
-      dipho_cosphi_ = dipho_cosphi();
+      njets_ = n_jets();
+      jet4_eta_ = jet_eta4();
+      jet2_eta_ = jet_eta2();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      min_dr_lead_photon = min_dr(lead_photon, objects);
+      n_leps_ = leps.size();
+      leadPSV_ = leadPixelSeed();
+      helic = helicity(lead_photon, sublead_photon);
+      jet1_pt_ = jet_pt1();
+      max1_btag_ = btag_scores_sorted[0].second;
+      subleadptoM_ = sublead_ptoM();
+      min_dr_sublead_photon = min_dr(sublead_photon, objects);
+      pt_higgs = diphoton.Pt() / diphoton.M();
+      ht_ = get_ht(jets);
       dipho_rapidity_ = dipho_rapidity();
+      leadptoM_ = lead_ptoM();
+      jet2_pt_ = jet_pt2();
       met_ = MetPt();
+      dipho_cosphi_ = dipho_cosphi();
       mt_ = mT();
+      nb_loose_ = nb_loose();
+      jet3_eta_ = jet_eta3();
+      jet3_pt_ = jet_pt3();
+
+
+
 
       rand_ = cms3.rand();
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());

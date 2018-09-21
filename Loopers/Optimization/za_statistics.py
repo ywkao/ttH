@@ -117,6 +117,7 @@ for var, info in vars_of_interest.iteritems():
 
 plt.plot(N_avg_list, fractional_uncertainty_data, 'r', label='data')
 plt.plot(N_avg_list, fractional_uncertainty_mc, 'b', label='mc')
+plt.plot(N_avg_list, (numpy.std(max_za_mc) / numpy.mean(max_za_mc)) / numpy.sqrt(N_avg_list), 'b--', label = 'Std. Dev. in Max Z_A / Sqrt(# of Trainings)')
 plt.ylabel(r'$\sigma(\langle$ Max $Z_A \rangle_{N})$ / $\mu(\langle$ Max $Z_A \rangle_{N})$')
 plt.xlabel("N")
 plt.legend(loc = 'upper right')

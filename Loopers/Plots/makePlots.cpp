@@ -142,6 +142,17 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     }
   }
 
+  else if (type == "individual_shape") {
+    hBkg.push_back(hSig);
+    vColors = {kBlack};
+    vLegendLabels = {"ttH (M125)"}; 
+    for (int i = 0; i < vBkgs.size(); i++) {
+      hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + mva_category));
+      vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
+      vColors.push_back(mColors.find(vBkgs[i])->second);
+    }
+  }
+
   else if (type =="genPhoton") {
     vLegendLabels = {"ttH (M125)"};
     vColors = {kBlue+2, kAzure+1, kCyan-7, kYellow, kGreen -4, kTeal + 3, kRed+3, kRed, kMagenta-9};
@@ -258,6 +269,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c = new Comparison(c1, hData, hSig, hBkg);
     c->set_data_drawOpt("E");
     c->set_rat_label("#frac{Data}{MC}");
+    c->set_y_label("Events");
   }
   else if (type == "shape") {
     c = new Comparison(c1, hSig, hBkg);
@@ -266,6 +278,16 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_scale(-1);
     c->set_log_rat();
     c->set_rat_lim_range({0.1, 10.0});
+  }
+  else if (type == "individual_shape") {
+    c = new Comparison(c1, hBkg);
+    c->set_data_drawOpt("HIST");
+    c->set_x_label(x_label);
+    c->set_y_label("Fraction of Events");
+    c->set_scale(-1);
+    c->set_no_lumi();
+    c->set_no_log();
+    c->set_y_lim_range({0.0, 1.0}); 
   }
   else {
     c = new Comparison(c1, hSig, hBkg);
@@ -348,9 +370,13 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   if (hist_name.Contains("SigmaIEtaIEta"))      c->set_x_bin_range({1,50});
 
-  c->plot(idx);
+  if (type == "individual_shape")
+    c->plot(idx, false);
+  else
+    c->plot(idx);
   delete hData;
-  delete hSig;
+  if (type != "individual_shape")
+    delete hSig;
   for (int i = 0; i < hBkg.size(); i++)
     delete hBkg[i];
   delete c;
@@ -396,6 +422,9 @@ int main(int argc, char* argv[])
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
     if (year == "All")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+  }
+  else if (type == "individual_shape") {
+    vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets"};
   }
   else if (type == "genPhoton") {
     //vBkgs = {"DiPhoton", "GammaJets", "QCD"};
@@ -523,7 +552,7 @@ int main(int argc, char* argv[])
     //  make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA", "Hadronic MVA Score", vBkgs, 1, type, year, loose_mva_cut); 
 
     //if (vNames[i] == "ttHLeptonicLoose_plots_" + type_s + ".pdf" || vNames[i] == "ttHLeptonicCustom_plots_" + type_s + ".pdf")
-    //  make_plot(c1, vFiles[i], vNames[i], "hLeptonicMVA", "Leptonic MVA Score", vBkgs, 1, type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hLeptonicMVA", "Leptonic MVA Score", vBkgs, 1, type, year, loose_mva_cut);
 
     make_plot(c1, vFiles[i], vNames[i], "hLeadMinDr", "Min #Delta R(#gamma_1, leps/jets)", vBkgs, 1, type, year, loose_mva_cut);
     make_plot(c1, vFiles[i], vNames[i], "hSubleadMinDr", "Min #Delta R(#gamma_2, leps/jets)", vBkgs, 1, type, year, loose_mva_cut);

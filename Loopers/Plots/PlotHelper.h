@@ -345,7 +345,7 @@ void Comparison::plotNoCompare(int idx)
   //compute_limits(mCustomXRange, mCustomYRange);
   //compute_flow(mXBinRange);
   draw_histograms();
-  set_histogram_options(mColor1, mColor2);
+  //set_histogram_options(mColor1, mColor2);
   annotate_plot();
   print(idx);
 
@@ -638,6 +638,9 @@ void Comparison::draw_histograms()
     if (mScale == -1) {
       double scale = 1/mVHData[i]->Integral();
       mVHData[i]->Scale(scale);
+      mVHData[i]->SetLineColor(mColorData[i]);
+      mVHData[i]->SetMarkerColor(mColorData[i]);
+      mVHData[i]->SetLineWidth(3);
     }
     if (i == 0) {
      mVHData[i]->Draw(mDataDrawOpt);

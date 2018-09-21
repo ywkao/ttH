@@ -10,4 +10,8 @@ export PYTHONPATH=/home/users/namin/2017/fourtop/analysis/bdt/xgboost/python-pac
 
 if [ ! -d Optimization/bkg_fits ]; then
   mkdir Optimization/bkg_fits
-fi 
+fi
+
+if [ ! -d n_minus_one_plots ]; then
+  mkdir n_minus_one_plots
+fi

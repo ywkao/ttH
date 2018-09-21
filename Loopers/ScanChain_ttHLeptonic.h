@@ -27,6 +27,9 @@
 using namespace std;
 using namespace tas;
 
+const bool no_weights = false; // turn this on to train/evaluate MVA without weights
+			      // useful for determining how much of uncertainty in Z_A comes from MC samples with poor stats
+
 const double lumi_2016 = 35.9;
 const double lumi_2017 = 41.5;
 const double lumi_all = lumi_2016 + lumi_2017;

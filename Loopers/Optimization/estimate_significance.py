@@ -90,6 +90,8 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
 
   # calculate effective width
   mean_eff, sigma_eff = utils.calc_sigma_eff(sig_mass, sig_weights, i, name)
+  if sigma_eff < 0:
+    sigma_eff = abs(sigma_eff)
   selection_mass = "mass_ >= %.10f && mass_ <= %.10f" % (mean_eff - (1.645 * sigma_eff), mean_eff + (1.645 * sigma_eff))
 
   # calculate s
@@ -105,7 +107,7 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
   #b_mc = (1 / (1 - train_frac)) * numpy.sum(bkg_weights)
 
   if do_simple_estimate:
-    b_mc = utils.constant_estimate(bkg_events, bkg_weights, mean_eff, sigma_eff)
+    b_mc = utils.constant_estimate(bkg_events, bkg_weights, mean_eff, sigma_eff, 0)
 
   else:
     try:
@@ -127,7 +129,7 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
     return # fit doesn't seem to work with less than 5 events
 
   elif do_simple_estimate:
-    b_data = utils.constant_estimate(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff)
+    b_data = utils.constant_estimate(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, 0)
 
   else:
     try: 
