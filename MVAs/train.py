@@ -10,6 +10,7 @@ from sklearn import metrics
 
 import utils
 import tmva_utils
+import ks_test
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -78,7 +79,7 @@ param = {
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
-	'nthread' : 1,
+	'nthread' : 12,
 	}
 
 n_round = 150
@@ -101,10 +102,14 @@ pred_train = bdt.predict(d_train)
 pred_test = bdt.predict(d_test)
 
 # analysis
+# ks test
+d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(pred_train, pred_test, y_train, y_test)
+print "Results of ks-test (d-score) for signal: %.10f and background: %.10f" % (d_sig, d_bkg)
+print "Results of ks-test (p-value) for signal: %.10f and background: %.10f" % (p_value_sig, p_value_bkg)
+
+# roc curves
 fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train)
 fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test)
-#fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train, sample_weight = weights_train)
-#fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test, sample_weight = weights_test)
 
 auc_train = metrics.auc(fpr_train, tpr_train)
 auc_test = metrics.auc(fpr_test, tpr_test)
