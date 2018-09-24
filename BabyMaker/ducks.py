@@ -25,12 +25,16 @@ hadoop_path = "ttH"
 
 if args.year == "2016":
   cmssw_ver = "CMSSW_8_0_28"
-  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
+  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
 elif args.year == "2017":
   cmssw_ver = "CMSSW_9_4_6"
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
+elif args.year == "2018":
+  cmssw_ver = "CMSSW_10_1_1"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
+
 
 if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "_" + args.year)
@@ -38,7 +42,7 @@ if not args.soft_rerun:
 
   #os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.cc' --exclude='*.h' --exclude-vcs %s" % cmssw_ver)
 
-  os.system("XZ_OPT=-9 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' -f package.tar.gz %s" % cmssw_ver) 
+  os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' -f package.tar.gz %s" % cmssw_ver) 
 
   with open("versions.txt", "a") as fout:
     os.chdir("%s/src/flashgg/" % cmssw_ver)
@@ -61,6 +65,9 @@ default_subdir = "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniA
 
 important_samples = ["TTJets", "TTGJets", "TTGG", "QCD", "GJet_Pt-", "DiPhoton", "DY", "WG", "ZG", "WJets", "ttHJetToGG_M125", "DoubleEG"]
 def important_sample(name):
+  if args.year == "2018":
+    if "101X" not in name:
+      return False
   for sample in important_samples:
     if sample in name:
       return True
