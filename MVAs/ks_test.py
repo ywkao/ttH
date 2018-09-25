@@ -1,4 +1,8 @@
 from scipy.stats import ks_2samp
+import numpy
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 def logical_vector(values, labels, label_target):
   array = []
@@ -9,6 +13,8 @@ def logical_vector(values, labels, label_target):
       array.append(values[i])
   return array
 
+def plot_hist(distribution, bins, color, label):
+  plt.hist(distribution, bins = bins, color = color, label = label, histtype = 'step', fill = False)
 
 def ks_test(pred_train, pred_test, y_train, y_test):
   pred_train_sig = logical_vector(pred_train, y_train, 1)
@@ -18,6 +24,25 @@ def ks_test(pred_train, pred_test, y_train, y_test):
 
   d_sig, p_value_sig = ks_2samp(pred_train_sig, pred_test_sig)
   d_bkg, p_value_bkg = ks_2samp(pred_train_bkg, pred_test_bkg)
+
+  bins = numpy.linspace(0, 1, 20)
+  # signal hist
+  fig = plt.figure()
+  plot_hist(pred_train_sig, bins, 'red', 'training set (signal)')
+  plot_hist(pred_test_sig, bins, 'green', 'testing set (signal)')
+  plt.text(0.05, 6000, 'KS Test D-statistic: %.6f' % (d_sig)) 
+  plt.xlabel('BDT Score')
+  plt.legend(loc = 'upper center')
+  plt.savefig('discriminant_hist_signal.pdf')
+
+  # background hist
+  fig = plt.figure()
+  plot_hist(pred_train_bkg, bins, 'red', 'training set (background)')
+  plot_hist(pred_test_bkg, bins, 'green', 'testing set (background)')
+  plt.text(0.1, 2000, 'KS Test D-statistic: %.6f' % (d_bkg))
+  plt.xlabel('BDT Score')
+  plt.legend(loc = 'upper center')
+  plt.savefig('discriminant_hist_background.pdf')
 
   return d_sig, p_value_sig, d_bkg, p_value_bkg
 

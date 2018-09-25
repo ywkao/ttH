@@ -23,7 +23,6 @@ parser.add_argument("tag", help = "tag to identify this training", type=str)
 args = parser.parse_args()
 
 # Read features
-#f = h5py.File("ttH" + args.channel + "_features.hdf5")
 f = h5py.File(args.input.replace(".hdf5", "") + ".hdf5", "r")
 
 feature_names = f['feature_names']
@@ -81,11 +80,11 @@ param = {
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
-	'nthread' : 1,
+	'nthread' : 12,
 	'min_child_weight' : 1,
 	}
 
-n_round = 100
+n_round = 150
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -94,9 +93,10 @@ if "hyperparameter_grid_search" in args.tag:
   hyperparams = {}
   with open("hyperparameter_points.json") as f_in:
     all_hyperparams = json.load(f_in)
-  hyperparams = all_hyperparams[ext]
+  hyperparameter_choice = args.tag.strip("hyperparameter_grid_search").strip("_")
+  hyperparams = all_hyperparams[hyperparameter_choice]
   param = hyperparams["params"]
-  n_rounds = hyperparams["n_rounds"]
+  n_round = hyperparams["n_rounds"]
 
 print param, n_round
 
