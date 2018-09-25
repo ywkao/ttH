@@ -143,9 +143,8 @@ for var, info in vars.iteritems():
     os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
 
 for var, info in vars.iteritems():
-  print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
-  os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
-
+    print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+    os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 
 if do_table:
   print "\\begin{center} \\Fontvi"

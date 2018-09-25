@@ -138,7 +138,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    year = currentFileTitle.Contains("2016") ? "2016" : "2017";
+    year = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "-1"));
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -170,6 +170,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
           evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
         else if (year == "2017")
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
+	else if (year == "2018")
+ 	  evt_weight *= sgn(weight());
       }
 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data

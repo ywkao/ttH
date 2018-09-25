@@ -40,6 +40,8 @@ if args.year == "2016":
   grab_event_info("nEvents/mc_events_2016_80X.json")
 elif args.year == "2017":
   grab_event_info("nEvents/mc_events_2017_94X.json")
+elif args.year == "2018":
+  grab_event_info("nEvents/mc_events_2018_101X.json")
 
 # Take cross sections from flashgg repository instead of Twiki
 with open("cross_sections_flashgg.json") as json_file:

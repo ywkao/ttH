@@ -3,6 +3,7 @@ import numpy
 import h5py
 import xgboost
 import pandas
+import json
 
 from sklearn.cross_validation import train_test_split
 from sklearn.utils import shuffle
@@ -11,6 +12,7 @@ from sklearn import metrics
 import utils
 import tmva_utils
 import ks_test
+
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -79,12 +81,24 @@ param = {
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
-	'nthread' : 12,
+	'nthread' : 1,
+	'min_child_weight' : 1,
 	}
 
-n_round = 150
+n_round = 100
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
+
+# or, read hyperparameters from dictionary
+if "hyperparameter_grid_search" in args.tag:
+  hyperparams = {}
+  with open("hyperparameter_points.json") as f_in:
+    all_hyperparams = json.load(f_in)
+  hyperparams = all_hyperparams[ext]
+  param = hyperparams["params"]
+  n_rounds = hyperparams["n_rounds"]
+
+print param, n_round
 
 # train
 bdt = xgboost.train(param, d_train, n_round, evallist, evals_result = progress)	

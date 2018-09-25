@@ -432,13 +432,18 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 			// No V + gamma samples for 2017 :(
 };
 
+const vector<TString> vSamples_2018 = {
+			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test",
+			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test",
+			"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test"
+};
 
 void add_samples(TChain* ch, TString year) {
-  TString tag = year == "2017" ? "v1.2" : "v3.16";
+  TString tag = year == "2018" ? "v10.18.1" : (year == "2017" ? "v1.2" : "v3.16");
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 
-  vector<TString> vSamples = year == "2017" ? vSamples_2017 : vSamples_2016;
+  vector<TString> vSamples = year == "2018" ? vSamples_2018 : (year == "2017" ? vSamples_2017 : vSamples_2016);
 
   for (int i = 0; i < vSamples.size(); i++)
     ch->Add(location + "/" + vSamples[i] + "__ttH_Babies_" + tag + "_" + year + "/merged_ntuple.root");

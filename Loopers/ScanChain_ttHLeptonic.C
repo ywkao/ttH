@@ -36,84 +36,26 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
-  float lead_eta_;
-  float jet4_pt_;
-  float jet1_eta_;
-  float jet5_pt_;
-  float maxIDMVA_;
-  float dipho_deltaR;
-  float jet5_eta_;
-  float max2_btag_;
-  float dR_higgs_lep;
-  float dR_higgs_W;
-  float sublead_eta_;
-  float lep_eta_;
-  float lep_pt_;
-  float subleadPSV_;
-  float njets_;
-  float jet4_eta_;
-  float jet2_eta_;
-  float minIDMVA_;
-  float min_dr_lead_photon;
-  float n_leps_;
-  float leadPSV_;
-  float helic;
-  float jet1_pt_;
-  float max1_btag_;
-  float subleadptoM_;
-  float min_dr_sublead_photon;
-  float pt_higgs;
-  float ht_;
-  float dipho_rapidity_;
-  float leadptoM_;
-  float jet2_pt_;
-  float met_;
-  float dipho_cosphi_;
   float mt_;
+  float lep_pt_;
+  float minIDMVA_;
+  float maxIDMVA_;
+  float subleadPSV_;
+  float leadPSV_;
   float nb_loose_;
-  float jet3_eta_;
-  float jet3_pt_;
+  float njets_;
 
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
-    mva->AddVariable("lead_eta_", &lead_eta_);
-    mva->AddVariable("jet4_pt_", &jet4_pt_);
-    mva->AddVariable("jet1_eta_", &jet1_eta_);
-    mva->AddVariable("jet5_pt_", &jet5_pt_);
-    mva->AddVariable("maxIDMVA_", &maxIDMVA_);
-    mva->AddVariable("dipho_deltaR", &dipho_deltaR);
-    mva->AddVariable("jet5_eta_", &jet5_eta_);
-    mva->AddVariable("max2_btag_", &max2_btag_);
-    mva->AddVariable("dR_higgs_lep", &dR_higgs_lep);
-    mva->AddVariable("dR_higgs_W", &dR_higgs_W);
-    mva->AddVariable("sublead_eta_", &sublead_eta_);
-    mva->AddVariable("lep_eta_", &lep_eta_);
-    mva->AddVariable("lep_pt_", &lep_pt_);
-    mva->AddVariable("subleadPSV_", &subleadPSV_);
-    mva->AddVariable("njets_", &njets_);
-    mva->AddVariable("jet4_eta_", &jet4_eta_);
-    mva->AddVariable("jet2_eta_", &jet2_eta_);
-    mva->AddVariable("minIDMVA_", &minIDMVA_);
-    mva->AddVariable("min_dr_lead_photon", &min_dr_lead_photon);
-    mva->AddVariable("n_leps_", &n_leps_);
-    mva->AddVariable("leadPSV_", &leadPSV_);
-    mva->AddVariable("helic", &helic);
-    mva->AddVariable("jet1_pt_", &jet1_pt_);
-    mva->AddVariable("max1_btag_", &max1_btag_);
-    mva->AddVariable("subleadptoM_", &subleadptoM_);
-    mva->AddVariable("min_dr_sublead_photon", &min_dr_sublead_photon);
-    mva->AddVariable("pt_higgs", &pt_higgs);
-    mva->AddVariable("ht_", &ht_);
-    mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
-    mva->AddVariable("leadptoM_", &leadptoM_);
-    mva->AddVariable("jet2_pt_", &jet2_pt_);
-    mva->AddVariable("met_", &met_);
-    mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
     mva->AddVariable("mt_", &mt_);
+    mva->AddVariable("lep_pt_", &lep_pt_);
+    mva->AddVariable("minIDMVA_", &minIDMVA_);
+    mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+    mva->AddVariable("subleadPSV_", &subleadPSV_);
+    mva->AddVariable("leadPSV_", &leadPSV_);
     mva->AddVariable("nb_loose_", &nb_loose_);
-    mva->AddVariable("jet3_eta_", &jet3_eta_);
-    mva->AddVariable("jet3_pt_", &jet3_pt_);
+    mva->AddVariable("njets_", &njets_);
 
 
 
@@ -410,43 +352,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (evaluate_mva) {
 
         // Calculate MVA value
-        lead_eta_ = leadEta();
-        jet4_pt_ = jet_pt4();
-        jet1_eta_ = jet_eta1();
-        jet5_pt_ = jet_pt5();
-        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        dipho_deltaR = lead_photon.DeltaR(sublead_photon);
-        jet5_eta_ = jet_eta5();
-        max2_btag_ = btag_scores_sorted[1].second;
-        dR_higgs_lep = diphoton.DeltaR(leps[0]);
-        dR_higgs_W = deltaR_Higgs_W(jets, diphoton);
-        sublead_eta_ = subleadEta();
-        lep_eta_ = leps[0].Eta();
-        lep_pt_ = leps[0].Pt();
-        subleadPSV_ = subleadPixelSeed();
-        njets_ = n_jets();
-        jet4_eta_ = jet_eta4();
-        jet2_eta_ = jet_eta2();
-        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        min_dr_lead_photon = min_dr(lead_photon, objects);
-        n_leps_ = leps.size();
-        leadPSV_ = leadPixelSeed();
-        helic = helicity(lead_photon, sublead_photon);
-        jet1_pt_ = jet_pt1();
-        max1_btag_ = btag_scores_sorted[0].second;
-        subleadptoM_ = sublead_ptoM();
-        min_dr_sublead_photon = min_dr(sublead_photon, objects);
-        pt_higgs = diphoton.Pt() / diphoton.M();
-        ht_ = get_ht(jets);
-        dipho_rapidity_ = dipho_rapidity();
-        leadptoM_ = lead_ptoM();
-        jet2_pt_ = jet_pt2();
-        met_ = MetPt();
-        dipho_cosphi_ = dipho_cosphi();
         mt_ = mT();
+        lep_pt_ = leps[0].Pt();
+        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+        subleadPSV_ = subleadPixelSeed();
+        leadPSV_ = leadPixelSeed();
         nb_loose_ = nb_loose();
-        jet3_eta_ = jet_eta3();
-        jet3_pt_ = jet_pt3();
+        njets_ = n_jets();
 
 
 

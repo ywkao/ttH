@@ -40,6 +40,31 @@ void compare_templates(TCanvas* c1, TFile* file, string output_name, TString his
   delete c;
 }
 
+void compare_shapes(TCanvas* c1, vector<TFile*> vFiles, string output_name, TString hist_name, TString x_label, vector<TString> vLegendLabels, vector<TString> vInfo, int idx, bool log = false) {
+  vector<TH1D*> vComp;
+  for (int i = 0; i < vFiles.size(); i++) {
+    vComp.push_back((TH1D*)vFiles[i]->Get(hist_name));
+  }
+
+  Comparison* c = new Comparison(c1, vComp);
+  c->set_data_drawOpt("hist");
+  c->set_filename(output_name);
+  c->set_x_label(x_label);
+  c->set_y_label("Fraction of Events");
+  c->set_legend_labels(vLegendLabels);
+  c->set_info(vInfo);
+  c->set_colors({kBlack, kAzure+1, kRed-7});
+  c->set_scale(-1);
+  c->set_no_lumi();
+  if (!log)
+    c->set_no_log();
+  if (!log)
+    c->set_y_lim_range({0.0, max_bin(vComp)*1.25});
+  c->plot(idx, false);
+  delete c;
+
+}
+
 std::map<TString, TString> mLabels = {
         {"TTGGGenPhoton_2", "t#bar{t} + #gamma#gamma (P/P)"},
 	{"TTGGGenPhoton_1", "t#bar{t} + #gamma#gamma (F/P)"},
@@ -82,9 +107,22 @@ int main(int argc, char* argv[]) {
   gStyle->SetTitleFontSize(0.03);
 
   TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
-  TFile* f = new TFile("../ttHHadronicLoose_histograms.root");
-  string output_name = "qcd_templates.pdf";
+  TFile* f1 = new TFile("../ttHHadronicLoose__histograms2018.root");
+  TFile* f2 = new TFile("../ttHHadronicLoose__histograms2017.root");
+  TFile* f3 = new TFile("../ttHHadronicLoose__histograms2016.root");
 
+ 
+  string output_name = "gammaJets_templates.pdf";
+
+  compare_shapes(c1, {f1, f2, f3}, output_name, "hMass_GammaJets", "m_{#gamma#gamma} [GeV]", {"2018 MC", "2017 MC", "2016 MC"}, {"ttH Hadronic", "Loose Preselection"}, 0);
+  compare_shapes(c1, {f1, f2, f3}, output_name, "hNJets_GammaJets", "N_{jets}", {"2018 MC", "2017 MC", "2016 MC"}, {"ttH Hadronic", "Loose Preselection"}, 1);
+  compare_shapes(c1, {f1, f2, f3}, output_name, "hNbLoose_GammaJets", "N_{b-jets} (loose)", {"2018 MC", "2017 MC", "2016 MC"}, {"ttH Hadronic", "Loose Preselection"}, 1);
+  compare_shapes(c1, {f1, f2, f3}, output_name, "hPhotonMinIDMVA_GammaJets", "Min. #gamma ID MVA", {"2018 MC", "2017 MC", "2016 MC"}, {"ttH Hadronic", "Loose Preselection"}, 1);
+  compare_shapes(c1, {f1, f2}, output_name, "htthMVA_GammaJets", "ttH Hadronic MVA", {"2018 MC", "2017 MC", "2016 MC"}, {"ttH Hadronic", "Loose Preselection"}, 1);
+  compare_shapes(c1, {f1, f2, f3}, output_name, "hDiphoMVA_GammaJets", "DiPhoton MVA", {"2018 MC", "2017 MC", "2016 MC"}, {"ttH Hadronic", "Loose Preselection"}, 2);  
+
+
+  /*
   compare_templates(c1, f, output_name, "hPhotonMinIDMVA", "Min #gamma ID MVA", {"QCDGenPhoton_0", "GammaJetsGenPhoton_0", "DiPhotonGenPhoton_0"}, {"QCD (F/F)", "#gamma + Jets (F/F)", "#gamma#gamma + Jets (F/F)"}, {kAzure+1, kViolet-4, kCyan-7}, {"ttH Hadronic Loose","Fake/fake templates"}, 0);
   compare_templates(c1, f, output_name, "hPhotonMinIDMVA", "Min #gamma ID MVA", {"QCDGenPhoton_1", "GammaJetsGenPhoton_1", "DiPhotonGenPhoton_1"}, {"QCD (F/P)", "#gamma + Jets (F/P)", "#gamma#gamma + Jets (F/P)"}, {kAzure+1, kViolet-4, kCyan-7}, {"ttH Hadronic Loose","Fake/prompt templates"}, 1);
   compare_templates(c1, f, output_name, "hPhotonMinIDMVA", "Min #gamma ID MVA", {"QCDGenPhoton_2", "GammaJetsGenPhoton_2", "DiPhotonGenPhoton_2"}, {"QCD (P/P)", "#gamma + Jets (P/P)", "#gamma#gamma + Jets (P/P)"}, {kAzure+1, kViolet-4, kCyan-7}, {"ttH Hadronic Loose","Prompt/prompt templates"}, 1);
@@ -98,5 +136,5 @@ int main(int argc, char* argv[]) {
   compare_templates(c1, f, output_name, "hPhotonDeltaRGen", "#Delta R(reco #gamma, gen #gamma)", {"QCD", "GammaJets", "DiPhoton"}, {"QCD", "#gamma + Jets", "#gamma#gamma + Jets"}, {kAzure+1, kViolet-4, kCyan-7}, {"ttH Hadronic Loose"}, 1, true);
 
   compare_templates(c1, f, output_name, "hPhotonMinIDMVA", "Min #gamma ID MVA", {"QCDGenPhotonDetail_3", "GammaJetsGenPhotonDetail_3", "DiPhotonGenPhotonDetail_3", "TTGJetsGenPhotonDetail_3", "TTGGGenPhotonDetail_3", "TTJetsGenPhotonDetail_3"}, {"QCD (F/P)", "#gamma + Jets (F/P)", "#gamma#gamma + Jets (F/P)", "t#bar{t}+#gamma + jets (F/P)", "t#bar{t}+#gamma#gamma (F/P)", "t#bar{t} + jets (F/P)"}, {kAzure+1, kViolet-4, kCyan-7, 1, 1}, {"ttH Hadronic Loose","Fake/prompt templates"}, 2);
-
+  */
 }

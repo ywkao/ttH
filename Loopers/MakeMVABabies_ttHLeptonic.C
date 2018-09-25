@@ -155,43 +155,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Variable definitions
-      lead_eta_ = leadEta();
-      jet4_pt_ = jet_pt4();
-      jet1_eta_ = jet_eta1();
-      jet5_pt_ = jet_pt5();
-      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      dipho_deltaR = lead_photon.DeltaR(sublead_photon);
-      jet5_eta_ = jet_eta5();
-      max2_btag_ = btag_scores_sorted[1].second;
-      dR_higgs_lep = diphoton.DeltaR(leps[0]);
-      dR_higgs_W = deltaR_Higgs_W(jets, diphoton);
-      sublead_eta_ = subleadEta();
-      lep_eta_ = leps[0].Eta();
-      lep_pt_ = leps[0].Pt();
-      subleadPSV_ = subleadPixelSeed();
-      njets_ = n_jets();
-      jet4_eta_ = jet_eta4();
-      jet2_eta_ = jet_eta2();
-      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      min_dr_lead_photon = min_dr(lead_photon, objects);
-      n_leps_ = leps.size();
-      leadPSV_ = leadPixelSeed();
-      helic = helicity(lead_photon, sublead_photon);
-      jet1_pt_ = jet_pt1();
-      max1_btag_ = btag_scores_sorted[0].second;
-      subleadptoM_ = sublead_ptoM();
-      min_dr_sublead_photon = min_dr(sublead_photon, objects);
-      pt_higgs = diphoton.Pt() / diphoton.M();
-      ht_ = get_ht(jets);
-      dipho_rapidity_ = dipho_rapidity();
-      leadptoM_ = lead_ptoM();
-      jet2_pt_ = jet_pt2();
-      met_ = MetPt();
-      dipho_cosphi_ = dipho_cosphi();
       mt_ = mT();
+      lep_pt_ = leps[0].Pt();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      subleadPSV_ = subleadPixelSeed();
+      leadPSV_ = leadPixelSeed();
       nb_loose_ = nb_loose();
-      jet3_eta_ = jet_eta3();
-      jet3_pt_ = jet_pt3();
+      njets_ = n_jets();
 
 
 
