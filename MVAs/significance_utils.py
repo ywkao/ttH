@@ -66,6 +66,7 @@ def events_passing_cut(events, cut):
 
 
 def za_scores(n_quantiles, signal_events, background_events):
+  testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
   za = []
   # Calculate cuts corresponding to each quantile
   quantiles, mva_cut = quantiles_to_mva_score(n_quantiles, signal_events["mva_score"])
@@ -85,7 +86,7 @@ def za_scores(n_quantiles, signal_events, background_events):
       if signal_events_pass["mass"][i] > mean_eff - (1.645 * sigma_eff) and signal_events_pass["mass"][i] < mean_eff + (1.645 * sigma_eff):
         signal_events_mass_window.append(signal_events_pass["weight"][i])
     signal_events_mass_window = numpy.asarray(signal_events_mass_window) 
-    s = 2.0 * numpy.sum(signal_events_mass_window)
+    s = ( 1. / testing_frac) * numpy.sum(signal_events_mass_window)
 
     # Calculate b
     bkg_events_mass_window = []
@@ -93,7 +94,7 @@ def za_scores(n_quantiles, signal_events, background_events):
       if bkg_events_pass["mass"][i] > 100 and bkg_events_pass["mass"] < 180:
         bkg_events_mass_window.append(bkg_events_pass["weight"][i])
     bkg_events_mass_window = numpy.asarray(bkg_events_mass_window)
-    b = constant_estimate(bkg_events_mass_window, sigma_eff)
+    b = ( 1. / testing_frac) * constant_estimate(bkg_events_mass_window, sigma_eff)
 
     # Calculate Z_A
     z_mc = Z_A(s, b)
