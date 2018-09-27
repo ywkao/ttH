@@ -142,7 +142,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       // Fill histograms //
       evt_weight_ = 1.;
-      if (!no_weights && !isData && !isSignal) {
+      if (!no_weights && !isData) {
 	if (year == "2016")
           evt_weight_ = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
         else if (year == "2017")
@@ -169,6 +169,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       rand_ = cms3.rand();
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
+      mass_ = mass();
 
       FillBabyNtuple();
 

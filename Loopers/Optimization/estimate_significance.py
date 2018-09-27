@@ -107,7 +107,7 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
   #b_mc = (1 / (1 - train_frac)) * numpy.sum(bkg_weights)
 
   if do_simple_estimate:
-    b_mc = utils.constant_estimate(bkg_events, bkg_weights, mean_eff, sigma_eff, 0)
+    b_mc = (1 / (1 - train_frac)) * utils.constant_estimate(bkg_events, bkg_weights, mean_eff, sigma_eff, 0)
 
   else:
     try:

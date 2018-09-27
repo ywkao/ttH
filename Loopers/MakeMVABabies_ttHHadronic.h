@@ -44,6 +44,7 @@ class BabyMaker {
     int 	process_id_;
     double 	rand_;
     double      super_rand_;
+    double      mass_;
 
     // Variable declarations
     float           dipho_delta_R;
@@ -101,6 +102,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
   BabyTree_->Branch("super_rand_"            , &super_rand_       );
+  BabyTree_->Branch("mass_"             , &mass_        );
 
   // Variable branches
   BabyTree_->Branch("dipho_delta_R" ,&dipho_delta_R);

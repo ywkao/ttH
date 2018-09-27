@@ -12,7 +12,7 @@ from sklearn import metrics
 import utils
 import tmva_utils
 import ks_test
-
+import significance_utils
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -30,18 +30,22 @@ feature_names = f['feature_names']
 global_features = f['global']
 label = f['label']
 weights = f['weights']
+mass = f['mass']
 
 global_features_validation = f['global_validation']
 label_validation = f['label_validation']
 weights_validation = f['weights_validation']
+mass_validation = f['mass_validation']
 
 global_features = numpy.asarray(global_features)
 label = numpy.asarray(label)
 weights = numpy.asarray(weights)
+mass = numpy.asarray(mass)
 
 global_features_validation = numpy.asarray(global_features_validation)
 label_validation = numpy.asarray(label_validation)
 weights_validation = numpy.asarray(weights_validation)
+mass_validation = numpy.asarray(mass_validation)
 
 feature_names = numpy.asarray(feature_names)
 
@@ -75,7 +79,7 @@ print sum_pos_weights, sum_neg_weights
 # Define BDT parameters
 param = { 
     	'max_depth': 8,
-	'eta': 0.2,
+	'eta': 0.1,
 	'objective': 'binary:logistic',
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
 	'subsample': 1.0,
@@ -84,7 +88,7 @@ param = {
 	'min_child_weight' : 1,
 	}
 
-n_round = 150
+n_round = 75
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -160,3 +164,23 @@ plt.xlabel('False Positive Rate (background efficiency)')
 plt.ylabel('True Positive Rate (signal efficiency)')
 plt.legend(loc='lower right')
 plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
+
+n_quantiles = 100
+signal_mva_scores = ks_test.logical_vector(pred_test, y_test, 1)
+bkg_mva_scores = ks_test.logical_vector(pred_test, y_test, 0)
+
+signal_mass = ks_test.logical_vector(mass_validation, y_test, 1)
+bkg_mass = ks_test.logical_vector(mass_validation, y_test, 0)
+
+signal_weights = ks_test.logical_vector(weights_validation, y_test, 1)
+bkg_weights = ks_test.logical_vector(weights_validation, y_test, 0)
+
+signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores}
+bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores}
+
+za = significance_utils.za_scores(n_quantiles, signal_events, bkg_events)
+za = numpy.asarray(za)
+
+max_za = numpy.max(za)
+print max_za
+
