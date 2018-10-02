@@ -107,6 +107,37 @@ if [ "$CMSSW_VER" = "101X" ]; then
   fi
 fi
 
+if [ "$CMSSW_VER" = "102X" ]; then
+  # Set up CMSSW 102X
+  export SCRAM_ARCH=slc6_amd64_gcc700 
+  if [ ! -d CMSSW_10_2_1 ]; then
+    cmsrel CMSSW_10_2_1
+    cd CMSSW_10_2_1/src
+    cmsenv
+    git cms-init
+  else
+    cd CMSSW_10_2_1/src
+    cmsenv
+  fi
+
+  if [ ! -d flashgg ]; then
+    cd $CMSSW_BASE/src
+    git clone https://github.com/sam-may/flashgg
+    cd flashgg
+    git checkout tth_dev_102X
+
+    cd ..
+    source flashgg/setup_10_2_X.sh
+
+    # Build
+    cd $CMSSW_BASE/src
+    scram b -j 30
+    cd ../../
+  else
+    cd ../../
+  fi
+fi
+
 
 if [ ! -d logs ]; then
   mkdir logs

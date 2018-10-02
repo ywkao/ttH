@@ -37,7 +37,8 @@ if [ "$CMSSW_VER" = "94X" ]; then
   cmsenv
 
   #INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1/TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8/RunIIFall17-3_1_0-3_1_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/microAOD_1.root' # or change to your favorite file
-  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/microAOD_1.root'
+  #INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/microAOD_1.root'
+  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8/RunIIFall17-3_1_0-3_1_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/microAOD_1.root'
 
 fi
 
@@ -52,8 +53,22 @@ if [ "$CMSSW_VER" = "101X" ]; then
   cmsenv
 
   #INPUTFILENAMES='file:/home/users/sjmay/ttH/BabyMaker/test_10X/CMSSW_10_1_1/src/flashgg/myMicroAODOutputFile.root'
-  INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test/test_skim_1.root'
+  #INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test/test_skim_1.root'
 
+fi
+
+
+if [ "$CMSSW_VER" = "102X" ]; then
+  export SCRAM_ARCH=slc6_amd64_gcc700
+  if [ ! -d CMSSW_10_2_1 ] ; then
+    echo "Need to run setup.sh first!"
+    return
+  fi
+
+  cd CMSSW_10_2_1/src/flashgg
+  cmsenv
+
+  INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/EGamma/RunIIFall18-4_0_0-RunIIFall18-4_0_0-3-g040ebcb0-v0-Run2018B-PromptReco-v1/microAOD_1.root'
 fi
 
 
