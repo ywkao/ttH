@@ -45,6 +45,9 @@ class BabyMaker {
     double 	rand_;
     double      super_rand_;
 
+    double      mass_;
+    int      eventCat_;
+
     // Variable declarations
     float           dipho_delta_R;
     int		njets_;
@@ -107,6 +110,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("njets_"     	, &njets_       );
   //BabyTree_->Branch("nbjets_"		, &nbjets_	);
   BabyTree_->Branch("ht_"    		, &ht_       	);
+  BabyTree_->Branch("mass_"    		, &mass_       	);
+  BabyTree_->Branch("eventCat_"    		, &eventCat_       	);
 
   BabyTree_->Branch("jet1_pt_"            , &jet1_pt_   );
   BabyTree_->Branch("jet1_eta_"            , &jet1_eta_ );

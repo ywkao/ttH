@@ -94,7 +94,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       // Fill histograms //
       evt_weight_ = 1.;
-      if (!isData && !isSignal) {
+      if (!isData /*&& !isSignal*/) {
 	if (year == "2016")
           evt_weight_ = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
         else if (year == "2017")
@@ -102,16 +102,40 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       }
 
       int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
+      /*
       if ((currentFileTitle.Contains("DiPhoton") || currentFileTitle.Contains("QCD")) && !useEventForTemplate(currentFileTitle, genPhotonId) ) continue;
       if (currentFileTitle.Contains("GJet")) continue;
       if (currentFileTitle.Contains("DiPhoton")) evt_weight_ *= 0.32;
       if (currentFileTitle.Contains("QCD") && genPhotonId == 1) evt_weight_ *= 0.96;
       if (currentFileTitle.Contains("QCD") && genPhotonId == 0) evt_weight_ *= 1.52;
-
+      */
       // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
 
-      label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+      //label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+
+      int eventCat = -1;
+      if (leadGenMatch() == 1 && subleadGenMatch() == 1) eventCat = 0; 
+      if (leadGenMatch() + subleadGenMatch() == 1) eventCat = 1; 
+      if (leadGenMatch() != 1 && subleadGenMatch() != 1) eventCat = 2;
+
+      // ttH: 0
+      // ttGG: 5
+      // ttG, tt: 6,9
+      // diPhoton, GJet, QCD: 2,3,4
+
+      bool fromTTX = false;
+      if (process_id_ == 5 || process_id_ == 6 || process_id_ == 9) fromTTX = true;
+
+      label_ = 5;
+      //if (process_id_ == 0) label_ = 1;
+      //if (process_id_ == 9) label_ = 0;
+      //if (process_id_ == 5 || process_id_ == 6 || process_id_ == 9) label_ = 1;
+      if (process_id_ == 2 || process_id_ == 3 || process_id_ == 4) label_ = 4;
+      if (fromTTX && eventCat == 0) label_ = 1;
+      if (fromTTX && eventCat == 1) label_ = 2;
+      if (fromTTX && eventCat == 2) label_ = 3;
+      if (process_id_ == 0) label_ = 0;
 
       // Variable definitions
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
@@ -156,6 +180,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       rand_ = cms3.rand();
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
+
+      mass_ = mass();
+      eventCat_ = eventCat;
 
       FillBabyNtuple();
 
