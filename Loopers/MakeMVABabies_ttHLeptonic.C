@@ -155,7 +155,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       // Variable definitions
-      mt_ = mT();
       lep_pt_ = leps[0].Pt();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();

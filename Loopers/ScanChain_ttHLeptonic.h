@@ -32,6 +32,8 @@ const bool no_weights = false; // turn this on to train/evaluate MVA without wei
 
 const double lumi_2016 = 35.9;
 const double lumi_2017 = 41.5;
+const double lumi_2018 = 45.966; //FIXME: got this from here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmV2018Analysis 
+				 // need to confirm that this is actually the json used
 const double lumi_all = lumi_2016 + lumi_2017;
 
 const vector<double> mva_thresh_2017 = { 0.3, 0.7 };

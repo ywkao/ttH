@@ -21,7 +21,7 @@ nice = 19
 os.nice(nice)
 
 # Maximum number of threads to launch in parallel (in principle, can be different from n_trainings)
-n_par = 15
+n_par = 10
 
 running_procs = []
 

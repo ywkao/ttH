@@ -128,12 +128,11 @@ cats = {
 	"lepton" : { "features" : [vars["lepton_pt"], vars["lepton_eta"], vars["mt"], vars["n_leps"]], "latex_name" : "Lepton Features"},
 }
 
-do_baseline = False
-  print numpy.max(za_mc)
-do_individual_vars = False
-do_categories = False
-do_build_up = False
-do_table = False
+do_baseline = True
+do_individual_vars = True
+do_categories = True
+do_build_up = True
+do_table = True
 
 
 # First, remove all variables and then add them all back in so we know we are starting with all variables
@@ -146,26 +145,6 @@ for var, info in vars.iteritems():
 for var, info in vars.iteritems():
     print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
     os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
-
-if do_table:
-  print "\\begin{center} \\Fontvi"
-  print "\\begin{tabular}{|c|r|r|c|r|}"
-  print "\\multicolumn{5}{c}{Assesment of Input Feature Importance} \\\\ \\hline"
-  print " Category & All Features Except & Only Features & Features & All Features Except \\\\ \\hline \\hline"
-  for cat, list in cats.iteritems():
-    cat_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, cat))
-    cat_build_up_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_only_%s_*_bdt.npz" % (args.channel, cat))
-    feature_scores = {}
-    for feature in list["features"]:
-      feature_scores[feature["name"]] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, feature["name"]))
-    print "\multirow{%d}{*}{%s} & \multirow{%d}{*}{%.2f $\\pm$ %.2f} & \multirow{%d}{*}{%.2f $\\pm$ %.2f} & %s & %.2f $\\pm$ %.2f \\\\" % (len(list["features"]), list["latex_name"], len(list["features"]), (cat_score["mean_mc"] - mean_mc) / (mean_mc*0.01), (cat_score["mean_unc_mc"]) / (cat_score["mean_mc"] * 0.01), len(list["features"]), (cat_build_up_score["mean_mc"] - mean_mc) / (mean_mc*0.01), (cat_build_up_score["mean_unc_mc"]) / (cat_build_up_score["mean_mc"] * 0.01), list["features"][0]["latex_name"], (feature_scores[list["features"][0]["name"]]["mean_mc"] - mean_mc) / (mean_mc*0.01), (feature_scores[list["features"][0]["name"]]["mean_unc_mc"]) / (feature_scores[list["features"][0]["name"]]["mean_mc"] * 0.01))
-    for i in range(1, len(list["features"])):
-      postfix = " \\hline \\hline" if i == len(list["features"]) - 1 else ""
-      print " & & & %s & %.2f $\\pm$ %.2f \\\\ %s" % (list["features"][i]["latex_name"], (feature_scores[list["features"][i]["name"]]["mean_mc"] - mean_mc) / (mean_mc*0.01), (feature_scores[list["features"][i]["name"]]["mean_unc_mc"]) / (feature_scores[list["features"][i]["name"]]["mean_mc"] * 0.01), postfix)
-  print "\\end{tabular}"
-  print "\\end{center}"
-  
-
 
 if not (do_baseline or do_individual_vars or do_categories or do_build_up):
   print "Done" 
@@ -273,11 +252,27 @@ else:
 	# Then, calculate <Max Z_A>_N and estimated uncertainty 
 	list["results_build_up"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_only_%s_*_bdt.npz" % (args.channel, cat))
 
-  # Now print out results all nicely
-  with open("var_rankings_v2.txt", "w") as fout:
-    fout.write("Mean Z_A (mc): %.4f +/- %.4f\n" % (mean_mc, unc_mc / (float(n_baseline) ** 0.5)))
-    fout.write("Std Dev in Z_A (mc): %.4f\n" % unc_mc)
-    fout.write("Mean Z_A (data): %.4f +/- %.4f\n" % (mean_data, unc_data / (float(n_baseline) ** 0.5)))
-    fout.write("Std Dev in Z_A (data): %.4f\n" % unc_data)
-    fout.write(json.dumps(vars))
-    fout.write(json.dumps(cats))
+
+if do_table:
+  print "\\begin{center} \\Fontvi"
+  print "\\begin{tabular}{|c|r|r|c|r|}"
+  print "\\multicolumn{5}{c}{Assesment of Input Feature Importance} \\\\ \\hline"
+  print " Category & All Features Except & Only Features & Features & All Features Except \\\\ \\hline \\hline"
+  for cat, list in cats.iteritems():
+    cat_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, cat))
+    cat_build_up_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_only_%s_*_bdt.npz" % (args.channel, cat))
+    feature_scores = {}
+    for feature in list["features"]:
+      feature_scores[feature["name"]] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, feature["name"]))
+    print "\multirow{%d}{*}{%s} & \multirow{%d}{*}{%.2f $\\pm$ %.2f} & \multirow{%d}{*}{%.2f $\\pm$ %.2f} & %s & %.2f $\\pm$ %.2f \\\\" % (len(list["features"]), list["latex_name"], len(list["features"]), (cat_score["mean_mc"] - mean_mc) / (mean_mc*0.01), (cat_score["mean_unc_mc"]) / (cat_score["mean_mc"] * 0.01), len(list["features"]), (cat_build_up_score["mean_mc"] - mean_mc) / (mean_mc*0.01), (cat_build_up_score["mean_unc_mc"]) / (cat_build_up_score["mean_mc"] * 0.01), list["features"][0]["latex_name"], (feature_scores[list["features"][0]["name"]]["mean_mc"] - mean_mc) / (mean_mc*0.01), (feature_scores[list["features"][0]["name"]]["mean_unc_mc"]) / (feature_scores[list["features"][0]["name"]]["mean_mc"] * 0.01))
+    for i in range(1, len(list["features"])):
+      postfix = " \\hline \\hline" if i == len(list["features"]) - 1 else ""
+      print " & & & %s & %.2f $\\pm$ %.2f \\\\ %s" % (list["features"][i]["latex_name"], (feature_scores[list["features"][i]["name"]]["mean_mc"] - mean_mc) / (mean_mc*0.01), (feature_scores[list["features"][i]["name"]]["mean_unc_mc"]) / (feature_scores[list["features"][i]["name"]]["mean_mc"] * 0.01), postfix)
+  print "\\end{tabular}"
+  print "\\end{center}"
+
+
+print mean_mc
+print mean_data
+print unc_mc
+print unc_data

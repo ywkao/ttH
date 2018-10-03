@@ -198,7 +198,7 @@ int categorize_process(TString currentFileTitle) {
     return 8;
   else if (currentFileTitle.Contains("TTJets"))
     return 9; // split into hadronic/semileptonic/dileptonic
-  else if (currentFileTitle.Contains("DoubleEG"))
+  else if (currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"))
     return 10;
   else {
     cout << "File does not fit into one of the background categories." << endl;
@@ -432,20 +432,41 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 			// No V + gamma samples for 2017 :(
 };
 
-const vector<TString> vSamples_2018 = {
+const vector<TString> vSamples_2018 = {"EGamma",
+                        "ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8",
+                        "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                        "DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa",
+                        "GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+                        "GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8",
+                        "GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+                        "QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+                        "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8",
+                        "QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+                        "TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8",
+                        "TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8",
+                        "TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8"
+                        // No V + gamma samples for 2017 :(
+};
+
+
+/*const vector<TString> vSamples_2018 = {
 			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test",
 			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test",
 			"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test"
-};
+};*/
 
 void add_samples(TChain* ch, TString year) {
-  TString tag = year == "2018" ? "v10.18.1" : (year == "2017" ? "v1.2" : "v3.16");
+  //TString tag = year == "2018" ? "v102.1" : (year == "2017" ? "v1.2" : "v3.16");
+  TString tag = year == "2016" ? "v3.16" : "v1.2";
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 
   vector<TString> vSamples = year == "2018" ? vSamples_2018 : (year == "2017" ? vSamples_2017 : vSamples_2016);
 
-  for (int i = 0; i < vSamples.size(); i++)
-    ch->Add(location + "/" + vSamples[i] + "__ttH_Babies_" + tag + "_" + year + "/merged_ntuple.root");
+  for (int i = 0; i < vSamples.size(); i++) {
+    TString tag_temp = vSamples[i].Contains("EGamma") ? "v102.1" : tag;
+    TString year_temp = vSamples[i].Contains("EGamma") ? "2018" : "2017";
+    ch->Add(location + "/" + vSamples[i] + "__ttH_Babies_" + tag_temp + "_" + year_temp + "/merged_ntuple.root");
+  }
 
 }

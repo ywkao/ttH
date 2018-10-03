@@ -16,7 +16,7 @@ param_ranges = {
 	"gamma" :		[0.0],
 	"lambda" :		[1.0],
 	"alpha" :		[1.0],
-	"objective" :		["binary:logistic"],
+	#"objective" :		["binary:logistic"],
 }
 
 def product_dict(**kwargs):

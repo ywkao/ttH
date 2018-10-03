@@ -29,6 +29,7 @@ using namespace tas;
 
 const double lumi_2016 = 35.9;
 const double lumi_2017 = 41.5;
+const double lumi_2018 = 45.966;
 const double lumi_all = lumi_2016 + lumi_2017;
 
 

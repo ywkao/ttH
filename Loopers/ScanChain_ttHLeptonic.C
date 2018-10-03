@@ -36,7 +36,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
-  float mt_;
   float lep_pt_;
   float minIDMVA_;
   float maxIDMVA_;
@@ -48,7 +47,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
-    mva->AddVariable("mt_", &mt_);
     mva->AddVariable("lep_pt_", &lep_pt_);
     mva->AddVariable("minIDMVA_", &minIDMVA_);
     mva->AddVariable("maxIDMVA_", &maxIDMVA_);
@@ -71,6 +69,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     // Get File Content
     TString currentFileTitle = currentFile->GetTitle();
+    cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
     TTree *tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all");
     if (fast) TTreeCache::SetLearnEntries(10);
@@ -78,9 +77,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     cms3.Init(tree);
 
     // Decide what type of sample this is
-    bool isData = currentFileTitle.Contains("DoubleEG");
+    bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma");
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    year = currentFileTitle.Contains("2016") ? "2016" : "2017";
+    year = currentFileTitle.Contains("2018") ? "2018" : (currentFileTitle.Contains("2016") ? "2016" : "2017");
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -117,8 +116,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (!no_weights && !isData) {
         if (year == "2016")
           evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
-        else if (year == "2017")
+        else if (year == "2017") 
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
+	else if (year == "2018")
+          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
       }
 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
@@ -352,7 +353,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (evaluate_mva) {
 
         // Calculate MVA value
-        mt_ = mT();
         lep_pt_ = leps[0].Pt();
         minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
         maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();

@@ -36,7 +36,7 @@ class BabyMaker {
     TTree *BabyTree_;
 
     // Variable names
-    vector<string> mva_branches = {"mt_", "lep_pt_", "minIDMVA_", "maxIDMVA_", "subleadPSV_", "leadPSV_", "nb_loose_", "njets_",  };
+    vector<string> mva_branches = {"lep_pt_", "minIDMVA_", "maxIDMVA_", "subleadPSV_", "leadPSV_", "nb_loose_", "njets_",  };
     
     int 	label_;
     double	evt_weight_;
@@ -46,7 +46,6 @@ class BabyMaker {
     double	mass_;
 
     // Variable declarations
-    double           mt_;
     double           lep_pt_;
     double           minIDMVA_;
     double           maxIDMVA_;
@@ -77,7 +76,6 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("mass_"		, &mass_	);
 
   // Variable branches
-  BabyTree_->Branch("mt_" ,&mt_);
   BabyTree_->Branch("lep_pt_" ,&lep_pt_);
   BabyTree_->Branch("minIDMVA_" ,&minIDMVA_);
   BabyTree_->Branch("maxIDMVA_" ,&maxIDMVA_);

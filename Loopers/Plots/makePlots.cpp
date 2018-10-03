@@ -301,7 +301,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   c->set_x_label(x_label);
   c->set_y_label("Events");
   TString output = output_name;
-  double lumi = year == "All" ? 77.4 : (year == "2017" ? 41.5 : 35.9);
+  double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9)));
   c->set_lumi(lumi);
   if (hist_name == "hMassAN") {
     c->set_no_flow();
@@ -398,7 +398,7 @@ int main(int argc, char* argv[])
   TString type_s = argv[1];
 
   TString file_path = argv[2];
-  TString year = file_path.Contains("All") ? "All" : (file_path.Contains("2017") ? "2017" : "2016");
+  TString year = file_path.Contains("All") ? "All" : file_path.Contains("2018") ? "2018" : ((file_path.Contains("2017") ? "2017" : "2016"));
   TString tag = file_path.Contains("Hadronic") ? "Hadronic" : "Leptonic";
 
   bool loose_mva_cut = argc > 3;
@@ -422,6 +422,8 @@ int main(int argc, char* argv[])
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
     if (year == "All")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+    if (year == "2018")
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
   }
   else if (type == "individual_shape") {
     vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets"};

@@ -22,10 +22,10 @@ def find_nearest(array,value):
     idx = (numpy.abs(array-val)).argmin()
     return array[idx], idx
 
-mean_data = 2.588
-mean_mc = 3.147
-unc_data = 0.096
-unc_mc = 0.091
+mean_data = 2.6140475044 
+mean_mc = 2.45864720897
+unc_data = 0.103457610201
+unc_mc = 0.0857337372867
 
 def calc_za_and_unc(file_pattern):
   files = glob.glob(file_pattern)
@@ -39,6 +39,10 @@ def calc_za_and_unc(file_pattern):
 
     max_za_data.append(numpy.max(za_data))
     max_za_mc.append(numpy.max(za_mc))
+
+
+  filter(lambda v: v==v, max_za_data)
+  filter(lambda v: v==v, max_za_mc)
 
   mean_mc = numpy.mean(max_za_mc)
   mean_unc_mc = unc_mc / (float(len(files)) ** 0.5)
@@ -58,6 +62,7 @@ def calc_za_and_unc(file_pattern):
         "max_za_data" : [max_za_data, "Max. Z_A (data)"],
         "max_za_mc" : [max_za_mc, "Max. Z_A (mc)"],
   }
+  vars_of_interest = {}
 
   fig = plt.figure()
   bins = numpy.linspace(2, 4, 40)
@@ -139,11 +144,10 @@ baseline_vars = [ # variables to store in the baseline BDT that we use as a star
 	"max_phoIDMVA",
 	"min_phoIDMVA",
 	"lepton_pt",
-	"mt",
 ]
 
 do_results = True
-do_hyperparameter_scan = True
+do_hyperparameter_scan = False
 
 # First, remove all variables 
 
@@ -172,12 +176,14 @@ if do_hyperparameter_scan:
 if do_results:
   scan_results = {}
   max_za_mc = numpy.empty(args.n_hyperparameter_points)
+  max_za_data = numpy.empty(args.n_hyperparameter_points)
   with open("../MVAs/hyperparameter_points.json") as f_in:
     all_hyperparams = json.load(f_in)
   for i in range(args.n_hyperparameter_points):
     print "Optimization/ZA_curves/MVAOptimizationBaby_*_%s_hyperparameter_grid_search_%s_*_bdt.npz" % (args.channel, str(i))
     hyperparam_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_hyperparameter_grid_search_%s_*_bdt.npz" % (args.channel, str(i)))
     max_za_mc[i] = hyperparam_score["mean_mc"]
+    max_za_data[i] = hyperparam_score["mean_data"]
     scan_results[str(i)] = { "mean_mc" : hyperparam_score["mean_mc"], "mean_data" : hyperparam_score["mean_data"], "hyperparameters" : all_hyperparams[str(i)] } 
   
   sort_indices = numpy.argsort(max_za_mc)

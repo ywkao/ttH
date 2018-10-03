@@ -32,8 +32,8 @@ elif args.year == "2017":
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
 elif args.year == "2018":
-  cmssw_ver = "CMSSW_10_1_1"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
+  cmssw_ver = "CMSSW_10_2_1"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/"
 
 
 if not args.soft_rerun:
@@ -63,11 +63,12 @@ subdir_map = { 	"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_
 }
 default_subdir = "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1"
 
-important_samples = ["TTJets", "TTGJets", "TTGG", "QCD", "GJet_Pt-", "DiPhoton", "DY", "WG", "ZG", "WJets", "ttHJetToGG_M125", "DoubleEG"]
+important_samples = ["TTJets", "TTGJets", "TTGG", "QCD", "GJet_Pt-", "DiPhoton", "DY", "WG", "ZG", "WJets", "ttHJetToGG_M125", "DoubleEG", "EGamma"]
 def important_sample(name):
   if args.year == "2018":
-    if "101X" not in name:
-      return False
+    #if "101X" not in name:
+    #  return False
+    return True # need to FIXME later
   for sample in important_samples:
     if sample in name:
       return True
@@ -78,7 +79,7 @@ samples = glob.glob(base_path + "/*")
 dslocs = []
 for sample in samples:
   name = sample.split("/")[-1]
-  if args.data_only and not "DoubleEG" in name:
+  if args.data_only and not ("DoubleEG" in name or "EGamma" in name):
     continue
   if not args.do_all and not important_sample(name):
     print "Skipping %s" % name
@@ -88,12 +89,10 @@ for sample in samples:
   else:
     subdir = default_subdir
 
-  if args.data_only and "DoubleEG" not in name:
-    continue
-
-  if "DoubleEG" in name:
+  if "DoubleEG" in name or "EGamma" in name:
     nFilesPerOutput = 25
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
+    print "here"
   if "ttH" in name or "TTGG" in name:
     nFilesPerOutput = 1
   elif "DiPhoton" in name: 

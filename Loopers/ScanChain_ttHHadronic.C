@@ -128,7 +128,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     // Get File Content
     TString currentFileTitle = currentFile->GetTitle();
-
+    cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
     TTree *tree = (TTree*)file.Get("tthHadronicTagDumper/trees/tth_13TeV_all");
     if (fast) TTreeCache::SetLearnEntries(10);
@@ -136,9 +136,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     cms3.Init(tree);
 
     // Decide what type of sample this is
-    bool isData = currentFileTitle.Contains("DoubleEG"); 
+    bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    year = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "-1"));
+    year = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -171,7 +171,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         else if (year == "2017")
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
 	else if (year == "2018")
- 	  evt_weight *= sgn(weight());
+          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
       }
 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
