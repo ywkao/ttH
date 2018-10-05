@@ -196,24 +196,26 @@ import matplotlib.pyplot as plt
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
-ax1.plot(n_sig_mc, sig_mc, label='MC', color = 'green', linestyle = '--', dashes = (5,2))
-ax1.plot(n_sig_data, sig_data, label='Data', color = 'green')
+ax1.plot(n_sig_mc, sig_mc, label='MC', color = 'blue')
+ax1.fill_between(n_sig_mc, numpy.asarray(sig_mc) - numpy.asarray(sig_unc_mc), numpy.asarray(sig_mc) + numpy.asarray(sig_unc_mc), color = 'blue', alpha = 0.25)
+ax1.plot(n_sig_data, sig_data, label='Data', color = 'black')
+ax1.fill_between(n_sig_data, numpy.asarray(sig_data) - numpy.asarray(sig_unc_data), numpy.asarray(sig_data) + numpy.asarray(sig_unc_data), color = 'black', alpha = 0.25)
 if do_reference_bdt:
   ax1.plot(n_sig_mc_ref, sig_mc_ref, label='2017 ttH BDT (MC)', color = 'blue', linestyle = '--', dashes = (5,2))
-  ax1.plot(n_sig_data_ref, sig_data_ref, label='2017 ttH BDT (data)', color = 'blue')
+  ax1.plot(n_sig_data_ref, sig_data_ref, label='2017 ttH BDT (data)', color = 'black', linestyle = '--', dashes = (5,2))
 plt.xlabel('# Signal Events')
 ax1.set_ylabel('Significance (Z_A)')
 ax1.tick_params('y', colors = 'green')
 plt.ylim([0.0, 3.0])
 
-if not do_reference_bdt:
-  ax2 = ax1.twinx()
-  ax2.plot(n_sig_mc, n_bkg_mc, color = 'red', linestyle = '--', dashes = (5,2))
-  ax2.plot(n_sig_data, n_bkg_data, color = 'red')
-  ax2.set_ylabel('# Bkg Events')
-  ax2.tick_params('y', colors = 'red')
-  ax2.set_yscale("log", nonposy='clip')
-  ax2.set_ylim([10**(-2), 10**3])
+#if not do_reference_bdt:
+#  ax2 = ax1.twinx()
+#  ax2.plot(n_sig_mc, n_bkg_mc, color = 'red', linestyle = '--', dashes = (5,2))
+#  ax2.plot(n_sig_data, n_bkg_data, color = 'red')
+#  ax2.set_ylabel('# Bkg Events')
+#  ax2.tick_params('y', colors = 'red')
+#  ax2.set_yscale("log", nonposy='clip')
+#  ax2.set_ylim([10**(-2), 10**3])
 
 ax1.legend(loc='upper right')
 plt.savefig('optimization_%s_.pdf' % args.file.replace(".root", ""))
