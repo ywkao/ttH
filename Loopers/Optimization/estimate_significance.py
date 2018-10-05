@@ -113,15 +113,12 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, sig
   sig_events = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_signal + " && " + selection_base + " && " + selection_mass)
   s = (1 / (1 - train_frac)) * numpy.sum(sig_events)
   s_unc = (1 / (1 - train_frac)) * math.sqrt(numpy.sum(sig_events**2))
-  print len(sig_events), s_unc / s
 
   # calculate b from mc
   selection_bkg_sidebands = selection_bkg + " && " + selection_base + " && " + selection_sideband
   #selection_bkg_sidebands = selection_bkg + " && " + selection_base + " && " + selection_mass
   bkg_weights = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_bkg_sidebands) 
   bkg_events = root_numpy.tree2array(tree, branches = "mass_", selection = selection_bkg_sidebands) 
-
-  #b_mc = (1 / (1 - train_frac)) * numpy.sum(bkg_weights)
 
   if do_simple_estimate:
     b_mc, unc_b_mc = utils.constant_estimate(bkg_events, bkg_weights, mean_eff, sigma_eff, 0)
