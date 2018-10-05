@@ -69,6 +69,15 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
+      else if (tag == "ttHLeptonic_2017_MVA_presel") {
+        if (mass() < 100)               continue;
+        if (n_jets() < 1)               continue;
+        if (nb_medium() < 1)            continue;
+        if (leadIDMVA() < -0.2)         continue;
+        if (subleadIDMVA() < -0.2)      continue;
+      }
+
+
       else if (tag == "ttHLeptonicMedium") {
         if (mass() < 100)                               continue;
         if (n_jets() < 2)                               continue;

@@ -207,6 +207,8 @@ plt.xlabel('# Signal Events')
 ax1.set_ylabel('Significance (Z_A)')
 ax1.tick_params('y', colors = 'green')
 plt.ylim([0.0, 3.0])
+l, r = plt.xlim()
+plt.xlim([1.0, r])
 
 #if not do_reference_bdt:
 #  ax2 = ax1.twinx()

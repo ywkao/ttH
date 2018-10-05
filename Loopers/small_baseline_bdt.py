@@ -109,43 +109,43 @@ def calc_za_and_unc(file_pattern):
   return results
 
 vars = { # dictionary of all potential variables to study
-	"helicity_angle" : { "name" : "helic", "type" : "double", "function" : "helicity(lead_photon, sublead_photon)", "latex_name" : "Helicity Angle ($\\theta$)"},
+	#"helicity_angle" : { "name" : "helic", "type" : "double", "function" : "helicity(lead_photon, sublead_photon)", "latex_name" : "Helicity Angle ($\\theta$)"},
 	"lepton_pt" : { "name" : "lep_pt_", "type" : "double", "function" : "leps[0].Pt()", "latex_name" : "Lepton $p_T$"},
-	"min_dr_lead_pho" : { "name" : "min_dr_lead_photon", "type" : "double", "function" : "min_dr(lead_photon, objects)", "latex_name" : "Min ($\\Delta R(\\gamma_{\\text{lead}}, \\text{leptons/jets})$)"},
-	"min_dr_sublead_pho" : { "name" : "min_dr_sublead_photon", "type" : "double", "function" : "min_dr(sublead_photon, objects)", "latex_name" : "Min ($\\Delta R(\\gamma_{\\text{sublead}}, \\text{leptons/jets})$)"},
-	"n_leps" : { "name" : "n_leps_", "type" : "int", "function" : "leps.size()", "latex_name" : "$N_{\\text{leps}}$"},
-	"lepton_eta" : { "name" : "lep_eta_", "type" : "double", "function" : "leps[0].Eta()", "latex_name" : "Lepton $\eta$"},
+	#"min_dr_lead_pho" : { "name" : "min_dr_lead_photon", "type" : "double", "function" : "min_dr(lead_photon, objects)", "latex_name" : "Min ($\\Delta R(\\gamma_{\\text{lead}}, \\text{leptons/jets})$)"},
+	#"min_dr_sublead_pho" : { "name" : "min_dr_sublead_photon", "type" : "double", "function" : "min_dr(sublead_photon, objects)", "latex_name" : "Min ($\\Delta R(\\gamma_{\\text{sublead}}, \\text{leptons/jets})$)"},
+	#"n_leps" : { "name" : "n_leps_", "type" : "int", "function" : "leps.size()", "latex_name" : "$N_{\\text{leps}}$"},
+	#"lepton_eta" : { "name" : "lep_eta_", "type" : "double", "function" : "leps[0].Eta()", "latex_name" : "Lepton $\eta$"},
 	"nb_loose" : { "name" : "nb_loose_", "type" : "int", "function" : "nb_loose()", "latex_name" : "$N_{\\text{b-jets}}$ (loose)"},
 	"max_btag" : { "name" : "max1_btag_", "type" : "double", "function" : "btag_scores_sorted[0].second", "latex_name" : "highest $b$-tag score"},
-	"second_max_btag" : { "name" : "max2_btag_", "type" : "double", "function" : "btag_scores_sorted[1].second", "latex_name" : "2nd highest $b$-tag score"},
-	"dR_higgs_lep" : { "name" : "dR_higgs_lep", "type" : "double", "function" : "diphoton.DeltaR(leps[0])", "latex_name" : "$\Delta R(p_{\gamma \gamma}, \\text{lep})$"},
-	"dR_higgs_W" : { "name" : "dR_higgs_W", "type" : "double", "function" : "deltaR_Higgs_W(jets, diphoton)", "latex_name" : "$\Delta R(p_{\gamma \gamma}, W)$"},
-	"pt_higgs" : { "name" : "pt_higgs", "type" : "double", "function" : "diphoton.Pt() / diphoton.M()", "latex_name" : "$p_T^{\gamma \gamma} / m_{\gamma \gamma}$"},
-	"diphoton_dR" : { "name" : "dipho_deltaR", "type" : "double", "function" : "lead_photon.DeltaR(sublead_photon)", "latex_name" : "$\Delta R(\gamma_1, \gamma_2)$"},
+	#"second_max_btag" : { "name" : "max2_btag_", "type" : "double", "function" : "btag_scores_sorted[1].second", "latex_name" : "2nd highest $b$-tag score"},
+	#"dR_higgs_lep" : { "name" : "dR_higgs_lep", "type" : "double", "function" : "diphoton.DeltaR(leps[0])", "latex_name" : "$\Delta R(p_{\gamma \gamma}, \\text{lep})$"},
+	#"dR_higgs_W" : { "name" : "dR_higgs_W", "type" : "double", "function" : "deltaR_Higgs_W(jets, diphoton)", "latex_name" : "$\Delta R(p_{\gamma \gamma}, W)$"},
+	#"pt_higgs" : { "name" : "pt_higgs", "type" : "double", "function" : "diphoton.Pt() / diphoton.M()", "latex_name" : "$p_T^{\gamma \gamma} / m_{\gamma \gamma}$"},
+	#"diphoton_dR" : { "name" : "dipho_deltaR", "type" : "double", "function" : "lead_photon.DeltaR(sublead_photon)", "latex_name" : "$\Delta R(\gamma_1, \gamma_2)$"},
 	"max_phoIDMVA" : { "name" : "maxIDMVA_", "type" : "double", "function" : "leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA()", "latex_name" : "Max $\gamma$ ID MVA"},
 	"min_phoIDMVA" : { "name" : "minIDMVA_", "type" : "double", "function" : "leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA()", "latex_name" : "Min $\gamma$ ID MVA"},
-	"ht" : { "name" : "ht_", "type" : "double", "function" : "get_ht(jets)", "latex_name" : "$H_T$"},
+	#"ht" : { "name" : "ht_", "type" : "double", "function" : "get_ht(jets)", "latex_name" : "$H_T$"},
 	"n_jets" : { "name" : "njets_", "type" : "int", "function" : "n_jets()", "latex_name" : "$N_{\\text{jets}}$"},
-	"jet1_pt" : { "name" : "jet1_pt_", "type" : "double", "function" : "jet_pt1()", "latex_name" : "Jet 1 $p_T$"},
-	"jet2_pt" : { "name" : "jet2_pt_", "type" : "double", "function" : "jet_pt2()", "latex_name" : "Jet 2 $p_T$"},
-	"jet3_pt" : { "name" : "jet3_pt_", "type" : "double", "function" : "jet_pt3()", "latex_name" : "Jet 3 $p_T$"},
-	"jet4_pt" : { "name" : "jet4_pt_", "type" : "double", "function" : "jet_pt4()", "latex_name" : "Jet 4 $p_T$"},
-	"jet5_pt" : { "name" : "jet5_pt_", "type" : "double", "function" : "jet_pt5()", "latex_name" : "Jet 5 $p_T$"}, 
-	"jet1_eta" : { "name" : "jet1_eta_", "type" : "double", "function" : "jet_eta1()", "latex_name" : "Jet 1 $\eta$"},
-        "jet2_eta" : { "name" : "jet2_eta_", "type" : "double", "function" : "jet_eta2()", "latex_name" : "Jet 2 $\eta$"},
-        "jet3_eta" : { "name" : "jet3_eta_", "type" : "double", "function" : "jet_eta3()", "latex_name" : "Jet 3 $\eta$"},
-        "jet4_eta" : { "name" : "jet4_eta_", "type" : "double", "function" : "jet_eta4()", "latex_name" : "Jet 4 $\eta$"},
-        "jet5_eta" : { "name" : "jet5_eta_", "type" : "double", "function" : "jet_eta5()", "latex_name" : "Jet 5 $\eta$"},
-	"lead_pt_over_m" : { "name" : "leadptoM_", "type" : "double", "function" : "lead_ptoM()", "latex_name" : "Lead $p_T / m_{\gamma \gamma}$"},
-	"sublead_pt_over_m" : { "name" : "subleadptoM_", "type" : "double", "function" : "sublead_ptoM()", "latex_name" : "Sublead $p_T / m_{\gamma \gamma}$"},
-	"lead_eta" : { "name" : "lead_eta_", "type" : "double", "function" : "leadEta()", "latex_name" : "Lead Photon $\eta$"},
-	"sublead_eta" : { "name" : "sublead_eta_", "type" : "double", "function" : "subleadEta()", "latex_name" : "Sublead Photon $\eta$"},
+	#"jet1_pt" : { "name" : "jet1_pt_", "type" : "double", "function" : "jet_pt1()", "latex_name" : "Jet 1 $p_T$"},
+	#"jet2_pt" : { "name" : "jet2_pt_", "type" : "double", "function" : "jet_pt2()", "latex_name" : "Jet 2 $p_T$"},
+	#"jet3_pt" : { "name" : "jet3_pt_", "type" : "double", "function" : "jet_pt3()", "latex_name" : "Jet 3 $p_T$"},
+	#"jet4_pt" : { "name" : "jet4_pt_", "type" : "double", "function" : "jet_pt4()", "latex_name" : "Jet 4 $p_T$"},
+	#"jet5_pt" : { "name" : "jet5_pt_", "type" : "double", "function" : "jet_pt5()", "latex_name" : "Jet 5 $p_T$"}, 
+	#"jet1_eta" : { "name" : "jet1_eta_", "type" : "double", "function" : "jet_eta1()", "latex_name" : "Jet 1 $\eta$"},
+        #"jet2_eta" : { "name" : "jet2_eta_", "type" : "double", "function" : "jet_eta2()", "latex_name" : "Jet 2 $\eta$"},
+        #"jet3_eta" : { "name" : "jet3_eta_", "type" : "double", "function" : "jet_eta3()", "latex_name" : "Jet 3 $\eta$"},
+        #"jet4_eta" : { "name" : "jet4_eta_", "type" : "double", "function" : "jet_eta4()", "latex_name" : "Jet 4 $\eta$"},
+        #"jet5_eta" : { "name" : "jet5_eta_", "type" : "double", "function" : "jet_eta5()", "latex_name" : "Jet 5 $\eta$"},
+	#"lead_pt_over_m" : { "name" : "leadptoM_", "type" : "double", "function" : "lead_ptoM()", "latex_name" : "Lead $p_T / m_{\gamma \gamma}$"},
+	#"sublead_pt_over_m" : { "name" : "subleadptoM_", "type" : "double", "function" : "sublead_ptoM()", "latex_name" : "Sublead $p_T / m_{\gamma \gamma}$"},
+	#"lead_eta" : { "name" : "lead_eta_", "type" : "double", "function" : "leadEta()", "latex_name" : "Lead Photon $\eta$"},
+	#"sublead_eta" : { "name" : "sublead_eta_", "type" : "double", "function" : "subleadEta()", "latex_name" : "Sublead Photon $\eta$"},
 	"lead_psv" : { "name" : "leadPSV_", "type" : "int", "function" : "leadPixelSeed()", "latex_name" : "Lead PSV"},
 	"sublead_psv" : { "name" : "subleadPSV_", "type" : "int", "function" : "subleadPixelSeed()", "latex_name" : "Sublead PSV"},
-	"diphoton_cosine_delta_phi" : { "name" : "dipho_cosphi_", "type" : "double", "function" : "dipho_cosphi()", "latex_name" : "$|\cos(\Delta \phi (\gamma_1, \gamma_2))|$"},
-	"diphoton_rapidity" : { "name" : "dipho_rapidity_", "type" : "double", "function" : "dipho_rapidity()", "latex_name" : "$Y_{\gamma \gamma}$"},
+	#"diphoton_cosine_delta_phi" : { "name" : "dipho_cosphi_", "type" : "double", "function" : "dipho_cosphi()", "latex_name" : "$|\cos(\Delta \phi (\gamma_1, \gamma_2))|$"},
+	#"diphoton_rapidity" : { "name" : "dipho_rapidity_", "type" : "double", "function" : "dipho_rapidity()", "latex_name" : "$Y_{\gamma \gamma}$"},
 	"met" : { "name" : "met_", "type" : "double", "function" : "MetPt()", "latex_name" : "$E_T^{\\text{miss}}$"},
-	"mt" : { "name" : "mt_", "type" : "double", "function" : "mT()", "latex_name" : "$m_T(l, E_T^{\\text{miss}})$"}	
+	#"mt" : { "name" : "mt_", "type" : "double", "function" : "mT()", "latex_name" : "$m_T(l, E_T^{\\text{miss}})$"}	
 }
 
 
@@ -178,10 +178,33 @@ baseline_vars = [ # variables to store in the baseline BDT that we use as a star
 	#"diphoton_dR"	
 ]
 
+#baseline_vars = [
+#	"lead_psv",
+#	"lead_pt_over_m",
+#	"sublead_psv",
+#	"max_btag",
+#	"sublead_pt_over_m",
+#	"jet2_pt",
+#	"lepton_pt",
+#	"jet3_pt",
+#	"max_phoIDMVA",
+#	"second_max_btag",
+#	"min_phoIDMVA",
+#	"jet3_eta",
+#	"met",
+#	"diphoton_cosine_delta_phi",
+#	"jet1_pt",
+#	"n_jets",
+#	"lead_eta",
+#	"sublead_eta",
+#	"lepton_eta",
+#	"nb_loose",
+#]
+
 do_baseline = True
-do_individual_vars = True
-do_make_baseline = False
-do_table = True
+do_individual_vars = False
+do_make_baseline = True
+do_table = False
 tag = "7var_5Oct2018"
 
 # First, remove all variables 

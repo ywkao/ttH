@@ -42,6 +42,8 @@ os.system("./ttH%sLooper %s %s %s %s" % (args.channel, args.selection, args.year
 os.chdir("Optimization")
 if args.randomize:
   os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root --randomize" % (args.ext, args.channel, args.tag, args.ext))
+elif args.invert:
+  os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root --invert" % (args.ext, args.channel, args.tag, args.ext))
 else:
   os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root" % (args.ext, args.channel, args.tag, args.ext))
 
