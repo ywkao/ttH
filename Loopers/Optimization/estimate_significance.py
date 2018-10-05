@@ -11,6 +11,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("file", help = "input root file", type=str)
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
+parser.add_argument("-i", "--invert", help = "invert the test/train split", action="store_true")
 #parser.add_argument("file2", help = "second input root file (for comparing two different bdts)", type=str, required=False)
 #parser.add_argument("file3", help = "third input root file (for comparing three different bdts)", type=str, required=False)
 args = parser.parse_args()
@@ -23,6 +24,11 @@ def Z_A(s, b):
   if b < 0:
     b = 0
   return math.sqrt(2 * ( ((s+b) * math.log(1 + (s/b) )) - s) ) 
+
+def unc_ZA(s, b, ds, db):
+  Zs = math.log(1 + (s/b)) / Z_A(s,b)
+  Zb = (math.log(1 + (s/b)) - (s/b)) / Z_A(s,b)
+  return ((Zs*ds)**2 + (Zb*db)**2)**(0.5)
 
 def find_nearest(array,value):
     val = numpy.ones_like(array)*value
@@ -46,8 +52,12 @@ tree = f.Get("t")
 
 train_frac = 0.5
 rand_branch = "super_rand_" if args.randomize else "rand_"
-selection_signal = "label_ == 1 && %s > %.10f" % (rand_branch, train_frac)
-selection_bkg = "label_ == 0 && %s > %.10f" % (rand_branch, train_frac)
+if args.invert:
+  selection_signal = "label_ == 1 && %s <= %.10f" % (rand_branch, train_frac)
+  selection_bkg = "label_ == 0 && %s <= %.10f" % (rand_branch, train_frac)
+else:
+  selection_signal = "label_ == 1 && %s > %.10f" % (rand_branch, train_frac)
+  selection_bkg = "label_ == 0 && %s > %.10f" % (rand_branch, train_frac)
 selection_data = "label_ == 2 && mass_ >= 100 && mass_ <= 180"
 selection_sideband = "mass_ >= 100 && mass_ <= 180"
 
@@ -76,15 +86,20 @@ n_bkg_data_ref = []
 
 sig_mc = []
 sig_data = []
+sig_unc_mc = []
+sig_unc_data = []
 sig_mc_ref = []
 sig_data_ref = []
+sig_unc_mc_ref = []
+sig_unc_data_ref = []
+
 
 # for each signal efficiency between 0-100%, calculate Z_A
 
 do_simple_estimate = True # estimate background as a constant rather than an expontential fit
 
 # helper function to calculate Z_A
-def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, quants_data, n_sig_data, n_bkg_data, sig_data, name):
+def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, sig_unc_mc, quants_data, n_sig_data, n_bkg_data, sig_data, sig_unc_data, name):
   sig_mass = root_numpy.tree2array(tree, branches = "mass_", selection = selection_signal + " && " + selection_base)
   sig_weights = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_signal + " && " + selection_base)
 
@@ -97,6 +112,8 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
   # calculate s
   sig_events = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_signal + " && " + selection_base + " && " + selection_mass)
   s = (1 / (1 - train_frac)) * numpy.sum(sig_events)
+  s_unc = (1 / (1 - train_frac)) * math.sqrt(numpy.sum(sig_events**2))
+  print len(sig_events), s_unc / s
 
   # calculate b from mc
   selection_bkg_sidebands = selection_bkg + " && " + selection_base + " && " + selection_sideband
@@ -107,7 +124,9 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
   #b_mc = (1 / (1 - train_frac)) * numpy.sum(bkg_weights)
 
   if do_simple_estimate:
-    b_mc = (1 / (1 - train_frac)) * utils.constant_estimate(bkg_events, bkg_weights, mean_eff, sigma_eff, 0)
+    b_mc, unc_b_mc = utils.constant_estimate(bkg_events, bkg_weights, mean_eff, sigma_eff, 0)
+    b_mc *= (1 / (1 - train_frac)) # account for train/test split
+    unc_b_mc *= (1 / (1 - train_frac)) # account for train/test split
 
   else:
     try:
@@ -117,9 +136,11 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
       return
 
   z_mc = Z_A(s, b_mc)
+  unc_z_mc = unc_ZA(s, b_mc, s_unc, unc_b_mc)
   quants_mc.append(quantiles[i])
   n_sig_mc.append(s)
   sig_mc.append(z_mc)
+  sig_unc_mc.append(unc_z_mc)
   n_bkg_mc.append(b_mc)
 
   # calculate b from fit to data sidebands
@@ -129,7 +150,7 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
     return # fit doesn't seem to work with less than 5 events
 
   elif do_simple_estimate:
-    b_data = utils.constant_estimate(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, 0)
+    b_data, unc_b_data = utils.constant_estimate(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, 0)
 
   else:
     try: 
@@ -139,12 +160,17 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
       return
 
   z_data = Z_A(s, b_data)
+  unc_z_data = unc_ZA(s, b_data, s_unc, unc_b_data)
 
-  print i, s, b_mc, b_data, z_mc, z_data
+  print i, s, s_unc, b_mc, unc_b_mc, b_data, unc_b_data
+  print i, z_mc, unc_z_mc, z_data, unc_z_data
+  print (unc_z_mc * 100) / z_mc, (unc_z_data * 100) / z_data
+  #print i, s, b_mc, b_data, z_mc, z_data
 
   quants_data.append(quantiles[i])
   n_sig_data.append(s)
   sig_data.append(z_data)
+  sig_unc_data.append(unc_z_data)
   n_bkg_data.append(b_data)
 
 
@@ -153,7 +179,7 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
 print "Significance estimates for our BDT: s, b_mc, b_data, z_mc, z_data"
 for i in range(len(quantiles)):
   selection_base = "mva_score_ >= %.10f" % mva_cut[i][0]
-  calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, quants_data, n_sig_data, n_bkg_data, sig_data, name)
+  calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, sig_unc_mc, quants_data, n_sig_data, n_bkg_data, sig_data, sig_unc_data, name)
 
 do_reference_bdt = False
 
@@ -162,9 +188,9 @@ if do_reference_bdt:
   # Calculate for reference BDT
   for i in range(len(quantiles_ref)):
     selection_base = "reference_mva_ >= %.10f && pass_ref_presel_ == 1" % mva_cut_ref[i][0]
-    calc_significance(selection_base, quants_mc_ref, n_sig_mc_ref, n_bkg_mc_ref, sig_mc_ref, quants_data_ref, n_sig_data_ref, n_bkg_data_ref, sig_data_ref, name + "_ref")
+    calc_significance(selection_base, quants_mc_ref, n_sig_mc_ref, n_bkg_mc_ref, sig_mc_ref, sig_unc_mc_ref, quants_data_ref, n_sig_data_ref, n_bkg_data_ref, sig_data_ref, sig_unc_data_ref, name + "_ref")
 
-numpy.savez('ZA_curves/%s' % args.file.replace(".root", ""), za_mc = sig_mc, za_data = sig_data, n_sig_mc = n_sig_mc, n_sig_data = n_sig_data, n_bkg_mc = n_bkg_mc, n_bkg_data = n_bkg_data)
+numpy.savez('ZA_curves/%s' % args.file.replace(".root", ""), za_mc = sig_mc, za_data = sig_data, n_sig_mc = n_sig_mc, n_sig_data = n_sig_data, n_bkg_mc = n_bkg_mc, n_bkg_data = n_bkg_data, za_unc_mc = sig_unc_mc, za_unc_data = sig_unc_data)
   
 ### Make diagnostic plots ###
 import matplotlib

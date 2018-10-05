@@ -22,19 +22,22 @@ def gaus(x, a, b, c):
   return a * numpy.exp(-0.5 * (( (x - b) / c ) ** 2))
 
 def constant_estimate(data, weights, mean_eff, sigma_eff, smear):
-  if smear == 0:
-    return numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
-  else:
-    h = ROOT.TH1D("h_sig", "", 1, 100, 180)
-    for i in range(len(data)):
-      h.Fill(data[i], weights[i])
-    mc_yield = h.GetBinContent(1)
-    mc_unc = h.GetBinError(1)
-    if smear == -1:
-      mc_yield += -mc_unc
-    elif smear == 1:
-      mc_yield += mc_unc
-    return mc_yield * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  if numpy.sum(weights) < 0:
+    return 999, 999
+  est = numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  unc = math.sqrt(numpy.sum(weights**2)) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  return est, unc 
+  #else:
+  #  h = ROOT.TH1D("h_sig", "", 1, 100, 180)
+  #  for i in range(len(data)):
+  #    h.Fill(data[i], weights[i])
+  #  mc_yield = h.GetBinContent(1)
+  #  mc_unc = h.GetBinError(1)
+  #  if smear == -1:
+  #    mc_yield += -mc_unc
+  #  elif smear == 1:
+  #    mc_yield += mc_unc
+  #  return mc_yield * ((2 * 1.645 * sigma_eff) / (180. - 100.))
     #smear = random.gauss(0, mc_unc)
     #print numpy.sum(weights), mc_yield, mc_yield + smear
     #return mc_yield + smear

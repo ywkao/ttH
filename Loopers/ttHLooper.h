@@ -215,7 +215,7 @@ bool has_ttX_overlap(TString currentFileTitle, int lead_prompt, int sublead_prom
 }
 
 bool is_low_stats_process(TString currentFileTitle) {
-  if (currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("QCD"))
+  if (currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("QCD") || currentFileTitle.Contains("DY"))
     return true;
   return false;
 }
@@ -465,7 +465,7 @@ void add_samples(TChain* ch, TString year) {
 
   for (int i = 0; i < vSamples.size(); i++) {
     TString tag_temp = vSamples[i].Contains("EGamma") ? "v102.1" : tag;
-    TString year_temp = vSamples[i].Contains("EGamma") ? "2018" : "2017";
+    TString year_temp = vSamples[i].Contains("EGamma") ? "2018" : year;
     ch->Add(location + "/" + vSamples[i] + "__ttH_Babies_" + tag_temp + "_" + year_temp + "/merged_ntuple.root");
   }
 

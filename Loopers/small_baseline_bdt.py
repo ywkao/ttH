@@ -9,6 +9,7 @@ parser.add_argument("channel", help = "Hadronic or Leptonic", type=str)
 parser.add_argument("selection", help = "e.g. ttHLeptonicLoose", type=str)
 parser.add_argument("year", help = "e.g. 2016 or 2017", type=str)
 parser.add_argument("n_trainings", help = "number of trainings to run", type=int)
+parser.add_argument("--do_stat_unc", help = "instead of running many test/train splits, run just 2 and use propagate statistical uncertainties through ZA", action="store_true")
 parser.add_argument("--dry_run", help = "just check the workflow (don't actually train BDTs)", action="store_true")
 args = parser.parse_args()
 
@@ -21,63 +22,90 @@ def find_nearest(array,value):
     idx = (numpy.abs(array-val)).argmin()
     return array[idx], idx
 
-mean_data = 2.588
-mean_mc = 3.147
-unc_data = 0.096
-unc_mc = 0.091
-
 def calc_za_and_unc(file_pattern):
   files = glob.glob(file_pattern)
   max_za_data = []
   max_za_mc = []
-  for file in files:
-    data = numpy.load(file)
-    value, start_idx = find_nearest(data["n_sig_mc"], 2.5)
-    za_data = data["za_data"] # for data, we already require at least 4 data events in sideband to trust Z_A estimate
-    za_mc = data["za_mc"][start_idx:] # for mc, require at least 2.5 signal events to trust Z_A estimate
+  max_za_unc_data = []
+  max_za_unc_mc = []
 
-    max_za_data.append(numpy.max(za_data))
-    max_za_mc.append(numpy.max(za_mc))
 
-  mean_mc = numpy.mean(max_za_mc)
-  mean_unc_mc = unc_mc / (float(len(files)) ** 0.5)
-  std_dev_mc = numpy.std(max_za_mc)
+  if args.do_stat_unc: 
+    if len(files) != 2:
+      print "Should only be 2 files if doing statistical uncertainties!"
+      return {}
+    for file in files:
+      data = numpy.load(file)
+      value, start_idx = find_nearest(data["n_sig_mc"], 2)
+      za_data = data["za_data"] # for data, we already require at least 4 data events in sideband to trust Z_A estimate
+      za_mc = data["za_mc"][start_idx:] # for mc, require at least 2.5 signal events to trust Z_A estimate
+      za_unc_data = data["za_unc_data"]
+      za_unc_mc = data["za_unc_mc"][start_idx:]
 
-  mean_data = numpy.mean(max_za_data)
-  #mean_unc_data = unc_data
-  mean_unc_data = unc_data / (float(len(files)) ** 0.5)
-  std_dev_data = numpy.std(max_za_data)  
+      idx_mc = numpy.argmax(za_mc)
+      idx_data = numpy.argmax(za_data)
 
-  #print "[data] Mean of max Z_A: %.3f +/- %.3f " % (numpy.mean(max_za_data), unc_data / (float(len(files)) ** 0.5))
-  #print "[mc] Mean of max Z_A: %.3f +/- %.3f " % (numpy.mean(max_za_mc), unc_mc / (float(len(files)) ** 0.5))
+      max_za_data.append(za_data[idx_data])
+      max_za_unc_data.append(za_unc_data[idx_data])
+      max_za_mc.append(za_mc[idx_mc])
+      max_za_unc_mc.append(za_unc_mc[idx_mc])
 
-  #print "[data] Std. Dev of max Z_A: %.3f " % numpy.std(max_za_data)
-  #print "[mc] Std. Dev of max Z_A: %.3f " % numpy.std(max_za_mc)
+    avg_max_za_data = numpy.mean(max_za_data)
+    avg_max_za_data_unc = numpy.mean(max_za_unc_data) / numpy.sqrt(len(max_za_unc_data))
+    avg_max_za_mc = numpy.mean(max_za_mc)
+    avg_max_za_mc_unc = numpy.mean(max_za_unc_mc) / numpy.sqrt(len(max_za_unc_mc))
 
-  vars_of_interest = {
-        "max_za_data" : [max_za_data, "Max. Z_A (data)"],
-        "max_za_mc" : [max_za_mc, "Max. Z_A (mc)"],
-  }
+    #print "[data] Mean of max Z_A: %.3f +/- %.3f " % (avg_max_za_data, avg_max_za_data_unc)
+    #print "[mc] Mean of max Z_A: %.3f +/- %.3f " % (avg_max_za_mc, avg_max_za_mc_unc)
 
-  fig = plt.figure()
-  bins = numpy.linspace(2, 4, 40)
-  for var, info in vars_of_interest.iteritems():
-    dist_to_plot = info[0]
-    plt.hist(dist_to_plot, label = info[1], bins = bins)
-    plt.ylabel("# of MVA Trainings")
-    plt.xlabel(info[1])
-    plt.xlim([2.0, 4.0])
-    plt.ylim([0.0, 15.0])
-    plt.legend(loc = 'upper right')
-    plt.text(3.5, 10, "Mean       = %.2f" % numpy.mean(dist_to_plot))
-    plt.text(3.5, 8,  "Std. Dev. = %.2f" % numpy.std(dist_to_plot))
-    #print file_pattern.replace(".npz", "") + var +'.pdf'
-    plt.savefig("n_minus_one_plots/" + (file_pattern.replace(".npz", "")).replace("Optimization/ZA_curves/", "") + var +'.pdf')
-    plt.close('all')
+    results = {         "mean_mc" : avg_max_za_mc, "mean_unc_mc" : avg_max_za_mc_unc,
+			"mean_data" : avg_max_za_data, "mean_unc_data" : avg_max_za_data_unc,
+          }
 
-  results = { 	"mean_mc" : mean_mc, "mean_unc_mc" : mean_unc_mc, "std_dev_mc" : std_dev_mc,
-		"mean_data" : mean_data, "mean_unc_data" : mean_unc_data, "std_dev_data" : std_dev_data,
-	}
+
+  else:
+    for file in files:
+      data = numpy.load(file)
+      value, start_idx = find_nearest(data["n_sig_mc"], 2.5)
+      za_data = data["za_data"] # for data, we already require at least 4 data events in sideband to trust Z_A estimate
+      za_mc = data["za_mc"][start_idx:] # for mc, require at least 2.5 signal events to trust Z_A estimate
+
+      max_za_data.append(numpy.max(za_data))
+      max_za_mc.append(numpy.max(za_mc))
+
+    mean_mc = numpy.mean(max_za_mc)
+    mean_unc_mc = unc_mc / (float(len(files)) ** 0.5)
+    std_dev_mc = numpy.std(max_za_mc)
+
+    mean_data = numpy.mean(max_za_data)
+    #mean_unc_data = unc_data
+    mean_unc_data = unc_data / (float(len(files)) ** 0.5)
+    std_dev_data = numpy.std(max_za_data)  
+
+    vars_of_interest = {
+	  "max_za_data" : [max_za_data, "Max. Z_A (data)"],
+	  "max_za_mc" : [max_za_mc, "Max. Z_A (mc)"],
+    }
+
+    fig = plt.figure()
+    bins = numpy.linspace(2, 4, 40)
+    for var, info in vars_of_interest.iteritems():
+      dist_to_plot = info[0]
+      plt.hist(dist_to_plot, label = info[1], bins = bins)
+      plt.ylabel("# of MVA Trainings")
+      plt.xlabel(info[1])
+      plt.xlim([2.0, 4.0])
+      plt.ylim([0.0, 15.0])
+      plt.legend(loc = 'upper right')
+      plt.text(3.5, 10, "Mean       = %.2f" % numpy.mean(dist_to_plot))
+      plt.text(3.5, 8,  "Std. Dev. = %.2f" % numpy.std(dist_to_plot))
+      #print file_pattern.replace(".npz", "") + var +'.pdf'
+      plt.savefig("n_minus_one_plots/" + (file_pattern.replace(".npz", "")).replace("Optimization/ZA_curves/", "") + var +'.pdf')
+      plt.close('all')
+
+    results = { 	"mean_mc" : mean_mc, "mean_unc_mc" : mean_unc_mc, "std_dev_mc" : std_dev_mc,
+		  "mean_data" : mean_data, "mean_unc_data" : mean_unc_data, "std_dev_data" : std_dev_data,
+	  }
   return results
 
 vars = { # dictionary of all potential variables to study
@@ -139,18 +167,28 @@ baseline_vars = [ # variables to store in the baseline BDT that we use as a star
 	"max_phoIDMVA",
 	"min_phoIDMVA",
 	"lepton_pt",
+	#"max_btag",
+	#"second_max_btag",
+	#"pt_higgs",
+	#"lead_pt_over_m",
+	#"sublead_pt_over_m",
+	#"lepton_eta",
+	#"met",
+	#"mt",
+	#"diphoton_dR"	
 ]
 
-do_baseline = False
-do_individual_vars = False
+do_baseline = True
+do_individual_vars = True
+do_make_baseline = False
 do_table = True
-
+tag = "7var_5Oct2018"
 
 # First, remove all variables 
 
 baseline_results = {}
 
-if do_baseline or do_individual_vars:
+if do_baseline or do_individual_vars or do_make_baseline:
   for var, info in vars.iteritems():
       print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
       os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
@@ -167,7 +205,8 @@ if not (do_baseline or do_individual_vars):
 else:
   # First, remove all variables and then add them all back in so we know we are starting with all variables
   n_baseline = 100
-  tag = "7var_2Oct2018"
+  if args.do_stat_unc:
+    n_baseline = 2
   if do_baseline:
     build_success = os.system("make")
     if build_success != 0:
@@ -176,14 +215,18 @@ else:
 
     if not args.dry_run:
       # Train BDT
-      print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline)
-      os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline))
+      if args.do_stat_unc:
+        print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s' --do_stat_unc" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline)
+        os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s' --do_stat_unc" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline))
+      else:
+	print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline)
+	os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline))
 
       baseline_results = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_baseline_%s_*_bdt.npz" % (args.channel, tag))
       mean_data = baseline_results["mean_data"]
       mean_mc = baseline_results["mean_mc"]
-      unc_data = baseline_results["std_dev_data"]
-      unc_mc = baseline_results["std_dev_mc"] 
+      unc_data = baseline_results["mean_unc_data"]
+      unc_mc = baseline_results["mean_unc_mc"] 
 
   if do_individual_vars:
     for var, info in vars.iteritems():
@@ -202,11 +245,15 @@ else:
 
       if not args.dry_run:
 	# Then, train the bdt
-	print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "add_'%s'" % var, args.n_trainings)
-	os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "add_'%s'" % var, args.n_trainings))
+	if args.do_stat_unc:
+	  print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s' --do_stat_unc" % (args.channel, args.selection, args.year, "add_'%s'_%s" % (var, tag), args.n_trainings)
+          os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s' --do_stat_unc" % (args.channel, args.selection, args.year, "add_'%s'_%s" % (var, tag), args.n_trainings))
+	else:
+	  print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "add_'%s'" % var, args.n_trainings)
+	  os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "add_'%s'" % var, args.n_trainings))
 	# Then, calculate <Max Z_A>_N and estimated uncertainty 
-	print "Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s_*_bdt.npz" % (args.channel, var)
-	info["results"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s__*_bdt.npz" % (args.channel, var)) 
+	print "Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s_%s_*_bdt.npz" % (args.channel, var, tag)
+	info["results"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s_%s__*_bdt.npz" % (args.channel, var, tag)) 
 
       # Now, remove the variable from the BDT 
       print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
@@ -214,12 +261,11 @@ else:
 
 
 if do_table:
-  tag = "7var_2Oct2018"
   baseline_results = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_baseline_%s_*_bdt.npz" % (args.channel, tag))
   mean_data = baseline_results["mean_data"]
   mean_mc = baseline_results["mean_mc"]
-  unc_data = baseline_results["std_dev_data"]
-  unc_mc = baseline_results["std_dev_mc"]
+  unc_data = baseline_results["mean_unc_data"]
+  unc_mc = baseline_results["mean_unc_mc"]
   print baseline_results
 
   print "\\begin{center} \\Fontvi"
@@ -232,7 +278,7 @@ if do_table:
       # Check if it's already in the baseline BDT
       if var in baseline_vars:
         continue
-      feature_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s_*_bdt.npz" % (args.channel, var))
+      feature_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s_%s_*_bdt.npz" % (args.channel, var, tag))
       feature_scores.append([var, info, feature_score])
       max_za_mc_scores.append(feature_score["mean_mc"])
   sort_indices = numpy.argsort(max_za_mc_scores)[::-1]

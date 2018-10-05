@@ -79,12 +79,12 @@ print sum_pos_weights, sum_neg_weights
 # Define BDT parameters
 param = { 
     	'max_depth': 4,
-	'eta': 0.2,
+	'eta': 0.1,
 	'objective': 'binary:logistic',
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
-	'nthread' : 1,
+	'nthread' : 8,
 	'min_child_weight' : 1,
 	}
 
@@ -170,7 +170,7 @@ plt.ylabel('True Positive Rate (signal efficiency)')
 plt.legend(loc='lower right')
 plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
-estimate_za = False
+estimate_za = True
 if estimate_za:
   n_quantiles = 100
   signal_mva_scores = ks_test.logical_vector(pred_test, y_test, 1)

@@ -8,6 +8,7 @@ parser.add_argument("year", help = "e.g. 2016 or 2017", type=str)
 parser.add_argument("ext", help = "extension, e.g. '1'", type=str)
 parser.add_argument("tag", help = "tag to identify this training of the BDT", type=str)
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
+parser.add_argument("-i", "--invert", help = "invert the test/train split", action="store_true")
 args = parser.parse_args()
 
 build_success = os.system("make")
@@ -28,6 +29,8 @@ os.chdir("../MVAs")
 mva_baby = "../Loopers/MVABaby_ttH%s_%s.root" % (args.channel, args.ext)
 if args.randomize:
   os.system("python prep.py %s --randomize" % (mva_baby))
+elif args.invert:
+  os.system("python prep.py %s --invert" % (mva_baby))
 else:
   os.system("python prep.py %s" % (mva_baby))
 
