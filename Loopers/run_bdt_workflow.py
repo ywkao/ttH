@@ -9,6 +9,7 @@ parser.add_argument("ext", help = "extension, e.g. '1'", type=str)
 parser.add_argument("tag", help = "tag to identify this training of the BDT", type=str)
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
 parser.add_argument("-i", "--invert", help = "invert the test/train split", action="store_true")
+parser.add_argument("-m", "--multi", help = "run a multiclassifier based BDT", action="store_true")
 args = parser.parse_args()
 
 build_success = os.system("make")
@@ -35,20 +36,25 @@ else:
   os.system("python prep.py %s" % (mva_baby))
 
 hdf5_file = "ttH%s_%s_features.hdf5" % (args.channel, args.ext)
-os.system("python train.py %s %s %s %s" % (args.channel, hdf5_file, args.ext, args.tag))
-os.chdir("../Loopers")
-os.system("./ttH%sLooper %s %s %s %s" % (args.channel, args.selection, args.year, args.ext, args.channel + "_" + args.tag + "_" + args.ext + '_bdt.xml'))
 
-os.chdir("Optimization")
-if args.randomize:
-  os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root --randomize" % (args.ext, args.channel, args.tag, args.ext))
-elif args.invert:
-  os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root --invert" % (args.ext, args.channel, args.tag, args.ext))
+if not args.multi:
+  os.system("python train.py %s %s %s %s" % (args.channel, hdf5_file, args.ext, args.tag))
 else:
-  os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root" % (args.ext, args.channel, args.tag, args.ext))
+  os.system("python train.py %s %s %s %s --multi" % (args.channel, hdf5_file, args.ext, args.tag))
+
+if not args.multi:
+  os.chdir("../Loopers")
+  os.system("./ttH%sLooper %s %s %s %s" % (args.channel, args.selection, args.year, args.ext, args.channel + "_" + args.tag + "_" + args.ext + '_bdt.xml'))
+
+  os.chdir("Optimization")
+  if args.randomize:
+    os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root --randomize" % (args.ext, args.channel, args.tag, args.ext))
+  elif args.invert:
+    os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root --invert" % (args.ext, args.channel, args.tag, args.ext))
+  else:
+    os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root" % (args.ext, args.channel, args.tag, args.ext))
+  os.chdir("../")
 
 # Cleanup
-os.chdir("../")
 os.system("rm MVABaby_ttH%s_%s.root" % (args.channel, args.ext))
 os.system("rm ../MVAs/ttH%s_%s_features.hdf5" % (args.channel, args.ext))
-#os.system("rm Utils/random_map_%s_%s.txt" % (args.channel, args.ext))  # save random maps so that we can train multiple BDTs with the same test/train splits

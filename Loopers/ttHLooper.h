@@ -1,5 +1,6 @@
 #include "TLorentzVector.h"
 #include "ttH_process.h"
+#include "GoldenJSON/goodrun.cc"
 
 vector<Process*> generate_processes(TFile* f) {
   vector<Process*> v;
@@ -206,9 +207,28 @@ int categorize_process(TString currentFileTitle) {
   }
 }
 
+int multiclassifier_label(TString currentFileTitle, int genPhotonId) {
+  if (currentFileTitle.Contains("ttHJet"))
+    return 0;
+  else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || currentFileTitle.Contains("TTJets")) {
+    if (genPhotonId == 2) // pp
+      return 1;
+    else if (genPhotonId == 1) // pf
+      return 2;
+    else if (genPhotonId == 0) // ff
+      return 3;
+  }
+  else if (currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma")) {
+    return -1;
+  }
+  else
+    return 4;
+}
+
 bool has_ttX_overlap(TString currentFileTitle, int lead_prompt, int sublead_prompt) {
-  if (!(currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets")))
+  if (!(currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets"))) {
     return false;
+  }
   else if (lead_prompt != 0 && sublead_prompt != 0)
     return false;
   return true;
@@ -449,6 +469,27 @@ const vector<TString> vSamples_2018 = {"EGamma",
 };
 
 
+const char* json_2018 = "GoldenJSON/Cert_314472-322633_13TeV_PromptReco_Collisions18_JSON_snt.txt";
+const char* json_2017 = "GoldenJSON/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_snt.txt";
+const char* json_2016 = "GoldenJSON/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
+
+void set_json(TString year) {
+  const char* json_file;
+  json_file = year == "2018" ? json_2018 : ( year == "2017" ? json_2017 : ( year == "2016" ? json_2016 : ""));
+  set_goodrun_file(json_file);
+}
+
+bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
+  if (year == "2018" || year == "2017") { 
+    bool pass = goodrun(run, lumi_block);
+    if (!pass)
+      cout << run << " " << lumi_block << " failed golden json" << endl;
+    return pass;
+  }
+  else
+    return true;
+}
+
 /*const vector<TString> vSamples_2018 = {
 			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test",
 			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8_RunIISummer18MiniAOD-101X_upgrade2018_realistic_v7-v1_MINIAODSIM_test",
@@ -465,7 +506,7 @@ void add_samples(TChain* ch, TString year) {
 
   for (int i = 0; i < vSamples.size(); i++) {
     TString tag_temp = vSamples[i].Contains("EGamma") ? "v102.1" : tag;
-    TString year_temp = vSamples[i].Contains("EGamma") ? "2018" : year;
+    TString year_temp = year == "2018" ? (vSamples[i].Contains("EGamma") ? "2018" : "2017") : year;
     ch->Add(location + "/" + vSamples[i] + "__ttH_Babies_" + tag_temp + "_" + year_temp + "/merged_ntuple.root");
   }
 

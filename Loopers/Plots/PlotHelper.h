@@ -38,6 +38,7 @@ class Comparison
     Comparison(TCanvas* c1, vector<TH1D*> hData, TH1D* hMC);
     Comparison(TCanvas* c1, TH1D* hData, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hMC);
+    Comparison(TCanvas* c1, vector<TH1D*> hData, TH1D* hSignal, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData);
     ~Comparison();
@@ -168,7 +169,7 @@ class Comparison
     int mColor2;
     vector<int> mColorData;
 
-    const double topSpace = 0.35;
+    const double topSpace = 0.45;
     const double botSpace = 0.05;
     const double fs = 0.04;
 };
@@ -239,6 +240,30 @@ Comparison::Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hM
   default_options(c1);
   mVHData.push_back((TH1D*)hData->Clone("mHData"));
 
+  int nMCHists = hMC.size();
+  for (int i=0; i<nMCHists; i++) {
+    TString idx = Form("%d", i);
+    mVHMC.push_back((TH1D*)hMC[i]->Clone("mHMC"+idx));
+    //mVHRat.push_back((TH1D*)hData[i]->Clone("mHRat"+idx));
+  }
+
+  mHMC = (TH1D*)hMC[0]->Clone("mHMC");
+  for (int i=1; i<nMCHists; i++)
+    mHMC->Add(hMC[i]);
+
+  mVHSignal.push_back((TH1D*)hSignal->Clone("mHSignal"));
+}
+
+inline
+Comparison::Comparison(TCanvas* c1, vector<TH1D*> hData, TH1D* hSignal, vector<TH1D*> hMC)
+{
+  default_options(c1);
+  //mVHData.push_back((TH1D*)hData->Clone("mHData"));
+  for (int i = 0; i < hData.size(); i++) {
+    TString name = "mHData" + to_string(i);
+    mVHData.push_back((TH1D*)hData[i]->Clone(name));
+  }
+  
   int nMCHists = hMC.size();
   for (int i=0; i<nMCHists; i++) {
     TString idx = Form("%d", i);
@@ -901,7 +926,7 @@ void Comparison::annotate_plot()
     for (int i=0; i<mVHData.size(); i++)
       l1->AddEntry(mVHData[i], mVLegendLabels[i], "lep");
     for (int i=0; i<mVHSignal.size(); i++)
-      l1->AddEntry(mVHSignal[i], mVLegendLabels[i+1], "f");
+      l1->AddEntry(mVHSignal[i], mVLegendLabels[i+mVHData.size()], "f");
     int idxMC = mVHData.size() + mVHSignal.size();
     for (int i=0; i<mVHMC.size(); i++) {
       if (!mBothData) l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC+i], "f");

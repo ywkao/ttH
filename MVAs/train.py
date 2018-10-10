@@ -20,6 +20,7 @@ parser.add_argument("channel", help = "e.g. Hadronic or Leptonic", type=str)
 parser.add_argument("input", help = "input hdf5 file", type=str)
 parser.add_argument("ext", help = "extension, e.g. '1'", type=str)
 parser.add_argument("tag", help = "tag to identify this training", type=str)
+parser.add_argument("-m", "--multi", help = "run a multiclassifier based BDT", action="store_true")
 args = parser.parse_args()
 
 # Read features
@@ -29,21 +30,25 @@ feature_names = f['feature_names']
 
 global_features = f['global']
 label = f['label']
+multi_label = f['multi_label']
 weights = f['weights']
 mass = f['mass']
 
 global_features_validation = f['global_validation']
 label_validation = f['label_validation']
+multi_label_validation = f['multi_label_validation']
 weights_validation = f['weights_validation']
 mass_validation = f['mass_validation']
 
 global_features = numpy.asarray(global_features)
 label = numpy.asarray(label)
+multi_label = numpy.asarray(multi_label)
 weights = numpy.asarray(weights)
 mass = numpy.asarray(mass)
 
 global_features_validation = numpy.asarray(global_features_validation)
 label_validation = numpy.asarray(label_validation)
+multi_label_validation = numpy.asarray(multi_label_validation)
 weights_validation = numpy.asarray(weights_validation)
 mass_validation = numpy.asarray(mass_validation)
 
@@ -60,21 +65,42 @@ print global_features_validation.shape
 print label_validation.shape
 print weights_validation.shape
 
-x_train, y_train, weights_train = global_features, label, weights
-x_test, y_test, weights_test  = global_features_validation, label_validation, weights_validation
-
-#x_train, x_test, y_train, y_test, weights_train, weights_test = train_test_split(global_features, label, weights, test_size = 1 - train_frac)
+x_train, y_train, y_train_multi, weights_train = global_features, label, multi_label, weights
+x_test, y_test, y_test_multi, weights_test  = global_features_validation, label_validation, multi_label_validation, weights_validation
 
 X_train = pandas.DataFrame(data=x_train, columns = feature_names)
 X_test = pandas.DataFrame(data=x_test, columns = feature_names)
-#d_train = xgboost.DMatrix(X_train, label = y_train)
-d_train = xgboost.DMatrix(X_train, label = y_train, weight = weights_train)
-d_test = xgboost.DMatrix(X_test, label = y_test)
 
-sum_neg_weights = utils.sum_of_weights(weights, label, 0)
-sum_pos_weights = utils.sum_of_weights(weights, label, 1)
+if args.multi:
+  Y_train = y_train_multi 
+  Y_test = y_test_multi
+else:
+  Y_train = y_train
+  Y_test = y_test
+
+#unique, count =  numpy.unique(multi_label,return_counts=True)
+#weights_train = numpy.multiply(weights_train, numpy.where(multi_label == 0, 1/(count[0]/float(sum(count))), 1) )
+#weights_train = numpy.multiply(weights_train, numpy.where(multi_label == 1, 1/(count[1]/float(sum(count))), 1) )
+#weights_train = numpy.multiply(weights_train, numpy.where(multi_label == 2, 1/(count[2]/float(sum(count))), 1) )
+#weights_train = numpy.multiply(weights_train, numpy.where(multi_label == 3, 1/(count[3]/float(sum(count))), 1) )
+#weights_train = numpy.multiply(weights_train, numpy.where(multi_label == 4, 1/(count[4]/float(sum(count))), 1) )
+
+sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
+sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
 
 print sum_pos_weights, sum_neg_weights
+
+for i in range(len(weights_train)):
+  if label[i] == 1:
+    weights_train[i] *= (sum_neg_weights / sum_pos_weights)
+
+sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
+sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
+
+print sum_pos_weights, sum_neg_weights
+
+d_train = xgboost.DMatrix(X_train, label = Y_train, weight = weights_train)
+d_test = xgboost.DMatrix(X_test, label = Y_test)
 
 # Define BDT parameters
 param = { 
@@ -87,6 +113,11 @@ param = {
 	'nthread' : 8,
 	'min_child_weight' : 1,
 	}
+
+if args.multi:
+  param["num_class"] = 5
+  param["objective"] = "multi:softprob"
+  param["scale_pos_weight"] = 1
 
 print param
 
@@ -121,8 +152,16 @@ for name in feature_names:
 tmva_utils.convert_model(model, input_variables = input_variables, output_xml = args.channel + "_" + args.tag + "_" + args.ext + '_bdt.xml')
 
 # predict
-pred_train = bdt.predict(d_train)
-pred_test = bdt.predict(d_test)
+pred_train = bdt.predict(d_train, output_margin=args.multi)
+pred_test = bdt.predict(d_test, output_margin=args.multi)
+
+print pred_test.shape
+
+if args.multi:
+  pred_train = pred_train[:,0] 
+  pred_test = pred_test[:,0] 
+
+print pred_test.shape
 
 # analysis
 # ks test
@@ -185,9 +224,26 @@ if estimate_za:
   signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores}
   bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores}
 
-  za = significance_utils.za_scores(n_quantiles, signal_events, bkg_events)
+  za, za_unc, s, b = significance_utils.za_scores(n_quantiles, signal_events, bkg_events)
   za = numpy.asarray(za)
 
   max_za = numpy.max(za)
   print max_za
 
+  import matplotlib
+  matplotlib.use('Agg')
+  import matplotlib.pyplot as plt
+
+  fig = plt.figure()
+  ax1 = fig.add_subplot(111)
+  ax1.plot(s, za, label='MC', color = 'blue')
+  ax1.fill_between(s, numpy.asarray(za) - numpy.asarray(za_unc), numpy.asarray(za) + numpy.asarray(za_unc), color = 'blue', alpha = 0.25)
+  plt.xlabel('# Signal Events')
+  ax1.set_ylabel('Significance (Z_A)')
+
+  plt.ylim([0.0, 3.0])
+  l, r = plt.xlim()
+  plt.xlim([1.0, r])
+
+  ax1.legend(loc='upper right')
+  plt.savefig('za_curve.pdf')

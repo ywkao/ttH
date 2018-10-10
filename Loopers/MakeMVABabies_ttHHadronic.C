@@ -105,6 +105,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       bool isSignal = process_id_ == 0;
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+      int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
+      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
 
       // Variable definitions
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);

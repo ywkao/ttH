@@ -138,7 +138,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    year = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
+
+    TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
+
+    // Set json file
+    set_json(mYear);
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -154,6 +158,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Progress
       ttHHadronic::progress( nEventsTotal, nEventsChain );
 
+      // Check golden json
+      if (isData) {
+        if (!pass_json(mYear, cms3.run(), cms3.lumi()))            continue;
+      }
+
       // Blinded region
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
@@ -166,11 +175,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       double evt_weight = 1.;
       if (!isData) {
-        if (year == "2016")
+	if (year == "2018") // temporary hack to use 2017 mc with 2018 data
+	  evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
+        else if (mYear == "2016")
           evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
-        else if (year == "2017")
+        else if (mYear == "2017")
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
-	else if (year == "2018")
+	else if (mYear == "2018")
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
       }
 
@@ -186,13 +197,23 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
 
       // Selection
-      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+      if ((currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets"))) {
+        if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+      }
 
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+      else if (tag == "ttHHadronicLoose_2018studies") {
+	if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
       }
       else if (tag == "ttHHadronic") {
 	if (mass() < 100)                continue;
@@ -295,7 +316,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
         mva_value = mva->EvaluateMVA( "BDT" );
         double reference_mva = tthMVA();
-        bool pass_ref_presel = year == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
+        bool pass_ref_presel = mYear == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
 	double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
         baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
       }

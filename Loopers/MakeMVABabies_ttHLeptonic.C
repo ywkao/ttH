@@ -123,7 +123,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
  
       // Decide what type of sample this is
       process_id_ = categorize_process(currentFileTitle);
-      if (is_low_stats_process(currentFileTitle))	continue;
+      //if (is_low_stats_process(currentFileTitle))	continue;
 
       // Make p4 for physics objects
       vector<TLorentzVector> jets;
@@ -162,15 +162,30 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+      int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch()); 
+      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
 
       // Variable definitions
-      lep_pt_ = leps[0].Pt();
-      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      subleadPSV_ = subleadPixelSeed();
-      leadPSV_ = leadPixelSeed();
       nb_loose_ = nb_loose();
+      lep_eta_ = leps[0].Eta();
+      sublead_eta_ = subleadEta();
+      lead_eta_ = leadEta();
       njets_ = n_jets();
+      jet1_pt_ = jet_pt1();
+      dipho_cosphi_ = dipho_cosphi();
+      met_ = MetPt();
+      jet3_eta_ = jet_eta3();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      max2_btag_ = btag_scores_sorted[1].second;
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      jet3_pt_ = jet_pt3();
+      lep_pt_ = leps[0].Pt();
+      jet2_pt_ = jet_pt2();
+      subleadptoM_ = sublead_ptoM();
+      max1_btag_ = btag_scores_sorted[0].second;
+      subleadPSV_ = subleadPixelSeed();
+      leadptoM_ = lead_ptoM();
+      leadPSV_ = leadPixelSeed();
 
 
 

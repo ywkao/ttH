@@ -26,15 +26,15 @@ std::map<TString, TString> mLabels = {
 };
 
 std::map<TString, int> mColors = {
-        {"DY", kRed - 7},
-        {"DiPhoton", kAzure+1},
-        {"GammaJets", kViolet -4},
+        {"DY", kViolet-9},
+        {"DiPhoton", kBlue - 4},
+        {"GammaJets", kAzure + 1},
         {"QCD", kCyan-7},
-        {"TTGG", kOrange+1},
-        {"TTGJets", kTeal+10},
+        {"TTGG", kGreen-2},
+        {"TTGJets", kGreen-7},
         {"VG", kGreen+3},
         {"WJets", kBlue+2},
-        {"TTJets", kPink-2}
+        {"TTJets", kSpring+10}
 };
 
 std::map<TString, TString> mLatex = {
@@ -78,13 +78,19 @@ std::map<int, TString> mLeptonsLatex = {
 };
 
 
-void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, int idx, TString type = "std", TString year = "2016", bool loose_mva_cut = false) {
+void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, int idx, TString type = "std", TString year = "2016", bool loose_mva_cut = false, TFile* file_ref = nullptr) {
 
   TString mva_category = loose_mva_cut ? "MVACategories_1" : "";
 
   cout << hist_name + "_Data" + mva_category << endl;
 
   TH1D* hData = (TH1D*)file->Get(hist_name + "_Data" + mva_category);
+  TH1D* hData_ref;
+  if (file_ref != nullptr) {
+    hData_ref = (TH1D*)file_ref->Get(hist_name + "_Data" + mva_category);
+    hData_ref->Scale(45.966/41.5); 
+  }
+
   TH1D* hSig = (TH1D*)file->Get(hist_name + "_ttH" + mva_category);
   vector<TH1D*> hBkg;
   Comparison* c;
@@ -95,6 +101,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   if (type =="std") {
     if (year != "All")
       vLegendLabels = {year + " Data", "ttH (M125)"};
+    if (file_ref != nullptr) 
+      vLegendLabels = {"2018 Data", "2017 Data", "ttH (M125)"};
     else
       vLegendLabels = {"2016 + 2017 Data", "ttH (M125)"};
     for (int i = 0; i < vBkgs.size(); i++) {
@@ -266,7 +274,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
  
   if (type == "std") {
-    c = new Comparison(c1, hData, hSig, hBkg);
+    if (file_ref == nullptr)
+      c = new Comparison(c1, hData, hSig, hBkg);
+    else
+      c = new Comparison(c1, {hData, hData_ref}, hSig, hBkg);
     c->set_data_drawOpt("E");
     c->set_rat_label("#frac{Data}{MC}");
     c->set_y_label("Events");
@@ -334,14 +345,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_verbose();
   }
 
-  if (output.Contains("HadronicLoose"))
-    c->give_info("ttH Hadronic Presel.");
-  else if (output.Contains("Hadronic") && !output.Contains("Custom"))
-    c->give_info("ttH Hadronic Tag");
-  else if (output.Contains("Hadronic") && output.Contains("Custom")) {
-    c->give_info("ttH Hadronic Presel.");
-  }
-  else if (output.Contains("LeptonicLoose")) {
+  if (output.Contains("LeptonicLoose")) {
     c->give_info("ttH Leptonic");
     c->give_info("Loose Preselection");
   }
@@ -353,6 +357,20 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->give_info("ttH Leptonic");
     c->give_info("Tight Preselection");
   }
+  else if (output.Contains("HadronicLoose")) {
+    c->give_info("ttH Hadronic");
+    c->give_info("Loose Preselection");
+  }
+  else if (output.Contains("HadronicMedium")) {
+    c->give_info("ttH Hadronic");
+    c->give_info("Medium Preselection");
+  }
+  else if (output.Contains("HadronicTight")) {
+    c->give_info("ttH Hadronic");
+    c->give_info("Tight Preselection");
+  }
+
+
   else if (output.Contains("ttbarCR")) {
     c->give_info("ttH Leptonic");
     c->give_info("t#bar{t}-Enriched Region");
@@ -401,12 +419,17 @@ int main(int argc, char* argv[])
   TString year = file_path.Contains("All") ? "All" : file_path.Contains("2018") ? "2018" : ((file_path.Contains("2017") ? "2017" : "2016"));
   TString tag = file_path.Contains("Hadronic") ? "Hadronic" : "Leptonic";
 
-  bool loose_mva_cut = argc > 3;
+  TString file_path_ref = argv[3];
+  TString year_ref = file_path_ref.Contains("All") ? "All" : file_path_ref.Contains("2018") ? "2018" : ((file_path_ref.Contains("2017") ? "2017" : "2016"));
+
+  bool loose_mva_cut = argc > 4;
   TString mva_ext = loose_mva_cut ? "_looseMVACut" : "";
 
-  TFile* f = new TFile(file_path); 
+  TFile* f = new TFile(file_path);
   vector<TFile*> vFiles = {f};
   string output = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", type + mva_ext + ".pdf").Data();
+
+  TFile* f_ref = new TFile(file_path_ref);
   
   vector<string> vNames = {output};
 
@@ -457,110 +480,110 @@ int main(int argc, char* argv[])
   TCanvas* c2 = new TCanvas("c2", "histos2", 900, 800);
 
   for (int i = 0; i < vFiles.size(); i++) {
-    make_plot(c1, vFiles[i], vNames[i], "hMass", "m_{#gamma#gamma} [GeV]", vBkgs, 0,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hRapidity", "Y_{#gamma#gamma} [GeV^{1/2}]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hDiphotonSumPt", "p_{T}(#gamma_{1}) + p_{T}(#gamma_{2}) [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hDiphotonCosPhi", "|cos(#Delta #phi_{#gamma 1, #gamma 2})|", vBkgs, 1,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hMass", "m_{#gamma#gamma} [GeV]", vBkgs, 0,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hRapidity", "Y_{#gamma#gamma} [GeV^{1/2}]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hDiphotonSumPt", "p_{T}(#gamma_{1}) + p_{T}(#gamma_{2}) [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hDiphotonCosPhi", "|cos(#Delta #phi_{#gamma 1, #gamma 2})|", vBkgs, 1,type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hNbLoose", "N_{b-jets} (Loose)", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hNbMedium", "N_{b-jets} (Medium)", vBkgs, 1,type, year, loose_mva_cut);   
-    make_plot(c1, vFiles[i], vNames[i], "hNbTight", "N_{b-jets} (Tight)", vBkgs, 1,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hNbLoose", "N_{b-jets} (Loose)", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hNbMedium", "N_{b-jets} (Medium)", vBkgs, 1,type, year, loose_mva_cut, f_ref);   
+    make_plot(c1, vFiles[i], vNames[i], "hNbTight", "N_{b-jets} (Tight)", vBkgs, 1,type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hJet1pT", "Jet1 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hJet2pT", "Jet2 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hJet3pT", "Jet3 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hJet4pT", "Jet4 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hbJet1pT", "bJet1 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hbJet2pT", "bJet2 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hJet1pT", "Jet1 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hJet2pT", "Jet2 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hJet3pT", "Jet3 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hJet4pT", "Jet4 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    //make_plot(c1, vFiles[i], vNames[i], "hbJet1pT", "bJet1 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    //make_plot(c1, vFiles[i], vNames[i], "hbJet2pT", "bJet2 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPt", "p_{T}(#gamma_{1}) [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadEta", "#eta(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPhi", "#phi(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadSigmaIEtaIEta", "#sigma_{i#eta,i#eta}(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadHOverE", "h/E(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadR9", "R9(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadIDMVA", "Photon ID MVA(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPToM", "p_{T}/m_{#gamma#gamma} (#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadSigmaEOverE", "#sigma_{E}/E (#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPt", "p_{T}(#gamma_{1}) [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadEta", "#eta(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPhi", "#phi(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadSigmaIEtaIEta", "#sigma_{i#eta,i#eta}(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadHOverE", "h/E(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadR9", "R9(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadIDMVA", "Photon ID MVA(#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPToM", "p_{T}/m_{#gamma#gamma} (#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadSigmaEOverE", "#sigma_{E}/E (#gamma_{1})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPt", "p_{T}(#gamma_{2}) [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadEta", "#eta(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPhi", "#phi(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadSigmaIEtaIEta", "#sigma_{i#eta,i#eta}(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadHOverE", "h/E(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadR9", "R9(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadIDMVA", "Photon ID MVA(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPToM", "p_{T}/m_{#gamma#gamma} (#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadSigmaEOverE", "#sigma_{E}/E (#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPt", "p_{T}(#gamma_{2}) [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadEta", "#eta(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPhi", "#phi(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadSigmaIEtaIEta", "#sigma_{i#eta,i#eta}(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadHOverE", "h/E(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadR9", "R9(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadIDMVA", "Photon ID MVA(#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPToM", "p_{T}/m_{#gamma#gamma} (#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadSigmaEOverE", "#sigma_{E}/E (#gamma_{2})", vBkgs, 1,type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "htthMVA", "tth MVA", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "max b-tag response", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd max b-tag response", vBkgs, 1,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "htthMVA", "tth MVA", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "max b-tag response", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd max b-tag response", vBkgs, 1,type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hJet1Eta", "Jet1 #eta", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hJet2Eta", "Jet2 #eta", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hJet3Eta", "Jet3 #eta", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hJet4Eta", "Jet4 #eta", vBkgs, 1,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hJet1Eta", "Jet1 #eta", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hJet2Eta", "Jet2 #eta", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hJet3Eta", "Jet3 #eta", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hJet4Eta", "Jet4 #eta", vBkgs, 1,type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hHT", "HT [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hMetPt", "E_{T}^{miss} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hHT", "HT [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hMetPt", "E_{T}^{miss} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
 
     if (vNames[i] == "ttHLeptonic_ttbarCR_plots" + type_s + ".pdf") {
-      make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type, year, loose_mva_cut);
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     }
-    make_plot(c2, vFiles[i], vNames[i], "hMassAN", "m_{#gamma#gamma} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hMassAN", "m_{#gamma#gamma} [GeV]", vBkgs, 1,type, year, loose_mva_cut);
-    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_prompt", "#gamma ID (Prompt)", vBkgs, 1, type, year, loose_mva_cut);
-    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_elec", "#gamma ID (Elec)", vBkgs, 1, type, year, loose_mva_cut);
-    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_fake", "#gamma ID (Fake)", vBkgs, 1, type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hMT", "m_{T}(E_{T}^{miss}, lep) [GeV]", vBkgs, 1, type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type, year, loose_mva_cut);
+    make_plot(c2, vFiles[i], vNames[i], "hMassAN", "m_{#gamma#gamma} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hMassAN", "m_{#gamma#gamma} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_prompt", "#gamma ID (Prompt)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_elec", "#gamma ID (Elec)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_fake", "#gamma ID (Fake)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hMT", "m_{T}(E_{T}^{miss}, lep) [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "h" + tag + "MVA", tag + " MVA", vBkgs, 1, type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "h" + tag + "MVA", tag + " MVA", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     if (tag == "Leptonic") {
-      make_plot(c1, vFiles[i], vNames[i], "hLeptonPt", "Lepton p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hLeptonEta", "Lepton #eta", vBkgs, 1, type, year, loose_mva_cut);
+      make_plot(c1, vFiles[i], vNames[i], "hLeptonPt", "Lepton p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hLeptonEta", "Lepton #eta", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     }
 
-    make_plot(c1, vFiles[i], vNames[i], "hPtHiggs", "DiPhoton p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hMinDrDiphoJet", "Min #Delta R(p_{#gamma#gamma}, jet)", vBkgs, 1, type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hPtHiggs", "DiPhoton p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hMinDrDiphoJet", "Min #Delta R(p_{#gamma#gamma}, jet)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
     if (tag == "Leptonic") {
-      make_plot(c1, vFiles[i], vNames[i], "hDijetClosestWMass", "Min |m_{jj} - m_{W}| [GeV]", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hDijetMass", "m_{jj} (all pairs)", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoW", "#Delta R(p_{#gamma#gamma}, p_{W})", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoLep", "#Delta R(p_{#gamma#gamma}, p_{lep})", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hTopPt", "Hadronic Top p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hTopMass", "Hadronic Top Mass [GeV]", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hTopEta", "Hadronic Top Eta [GeV]", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoTop", "#Delta R(p_{#gamma#gamma}, p_{top (had.)})", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hPhotonDeltaR", "#Delta R(#gamma_{1}, #gamma_{2})", vBkgs, 1, type, year, loose_mva_cut);
+      make_plot(c1, vFiles[i], vNames[i], "hDijetClosestWMass", "Min |m_{jj} - m_{W}| [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hDijetMass", "m_{jj} (all pairs)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoW", "#Delta R(p_{#gamma#gamma}, p_{W})", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoLep", "#Delta R(p_{#gamma#gamma}, p_{lep})", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hTopPt", "Hadronic Top p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hTopMass", "Hadronic Top Mass [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hTopEta", "Hadronic Top Eta [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hDeltaRDiphoTop", "#Delta R(p_{#gamma#gamma}, p_{top (had.)})", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonDeltaR", "#Delta R(#gamma_{1}, #gamma_{2})", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
-      make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "Max b-tag", vBkgs, 1, type, year, loose_mva_cut);
-      make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd Max b-tag", vBkgs, 1, type, year, loose_mva_cut);
+      make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "Max b-tag", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd Max b-tag", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
-      make_plot(c1, vFiles[i], vNames[i], "hJet5pT", "Jet5 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut);     
-      make_plot(c1, vFiles[i], vNames[i], "hJet5Eta", "Jet5 #eta", vBkgs, 1,type, year, loose_mva_cut);
+      make_plot(c1, vFiles[i], vNames[i], "hJet5pT", "Jet5 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref);     
+      make_plot(c1, vFiles[i], vNames[i], "hJet5Eta", "Jet5 #eta", vBkgs, 1,type, year, loose_mva_cut, f_ref);
     }
 
     //if (vNames[i] == "ttHHadronicLoose_plots_" + type_s + ".pdf" || vNames[i] == "ttHHadronicCustom_plots_" + type_s + ".pdf")
-    //  make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA", "Hadronic MVA Score", vBkgs, 1, type, year, loose_mva_cut); 
+    //  make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA", "Hadronic MVA Score", vBkgs, 1, type, year, loose_mva_cut, f_ref); 
 
     //if (vNames[i] == "ttHLeptonicLoose_plots_" + type_s + ".pdf" || vNames[i] == "ttHLeptonicCustom_plots_" + type_s + ".pdf")
-    make_plot(c1, vFiles[i], vNames[i], "hLeptonicMVA", "Leptonic MVA Score", vBkgs, 1, type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hLeptonicMVA", "Leptonic MVA Score", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hLeadMinDr", "Min #Delta R(#gamma_1, leps/jets)", vBkgs, 1, type, year, loose_mva_cut);
-    make_plot(c1, vFiles[i], vNames[i], "hSubleadMinDr", "Min #Delta R(#gamma_2, leps/jets)", vBkgs, 1, type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hLeadMinDr", "Min #Delta R(#gamma_1, leps/jets)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hSubleadMinDr", "Min #Delta R(#gamma_2, leps/jets)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hAbsCosHelicity", "|cos(#theta_{helicity})| (p_{#gamma #gamma})", vBkgs, 1, type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hAbsCosHelicity", "|cos(#theta_{helicity})| (p_{#gamma #gamma})", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
-    make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut);
+    make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref);
   }
 }

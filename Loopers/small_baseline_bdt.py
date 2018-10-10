@@ -32,7 +32,7 @@ def calc_za_and_unc(file_pattern):
 
   if args.do_stat_unc: 
     if len(files) != 2:
-      print "Should only be 2 files if doing statistical uncertainties!"
+      print "There are %d files, but should only be 2 files if doing statistical uncertainties!" % len(files)
       return {}
     for file in files:
       data = numpy.load(file)
@@ -51,9 +51,11 @@ def calc_za_and_unc(file_pattern):
       max_za_unc_mc.append(za_unc_mc[idx_mc])
 
     avg_max_za_data = numpy.mean(max_za_data)
-    avg_max_za_data_unc = numpy.mean(max_za_unc_data) / numpy.sqrt(len(max_za_unc_data))
+    #avg_max_za_data_unc = numpy.mean(max_za_unc_data) / numpy.sqrt(len(max_za_unc_data))
+    avg_max_za_data_unc = 0.5*numpy.sqrt(max_za_unc_data[0]**2 + max_za_unc_data[1]**2)
     avg_max_za_mc = numpy.mean(max_za_mc)
-    avg_max_za_mc_unc = numpy.mean(max_za_unc_mc) / numpy.sqrt(len(max_za_unc_mc))
+    #avg_max_za_mc_unc = numpy.mean(max_za_unc_mc) / numpy.sqrt(len(max_za_unc_mc))
+    avg_max_za_mc_unc = 0.5*numpy.sqrt(max_za_unc_mc[0]**2 + max_za_unc_mc[1]**2)
 
     #print "[data] Mean of max Z_A: %.3f +/- %.3f " % (avg_max_za_data, avg_max_za_data_unc)
     #print "[mc] Mean of max Z_A: %.3f +/- %.3f " % (avg_max_za_mc, avg_max_za_mc_unc)
@@ -174,7 +176,8 @@ baseline_vars = [ # variables to store in the baseline BDT that we use as a star
 	#"sublead_pt_over_m",
 	#"lepton_eta",
 	#"met",
-	#"mt",
+	#"dR_higgs_lep",
+	#"lead_eta",
 	#"diphoton_dR"	
 ]
 
@@ -201,9 +204,9 @@ baseline_vars = [ # variables to store in the baseline BDT that we use as a star
 #	"nb_loose",
 #]
 
-do_baseline = True
-do_individual_vars = True
-do_make_baseline = True
+do_baseline = False
+do_individual_vars = False
+do_make_baseline = False
 do_table = True
 tag = "7var_5Oct2018"
 
@@ -276,25 +279,26 @@ else:
 	  os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "add_'%s'" % var, args.n_trainings))
 	# Then, calculate <Max Z_A>_N and estimated uncertainty 
 	print "Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s_%s_*_bdt.npz" % (args.channel, var, tag)
-	info["results"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s_%s__*_bdt.npz" % (args.channel, var, tag)) 
+	info["results"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_add_%s_%s_*_bdt.npz" % (args.channel, var, tag)) 
 
       # Now, remove the variable from the BDT 
       print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
       os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
 
 
-if do_table:
-  baseline_results = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_baseline_%s_*_bdt.npz" % (args.channel, tag))
-  mean_data = baseline_results["mean_data"]
-  mean_mc = baseline_results["mean_mc"]
-  unc_data = baseline_results["mean_unc_data"]
-  unc_mc = baseline_results["mean_unc_mc"]
-  print baseline_results
+baseline_results = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_baseline_%s_*_bdt.npz" % (args.channel, tag))
+mean_data = baseline_results["mean_data"]
+mean_mc = baseline_results["mean_mc"]
+unc_data = baseline_results["mean_unc_data"]
+unc_mc = baseline_results["mean_unc_mc"]
+print baseline_results
 
+if do_table:
   print "\\begin{center} \\Fontvi"
   print "\\begin{tabular}{|c|r|r|}"
   print "\\multicolumn{3}{c}{Assesment of Input Feature Importance} \\\\ \\hline"
-  print "Feature & \\% Change in Max $Z_A$ (MC) & \\% Change in Max $Z_A$ (data) \\\\ \\hline \\hline"
+  #print "Feature & \\% Change in Max $Z_A$ (MC) & \\% Change in Max $Z_A$ (data) \\\\ \\hline \\hline"
+  print "Feature & Max $Z_A$ (MC) & Max $Z_A$ (data)  \\\\ \\hline \\hline"
   feature_scores = []
   max_za_mc_scores = []
   for var, info in vars.iteritems():
@@ -307,7 +311,8 @@ if do_table:
   sort_indices = numpy.argsort(max_za_mc_scores)[::-1]
   for i in range(len(max_za_mc_scores)):
       var, info, feature_score = feature_scores[sort_indices[i]]
-      print "%s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\ \\hline" % (info["latex_name"], (feature_score["mean_mc"] - mean_mc) / (mean_mc * 0.01), (feature_score["mean_unc_mc"]) / (feature_score["mean_mc"] * 0.01), (feature_score["mean_data"] - mean_data) / (mean_data * 0.01), (feature_score["mean_unc_data"]) / (feature_score["mean_data"] * 0.01)) 
+      print "%s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\ \\hline" % (info["latex_name"], (feature_score["mean_mc"]), feature_score["mean_unc_mc"], feature_score["mean_data"], feature_score["mean_unc_data"])
+      #print "%s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\ \\hline" % (info["latex_name"], (feature_score["mean_mc"] - mean_mc) / (mean_mc * 0.01), (feature_score["mean_unc_mc"]) / (feature_score["mean_mc"] * 0.01), (feature_score["mean_data"] - mean_data) / (mean_data * 0.01), (feature_score["mean_unc_data"]) / (feature_score["mean_data"] * 0.01)) 
   print "\\end{tabular}"
   print "\\end{center}"
 

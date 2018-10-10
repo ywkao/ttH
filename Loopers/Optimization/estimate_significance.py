@@ -178,7 +178,7 @@ for i in range(len(quantiles)):
   selection_base = "mva_score_ >= %.10f" % mva_cut[i][0]
   calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, sig_unc_mc, quants_data, n_sig_data, n_bkg_data, sig_data, sig_unc_data, name)
 
-do_reference_bdt = False
+do_reference_bdt = True
 
 if do_reference_bdt:
   print "Significance estimates for reference BDT: s, b_mc, b_data, z_mc, z_data"

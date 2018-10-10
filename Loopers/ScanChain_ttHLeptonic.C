@@ -36,24 +36,50 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
-  float lep_pt_;
-  float minIDMVA_;
-  float maxIDMVA_;
-  float subleadPSV_;
-  float leadPSV_;
   float nb_loose_;
+  float lep_eta_;
+  float sublead_eta_;
+  float lead_eta_;
   float njets_;
+  float jet1_pt_;
+  float dipho_cosphi_;
+  float met_;
+  float jet3_eta_;
+  float minIDMVA_;
+  float max2_btag_;
+  float maxIDMVA_;
+  float jet3_pt_;
+  float lep_pt_;
+  float jet2_pt_;
+  float subleadptoM_;
+  float max1_btag_;
+  float subleadPSV_;
+  float leadptoM_;
+  float leadPSV_;
 
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
-    mva->AddVariable("lep_pt_", &lep_pt_);
-    mva->AddVariable("minIDMVA_", &minIDMVA_);
-    mva->AddVariable("maxIDMVA_", &maxIDMVA_);
-    mva->AddVariable("subleadPSV_", &subleadPSV_);
-    mva->AddVariable("leadPSV_", &leadPSV_);
     mva->AddVariable("nb_loose_", &nb_loose_);
+    mva->AddVariable("lep_eta_", &lep_eta_);
+    mva->AddVariable("sublead_eta_", &sublead_eta_);
+    mva->AddVariable("lead_eta_", &lead_eta_);
     mva->AddVariable("njets_", &njets_);
+    mva->AddVariable("jet1_pt_", &jet1_pt_);
+    mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
+    mva->AddVariable("met_", &met_);
+    mva->AddVariable("jet3_eta_", &jet3_eta_);
+    mva->AddVariable("minIDMVA_", &minIDMVA_);
+    mva->AddVariable("max2_btag_", &max2_btag_);
+    mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+    mva->AddVariable("jet3_pt_", &jet3_pt_);
+    mva->AddVariable("lep_pt_", &lep_pt_);
+    mva->AddVariable("jet2_pt_", &jet2_pt_);
+    mva->AddVariable("subleadptoM_", &subleadptoM_);
+    mva->AddVariable("max1_btag_", &max1_btag_);
+    mva->AddVariable("subleadPSV_", &subleadPSV_);
+    mva->AddVariable("leadptoM_", &leadptoM_);
+    mva->AddVariable("leadPSV_", &leadPSV_);
 
 
 
@@ -61,8 +87,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }
-
-
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
@@ -79,7 +103,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma");
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    year = currentFileTitle.Contains("2018") ? "2018" : (currentFileTitle.Contains("2016") ? "2016" : "2017");
+    TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018")); 
+
+    // Set json file
+    set_json(mYear);
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -102,6 +129,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         }
       }
 
+      // Check golden json
+      if (isData) {
+        if (!pass_json(mYear, cms3.run(), cms3.lumi()))		continue;
+      }
+
       // Blinded region 
       if (isData && blind && mass() > 120 && mass() < 130)        continue;
 
@@ -114,11 +146,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       double evt_weight = 1.;
       if (!no_weights && !isData) {
-        if (year == "2016")
+	if (year == "2018") // temporary hack to use 2017 mc with 2018 data
+          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
+        else if (mYear == "2016")
           evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
-        else if (year == "2017") 
+        else if (mYear == "2017") 
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
-	else if (year == "2018")
+	else if (mYear == "2018")
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
       }
 
@@ -149,13 +183,23 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       // Selection
       // NOTE: need to implement overlap removal for all microAOD at some point
-      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))		continue;
+      if ((currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets"))) {
+        if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))		continue;
+      }
 
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
 	if (n_jets() < 2)	continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+      else if (tag == "ttHLeptonicLoose_2018studies") {
+	if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)      continue;
       }
       else if (tag == "ttHLeptonic_2017_MVA_presel") {
 	if (mass() < 100)               continue;
@@ -360,20 +404,33 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (evaluate_mva) {
 
         // Calculate MVA value
-        lep_pt_ = leps[0].Pt();
-        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        subleadPSV_ = subleadPixelSeed();
-        leadPSV_ = leadPixelSeed();
         nb_loose_ = nb_loose();
+        lep_eta_ = leps[0].Eta();
+        sublead_eta_ = subleadEta();
+        lead_eta_ = leadEta();
         njets_ = n_jets();
+        jet1_pt_ = jet_pt1();
+        dipho_cosphi_ = dipho_cosphi();
+        met_ = MetPt();
+        jet3_eta_ = jet_eta3();
+        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+        max2_btag_ = btag_scores_sorted[1].second;
+        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+        jet3_pt_ = jet_pt3();
+        lep_pt_ = leps[0].Pt();
+        jet2_pt_ = jet_pt2();
+        subleadptoM_ = sublead_ptoM();
+        max1_btag_ = btag_scores_sorted[0].second;
+        subleadPSV_ = subleadPixelSeed();
+        leadptoM_ = lead_ptoM();
+        leadPSV_ = leadPixelSeed();
 
 
 
 
         mva_value = mva->EvaluateMVA( "BDT" );
-        double reference_mva = year == "2017" ? tthMVA() : -1;
-        bool pass_ref_presel = year == "2017" ? pass_2017_mva_presel() : true;
+        double reference_mva = mYear == "2017" ? tthMVA() : -1;
+        bool pass_ref_presel = mYear == "2017" ? pass_2017_mva_presel() : true;
 	//double rand = use_random_test_train_split ? rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi()) : cms3.rand();
 	double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
         if (!is_low_stats_process(currentFileTitle)) 	
@@ -386,7 +443,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       bool make_text_file = false;
       bool make_2prompts = true;
-      if (make_text_file && year == "2016") {
+      if (make_text_file && mYear == "2016") {
 	if (currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets")) {
 	  if (make_2prompts && genPhotonId == 2) {
 	    TString name = currentFileTitle.Contains("TTJets") ? "TTJets" : "TTGammaJets";
@@ -413,7 +470,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Skip blinded region for MC after filling mass histogram
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
 
-      double helic = helicity(sublead_photon, sublead_photon);
+      double helic = helicity(lead_photon,  sublead_photon);//
       vProcess[processId]->fill_histogram("hAbsCosHelicity", helic, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hLeadMinDr", min_dr(lead_photon, objects), evt_weight, vId);

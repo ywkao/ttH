@@ -10,6 +10,11 @@ def Z_A(s, b):
     b = 0
   return math.sqrt(2 * ( ((s+b) * math.log(1 + (s/b) )) - s) )
 
+def unc_ZA(s, b, ds, db):
+  Zs = math.log(1 + (s/b)) / Z_A(s,b)
+  Zb = (math.log(1 + (s/b)) - (s/b)) / Z_A(s,b)
+  return ((Zs*ds)**2 + (Zb*db)**2)**(0.5)
+
 def quantiles_to_mva_score(n_quantiles, mva_scores): # return mva_scores corresponding to each quantile in n_quantiles
   sorted_mva = numpy.flip(numpy.sort(mva_scores), 0)
   quantiles = []
@@ -30,7 +35,12 @@ def gaus(x, a, b, c):
   return a * numpy.exp(-0.5 * (( (x - b) / c ) ** 2))
 
 def constant_estimate(weights, sigma_eff):
-  return numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  est = numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  unc = math.sqrt(numpy.sum(weights**2)) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  if est > 0:
+    return est, unc
+  else:
+    return 999999, 999999
 
 def calc_sigma_eff(signal_data, weights): 
   h = ROOT.TH1D("h_sig", "", 80, 100, 180)
@@ -64,6 +74,9 @@ def events_passing_cut(events, cut):
 def za_scores(n_quantiles, signal_events, background_events):
   testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
   za = []
+  za_unc = []
+  n_sig = []
+  n_bkg = []
   # Calculate cuts corresponding to each quantile
   quantiles, mva_cut = quantiles_to_mva_score(n_quantiles, signal_events["mva_score"])
 
@@ -74,8 +87,8 @@ def za_scores(n_quantiles, signal_events, background_events):
     bkg_events_passing_cut = events_passing_cut(background_events, cut_value)
 
     # Calculate sigma eff
-    mean_eff, sigma_eff = calc_sigma_eff(signal_events_passing_cut["mass"], signal_events_passing_cut["weights"])
-    
+    mean_eff, sigma_eff = calc_sigma_eff(signal_events_passing_cut["mass"], signal_events_passing_cut["weights"])   
+ 
     # Calculate s
     signal_events_mass_window = []
     for i in range(len(signal_events_passing_cut["mass"])):
@@ -83,6 +96,7 @@ def za_scores(n_quantiles, signal_events, background_events):
         signal_events_mass_window.append(signal_events_passing_cut["weights"][i])
     signal_events_mass_window = numpy.asarray(signal_events_mass_window) 
     s = ( 1. / testing_frac) * numpy.sum(signal_events_mass_window)
+    s_unc = ( 1. / testing_frac) * math.sqrt(numpy.sum(signal_events_mass_window**2))
 
     # Calculate b
     bkg_events_mass_window = []
@@ -90,11 +104,19 @@ def za_scores(n_quantiles, signal_events, background_events):
       if bkg_events_passing_cut["mass"][i] > 100 and bkg_events_passing_cut["mass"][i] < 180:
         bkg_events_mass_window.append(bkg_events_passing_cut["weights"][i])
     bkg_events_mass_window = numpy.asarray(bkg_events_mass_window)
-    b = ( 1. / testing_frac) * constant_estimate(bkg_events_mass_window, sigma_eff)
+    #b = ( 1. / testing_frac) * constant_estimate(bkg_events_mass_window, sigma_eff)
+    b, b_unc = constant_estimate(bkg_events_mass_window, sigma_eff)
+    b *= ( 1. / testing_frac)
+    b_unc *= ( 1. / testing_frac)
 
     # Calculate Z_A
     z_mc = Z_A(s, b)
-    print s, b, z_mc
+    z_mc_unc = unc_ZA(s, b, s_unc, b_unc)
+    print "s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)
+    print "za: %.3f +/- %.3f" % (z_mc, z_mc_unc)
     za.append(z_mc)
+    za_unc.append(z_mc_unc)
+    n_sig.append(s)
+    n_bkg.append(b)
 
-  return za
+  return za, za_unc, n_sig, n_bkg 

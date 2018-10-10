@@ -40,6 +40,7 @@ class BabyMaker {
     
 
     int 	label_;
+    int         multi_label_;
     double	evt_weight_;
     int 	process_id_;
     double 	rand_;
