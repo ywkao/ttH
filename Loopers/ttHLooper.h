@@ -135,6 +135,10 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hLeptonPt", 25, 0, 200);
     v[i]->add_histogram("hLeptonEta", 25, -3, 3);
 
+    v[i]->add_histogram("hPixelSeed", 2, -0.5, 1.5);
+    v[i]->add_histogram("hPixelSeedEB", 2, -0.5, 1.5);
+    v[i]->add_histogram("hPixelSeedEE", 2, -0.5, 1.5);
+
 
     v[i]->add_histogram("hPhotonMinIDMVA_passPSV", 5, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_failPSV", 5, -1, 1);
@@ -232,6 +236,21 @@ bool has_ttX_overlap(TString currentFileTitle, int lead_prompt, int sublead_prom
   else if (lead_prompt != 0 && sublead_prompt != 0)
     return false;
   return true;
+}
+
+bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
+  if (!(currentFileTitle.Contains("QCD") || currentFileTitle.Contains("GJet_Pt"))) {
+    return false;
+  }
+  else if (currentFileTitle.Contains("GJet_Pt")) {
+    if (genPhotonId == 2) // PP
+      return true;
+  }
+  else if (currentFileTitle.Contains("QCD")) {
+    if (genPhotonId == 1 || genPhotonId == 2) // FP, PP
+      return true;
+  }
+  return false;
 }
 
 bool is_low_stats_process(TString currentFileTitle) {
@@ -498,7 +517,7 @@ bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
 
 void add_samples(TChain* ch, TString year) {
   //TString tag = year == "2018" ? "v102.1" : (year == "2017" ? "v1.2" : "v3.16");
-  TString tag = year == "2016" ? "v3.16" : "v1.2";
+  TString tag = year == "2016" ? "v3.16" : "v1.3";
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 

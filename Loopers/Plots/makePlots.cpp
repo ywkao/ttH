@@ -101,7 +101,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   if (type =="std") {
     if (year != "All")
       vLegendLabels = {year + " Data", "ttH (M125)"};
-    if (file_ref != nullptr) 
+    else if (file_ref != nullptr) 
       vLegendLabels = {"2018 Data", "2017 Data", "ttH (M125)"};
     else
       vLegendLabels = {"2016 + 2017 Data", "ttH (M125)"};
@@ -314,6 +314,14 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   TString output = output_name;
   double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9)));
   c->set_lumi(lumi);
+
+  if (hist_name == "hNJets" || hist_name == "hNbLoose") {
+    if (output.Contains("Leptonic"))
+      c->set_y_lim_range({0.5, pow(10,4)});
+    else if (output.Contains("Hadronic"))
+      c->set_y_lim_range({1, pow(10,6)});
+  }
+
   if (hist_name == "hMassAN") {
     c->set_no_flow();
     c->set_no_log();
@@ -356,6 +364,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   else if (output.Contains("LeptonicTight")) {
     c->give_info("ttH Leptonic");
     c->give_info("Tight Preselection");
+  }
+  else if (output.Contains("ttbar")) {
+    c->give_info("ttH Leptonic");
+    c->give_info("t#bar{t} CR");
   }
   else if (output.Contains("HadronicLoose")) {
     c->give_info("ttH Hadronic");
@@ -429,7 +441,9 @@ int main(int argc, char* argv[])
   vector<TFile*> vFiles = {f};
   string output = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", type + mva_ext + ".pdf").Data();
 
-  TFile* f_ref = new TFile(file_path_ref);
+  TFile* f_ref; 
+  if (argc > 3) f_ref = new TFile(file_path_ref);
+  else f_ref = nullptr;
   
   vector<string> vNames = {output};
 
@@ -583,6 +597,15 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hSubleadMinDr", "Min #Delta R(#gamma_2, leps/jets)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
     make_plot(c1, vFiles[i], vNames[i], "hAbsCosHelicity", "|cos(#theta_{helicity})| (p_{#gamma #gamma})", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    
+    if (tag == "Leptonic") {
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_passPSV", "Min #gamma ID (pass PSV)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_failPSV", "Min #gamma ID (fail PSV)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    }
+
+    make_plot(c1, vFiles[i], vNames[i], "hPixelSeed", "Pixel Seed Veto", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPixelSeedEB", "Pixel Seed Veto (EB)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPixelSeedEE", "Pixel Seed Veto (EE)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref);
   }

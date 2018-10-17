@@ -203,6 +203,12 @@ void ttHLeptonic::Init(TTree *tree) {
   if (n_bjets_branch) n_bjets_branch->SetAddress(&n_bjets_);
   n_jets_branch = tree->GetBranch("n_jets");
   if (n_jets_branch) n_jets_branch->SetAddress(&n_jets_);
+  topTag_score_branch = tree->GetBranch("topTag_score");
+  if (topTag_score_branch) topTag_score_branch->SetAddress(&topTag_score_);
+  topTag_topMass_branch = tree->GetBranch("topTag_topMass");
+  if (topTag_topMass_branch) topTag_topMass_branch->SetAddress(&topTag_topMass_);
+  topTag_WMass_branch = tree->GetBranch("topTag_WMass");
+  if (topTag_WMass_branch) topTag_WMass_branch->SetAddress(&topTag_WMass_);
   Mjj_branch = tree->GetBranch("Mjj");
   if (Mjj_branch) Mjj_branch->SetAddress(&Mjj_);
   MetPt_branch = tree->GetBranch("MetPt");
@@ -575,6 +581,9 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   muon2_energy_isLoaded = false;
   n_bjets_isLoaded = false;
   n_jets_isLoaded = false;
+  topTag_score_isLoaded = false;
+  topTag_topMass_isLoaded = false;
+  topTag_WMass_isLoaded = false;
   Mjj_isLoaded = false;
   MetPt_isLoaded = false;
   MetPhi_isLoaded = false;
@@ -811,6 +820,9 @@ void ttHLeptonic::LoadAllBranches() {
   if (muon2_energy_branch != 0) muon2_energy();
   if (n_bjets_branch != 0) n_bjets();
   if (n_jets_branch != 0) n_jets();
+  if (topTag_score_branch != 0) topTag_score();
+  if (topTag_topMass_branch != 0) topTag_topMass();
+  if (topTag_WMass_branch != 0) topTag_WMass();
   if (Mjj_branch != 0) Mjj();
   if (MetPt_branch != 0) MetPt();
   if (MetPhi_branch != 0) MetPhi();
@@ -2231,6 +2243,45 @@ const float &ttHLeptonic::n_jets() {
     n_jets_isLoaded = true;
   }
   return n_jets_;
+}
+
+const float &ttHLeptonic::topTag_score() {
+  if (not topTag_score_isLoaded) {
+    if (topTag_score_branch != 0) {
+      topTag_score_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_score_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_score_isLoaded = true;
+  }
+  return topTag_score_;
+}
+
+const float &ttHLeptonic::topTag_topMass() {
+  if (not topTag_topMass_isLoaded) {
+    if (topTag_topMass_branch != 0) {
+      topTag_topMass_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_topMass_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_topMass_isLoaded = true;
+  }
+  return topTag_topMass_;
+}
+
+const float &ttHLeptonic::topTag_WMass() {
+  if (not topTag_WMass_isLoaded) {
+    if (topTag_WMass_branch != 0) {
+      topTag_WMass_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_WMass_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_WMass_isLoaded = true;
+  }
+  return topTag_WMass_;
 }
 
 const float &ttHLeptonic::Mjj() {
@@ -4084,6 +4135,9 @@ const float &muon1_energy() { return cms3.muon1_energy(); }
 const float &muon2_energy() { return cms3.muon2_energy(); }
 const float &n_bjets() { return cms3.n_bjets(); }
 const float &n_jets() { return cms3.n_jets(); }
+const float &topTag_score() { return cms3.topTag_score(); }
+const float &topTag_topMass() { return cms3.topTag_topMass(); }
+const float &topTag_WMass() { return cms3.topTag_WMass(); }
 const float &Mjj() { return cms3.Mjj(); }
 const float &MetPt() { return cms3.MetPt(); }
 const float &MetPhi() { return cms3.MetPhi(); }

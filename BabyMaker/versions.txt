@@ -86,3 +86,14 @@ Submitting ttH Babies version v10.18.1 using skims in /hadoop/cms/store/user/bem
 Date: 2018-10-02 17:47:53.262624 
 Submitting ttH Babies version v102.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/ and commit a5c8d5e316dc1fd08e51ff773e477966a7f11889 of tth_dev_102X branch of flashgg
 
+# Note starting in v94.1, add top tagger info
+
+Date: 2018-10-11 18:35:08.279786 
+Submitting ttH Babies version v94.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit 5a7102e8bae4f6c1ecb900f45ccc1374eb8bc896 of tth_dev_94X branch of flashgg
+
+Date: 2018-10-11 18:39:38.530994 
+Submitting ttH Babies version v94.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit 5a7102e8bae4f6c1ecb900f45ccc1374eb8bc896 of tth_dev_94X branch of flashgg
+
+Date: 2018-10-17 13:23:06.109310 
+Submitting ttH Babies version v3.16 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test and commit 77667c3420fbcf361183774d0f345913b351a9b4 of tth_dev_80X branch of flashgg
+

@@ -201,6 +201,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
       }
 
+      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
+
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
@@ -215,6 +217,20 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (leadIDMVA() < -0.9)         continue;
         if (subleadIDMVA() < -0.9)         continue;
       }
+      else if (tag == "ttHHadronic_HLLHC_presel") {
+	if (mass() < 100 || mass() > 180)                continue;
+	if (n_jets() < 3)               continue;
+	if (nb_medium() < 1)		continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+      else if (tag == "ttHHadronic_HLLHC_presel_withBDT") {
+        if (mass() < 100 || mass() > 180)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_medium() < 1)            continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (tthMVA() < 0.38)		continue;
+      }
+
       else if (tag == "ttHHadronic") {
 	if (mass() < 100)                continue;
         if (n_jets() < 3)       continue;
@@ -336,6 +352,17 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
 
       // Fill rest of histograms //
+      vProcess[processId]->fill_histogram("hPixelSeed", leadPixelSeed(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPixelSeed", subleadPixelSeed(), evt_weight, vId);
+      if (abs(leadEta()) < barrel_eta)
+	vProcess[processId]->fill_histogram("hPixelSeedEB", leadPixelSeed(), evt_weight, vId);
+      else
+	vProcess[processId]->fill_histogram("hPixelSeedEE", leadPixelSeed(), evt_weight, vId);
+      if (abs(subleadEta()) < barrel_eta)
+        vProcess[processId]->fill_histogram("hPixelSeedEB", subleadPixelSeed(), evt_weight, vId);
+      else
+        vProcess[processId]->fill_histogram("hPixelSeedEE", subleadPixelSeed(), evt_weight, vId);
+	
       double helic = helicity(lead_photon, sublead_photon);
       vProcess[processId]->fill_histogram("hAbsCosHelicity", helic, evt_weight, vId);
 

@@ -90,9 +90,10 @@ sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
 
 print sum_pos_weights, sum_neg_weights
 
-for i in range(len(weights_train)):
-  if label[i] == 1:
-    weights_train[i] *= (sum_neg_weights / sum_pos_weights)
+if args.multi:
+  for i in range(len(weights_train)):
+    if label[i] == 1:
+      weights_train[i] *= (sum_neg_weights / sum_pos_weights)
 
 sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
 sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
@@ -210,7 +211,19 @@ plt.legend(loc='lower right')
 plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
 estimate_za = True
-if estimate_za:
+if estimate_za and args.ext == "1":
+  ref_file = "/home/users/sjmay/ttH/Loopers/Optimization/ZA_curves/MVAOptimizationBaby_1_Leptonic_reproduce_1_bdt.npz"
+  ref2_file = "/home/users/sjmay/ttH/Loopers/Optimization/ZA_curves/MVAOptimizationBaby_1_Leptonic_baseline_20var_14Oct2018_1_bdt.npz"
+  ref_results = numpy.load(ref_file)
+  ref2_results = numpy.load(ref2_file)
+  s_ref = ref_results["n_sig_mc"]
+  za_ref = ref_results["za_mc"]
+  za_ref_unc = ref_results["za_unc_mc"]
+
+  s_ref2 = ref2_results["n_sig_mc_ref"]
+  za_ref2 = ref2_results["za_mc_ref"]
+  za_ref2_unc = ref2_results["za_unc_mc_ref"]
+
   n_quantiles = 100
   signal_mva_scores = ks_test.logical_vector(pred_test, y_test, 1)
   bkg_mva_scores = ks_test.logical_vector(pred_test, y_test, 0)
@@ -236,8 +249,13 @@ if estimate_za:
 
   fig = plt.figure()
   ax1 = fig.add_subplot(111)
-  ax1.plot(s, za, label='MC', color = 'blue')
-  ax1.fill_between(s, numpy.asarray(za) - numpy.asarray(za_unc), numpy.asarray(za) + numpy.asarray(za_unc), color = 'blue', alpha = 0.25)
+  ax1.plot(s, za, label='Best Guess of Optimal BDT', color = 'red')
+  ax1.fill_between(s, numpy.asarray(za) - numpy.asarray(za_unc), numpy.asarray(za) + numpy.asarray(za_unc), color = 'red', alpha = 0.25)
+  ax1.plot(s_ref, za_ref, label='Reproduce 2017 BDT (MC)', color = 'blue')
+  ax1.fill_between(s_ref, numpy.asarray(za_ref) - numpy.asarray(za_ref_unc), numpy.asarray(za_ref) + numpy.asarray(za_ref_unc), color = 'blue', alpha = 0.25)
+  ax1.plot(s_ref2, za_ref2, label='2017 ttH BDT (MC)', color = 'black', linestyle = '--', dashes = (5,2))
+  ax1.fill_between(s_ref2, numpy.asarray(za_ref2) - numpy.asarray(za_ref2_unc), numpy.asarray(za_ref2) + numpy.asarray(za_ref2_unc), color = 'black', alpha = 0.25)
+
   plt.xlabel('# Signal Events')
   ax1.set_ylabel('Significance (Z_A)')
 

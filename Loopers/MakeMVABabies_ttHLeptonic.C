@@ -166,26 +166,34 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
 
       // Variable definitions
-      nb_loose_ = nb_loose();
-      lep_eta_ = leps[0].Eta();
+      dipho_rapidity_ = dipho_rapidity();
+      jet3_eta_ = jet_eta3();
+      jet2_eta_ = jet_eta2();
+      jet1_eta_ = jet_eta1();
+      jet3_pt_ = jet_pt3();
+      jet2_pt_ = jet_pt2();
+      jet1_pt_ = jet_pt1();
+      helic = helicity(lead_photon, sublead_photon);
+      ht_ = get_ht(jets);
+      mt_ = mT();
+      dR_higgs_lep = diphoton.DeltaR(leps[0]);
+      dipho_deltaR = lead_photon.DeltaR(sublead_photon);
       sublead_eta_ = subleadEta();
       lead_eta_ = leadEta();
-      njets_ = n_jets();
-      jet1_pt_ = jet_pt1();
-      dipho_cosphi_ = dipho_cosphi();
       met_ = MetPt();
-      jet3_eta_ = jet_eta3();
-      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      max2_btag_ = btag_scores_sorted[1].second;
-      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      jet3_pt_ = jet_pt3();
-      lep_pt_ = leps[0].Pt();
-      jet2_pt_ = jet_pt2();
+      lep_eta_ = leps[0].Eta();
       subleadptoM_ = sublead_ptoM();
-      max1_btag_ = btag_scores_sorted[0].second;
-      subleadPSV_ = subleadPixelSeed();
       leadptoM_ = lead_ptoM();
+      pt_higgs = diphoton.Pt() / diphoton.M();
+      max2_btag_ = btag_scores_sorted[1].second;
+      max1_btag_ = btag_scores_sorted[0].second;
+      lep_pt_ = leps[0].Pt();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      subleadPSV_ = subleadPixelSeed();
       leadPSV_ = leadPixelSeed();
+      nb_loose_ = nb_loose();
+      njets_ = n_jets();
 
 
 

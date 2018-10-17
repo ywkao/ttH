@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8__ttH_Babies_v1.3_2017/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
+// makeCMS3ClassFiles("merged_babies/DoubleEG__ttH_Babies_v94.1_2017/merged_ntuple.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
 
 #ifndef ttHHadronic_H
 #define ttHHadronic_H
@@ -265,6 +265,9 @@ class ttHHadronic {
   float    n_jets_;
   TBranch *n_jets_branch;
   bool     n_jets_isLoaded;
+  float    nGenJets_;
+  TBranch *nGenJets_branch;
+  bool     nGenJets_isLoaded;
   float    bjet1_pt_;
   TBranch *bjet1_pt_branch;
   bool     bjet1_pt_isLoaded;
@@ -277,6 +280,15 @@ class ttHHadronic {
   float    MetPhi_;
   TBranch *MetPhi_branch;
   bool     MetPhi_isLoaded;
+  float    topTag_score_;
+  TBranch *topTag_score_branch;
+  bool     topTag_score_isLoaded;
+  float    topTag_topMass_;
+  TBranch *topTag_topMass_branch;
+  bool     topTag_topMass_isLoaded;
+  float    topTag_WMass_;
+  TBranch *topTag_WMass_branch;
+  bool     topTag_WMass_isLoaded;
   float    jet1_pt_;
   TBranch *jet1_pt_branch;
   bool     jet1_pt_isLoaded;
@@ -755,10 +767,14 @@ void LoadAllBranches();
   const float &sublead_SmallestDr();
   const float &n_bjets();
   const float &n_jets();
+  const float &nGenJets();
   const float &bjet1_pt();
   const float &bjet2_pt();
   const float &MetPt();
   const float &MetPhi();
+  const float &topTag_score();
+  const float &topTag_topMass();
+  const float &topTag_WMass();
   const float &jet1_pt();
   const float &jet2_pt();
   const float &jet3_pt();
@@ -980,10 +996,14 @@ namespace tas {
   const float &sublead_SmallestDr();
   const float &n_bjets();
   const float &n_jets();
+  const float &nGenJets();
   const float &bjet1_pt();
   const float &bjet2_pt();
   const float &MetPt();
   const float &MetPhi();
+  const float &topTag_score();
+  const float &topTag_topMass();
+  const float &topTag_WMass();
   const float &jet1_pt();
   const float &jet2_pt();
   const float &jet3_pt();

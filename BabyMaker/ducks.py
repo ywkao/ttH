@@ -16,6 +16,7 @@ parser.add_argument("year", help = "which year to run on e.g. '2016'", type=str)
 parser.add_argument("--data_only", action="store_true")
 parser.add_argument("--do_all", help = "run on every single skim (not just important ones)", action="store_true")
 parser.add_argument("--soft_rerun", help = "don't remake tarball", action="store_true")
+parser.add_argument("--tH_only", help = "only jobs for THW, THQ", action="store_true")
 args = parser.parse_args()
 
 job_tag = "ttH_Babies_" + args.tag + "_" + args.year
@@ -25,12 +26,13 @@ hadoop_path = "ttH"
 
 if args.year == "2016":
   cmssw_ver = "CMSSW_8_0_28"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
-  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
+  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
 elif args.year == "2017":
   cmssw_ver = "CMSSW_9_4_6"
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
+  #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017" # microAOD with tt+X overlap and top tagger info
 elif args.year == "2018":
   cmssw_ver = "CMSSW_10_2_1"
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/"
@@ -39,8 +41,6 @@ elif args.year == "2018":
 if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "_" + args.year)
   os.system("rm package.tar.gz")
-
-  #os.system("tar -czf package.tar.gz --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.cc' --exclude='*.h' --exclude-vcs %s" % cmssw_ver)
 
   os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' -f package.tar.gz %s" % cmssw_ver) 
 
@@ -63,8 +63,13 @@ subdir_map = { 	"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_
 }
 default_subdir = "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1"
 
-important_samples = ["TTJets", "TTGJets", "TTGG", "QCD", "GJet_Pt-", "DiPhoton", "DY", "WG", "ZG", "WJets", "ttHJetToGG_M125", "DoubleEG", "EGamma"]
+important_samples = ["TTJets", "TTGJets", "TTGG", "QCD", "GJet_Pt-", "DiPhoton", "DY", "WG", "ZG", "WJets", "ttHJetToGG_M12", "DoubleEG", "EGamma", "TTTo2L2Nu", "TTToSemiLeptonic", "THQ", "THW"]
 def important_sample(name):
+  if args.tH_only:
+    if "THQ" in name or "THW" in name:
+      return True
+    else:
+      return False
   if args.year == "2018":
     #if "101X" not in name:
     #  return False
@@ -105,9 +110,12 @@ for sample in samples:
   elif args.year == "2017":
     if "TTGG" in name:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
+    elif "forHualin" in base_path:
+      dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput])
     else:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])    
   else:
+    print "here"
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput]) 
 
 

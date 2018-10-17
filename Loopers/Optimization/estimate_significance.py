@@ -27,8 +27,12 @@ def Z_A(s, b):
 
 def unc_ZA(s, b, ds, db):
   Zs = math.log(1 + (s/b)) / Z_A(s,b)
+  print Zs
   Zb = (math.log(1 + (s/b)) - (s/b)) / Z_A(s,b)
+  print Zb
   return ((Zs*ds)**2 + (Zb*db)**2)**(0.5)
+
+print unc_ZA(1, 1, 1, 1)
 
 def find_nearest(array,value):
     val = numpy.ones_like(array)*value
@@ -187,7 +191,7 @@ if do_reference_bdt:
     selection_base = "reference_mva_ >= %.10f && pass_ref_presel_ == 1" % mva_cut_ref[i][0]
     calc_significance(selection_base, quants_mc_ref, n_sig_mc_ref, n_bkg_mc_ref, sig_mc_ref, sig_unc_mc_ref, quants_data_ref, n_sig_data_ref, n_bkg_data_ref, sig_data_ref, sig_unc_data_ref, name + "_ref")
 
-numpy.savez('ZA_curves/%s' % args.file.replace(".root", ""), za_mc = sig_mc, za_data = sig_data, n_sig_mc = n_sig_mc, n_sig_data = n_sig_data, n_bkg_mc = n_bkg_mc, n_bkg_data = n_bkg_data, za_unc_mc = sig_unc_mc, za_unc_data = sig_unc_data)
+numpy.savez('ZA_curves/%s' % args.file.replace(".root", ""), za_mc = sig_mc, za_data = sig_data, n_sig_mc = n_sig_mc, n_sig_data = n_sig_data, n_bkg_mc = n_bkg_mc, n_bkg_data = n_bkg_data, za_unc_mc = sig_unc_mc, za_unc_data = sig_unc_data, n_sig_mc_ref = n_sig_mc_ref, za_mc_ref = sig_mc_ref, za_unc_mc_ref = sig_unc_mc_ref)
   
 ### Make diagnostic plots ###
 import matplotlib
@@ -202,7 +206,9 @@ ax1.plot(n_sig_data, sig_data, label='Data', color = 'black')
 ax1.fill_between(n_sig_data, numpy.asarray(sig_data) - numpy.asarray(sig_unc_data), numpy.asarray(sig_data) + numpy.asarray(sig_unc_data), color = 'black', alpha = 0.25)
 if do_reference_bdt:
   ax1.plot(n_sig_mc_ref, sig_mc_ref, label='2017 ttH BDT (MC)', color = 'blue', linestyle = '--', dashes = (5,2))
+  ax1.fill_between(n_sig_mc_ref, numpy.asarray(sig_mc_ref) - numpy.asarray(sig_unc_mc_ref), numpy.asarray(sig_mc_ref) + numpy.asarray(sig_unc_mc_ref), color = 'blue', alpha = 0.1)
   ax1.plot(n_sig_data_ref, sig_data_ref, label='2017 ttH BDT (data)', color = 'black', linestyle = '--', dashes = (5,2))
+  ax1.fill_between(n_sig_data_ref, numpy.asarray(sig_data_ref) - numpy.asarray(sig_unc_data_ref), numpy.asarray(sig_data_ref) + numpy.asarray(sig_unc_data_ref), color = 'black', alpha = 0.1)
 plt.xlabel('# Signal Events')
 ax1.set_ylabel('Significance (Z_A)')
 ax1.tick_params('y', colors = 'green')

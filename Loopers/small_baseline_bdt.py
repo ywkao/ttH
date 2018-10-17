@@ -50,6 +50,8 @@ def calc_za_and_unc(file_pattern):
       max_za_mc.append(za_mc[idx_mc])
       max_za_unc_mc.append(za_unc_mc[idx_mc])
 
+      print za_unc_mc[idx_mc]
+
     avg_max_za_data = numpy.mean(max_za_data)
     #avg_max_za_data_unc = numpy.mean(max_za_unc_data) / numpy.sqrt(len(max_za_unc_data))
     avg_max_za_data_unc = 0.5*numpy.sqrt(max_za_unc_data[0]**2 + max_za_unc_data[1]**2)
@@ -111,6 +113,7 @@ def calc_za_and_unc(file_pattern):
   return results
 
 vars = { # dictionary of all potential variables to study
+	"top_tag_score" : { "name" : "top_tag_score", "type" : "double", "function" : "topTag_score()", "latex_name" : "Top Tag BDT"},
 	"helicity_angle" : { "name" : "helic", "type" : "double", "function" : "helicity(lead_photon, sublead_photon)", "latex_name" : "Helicity Angle ($\\theta$)"},
 	"lepton_pt" : { "name" : "lep_pt_", "type" : "double", "function" : "leps[0].Pt()", "latex_name" : "Lepton $p_T$"},
 	"min_dr_lead_pho" : { "name" : "min_dr_lead_photon", "type" : "double", "function" : "min_dr(lead_photon, objects)", "latex_name" : "Min ($\\Delta R(\\gamma_{\\text{lead}}, \\text{leptons/jets})$)"},
@@ -150,6 +153,9 @@ vars = { # dictionary of all potential variables to study
 	"mt" : { "name" : "mt_", "type" : "double", "function" : "mT()", "latex_name" : "$m_T(l, E_T^{\\text{miss}})$"}	
 }
 
+vars_to_add = {
+        "top_tag_score" : { "name" : "top_tag_score", "type" : "double", "function" : "topTag_score()", "latex_name" : "Top Tag BDT"},
+} 
 
 #cats = { # sort all of these into categories
 #  	"b_tagging" : {"features" : [vars["nb_loose"], vars["max_btag"], vars["second_max_btag"]], "latex_name" : "b-tagging Features"},
@@ -169,16 +175,28 @@ baseline_vars = [ # variables to store in the baseline BDT that we use as a star
 	"max_phoIDMVA",
 	"min_phoIDMVA",
 	"lepton_pt",
-	#"max_btag",
-	#"second_max_btag",
-	#"pt_higgs",
-	#"lead_pt_over_m",
-	#"sublead_pt_over_m",
-	#"lepton_eta",
-	#"met",
-	#"dR_higgs_lep",
-	#"lead_eta",
-	#"diphoton_dR"	
+	"max_btag",
+	"second_max_btag",
+	"pt_higgs",
+	"lead_pt_over_m",
+	"sublead_pt_over_m",
+	"lepton_eta",
+	"met",
+	"lead_eta",
+	"sublead_eta",
+	"diphoton_dR",
+	"dR_higgs_lep",
+	"mt",
+	"ht",
+	"helicity_angle",
+	"jet1_pt",
+	"jet2_pt",
+	"jet3_pt",
+	"jet1_eta",
+	"jet2_eta",
+	"jet3_eta",
+	"diphoton_rapidity",
+	#"top_tag_score",	
 ]
 
 #baseline_vars = [
@@ -204,11 +222,11 @@ baseline_vars = [ # variables to store in the baseline BDT that we use as a star
 #	"nb_loose",
 #]
 
-do_baseline = False
+do_baseline = True
 do_individual_vars = False
 do_make_baseline = False
 do_table = True
-tag = "7var_5Oct2018"
+tag = "25var_14Oct2018"
 
 # First, remove all variables 
 
@@ -255,7 +273,7 @@ else:
       unc_mc = baseline_results["mean_unc_mc"] 
 
   if do_individual_vars:
-    for var, info in vars.iteritems():
+    for var, info in vars_to_add.iteritems():
       # Check if it's already in the baseline BDT
       if var in baseline_vars:
         continue
@@ -301,7 +319,7 @@ if do_table:
   print "Feature & Max $Z_A$ (MC) & Max $Z_A$ (data)  \\\\ \\hline \\hline"
   feature_scores = []
   max_za_mc_scores = []
-  for var, info in vars.iteritems():
+  for var, info in vars_to_add.iteritems():
       # Check if it's already in the baseline BDT
       if var in baseline_vars:
         continue

@@ -36,50 +36,66 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   unique_ptr<TMVA::Reader> mva;
 
   // Declare BDT vars
-  float nb_loose_;
-  float lep_eta_;
+  float dipho_rapidity_;
+  float jet3_eta_;
+  float jet2_eta_;
+  float jet1_eta_;
+  float jet3_pt_;
+  float jet2_pt_;
+  float jet1_pt_;
+  float helic;
+  float ht_;
+  float mt_;
+  float dR_higgs_lep;
+  float dipho_deltaR;
   float sublead_eta_;
   float lead_eta_;
-  float njets_;
-  float jet1_pt_;
-  float dipho_cosphi_;
   float met_;
-  float jet3_eta_;
-  float minIDMVA_;
-  float max2_btag_;
-  float maxIDMVA_;
-  float jet3_pt_;
-  float lep_pt_;
-  float jet2_pt_;
+  float lep_eta_;
   float subleadptoM_;
-  float max1_btag_;
-  float subleadPSV_;
   float leadptoM_;
+  float pt_higgs;
+  float max2_btag_;
+  float max1_btag_;
+  float lep_pt_;
+  float minIDMVA_;
+  float maxIDMVA_;
+  float subleadPSV_;
   float leadPSV_;
+  float nb_loose_;
+  float njets_;
 
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
-    mva->AddVariable("nb_loose_", &nb_loose_);
-    mva->AddVariable("lep_eta_", &lep_eta_);
+    mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
+    mva->AddVariable("jet3_eta_", &jet3_eta_);
+    mva->AddVariable("jet2_eta_", &jet2_eta_);
+    mva->AddVariable("jet1_eta_", &jet1_eta_);
+    mva->AddVariable("jet3_pt_", &jet3_pt_);
+    mva->AddVariable("jet2_pt_", &jet2_pt_);
+    mva->AddVariable("jet1_pt_", &jet1_pt_);
+    mva->AddVariable("helic", &helic);
+    mva->AddVariable("ht_", &ht_);
+    mva->AddVariable("mt_", &mt_);
+    mva->AddVariable("dR_higgs_lep", &dR_higgs_lep);
+    mva->AddVariable("dipho_deltaR", &dipho_deltaR);
     mva->AddVariable("sublead_eta_", &sublead_eta_);
     mva->AddVariable("lead_eta_", &lead_eta_);
-    mva->AddVariable("njets_", &njets_);
-    mva->AddVariable("jet1_pt_", &jet1_pt_);
-    mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
     mva->AddVariable("met_", &met_);
-    mva->AddVariable("jet3_eta_", &jet3_eta_);
-    mva->AddVariable("minIDMVA_", &minIDMVA_);
-    mva->AddVariable("max2_btag_", &max2_btag_);
-    mva->AddVariable("maxIDMVA_", &maxIDMVA_);
-    mva->AddVariable("jet3_pt_", &jet3_pt_);
-    mva->AddVariable("lep_pt_", &lep_pt_);
-    mva->AddVariable("jet2_pt_", &jet2_pt_);
+    mva->AddVariable("lep_eta_", &lep_eta_);
     mva->AddVariable("subleadptoM_", &subleadptoM_);
-    mva->AddVariable("max1_btag_", &max1_btag_);
-    mva->AddVariable("subleadPSV_", &subleadPSV_);
     mva->AddVariable("leadptoM_", &leadptoM_);
+    mva->AddVariable("pt_higgs", &pt_higgs);
+    mva->AddVariable("max2_btag_", &max2_btag_);
+    mva->AddVariable("max1_btag_", &max1_btag_);
+    mva->AddVariable("lep_pt_", &lep_pt_);
+    mva->AddVariable("minIDMVA_", &minIDMVA_);
+    mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+    mva->AddVariable("subleadPSV_", &subleadPSV_);
     mva->AddVariable("leadPSV_", &leadPSV_);
+    mva->AddVariable("nb_loose_", &nb_loose_);
+    mva->AddVariable("njets_", &njets_);
 
 
 
@@ -187,11 +203,23 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))		continue;
       }
 
+      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))			continue;
+
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
 	if (n_jets() < 2)	continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+      else if (tag == "ttHLeptonic_ttbarCR") {
+	if (mass() < 100)        continue;
+	if (n_jets() < 2)       continue;
+	if (nb_tight() < 1)             continue;
+	if (leadIDMVA() < -0.2)         continue;
+        if (subleadIDMVA() < -0.2)      continue;
+	if (leps[0].Pt() < 20)		continue;
+	if (MetPt() < 40)		continue;
+	if (leadPixelSeed() || subleadPixelSeed())      continue;
       }
       else if (tag == "ttHLeptonicLoose_2018studies") {
 	if (mass() < 100)        continue;
@@ -404,26 +432,34 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (evaluate_mva) {
 
         // Calculate MVA value
-        nb_loose_ = nb_loose();
-        lep_eta_ = leps[0].Eta();
+        dipho_rapidity_ = dipho_rapidity();
+        jet3_eta_ = jet_eta3();
+        jet2_eta_ = jet_eta2();
+        jet1_eta_ = jet_eta1();
+        jet3_pt_ = jet_pt3();
+        jet2_pt_ = jet_pt2();
+        jet1_pt_ = jet_pt1();
+        helic = helicity(lead_photon, sublead_photon);
+        ht_ = get_ht(jets);
+        mt_ = mT();
+        dR_higgs_lep = diphoton.DeltaR(leps[0]);
+        dipho_deltaR = lead_photon.DeltaR(sublead_photon);
         sublead_eta_ = subleadEta();
         lead_eta_ = leadEta();
-        njets_ = n_jets();
-        jet1_pt_ = jet_pt1();
-        dipho_cosphi_ = dipho_cosphi();
         met_ = MetPt();
-        jet3_eta_ = jet_eta3();
-        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        max2_btag_ = btag_scores_sorted[1].second;
-        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        jet3_pt_ = jet_pt3();
-        lep_pt_ = leps[0].Pt();
-        jet2_pt_ = jet_pt2();
+        lep_eta_ = leps[0].Eta();
         subleadptoM_ = sublead_ptoM();
-        max1_btag_ = btag_scores_sorted[0].second;
-        subleadPSV_ = subleadPixelSeed();
         leadptoM_ = lead_ptoM();
+        pt_higgs = diphoton.Pt() / diphoton.M();
+        max2_btag_ = btag_scores_sorted[1].second;
+        max1_btag_ = btag_scores_sorted[0].second;
+        lep_pt_ = leps[0].Pt();
+        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+        subleadPSV_ = subleadPixelSeed();
         leadPSV_ = leadPixelSeed();
+        nb_loose_ = nb_loose();
+        njets_ = n_jets();
 
 
 
@@ -433,7 +469,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         bool pass_ref_presel = mYear == "2017" ? pass_2017_mva_presel() : true;
 	//double rand = use_random_test_train_split ? rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi()) : cms3.rand();
 	double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
-        if (!is_low_stats_process(currentFileTitle)) 	
+        //if (!is_low_stats_process(currentFileTitle)) 	
           baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
       }
 
@@ -481,6 +517,18 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
       vProcess[processId]->fill_histogram("hDeltaRDiphoLep", diphoton.DeltaR(leps[0]), evt_weight, vId);
+
+      vProcess[processId]->fill_histogram("hPixelSeed", leadPixelSeed(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPixelSeed", subleadPixelSeed(), evt_weight, vId);
+      if (abs(leadEta()) < barrel_eta)
+        vProcess[processId]->fill_histogram("hPixelSeedEB", leadPixelSeed(), evt_weight, vId);
+      else
+        vProcess[processId]->fill_histogram("hPixelSeedEE", leadPixelSeed(), evt_weight, vId);
+      if (abs(subleadEta()) < barrel_eta)
+        vProcess[processId]->fill_histogram("hPixelSeedEB", subleadPixelSeed(), evt_weight, vId);
+      else
+        vProcess[processId]->fill_histogram("hPixelSeedEE", subleadPixelSeed(), evt_weight, vId);
+	
       double close_mW, deltaR_dipho_W;
       if (n_ele() + n_muons() == 1) { // only for semileptonic events where we expect W->qq 
 	// Hadronic W

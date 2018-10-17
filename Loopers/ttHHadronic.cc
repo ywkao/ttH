@@ -167,6 +167,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (n_bjets_branch) n_bjets_branch->SetAddress(&n_bjets_);
   n_jets_branch = tree->GetBranch("n_jets");
   if (n_jets_branch) n_jets_branch->SetAddress(&n_jets_);
+  nGenJets_branch = tree->GetBranch("nGenJets");
+  if (nGenJets_branch) nGenJets_branch->SetAddress(&nGenJets_);
   bjet1_pt_branch = tree->GetBranch("bjet1_pt");
   if (bjet1_pt_branch) bjet1_pt_branch->SetAddress(&bjet1_pt_);
   bjet2_pt_branch = tree->GetBranch("bjet2_pt");
@@ -175,6 +177,12 @@ void ttHHadronic::Init(TTree *tree) {
   if (MetPt_branch) MetPt_branch->SetAddress(&MetPt_);
   MetPhi_branch = tree->GetBranch("MetPhi");
   if (MetPhi_branch) MetPhi_branch->SetAddress(&MetPhi_);
+  topTag_score_branch = tree->GetBranch("topTag_score");
+  if (topTag_score_branch) topTag_score_branch->SetAddress(&topTag_score_);
+  topTag_topMass_branch = tree->GetBranch("topTag_topMass");
+  if (topTag_topMass_branch) topTag_topMass_branch->SetAddress(&topTag_topMass_);
+  topTag_WMass_branch = tree->GetBranch("topTag_WMass");
+  if (topTag_WMass_branch) topTag_WMass_branch->SetAddress(&topTag_WMass_);
   jet1_pt_branch = tree->GetBranch("jet1_pt");
   if (jet1_pt_branch) jet1_pt_branch->SetAddress(&jet1_pt_);
   jet2_pt_branch = tree->GetBranch("jet2_pt");
@@ -525,10 +533,14 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   sublead_SmallestDr_isLoaded = false;
   n_bjets_isLoaded = false;
   n_jets_isLoaded = false;
+  nGenJets_isLoaded = false;
   bjet1_pt_isLoaded = false;
   bjet2_pt_isLoaded = false;
   MetPt_isLoaded = false;
   MetPhi_isLoaded = false;
+  topTag_score_isLoaded = false;
+  topTag_topMass_isLoaded = false;
+  topTag_WMass_isLoaded = false;
   jet1_pt_isLoaded = false;
   jet2_pt_isLoaded = false;
   jet3_pt_isLoaded = false;
@@ -745,10 +757,14 @@ void ttHHadronic::LoadAllBranches() {
   if (sublead_SmallestDr_branch != 0) sublead_SmallestDr();
   if (n_bjets_branch != 0) n_bjets();
   if (n_jets_branch != 0) n_jets();
+  if (nGenJets_branch != 0) nGenJets();
   if (bjet1_pt_branch != 0) bjet1_pt();
   if (bjet2_pt_branch != 0) bjet2_pt();
   if (MetPt_branch != 0) MetPt();
   if (MetPhi_branch != 0) MetPhi();
+  if (topTag_score_branch != 0) topTag_score();
+  if (topTag_topMass_branch != 0) topTag_topMass();
+  if (topTag_WMass_branch != 0) topTag_WMass();
   if (jet1_pt_branch != 0) jet1_pt();
   if (jet2_pt_branch != 0) jet2_pt();
   if (jet3_pt_branch != 0) jet3_pt();
@@ -1935,6 +1951,19 @@ const float &ttHHadronic::n_jets() {
   return n_jets_;
 }
 
+const float &ttHHadronic::nGenJets() {
+  if (not nGenJets_isLoaded) {
+    if (nGenJets_branch != 0) {
+      nGenJets_branch->GetEntry(index);
+    } else {
+      printf("branch nGenJets_branch does not exist!\n");
+      exit(1);
+    }
+    nGenJets_isLoaded = true;
+  }
+  return nGenJets_;
+}
+
 const float &ttHHadronic::bjet1_pt() {
   if (not bjet1_pt_isLoaded) {
     if (bjet1_pt_branch != 0) {
@@ -1985,6 +2014,45 @@ const float &ttHHadronic::MetPhi() {
     MetPhi_isLoaded = true;
   }
   return MetPhi_;
+}
+
+const float &ttHHadronic::topTag_score() {
+  if (not topTag_score_isLoaded) {
+    if (topTag_score_branch != 0) {
+      topTag_score_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_score_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_score_isLoaded = true;
+  }
+  return topTag_score_;
+}
+
+const float &ttHHadronic::topTag_topMass() {
+  if (not topTag_topMass_isLoaded) {
+    if (topTag_topMass_branch != 0) {
+      topTag_topMass_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_topMass_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_topMass_isLoaded = true;
+  }
+  return topTag_topMass_;
+}
+
+const float &ttHHadronic::topTag_WMass() {
+  if (not topTag_WMass_isLoaded) {
+    if (topTag_WMass_branch != 0) {
+      topTag_WMass_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_WMass_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_WMass_isLoaded = true;
+  }
+  return topTag_WMass_;
 }
 
 const float &ttHHadronic::jet1_pt() {
@@ -3794,10 +3862,14 @@ const float &sublead_PassFrix() { return cms3.sublead_PassFrix(); }
 const float &sublead_SmallestDr() { return cms3.sublead_SmallestDr(); }
 const float &n_bjets() { return cms3.n_bjets(); }
 const float &n_jets() { return cms3.n_jets(); }
+const float &nGenJets() { return cms3.nGenJets(); }
 const float &bjet1_pt() { return cms3.bjet1_pt(); }
 const float &bjet2_pt() { return cms3.bjet2_pt(); }
 const float &MetPt() { return cms3.MetPt(); }
 const float &MetPhi() { return cms3.MetPhi(); }
+const float &topTag_score() { return cms3.topTag_score(); }
+const float &topTag_topMass() { return cms3.topTag_topMass(); }
+const float &topTag_WMass() { return cms3.topTag_WMass(); }
 const float &jet1_pt() { return cms3.jet1_pt(); }
 const float &jet2_pt() { return cms3.jet2_pt(); }
 const float &jet3_pt() { return cms3.jet3_pt(); }
