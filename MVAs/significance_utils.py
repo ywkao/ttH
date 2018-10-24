@@ -34,7 +34,8 @@ def all_ones(array):
 def gaus(x, a, b, c):
   return a * numpy.exp(-0.5 * (( (x - b) / c ) ** 2))
 
-def constant_estimate(weights, sigma_eff):
+def constant_estimate(weights, sigma_eff, is_data):
+  sideband_width = (180. - 130.) + (120. - 100.) if is_data else (180. - 100.)
   est = numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
   unc = math.sqrt(numpy.sum(weights**2)) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
   if est > 0:
@@ -71,7 +72,7 @@ def events_passing_cut(events, cut):
       events_pass["mva_score"].append(events["mva_score"][i])
   return events_pass
 
-def za_scores(n_quantiles, signal_events, background_events):
+def za_scores(n_quantiles, signal_events, background_events, is_data):
   testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
   za = []
   za_unc = []
@@ -105,9 +106,10 @@ def za_scores(n_quantiles, signal_events, background_events):
         bkg_events_mass_window.append(bkg_events_passing_cut["weights"][i])
     bkg_events_mass_window = numpy.asarray(bkg_events_mass_window)
     #b = ( 1. / testing_frac) * constant_estimate(bkg_events_mass_window, sigma_eff)
-    b, b_unc = constant_estimate(bkg_events_mass_window, sigma_eff)
-    b *= ( 1. / testing_frac)
-    b_unc *= ( 1. / testing_frac)
+    b, b_unc = constant_estimate(bkg_events_mass_window, sigma_eff, is_data)
+    if not is_data:
+      b *= ( 1. / testing_frac)
+      b_unc *= ( 1. / testing_frac)
 
     # Calculate Z_A
     z_mc = Z_A(s, b)

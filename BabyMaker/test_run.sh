@@ -22,7 +22,8 @@ if [ "$CMSSW_VER" = "80X" ]; then
   cmsenv
 
   #INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20/TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8/RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/microAOD_1.root' # or change to your favorite file
-  INPUTFILENAMES='file:/home/users/bemarsh/analysis/tth/test/CMSSW_8_0_28/src/flashgg/myMicroAODOutputFile.root'
+  #INPUTFILENAMES='file:/home/users/bemarsh/analysis/tth/test/CMSSW_8_0_28/src/flashgg/myMicroAODOutputFile.root'
+  INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/2016_topTag_overlapRemoval/test_ttgg.root'
 
 fi
 

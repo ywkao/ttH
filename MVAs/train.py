@@ -21,6 +21,7 @@ parser.add_argument("input", help = "input hdf5 file", type=str)
 parser.add_argument("ext", help = "extension, e.g. '1'", type=str)
 parser.add_argument("tag", help = "tag to identify this training", type=str)
 parser.add_argument("-m", "--multi", help = "run a multiclassifier based BDT", action="store_true")
+parser.add_argument("-d", "--data", help = "check ZA on data also", action="store_true")
 args = parser.parse_args()
 
 # Read features
@@ -40,6 +41,12 @@ multi_label_validation = f['multi_label_validation']
 weights_validation = f['weights_validation']
 mass_validation = f['mass_validation']
 
+global_features_data = f['global_data']
+label_data = f['label_data']
+multi_label_data = f['multi_label_data']
+weights_data = f['weights_data']
+mass_data = f['mass_data']
+
 global_features = numpy.asarray(global_features)
 label = numpy.asarray(label)
 multi_label = numpy.asarray(multi_label)
@@ -51,6 +58,12 @@ label_validation = numpy.asarray(label_validation)
 multi_label_validation = numpy.asarray(multi_label_validation)
 weights_validation = numpy.asarray(weights_validation)
 mass_validation = numpy.asarray(mass_validation)
+
+global_features_data = numpy.asarray(global_features_data)
+label_data = numpy.asarray(label_data)
+multi_label_data = numpy.asarray(multi_label_data)
+weights_data = numpy.asarray(weights_data)
+mass_data = numpy.asarray(mass_data)
 
 feature_names = numpy.asarray(feature_names)
 
@@ -65,11 +78,17 @@ print global_features_validation.shape
 print label_validation.shape
 print weights_validation.shape
 
+print global_features_data.shape
+print label_data.shape
+print weights_data.shape
+
+
 x_train, y_train, y_train_multi, weights_train = global_features, label, multi_label, weights
 x_test, y_test, y_test_multi, weights_test  = global_features_validation, label_validation, multi_label_validation, weights_validation
 
 X_train = pandas.DataFrame(data=x_train, columns = feature_names)
 X_test = pandas.DataFrame(data=x_test, columns = feature_names)
+X_data = pandas.DataFrame(data=global_features_data, columns = feature_names)
 
 if args.multi:
   Y_train = y_train_multi 
@@ -102,6 +121,7 @@ print sum_pos_weights, sum_neg_weights
 
 d_train = xgboost.DMatrix(X_train, label = Y_train, weight = weights_train)
 d_test = xgboost.DMatrix(X_test, label = Y_test)
+d_data = xgboost.DMatrix(X_data)
 
 # Define BDT parameters
 param = { 
@@ -155,12 +175,15 @@ tmva_utils.convert_model(model, input_variables = input_variables, output_xml = 
 # predict
 pred_train = bdt.predict(d_train, output_margin=args.multi)
 pred_test = bdt.predict(d_test, output_margin=args.multi)
+pred_data = bdt.predict(d_data, output_margin=args.multi)
+
 
 print pred_test.shape
 
 if args.multi:
   pred_train = pred_train[:,0] 
   pred_test = pred_test[:,0] 
+  pred_data = pred_data[:,0]
 
 print pred_test.shape
 
@@ -211,18 +234,27 @@ plt.legend(loc='lower right')
 plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
 estimate_za = True
-if estimate_za and args.ext == "1":
+if estimate_za:
   ref_file = "/home/users/sjmay/ttH/Loopers/Optimization/ZA_curves/MVAOptimizationBaby_1_Leptonic_reproduce_1_bdt.npz"
   ref2_file = "/home/users/sjmay/ttH/Loopers/Optimization/ZA_curves/MVAOptimizationBaby_1_Leptonic_baseline_20var_14Oct2018_1_bdt.npz"
   ref_results = numpy.load(ref_file)
   ref2_results = numpy.load(ref2_file)
+
   s_ref = ref_results["n_sig_mc"]
   za_ref = ref_results["za_mc"]
   za_ref_unc = ref_results["za_unc_mc"]
 
+  s_ref_data = ref_results["n_sig_data"]
+  za_ref_data = ref_results["za_data"]
+  za_ref_unc_data = ref_results["za_unc_data"]
+
   s_ref2 = ref2_results["n_sig_mc_ref"]
   za_ref2 = ref2_results["za_mc_ref"]
   za_ref2_unc = ref2_results["za_unc_mc_ref"]
+
+  s_ref2_data = ref2_results["n_sig_data_ref"]
+  za_ref2_data = ref2_results["za_data_ref"]
+  za_ref2_unc_data = ref2_results["za_unc_data_ref"]
 
   n_quantiles = 100
   signal_mva_scores = ks_test.logical_vector(pred_test, y_test, 1)
@@ -234,10 +266,12 @@ if estimate_za and args.ext == "1":
   signal_weights = ks_test.logical_vector(weights_validation, y_test, 1)
   bkg_weights = ks_test.logical_vector(weights_validation, y_test, 0)
 
-  signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores}
-  bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores}
+  signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores }
+  bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores }
+  data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : pred_data }  
 
-  za, za_unc, s, b = significance_utils.za_scores(n_quantiles, signal_events, bkg_events)
+  za, za_unc, s, b = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False)
+  za_data, za_unc_data, s_data, b_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True)
   za = numpy.asarray(za)
 
   max_za = numpy.max(za)
@@ -249,12 +283,22 @@ if estimate_za and args.ext == "1":
 
   fig = plt.figure()
   ax1 = fig.add_subplot(111)
-  ax1.plot(s, za, label='Best Guess of Optimal BDT', color = 'red')
-  ax1.fill_between(s, numpy.asarray(za) - numpy.asarray(za_unc), numpy.asarray(za) + numpy.asarray(za_unc), color = 'red', alpha = 0.25)
-  ax1.plot(s_ref, za_ref, label='Reproduce 2017 BDT (MC)', color = 'blue')
-  ax1.fill_between(s_ref, numpy.asarray(za_ref) - numpy.asarray(za_ref_unc), numpy.asarray(za_ref) + numpy.asarray(za_ref_unc), color = 'blue', alpha = 0.25)
-  ax1.plot(s_ref2, za_ref2, label='2017 ttH BDT (MC)', color = 'black', linestyle = '--', dashes = (5,2))
-  ax1.fill_between(s_ref2, numpy.asarray(za_ref2) - numpy.asarray(za_ref2_unc), numpy.asarray(za_ref2) + numpy.asarray(za_ref2_unc), color = 'black', alpha = 0.25)
+  if not args.data:
+    ax1.plot(s, za, label='Best Guess of Optimal BDT', color = 'red')
+    ax1.fill_between(s, numpy.asarray(za) - numpy.asarray(za_unc), numpy.asarray(za) + numpy.asarray(za_unc), color = 'red', alpha = 0.25)
+    ax1.plot(s_ref, za_ref, label='Reproduce 2017 BDT (MC)', color = 'blue')
+    ax1.fill_between(s_ref, numpy.asarray(za_ref) - numpy.asarray(za_ref_unc), numpy.asarray(za_ref) + numpy.asarray(za_ref_unc), color = 'blue', alpha = 0.25)
+    ax1.plot(s_ref2, za_ref2, label='2017 ttH BDT (MC)', color = 'black', linestyle = '--', dashes = (5,2))
+    ax1.fill_between(s_ref2, numpy.asarray(za_ref2) - numpy.asarray(za_ref2_unc), numpy.asarray(za_ref2) + numpy.asarray(za_ref2_unc), color = 'black', alpha = 0.25)
+
+  else:
+    ax1.plot(s_data, za_data, label='Best Guess of Optimal BDT', color = 'red')
+    ax1.fill_between(s_data, numpy.asarray(za_data) - numpy.asarray(za_unc_data), numpy.asarray(za_data) + numpy.asarray(za_unc_data), color = 'red', alpha = 0.25)
+    ax1.plot(s_ref_data, za_ref_data, label='Reproduce 2017 BDT (Data)', color = 'blue')
+    ax1.fill_between(s_ref_data, numpy.asarray(za_ref_data) - numpy.asarray(za_ref_unc_data), numpy.asarray(za_ref_data) + numpy.asarray(za_ref_unc_data), color = 'blue', alpha = 0.25)
+    ax1.plot(s_ref2_data, za_ref2_data, label='2017 ttH BDT (Data)', color = 'black', linestyle = '--', dashes = (5,2))
+    ax1.fill_between(s_ref2_data, numpy.asarray(za_ref2_data) - numpy.asarray(za_ref2_unc_data), numpy.asarray(za_ref2_data) + numpy.asarray(za_ref2_unc_data), color = 'black', alpha = 0.25)
+
 
   plt.xlabel('# Signal Events')
   ax1.set_ylabel('Significance (Z_A)')
