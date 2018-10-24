@@ -24,8 +24,10 @@ def gaus(x, a, b, c):
 def constant_estimate(data, weights, mean_eff, sigma_eff, smear):
   if numpy.sum(weights) < 0:
     return 999, 999
-  est = numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
-  unc = math.sqrt(numpy.sum(weights**2)) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  is_data = numpy.all(weights==1)
+  sideband_width = (180. - 130.) + (120. - 100.) if is_data else (180. - 100.)
+  est = numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / sideband_width)
+  unc = math.sqrt(numpy.sum(weights**2)) * ((2 * 1.645 * sigma_eff) / (sideband_width))
   return est, unc 
   #else:
   #  h = ROOT.TH1D("h_sig", "", 1, 100, 180)
