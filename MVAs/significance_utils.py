@@ -78,6 +78,7 @@ def za_scores(n_quantiles, signal_events, background_events, is_data):
   za_unc = []
   n_sig = []
   n_bkg = []
+  sigma_eff_ = []
   # Calculate cuts corresponding to each quantile
   quantiles, mva_cut = quantiles_to_mva_score(n_quantiles, signal_events["mva_score"])
 
@@ -120,5 +121,6 @@ def za_scores(n_quantiles, signal_events, background_events, is_data):
     za_unc.append(z_mc_unc)
     n_sig.append(s)
     n_bkg.append(b)
+    sigma_eff_.append(sigma_eff)
 
-  return za, za_unc, n_sig, n_bkg 
+  return za, za_unc, n_sig, n_bkg, sigma_eff_ 

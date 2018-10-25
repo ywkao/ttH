@@ -4,6 +4,7 @@ import h5py
 import xgboost
 import pandas
 import json
+import math
 
 from sklearn.cross_validation import train_test_split
 from sklearn.utils import shuffle
@@ -22,6 +23,7 @@ parser.add_argument("ext", help = "extension, e.g. '1'", type=str)
 parser.add_argument("tag", help = "tag to identify this training", type=str)
 parser.add_argument("-m", "--multi", help = "run a multiclassifier based BDT", action="store_true")
 parser.add_argument("-d", "--data", help = "check ZA on data also", action="store_true")
+parser.add_argument("-r", "--res", help = "weight signal events by relative mass resolution", action = "store_true")
 args = parser.parse_args()
 
 # Read features
@@ -34,6 +36,8 @@ label = f['label']
 multi_label = f['multi_label']
 weights = f['weights']
 mass = f['mass']
+lead_sigmaEtoE = f['lead_sigmaEtoE']
+sublead_sigmaEtoE = f['sublead_sigmaEtoE']
 
 global_features_validation = f['global_validation']
 label_validation = f['label_validation']
@@ -52,6 +56,8 @@ label = numpy.asarray(label)
 multi_label = numpy.asarray(multi_label)
 weights = numpy.asarray(weights)
 mass = numpy.asarray(mass)
+lead_sigmaEtoE = numpy.asarray(lead_sigmaEtoE)
+sublead_sigmaEtoE = numpy.asarray(sublead_sigmaEtoE)
 
 global_features_validation = numpy.asarray(global_features_validation)
 label_validation = numpy.asarray(label_validation)
@@ -113,6 +119,13 @@ if args.multi:
   for i in range(len(weights_train)):
     if label[i] == 1:
       weights_train[i] *= (sum_neg_weights / sum_pos_weights)
+
+if args.res:
+  for i in range(len(weights_train)):
+    if label[i] == 1:
+      print weights_train[i], 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2)
+      weights_train[i] *= 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2) 
+      print weights_train[i]
 
 sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
 sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
@@ -270,12 +283,14 @@ if estimate_za:
   bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores }
   data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : pred_data }  
 
-  za, za_unc, s, b = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False)
-  za_data, za_unc_data, s_data, b_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True)
+  za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False)
+  za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True)
   za = numpy.asarray(za)
 
   max_za = numpy.max(za)
   print max_za
+
+  numpy.savez("sigma_eff.npz", sigma_eff = sigma_eff, n_sig = s)
 
   import matplotlib
   matplotlib.use('Agg')

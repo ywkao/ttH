@@ -50,8 +50,6 @@ def calc_za_and_unc(file_pattern):
       max_za_mc.append(za_mc[idx_mc])
       max_za_unc_mc.append(za_unc_mc[idx_mc])
 
-      print za_unc_mc[idx_mc]
-
     avg_max_za_data = numpy.mean(max_za_data)
     #avg_max_za_data_unc = numpy.mean(max_za_unc_data) / numpy.sqrt(len(max_za_unc_data))
     avg_max_za_data_unc = 0.5*numpy.sqrt(max_za_unc_data[0]**2 + max_za_unc_data[1]**2)
@@ -150,11 +148,15 @@ vars = { # dictionary of all potential variables to study
 	"diphoton_cosine_delta_phi" : { "name" : "dipho_cosphi_", "type" : "double", "function" : "dipho_cosphi()", "latex_name" : "$|\cos(\Delta \phi (\gamma_1, \gamma_2))|$"},
 	"diphoton_rapidity" : { "name" : "dipho_rapidity_", "type" : "double", "function" : "dipho_rapidity()", "latex_name" : "$Y_{\gamma \gamma}$"},
 	"met" : { "name" : "met_", "type" : "double", "function" : "MetPt()", "latex_name" : "$E_T^{\\text{miss}}$"},
-	"mt" : { "name" : "mt_", "type" : "double", "function" : "mT()", "latex_name" : "$m_T(l, E_T^{\\text{miss}})$"}	
+	"mt" : { "name" : "mt_", "type" : "double", "function" : "mT()", "latex_name" : "$m_T(l, E_T^{\\text{miss}})$"},
+	"year" : { "name" : "year_", "type" : "int", "function" : 'year == "2018" ? 2 : (year == "2017" ? 1 : (year == "2016" ? 0 : -999))', "latex_name" : "year"},	
 }
 
 vars_to_add = {
-        "top_tag_score" : { "name" : "top_tag_score", "type" : "double", "function" : "topTag_score()", "latex_name" : "Top Tag BDT"},
+        #"top_tag_score" : { "name" : "top_tag_score", "type" : "double", "function" : "topTag_score()", "latex_name" : "Top Tag BDT"},
+	"year" : vars["year"],
+	"max_btag" : vars["max_btag"],
+	"jet5_eta" : vars["jet5_eta"], 
 } 
 
 #cats = { # sort all of these into categories
@@ -175,27 +177,27 @@ baseline_vars = [ # variables to store in the baseline BDT that we use as a star
 	"max_phoIDMVA",
 	"min_phoIDMVA",
 	"lepton_pt",
-	"max_btag",
-	"second_max_btag",
-	"pt_higgs",
-	"lead_pt_over_m",
-	"sublead_pt_over_m",
-	"lepton_eta",
-	"met",
-	"lead_eta",
-	"sublead_eta",
-	"diphoton_dR",
-	"dR_higgs_lep",
-	"mt",
-	"ht",
-	"helicity_angle",
-	"jet1_pt",
-	"jet2_pt",
-	"jet3_pt",
-	"jet1_eta",
-	"jet2_eta",
-	"jet3_eta",
-	"diphoton_rapidity",
+	#"max_btag",
+	#"second_max_btag",
+	#"pt_higgs",
+	#"lead_pt_over_m",
+	#"sublead_pt_over_m",
+	#"lepton_eta",
+	#"met",
+	#"lead_eta",
+	#"sublead_eta",
+	#"diphoton_dR",
+	#"dR_higgs_lep",
+	#"mt",
+	#"ht",
+	#"helicity_angle",
+	#"jet1_pt",
+	#"jet2_pt",
+	#"jet3_pt",
+	#"jet1_eta",
+	#"jet2_eta",
+	#"jet3_eta",
+	#"diphoton_rapidity",
 	#"top_tag_score",	
 ]
 
@@ -226,7 +228,7 @@ do_baseline = True
 do_individual_vars = False
 do_make_baseline = False
 do_table = True
-tag = "25var_14Oct2018"
+tag = "7var_24Oct2018"
 
 # First, remove all variables 
 

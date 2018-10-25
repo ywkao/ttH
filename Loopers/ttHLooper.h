@@ -517,7 +517,7 @@ bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
 
 void add_samples(TChain* ch, TString year) {
   //TString tag = year == "2018" ? "v102.1" : (year == "2017" ? "v1.2" : "v3.16");
-  TString tag = year == "2016" ? "v3.16" : "v1.3";
+  TString tag = year == "2016" ? "v3.16" : "v1.2";
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 

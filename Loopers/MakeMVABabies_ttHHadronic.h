@@ -46,6 +46,8 @@ class BabyMaker {
     double 	rand_;
     double      super_rand_;
     double      mass_;
+    double      lead_sigmaEtoE_;
+    double      sublead_sigmaEtoE_;
 
     // Variable declarations
     float           dipho_delta_R;
@@ -104,6 +106,9 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("rand_"            , &rand_       );
   BabyTree_->Branch("super_rand_"            , &super_rand_       );
   BabyTree_->Branch("mass_"             , &mass_        );
+
+  BabyTree_->Branch("lead_sigmaEtoE_"             , &lead_sigmaEtoE_        );
+  BabyTree_->Branch("sublead_sigmaEtoE_"             , &sublead_sigmaEtoE_        );
 
   // Variable branches
   BabyTree_->Branch("dipho_delta_R" ,&dipho_delta_R);

@@ -223,6 +223,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (nb_medium() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+      else if (tag == "ttHHadronic_HLLHC_presel2") {
+        if (mass() < 100 || mass() > 180)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_medium() < 1)            continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() < 0.55)         continue;
+        if (subleadIDMVA() < 0.55)         continue;
+      }
       else if (tag == "ttHHadronic_HLLHC_presel_withBDT") {
         if (mass() < 100 || mass() > 180)                continue;
         if (n_jets() < 3)               continue;

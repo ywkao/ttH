@@ -77,7 +77,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (subleadIDMVA() < -0.2)      continue;
       }
 
-
       else if (tag == "ttHLeptonicMedium") {
         if (mass() < 100)                               continue;
         if (n_jets() < 2)                               continue;
@@ -123,7 +122,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
  
       // Decide what type of sample this is
       process_id_ = categorize_process(currentFileTitle);
-      //if (is_low_stats_process(currentFileTitle))	continue;
+      if (is_low_stats_process(currentFileTitle))	continue;
 
       // Make p4 for physics objects
       vector<TLorentzVector> jets;
@@ -166,27 +165,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
 
       // Variable definitions
-      dipho_rapidity_ = dipho_rapidity();
-      jet3_eta_ = jet_eta3();
-      jet2_eta_ = jet_eta2();
-      jet1_eta_ = jet_eta1();
-      jet3_pt_ = jet_pt3();
-      jet2_pt_ = jet_pt2();
-      jet1_pt_ = jet_pt1();
-      helic = helicity(lead_photon, sublead_photon);
-      ht_ = get_ht(jets);
-      mt_ = mT();
-      dR_higgs_lep = diphoton.DeltaR(leps[0]);
-      dipho_deltaR = lead_photon.DeltaR(sublead_photon);
-      sublead_eta_ = subleadEta();
-      lead_eta_ = leadEta();
-      met_ = MetPt();
-      lep_eta_ = leps[0].Eta();
-      subleadptoM_ = sublead_ptoM();
-      leadptoM_ = lead_ptoM();
-      pt_higgs = diphoton.Pt() / diphoton.M();
-      max2_btag_ = btag_scores_sorted[1].second;
-      max1_btag_ = btag_scores_sorted[0].second;
       lep_pt_ = leps[0].Pt();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
@@ -195,12 +173,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       nb_loose_ = nb_loose();
       njets_ = n_jets();
 
-
-
-
       rand_ = cms3.rand();
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
       mass_ = mass();
+
+      lead_sigmaEtoE_ = lead_sigmaEoE();
+      sublead_sigmaEtoE_ = sublead_sigmaEoE();
 
       FillBabyNtuple();
 

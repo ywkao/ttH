@@ -21,14 +21,9 @@ tree = f.Get("t")
 feature_names = (root_numpy.tree2array(tree, branches = ["mva_branches"], start=0, stop=1))[0][0]
 feature_names = list(feature_names) 
 
-# use year as a feature
-use_year = False
-if use_year:
-  feature_names.append("year_")
-
 print feature_names
 
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_"]))
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_"]))
 
 # grab features
 train_frac = 0.5
@@ -60,6 +55,8 @@ label = features["label_"]
 multi_label = features["multi_label_"]
 weights = features["evt_weight_"]
 mass = features["mass_"]
+lead_sigmaEtoE = features["lead_sigmaEtoE_"]
+sublead_sigmaEtoE = features["sublead_sigmaEtoE_"]
 
 label_validation = features_validation["label_"]
 multi_label_validation = features_validation["multi_label_"]
@@ -83,6 +80,8 @@ dset_label = f_out.create_dataset("label", data=label)
 dset_multi_label = f_out.create_dataset("multi_label", data=multi_label)
 dset_weights = f_out.create_dataset("weights", data=weights)
 dset_mass = f_out.create_dataset("mass", data=mass)
+dset_lead_sigmaEtoE = f_out.create_dataset("lead_sigmaEtoE", data=lead_sigmaEtoE)
+dset_sublead_sigmaEtoE = f_out.create_dataset("sublead_sigmaEtoE", data=sublead_sigmaEtoE)
 
 dset_global_validation = f_out.create_dataset("global_validation", data=global_features_validation)
 dset_label_validation = f_out.create_dataset("label_validation", data=label_validation)

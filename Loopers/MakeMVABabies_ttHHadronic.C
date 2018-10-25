@@ -152,6 +152,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       rand_ = cms3.rand();
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
       mass_ = mass();
+      lead_sigmaEtoE_ = lead_sigmaEoE();
+      sublead_sigmaEtoE_ = sublead_sigmaEoE();
 
       FillBabyNtuple();
 
