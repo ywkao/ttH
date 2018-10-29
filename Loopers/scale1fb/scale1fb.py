@@ -36,6 +36,8 @@ def grab_event_info(json_file_):
       scale1fb[dataset]["negative_weight_frac"] = mc_events[dataset.replace("/","")][0]
       scale1fb[dataset]["nevents"] = mc_events[dataset.replace("/","")][1]
 
+#grab_event_info("nEvents_fromDBS/n_events.json")
+
 if args.year == "2016":
   grab_event_info("nEvents/mc_events_2016_80X.json")
 elif args.year == "2017":

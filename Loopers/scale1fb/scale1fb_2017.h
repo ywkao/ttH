@@ -91,6 +91,7 @@ double scale1fb_2017(TString currentFileTitle) {
   	{"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8", 0.0021268834},
   	{"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8", 0.0000074081},
   	{"THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5", 0.0000000893},
+	{"THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5", 3.5706368290131152e-08},
   	{"VHToGG_M65_13TeV_amcatnloFXFX_madspin_pythia8", 0.0027637740},
   	{"VHToGG_M75_13TeV_amcatnloFXFX_madspin_pythia8", 0.0030543043},
   	{"GluGluHToGG_M85_13TeV_amcatnloFXFX_pythia8", 0.0137841607},
@@ -104,9 +105,11 @@ double scale1fb_2017(TString currentFileTitle) {
   };
   TObjArray *tx = currentFileTitle.Tokenize("/");
   TString key = ((TObjString *)(tx->At(tx->GetEntries()-2)))->String();
-  TString tag = "v1.2";
+  TString tag = "v94.1";
   TString to_replace = "__ttH_Babies_" + tag + "_2017";
   TString replace_with = "";
   key = key.ReplaceAll(to_replace, replace_with);
+  key = key.ReplaceAll("_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017", "");
+  key = key.ReplaceAll("_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017", "");
   return m.find(key)->second;
 }

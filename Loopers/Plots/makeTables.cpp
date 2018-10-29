@@ -24,7 +24,8 @@ std::map<TString, TString> mLatex = {
         {"WJets", "W + Jets"},
         {"TTJets", "$t\\bar{t}$ + Jets"},
 	{"ttH", "ttH"},
-	{"Data", "Data"}
+	{"Data", "Data"},
+	{"THQ", "tHq"},
 };
 
 std::map<int, TString> mLeptons = {
@@ -372,7 +373,7 @@ int main(int argc, char* argv[])
     if (year == "2016")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
     else if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ"};
 
     make_table_multiple(vF, "hNVtx", vBkgs, vLabels); 
 

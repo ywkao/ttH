@@ -33,9 +33,6 @@ if len(old_files) > 0:
 
 nPar = 10
 for dir in dirs:
-  if not "TTGG" in dir:
-    continue 
-
   if args.data_only:
     if "DoubleEG" not in dir:
       continue

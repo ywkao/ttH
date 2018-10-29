@@ -137,7 +137,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
-    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
+    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW");
 
     TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
 
@@ -167,9 +167,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
       // Fill mva baby before any selections
-      int processId = categorize_process(currentFileTitle);
-      int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
       int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
+      int processId = categorize_process(currentFileTitle, genPhotonId);
+      int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
@@ -358,8 +358,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Skip blinded region for MC after filling mass histogram
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
 
-
       // Fill rest of histograms //
+      double dipho_mass_resolution = pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), -0.5);
+      vProcess[processId]->fill_histogram("hDiphotonMassResolution", dipho_mass_resolution, evt_weight, vId);
+
+      vProcess[processId]->fill_histogram("hTopTagger_score", topTag_score(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hTopTagger_topMass", topTag_topMass(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hTopTagger_WMass", topTag_WMass(), evt_weight, vId);
+
       vProcess[processId]->fill_histogram("hPixelSeed", leadPixelSeed(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPixelSeed", subleadPixelSeed(), evt_weight, vId);
       if (abs(leadEta()) < barrel_eta)

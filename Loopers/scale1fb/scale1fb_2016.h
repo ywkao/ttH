@@ -37,7 +37,7 @@ double scale1fb_2016(TString currentFileTitle) {
   };
   TObjArray *tx = currentFileTitle.Tokenize("/");
   TString key = ((TObjString *)(tx->At(tx->GetEntries()-2)))->String();
-  TString tag = "v3.16";
+  TString tag = "v80.1";
   TString to_replace = "__ttH_Babies_" + tag + "_2016";
   TString replace_with = "";
   key = key.ReplaceAll(to_replace, replace_with);

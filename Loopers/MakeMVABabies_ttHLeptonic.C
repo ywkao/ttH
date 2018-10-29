@@ -121,7 +121,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       }
  
       // Decide what type of sample this is
-      process_id_ = categorize_process(currentFileTitle);
+      int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
+      process_id_ = categorize_process(currentFileTitle, genPhotonId);
       if (is_low_stats_process(currentFileTitle))	continue;
 
       // Make p4 for physics objects
@@ -161,7 +162,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
-      int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch()); 
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
 
       // Variable definitions

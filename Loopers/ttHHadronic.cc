@@ -115,12 +115,6 @@ void ttHHadronic::Init(TTree *tree) {
   if (lead_closest_gen_dR_branch) lead_closest_gen_dR_branch->SetAddress(&lead_closest_gen_dR_);
   sublead_closest_gen_dR_branch = tree->GetBranch("sublead_closest_gen_dR");
   if (sublead_closest_gen_dR_branch) sublead_closest_gen_dR_branch->SetAddress(&sublead_closest_gen_dR_);
-  lead_PhoGenPt_branch = tree->GetBranch("lead_PhoGenPt");
-  if (lead_PhoGenPt_branch) lead_PhoGenPt_branch->SetAddress(&lead_PhoGenPt_);
-  lead_PhoGenEta_branch = tree->GetBranch("lead_PhoGenEta");
-  if (lead_PhoGenEta_branch) lead_PhoGenEta_branch->SetAddress(&lead_PhoGenEta_);
-  lead_PhoGenPhi_branch = tree->GetBranch("lead_PhoGenPhi");
-  if (lead_PhoGenPhi_branch) lead_PhoGenPhi_branch->SetAddress(&lead_PhoGenPhi_);
   lead_Prompt_branch = tree->GetBranch("lead_Prompt");
   if (lead_Prompt_branch) lead_Prompt_branch->SetAddress(&lead_Prompt_);
   lead_Mad_branch = tree->GetBranch("lead_Mad");
@@ -139,12 +133,6 @@ void ttHHadronic::Init(TTree *tree) {
   if (lead_PassFrix_branch) lead_PassFrix_branch->SetAddress(&lead_PassFrix_);
   lead_SmallestDr_branch = tree->GetBranch("lead_SmallestDr");
   if (lead_SmallestDr_branch) lead_SmallestDr_branch->SetAddress(&lead_SmallestDr_);
-  sublead_PhoGenPt_branch = tree->GetBranch("sublead_PhoGenPt");
-  if (sublead_PhoGenPt_branch) sublead_PhoGenPt_branch->SetAddress(&sublead_PhoGenPt_);
-  sublead_PhoGenEta_branch = tree->GetBranch("sublead_PhoGenEta");
-  if (sublead_PhoGenEta_branch) sublead_PhoGenEta_branch->SetAddress(&sublead_PhoGenEta_);
-  sublead_PhoGenPhi_branch = tree->GetBranch("sublead_PhoGenPhi");
-  if (sublead_PhoGenPhi_branch) sublead_PhoGenPhi_branch->SetAddress(&sublead_PhoGenPhi_);
   sublead_Prompt_branch = tree->GetBranch("sublead_Prompt");
   if (sublead_Prompt_branch) sublead_Prompt_branch->SetAddress(&sublead_Prompt_);
   sublead_Mad_branch = tree->GetBranch("sublead_Mad");
@@ -163,12 +151,16 @@ void ttHHadronic::Init(TTree *tree) {
   if (sublead_PassFrix_branch) sublead_PassFrix_branch->SetAddress(&sublead_PassFrix_);
   sublead_SmallestDr_branch = tree->GetBranch("sublead_SmallestDr");
   if (sublead_SmallestDr_branch) sublead_SmallestDr_branch->SetAddress(&sublead_SmallestDr_);
+  topTag_score_branch = tree->GetBranch("topTag_score");
+  if (topTag_score_branch) topTag_score_branch->SetAddress(&topTag_score_);
+  topTag_topMass_branch = tree->GetBranch("topTag_topMass");
+  if (topTag_topMass_branch) topTag_topMass_branch->SetAddress(&topTag_topMass_);
+  topTag_WMass_branch = tree->GetBranch("topTag_WMass");
+  if (topTag_WMass_branch) topTag_WMass_branch->SetAddress(&topTag_WMass_);
   n_bjets_branch = tree->GetBranch("n_bjets");
   if (n_bjets_branch) n_bjets_branch->SetAddress(&n_bjets_);
   n_jets_branch = tree->GetBranch("n_jets");
   if (n_jets_branch) n_jets_branch->SetAddress(&n_jets_);
-  nGenJets_branch = tree->GetBranch("nGenJets");
-  if (nGenJets_branch) nGenJets_branch->SetAddress(&nGenJets_);
   bjet1_pt_branch = tree->GetBranch("bjet1_pt");
   if (bjet1_pt_branch) bjet1_pt_branch->SetAddress(&bjet1_pt_);
   bjet2_pt_branch = tree->GetBranch("bjet2_pt");
@@ -177,12 +169,6 @@ void ttHHadronic::Init(TTree *tree) {
   if (MetPt_branch) MetPt_branch->SetAddress(&MetPt_);
   MetPhi_branch = tree->GetBranch("MetPhi");
   if (MetPhi_branch) MetPhi_branch->SetAddress(&MetPhi_);
-  topTag_score_branch = tree->GetBranch("topTag_score");
-  if (topTag_score_branch) topTag_score_branch->SetAddress(&topTag_score_);
-  topTag_topMass_branch = tree->GetBranch("topTag_topMass");
-  if (topTag_topMass_branch) topTag_topMass_branch->SetAddress(&topTag_topMass_);
-  topTag_WMass_branch = tree->GetBranch("topTag_WMass");
-  if (topTag_WMass_branch) topTag_WMass_branch->SetAddress(&topTag_WMass_);
   jet1_pt_branch = tree->GetBranch("jet1_pt");
   if (jet1_pt_branch) jet1_pt_branch->SetAddress(&jet1_pt_);
   jet2_pt_branch = tree->GetBranch("jet2_pt");
@@ -303,6 +289,36 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet14_bdiscriminant_branch) jet14_bdiscriminant_branch->SetAddress(&jet14_bdiscriminant_);
   jet15_bdiscriminant_branch = tree->GetBranch("jet15_bdiscriminant");
   if (jet15_bdiscriminant_branch) jet15_bdiscriminant_branch->SetAddress(&jet15_bdiscriminant_);
+  jet1_b_DeepCSV_discriminant_branch = tree->GetBranch("jet1_b_DeepCSV_discriminant");
+  if (jet1_b_DeepCSV_discriminant_branch) jet1_b_DeepCSV_discriminant_branch->SetAddress(&jet1_b_DeepCSV_discriminant_);
+  jet2_b_DeepCSV_discriminant_branch = tree->GetBranch("jet2_b_DeepCSV_discriminant");
+  if (jet2_b_DeepCSV_discriminant_branch) jet2_b_DeepCSV_discriminant_branch->SetAddress(&jet2_b_DeepCSV_discriminant_);
+  jet3_b_DeepCSV_discriminant_branch = tree->GetBranch("jet3_b_DeepCSV_discriminant");
+  if (jet3_b_DeepCSV_discriminant_branch) jet3_b_DeepCSV_discriminant_branch->SetAddress(&jet3_b_DeepCSV_discriminant_);
+  jet4_b_DeepCSV_discriminant_branch = tree->GetBranch("jet4_b_DeepCSV_discriminant");
+  if (jet4_b_DeepCSV_discriminant_branch) jet4_b_DeepCSV_discriminant_branch->SetAddress(&jet4_b_DeepCSV_discriminant_);
+  jet5_b_DeepCSV_discriminant_branch = tree->GetBranch("jet5_b_DeepCSV_discriminant");
+  if (jet5_b_DeepCSV_discriminant_branch) jet5_b_DeepCSV_discriminant_branch->SetAddress(&jet5_b_DeepCSV_discriminant_);
+  jet6_b_DeepCSV_discriminant_branch = tree->GetBranch("jet6_b_DeepCSV_discriminant");
+  if (jet6_b_DeepCSV_discriminant_branch) jet6_b_DeepCSV_discriminant_branch->SetAddress(&jet6_b_DeepCSV_discriminant_);
+  jet7_b_DeepCSV_discriminant_branch = tree->GetBranch("jet7_b_DeepCSV_discriminant");
+  if (jet7_b_DeepCSV_discriminant_branch) jet7_b_DeepCSV_discriminant_branch->SetAddress(&jet7_b_DeepCSV_discriminant_);
+  jet8_b_DeepCSV_discriminant_branch = tree->GetBranch("jet8_b_DeepCSV_discriminant");
+  if (jet8_b_DeepCSV_discriminant_branch) jet8_b_DeepCSV_discriminant_branch->SetAddress(&jet8_b_DeepCSV_discriminant_);
+  jet9_b_DeepCSV_discriminant_branch = tree->GetBranch("jet9_b_DeepCSV_discriminant");
+  if (jet9_b_DeepCSV_discriminant_branch) jet9_b_DeepCSV_discriminant_branch->SetAddress(&jet9_b_DeepCSV_discriminant_);
+  jet10_b_DeepCSV_discriminant_branch = tree->GetBranch("jet10_b_DeepCSV_discriminant");
+  if (jet10_b_DeepCSV_discriminant_branch) jet10_b_DeepCSV_discriminant_branch->SetAddress(&jet10_b_DeepCSV_discriminant_);
+  jet11_b_DeepCSV_discriminant_branch = tree->GetBranch("jet11_b_DeepCSV_discriminant");
+  if (jet11_b_DeepCSV_discriminant_branch) jet11_b_DeepCSV_discriminant_branch->SetAddress(&jet11_b_DeepCSV_discriminant_);
+  jet12_b_DeepCSV_discriminant_branch = tree->GetBranch("jet12_b_DeepCSV_discriminant");
+  if (jet12_b_DeepCSV_discriminant_branch) jet12_b_DeepCSV_discriminant_branch->SetAddress(&jet12_b_DeepCSV_discriminant_);
+  jet13_b_DeepCSV_discriminant_branch = tree->GetBranch("jet13_b_DeepCSV_discriminant");
+  if (jet13_b_DeepCSV_discriminant_branch) jet13_b_DeepCSV_discriminant_branch->SetAddress(&jet13_b_DeepCSV_discriminant_);
+  jet14_b_DeepCSV_discriminant_branch = tree->GetBranch("jet14_b_DeepCSV_discriminant");
+  if (jet14_b_DeepCSV_discriminant_branch) jet14_b_DeepCSV_discriminant_branch->SetAddress(&jet14_b_DeepCSV_discriminant_);
+  jet15_b_DeepCSV_discriminant_branch = tree->GetBranch("jet15_b_DeepCSV_discriminant");
+  if (jet15_b_DeepCSV_discriminant_branch) jet15_b_DeepCSV_discriminant_branch->SetAddress(&jet15_b_DeepCSV_discriminant_);
   jet1_bbdiscriminant_branch = tree->GetBranch("jet1_bbdiscriminant");
   if (jet1_bbdiscriminant_branch) jet1_bbdiscriminant_branch->SetAddress(&jet1_bbdiscriminant_);
   jet2_bbdiscriminant_branch = tree->GetBranch("jet2_bbdiscriminant");
@@ -393,6 +409,12 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet14_udsgdiscriminant_branch) jet14_udsgdiscriminant_branch->SetAddress(&jet14_udsgdiscriminant_);
   jet15_udsgdiscriminant_branch = tree->GetBranch("jet15_udsgdiscriminant");
   if (jet15_udsgdiscriminant_branch) jet15_udsgdiscriminant_branch->SetAddress(&jet15_udsgdiscriminant_);
+  bjet1_csv_branch = tree->GetBranch("bjet1_csv");
+  if (bjet1_csv_branch) bjet1_csv_branch->SetAddress(&bjet1_csv_);
+  bjet2_csv_branch = tree->GetBranch("bjet2_csv");
+  if (bjet2_csv_branch) bjet2_csv_branch->SetAddress(&bjet2_csv_);
+  tthMVA_branch = tree->GetBranch("tthMVA");
+  if (tthMVA_branch) tthMVA_branch->SetAddress(&tthMVA_);
   jet1_energy_branch = tree->GetBranch("jet1_energy");
   if (jet1_energy_branch) jet1_energy_branch->SetAddress(&jet1_energy_);
   jet2_energy_branch = tree->GetBranch("jet2_energy");
@@ -423,12 +445,6 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet14_energy_branch) jet14_energy_branch->SetAddress(&jet14_energy_);
   jet15_energy_branch = tree->GetBranch("jet15_energy");
   if (jet15_energy_branch) jet15_energy_branch->SetAddress(&jet15_energy_);
-  bjet1_csv_branch = tree->GetBranch("bjet1_csv");
-  if (bjet1_csv_branch) bjet1_csv_branch->SetAddress(&bjet1_csv_);
-  bjet2_csv_branch = tree->GetBranch("bjet2_csv");
-  if (bjet2_csv_branch) bjet2_csv_branch->SetAddress(&bjet2_csv_);
-  tthMVA_branch = tree->GetBranch("tthMVA");
-  if (tthMVA_branch) tthMVA_branch->SetAddress(&tthMVA_);
   rho_branch = tree->GetBranch("rho");
   if (rho_branch) rho_branch->SetAddress(&rho_);
   nvtx_branch = tree->GetBranch("nvtx");
@@ -507,9 +523,6 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   sublead_closest_gen_Pt_isLoaded = false;
   lead_closest_gen_dR_isLoaded = false;
   sublead_closest_gen_dR_isLoaded = false;
-  lead_PhoGenPt_isLoaded = false;
-  lead_PhoGenEta_isLoaded = false;
-  lead_PhoGenPhi_isLoaded = false;
   lead_Prompt_isLoaded = false;
   lead_Mad_isLoaded = false;
   lead_Pythia_isLoaded = false;
@@ -519,9 +532,6 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   lead_MomMomID_isLoaded = false;
   lead_PassFrix_isLoaded = false;
   lead_SmallestDr_isLoaded = false;
-  sublead_PhoGenPt_isLoaded = false;
-  sublead_PhoGenEta_isLoaded = false;
-  sublead_PhoGenPhi_isLoaded = false;
   sublead_Prompt_isLoaded = false;
   sublead_Mad_isLoaded = false;
   sublead_Pythia_isLoaded = false;
@@ -531,16 +541,15 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   sublead_MomMomID_isLoaded = false;
   sublead_PassFrix_isLoaded = false;
   sublead_SmallestDr_isLoaded = false;
+  topTag_score_isLoaded = false;
+  topTag_topMass_isLoaded = false;
+  topTag_WMass_isLoaded = false;
   n_bjets_isLoaded = false;
   n_jets_isLoaded = false;
-  nGenJets_isLoaded = false;
   bjet1_pt_isLoaded = false;
   bjet2_pt_isLoaded = false;
   MetPt_isLoaded = false;
   MetPhi_isLoaded = false;
-  topTag_score_isLoaded = false;
-  topTag_topMass_isLoaded = false;
-  topTag_WMass_isLoaded = false;
   jet1_pt_isLoaded = false;
   jet2_pt_isLoaded = false;
   jet3_pt_isLoaded = false;
@@ -601,6 +610,21 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet13_bdiscriminant_isLoaded = false;
   jet14_bdiscriminant_isLoaded = false;
   jet15_bdiscriminant_isLoaded = false;
+  jet1_b_DeepCSV_discriminant_isLoaded = false;
+  jet2_b_DeepCSV_discriminant_isLoaded = false;
+  jet3_b_DeepCSV_discriminant_isLoaded = false;
+  jet4_b_DeepCSV_discriminant_isLoaded = false;
+  jet5_b_DeepCSV_discriminant_isLoaded = false;
+  jet6_b_DeepCSV_discriminant_isLoaded = false;
+  jet7_b_DeepCSV_discriminant_isLoaded = false;
+  jet8_b_DeepCSV_discriminant_isLoaded = false;
+  jet9_b_DeepCSV_discriminant_isLoaded = false;
+  jet10_b_DeepCSV_discriminant_isLoaded = false;
+  jet11_b_DeepCSV_discriminant_isLoaded = false;
+  jet12_b_DeepCSV_discriminant_isLoaded = false;
+  jet13_b_DeepCSV_discriminant_isLoaded = false;
+  jet14_b_DeepCSV_discriminant_isLoaded = false;
+  jet15_b_DeepCSV_discriminant_isLoaded = false;
   jet1_bbdiscriminant_isLoaded = false;
   jet2_bbdiscriminant_isLoaded = false;
   jet3_bbdiscriminant_isLoaded = false;
@@ -646,6 +670,9 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet13_udsgdiscriminant_isLoaded = false;
   jet14_udsgdiscriminant_isLoaded = false;
   jet15_udsgdiscriminant_isLoaded = false;
+  bjet1_csv_isLoaded = false;
+  bjet2_csv_isLoaded = false;
+  tthMVA_isLoaded = false;
   jet1_energy_isLoaded = false;
   jet2_energy_isLoaded = false;
   jet3_energy_isLoaded = false;
@@ -661,9 +688,6 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet13_energy_isLoaded = false;
   jet14_energy_isLoaded = false;
   jet15_energy_isLoaded = false;
-  bjet1_csv_isLoaded = false;
-  bjet2_csv_isLoaded = false;
-  tthMVA_isLoaded = false;
   rho_isLoaded = false;
   nvtx_isLoaded = false;
   event_isLoaded = false;
@@ -731,9 +755,6 @@ void ttHHadronic::LoadAllBranches() {
   if (sublead_closest_gen_Pt_branch != 0) sublead_closest_gen_Pt();
   if (lead_closest_gen_dR_branch != 0) lead_closest_gen_dR();
   if (sublead_closest_gen_dR_branch != 0) sublead_closest_gen_dR();
-  if (lead_PhoGenPt_branch != 0) lead_PhoGenPt();
-  if (lead_PhoGenEta_branch != 0) lead_PhoGenEta();
-  if (lead_PhoGenPhi_branch != 0) lead_PhoGenPhi();
   if (lead_Prompt_branch != 0) lead_Prompt();
   if (lead_Mad_branch != 0) lead_Mad();
   if (lead_Pythia_branch != 0) lead_Pythia();
@@ -743,9 +764,6 @@ void ttHHadronic::LoadAllBranches() {
   if (lead_MomMomID_branch != 0) lead_MomMomID();
   if (lead_PassFrix_branch != 0) lead_PassFrix();
   if (lead_SmallestDr_branch != 0) lead_SmallestDr();
-  if (sublead_PhoGenPt_branch != 0) sublead_PhoGenPt();
-  if (sublead_PhoGenEta_branch != 0) sublead_PhoGenEta();
-  if (sublead_PhoGenPhi_branch != 0) sublead_PhoGenPhi();
   if (sublead_Prompt_branch != 0) sublead_Prompt();
   if (sublead_Mad_branch != 0) sublead_Mad();
   if (sublead_Pythia_branch != 0) sublead_Pythia();
@@ -755,16 +773,15 @@ void ttHHadronic::LoadAllBranches() {
   if (sublead_MomMomID_branch != 0) sublead_MomMomID();
   if (sublead_PassFrix_branch != 0) sublead_PassFrix();
   if (sublead_SmallestDr_branch != 0) sublead_SmallestDr();
+  if (topTag_score_branch != 0) topTag_score();
+  if (topTag_topMass_branch != 0) topTag_topMass();
+  if (topTag_WMass_branch != 0) topTag_WMass();
   if (n_bjets_branch != 0) n_bjets();
   if (n_jets_branch != 0) n_jets();
-  if (nGenJets_branch != 0) nGenJets();
   if (bjet1_pt_branch != 0) bjet1_pt();
   if (bjet2_pt_branch != 0) bjet2_pt();
   if (MetPt_branch != 0) MetPt();
   if (MetPhi_branch != 0) MetPhi();
-  if (topTag_score_branch != 0) topTag_score();
-  if (topTag_topMass_branch != 0) topTag_topMass();
-  if (topTag_WMass_branch != 0) topTag_WMass();
   if (jet1_pt_branch != 0) jet1_pt();
   if (jet2_pt_branch != 0) jet2_pt();
   if (jet3_pt_branch != 0) jet3_pt();
@@ -825,6 +842,21 @@ void ttHHadronic::LoadAllBranches() {
   if (jet13_bdiscriminant_branch != 0) jet13_bdiscriminant();
   if (jet14_bdiscriminant_branch != 0) jet14_bdiscriminant();
   if (jet15_bdiscriminant_branch != 0) jet15_bdiscriminant();
+  if (jet1_b_DeepCSV_discriminant_branch != 0) jet1_b_DeepCSV_discriminant();
+  if (jet2_b_DeepCSV_discriminant_branch != 0) jet2_b_DeepCSV_discriminant();
+  if (jet3_b_DeepCSV_discriminant_branch != 0) jet3_b_DeepCSV_discriminant();
+  if (jet4_b_DeepCSV_discriminant_branch != 0) jet4_b_DeepCSV_discriminant();
+  if (jet5_b_DeepCSV_discriminant_branch != 0) jet5_b_DeepCSV_discriminant();
+  if (jet6_b_DeepCSV_discriminant_branch != 0) jet6_b_DeepCSV_discriminant();
+  if (jet7_b_DeepCSV_discriminant_branch != 0) jet7_b_DeepCSV_discriminant();
+  if (jet8_b_DeepCSV_discriminant_branch != 0) jet8_b_DeepCSV_discriminant();
+  if (jet9_b_DeepCSV_discriminant_branch != 0) jet9_b_DeepCSV_discriminant();
+  if (jet10_b_DeepCSV_discriminant_branch != 0) jet10_b_DeepCSV_discriminant();
+  if (jet11_b_DeepCSV_discriminant_branch != 0) jet11_b_DeepCSV_discriminant();
+  if (jet12_b_DeepCSV_discriminant_branch != 0) jet12_b_DeepCSV_discriminant();
+  if (jet13_b_DeepCSV_discriminant_branch != 0) jet13_b_DeepCSV_discriminant();
+  if (jet14_b_DeepCSV_discriminant_branch != 0) jet14_b_DeepCSV_discriminant();
+  if (jet15_b_DeepCSV_discriminant_branch != 0) jet15_b_DeepCSV_discriminant();
   if (jet1_bbdiscriminant_branch != 0) jet1_bbdiscriminant();
   if (jet2_bbdiscriminant_branch != 0) jet2_bbdiscriminant();
   if (jet3_bbdiscriminant_branch != 0) jet3_bbdiscriminant();
@@ -870,6 +902,9 @@ void ttHHadronic::LoadAllBranches() {
   if (jet13_udsgdiscriminant_branch != 0) jet13_udsgdiscriminant();
   if (jet14_udsgdiscriminant_branch != 0) jet14_udsgdiscriminant();
   if (jet15_udsgdiscriminant_branch != 0) jet15_udsgdiscriminant();
+  if (bjet1_csv_branch != 0) bjet1_csv();
+  if (bjet2_csv_branch != 0) bjet2_csv();
+  if (tthMVA_branch != 0) tthMVA();
   if (jet1_energy_branch != 0) jet1_energy();
   if (jet2_energy_branch != 0) jet2_energy();
   if (jet3_energy_branch != 0) jet3_energy();
@@ -885,9 +920,6 @@ void ttHHadronic::LoadAllBranches() {
   if (jet13_energy_branch != 0) jet13_energy();
   if (jet14_energy_branch != 0) jet14_energy();
   if (jet15_energy_branch != 0) jet15_energy();
-  if (bjet1_csv_branch != 0) bjet1_csv();
-  if (bjet2_csv_branch != 0) bjet2_csv();
-  if (tthMVA_branch != 0) tthMVA();
   if (rho_branch != 0) rho();
   if (nvtx_branch != 0) nvtx();
   if (event_branch != 0) event();
@@ -1613,45 +1645,6 @@ const float &ttHHadronic::sublead_closest_gen_dR() {
   return sublead_closest_gen_dR_;
 }
 
-const float &ttHHadronic::lead_PhoGenPt() {
-  if (not lead_PhoGenPt_isLoaded) {
-    if (lead_PhoGenPt_branch != 0) {
-      lead_PhoGenPt_branch->GetEntry(index);
-    } else {
-      printf("branch lead_PhoGenPt_branch does not exist!\n");
-      exit(1);
-    }
-    lead_PhoGenPt_isLoaded = true;
-  }
-  return lead_PhoGenPt_;
-}
-
-const float &ttHHadronic::lead_PhoGenEta() {
-  if (not lead_PhoGenEta_isLoaded) {
-    if (lead_PhoGenEta_branch != 0) {
-      lead_PhoGenEta_branch->GetEntry(index);
-    } else {
-      printf("branch lead_PhoGenEta_branch does not exist!\n");
-      exit(1);
-    }
-    lead_PhoGenEta_isLoaded = true;
-  }
-  return lead_PhoGenEta_;
-}
-
-const float &ttHHadronic::lead_PhoGenPhi() {
-  if (not lead_PhoGenPhi_isLoaded) {
-    if (lead_PhoGenPhi_branch != 0) {
-      lead_PhoGenPhi_branch->GetEntry(index);
-    } else {
-      printf("branch lead_PhoGenPhi_branch does not exist!\n");
-      exit(1);
-    }
-    lead_PhoGenPhi_isLoaded = true;
-  }
-  return lead_PhoGenPhi_;
-}
-
 const float &ttHHadronic::lead_Prompt() {
   if (not lead_Prompt_isLoaded) {
     if (lead_Prompt_branch != 0) {
@@ -1767,45 +1760,6 @@ const float &ttHHadronic::lead_SmallestDr() {
     lead_SmallestDr_isLoaded = true;
   }
   return lead_SmallestDr_;
-}
-
-const float &ttHHadronic::sublead_PhoGenPt() {
-  if (not sublead_PhoGenPt_isLoaded) {
-    if (sublead_PhoGenPt_branch != 0) {
-      sublead_PhoGenPt_branch->GetEntry(index);
-    } else {
-      printf("branch sublead_PhoGenPt_branch does not exist!\n");
-      exit(1);
-    }
-    sublead_PhoGenPt_isLoaded = true;
-  }
-  return sublead_PhoGenPt_;
-}
-
-const float &ttHHadronic::sublead_PhoGenEta() {
-  if (not sublead_PhoGenEta_isLoaded) {
-    if (sublead_PhoGenEta_branch != 0) {
-      sublead_PhoGenEta_branch->GetEntry(index);
-    } else {
-      printf("branch sublead_PhoGenEta_branch does not exist!\n");
-      exit(1);
-    }
-    sublead_PhoGenEta_isLoaded = true;
-  }
-  return sublead_PhoGenEta_;
-}
-
-const float &ttHHadronic::sublead_PhoGenPhi() {
-  if (not sublead_PhoGenPhi_isLoaded) {
-    if (sublead_PhoGenPhi_branch != 0) {
-      sublead_PhoGenPhi_branch->GetEntry(index);
-    } else {
-      printf("branch sublead_PhoGenPhi_branch does not exist!\n");
-      exit(1);
-    }
-    sublead_PhoGenPhi_isLoaded = true;
-  }
-  return sublead_PhoGenPhi_;
 }
 
 const float &ttHHadronic::sublead_Prompt() {
@@ -1925,6 +1879,45 @@ const float &ttHHadronic::sublead_SmallestDr() {
   return sublead_SmallestDr_;
 }
 
+const float &ttHHadronic::topTag_score() {
+  if (not topTag_score_isLoaded) {
+    if (topTag_score_branch != 0) {
+      topTag_score_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_score_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_score_isLoaded = true;
+  }
+  return topTag_score_;
+}
+
+const float &ttHHadronic::topTag_topMass() {
+  if (not topTag_topMass_isLoaded) {
+    if (topTag_topMass_branch != 0) {
+      topTag_topMass_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_topMass_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_topMass_isLoaded = true;
+  }
+  return topTag_topMass_;
+}
+
+const float &ttHHadronic::topTag_WMass() {
+  if (not topTag_WMass_isLoaded) {
+    if (topTag_WMass_branch != 0) {
+      topTag_WMass_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_WMass_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_WMass_isLoaded = true;
+  }
+  return topTag_WMass_;
+}
+
 const float &ttHHadronic::n_bjets() {
   if (not n_bjets_isLoaded) {
     if (n_bjets_branch != 0) {
@@ -1949,19 +1942,6 @@ const float &ttHHadronic::n_jets() {
     n_jets_isLoaded = true;
   }
   return n_jets_;
-}
-
-const float &ttHHadronic::nGenJets() {
-  if (not nGenJets_isLoaded) {
-    if (nGenJets_branch != 0) {
-      nGenJets_branch->GetEntry(index);
-    } else {
-      printf("branch nGenJets_branch does not exist!\n");
-      exit(1);
-    }
-    nGenJets_isLoaded = true;
-  }
-  return nGenJets_;
 }
 
 const float &ttHHadronic::bjet1_pt() {
@@ -2014,45 +1994,6 @@ const float &ttHHadronic::MetPhi() {
     MetPhi_isLoaded = true;
   }
   return MetPhi_;
-}
-
-const float &ttHHadronic::topTag_score() {
-  if (not topTag_score_isLoaded) {
-    if (topTag_score_branch != 0) {
-      topTag_score_branch->GetEntry(index);
-    } else {
-      printf("branch topTag_score_branch does not exist!\n");
-      exit(1);
-    }
-    topTag_score_isLoaded = true;
-  }
-  return topTag_score_;
-}
-
-const float &ttHHadronic::topTag_topMass() {
-  if (not topTag_topMass_isLoaded) {
-    if (topTag_topMass_branch != 0) {
-      topTag_topMass_branch->GetEntry(index);
-    } else {
-      printf("branch topTag_topMass_branch does not exist!\n");
-      exit(1);
-    }
-    topTag_topMass_isLoaded = true;
-  }
-  return topTag_topMass_;
-}
-
-const float &ttHHadronic::topTag_WMass() {
-  if (not topTag_WMass_isLoaded) {
-    if (topTag_WMass_branch != 0) {
-      topTag_WMass_branch->GetEntry(index);
-    } else {
-      printf("branch topTag_WMass_branch does not exist!\n");
-      exit(1);
-    }
-    topTag_WMass_isLoaded = true;
-  }
-  return topTag_WMass_;
 }
 
 const float &ttHHadronic::jet1_pt() {
@@ -2835,6 +2776,201 @@ const float &ttHHadronic::jet15_bdiscriminant() {
   return jet15_bdiscriminant_;
 }
 
+const float &ttHHadronic::jet1_b_DeepCSV_discriminant() {
+  if (not jet1_b_DeepCSV_discriminant_isLoaded) {
+    if (jet1_b_DeepCSV_discriminant_branch != 0) {
+      jet1_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet1_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet1_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet1_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet2_b_DeepCSV_discriminant() {
+  if (not jet2_b_DeepCSV_discriminant_isLoaded) {
+    if (jet2_b_DeepCSV_discriminant_branch != 0) {
+      jet2_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet2_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet2_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet2_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet3_b_DeepCSV_discriminant() {
+  if (not jet3_b_DeepCSV_discriminant_isLoaded) {
+    if (jet3_b_DeepCSV_discriminant_branch != 0) {
+      jet3_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet3_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet3_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet3_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet4_b_DeepCSV_discriminant() {
+  if (not jet4_b_DeepCSV_discriminant_isLoaded) {
+    if (jet4_b_DeepCSV_discriminant_branch != 0) {
+      jet4_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet4_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet4_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet4_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet5_b_DeepCSV_discriminant() {
+  if (not jet5_b_DeepCSV_discriminant_isLoaded) {
+    if (jet5_b_DeepCSV_discriminant_branch != 0) {
+      jet5_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet5_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet5_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet5_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet6_b_DeepCSV_discriminant() {
+  if (not jet6_b_DeepCSV_discriminant_isLoaded) {
+    if (jet6_b_DeepCSV_discriminant_branch != 0) {
+      jet6_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet6_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet6_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet6_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet7_b_DeepCSV_discriminant() {
+  if (not jet7_b_DeepCSV_discriminant_isLoaded) {
+    if (jet7_b_DeepCSV_discriminant_branch != 0) {
+      jet7_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet7_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet7_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet7_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet8_b_DeepCSV_discriminant() {
+  if (not jet8_b_DeepCSV_discriminant_isLoaded) {
+    if (jet8_b_DeepCSV_discriminant_branch != 0) {
+      jet8_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet8_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet8_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet8_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet9_b_DeepCSV_discriminant() {
+  if (not jet9_b_DeepCSV_discriminant_isLoaded) {
+    if (jet9_b_DeepCSV_discriminant_branch != 0) {
+      jet9_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet9_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet9_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet9_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet10_b_DeepCSV_discriminant() {
+  if (not jet10_b_DeepCSV_discriminant_isLoaded) {
+    if (jet10_b_DeepCSV_discriminant_branch != 0) {
+      jet10_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet10_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet10_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet10_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet11_b_DeepCSV_discriminant() {
+  if (not jet11_b_DeepCSV_discriminant_isLoaded) {
+    if (jet11_b_DeepCSV_discriminant_branch != 0) {
+      jet11_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet11_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet11_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet11_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet12_b_DeepCSV_discriminant() {
+  if (not jet12_b_DeepCSV_discriminant_isLoaded) {
+    if (jet12_b_DeepCSV_discriminant_branch != 0) {
+      jet12_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet12_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet12_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet12_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet13_b_DeepCSV_discriminant() {
+  if (not jet13_b_DeepCSV_discriminant_isLoaded) {
+    if (jet13_b_DeepCSV_discriminant_branch != 0) {
+      jet13_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet13_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet13_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet13_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet14_b_DeepCSV_discriminant() {
+  if (not jet14_b_DeepCSV_discriminant_isLoaded) {
+    if (jet14_b_DeepCSV_discriminant_branch != 0) {
+      jet14_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet14_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet14_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet14_b_DeepCSV_discriminant_;
+}
+
+const float &ttHHadronic::jet15_b_DeepCSV_discriminant() {
+  if (not jet15_b_DeepCSV_discriminant_isLoaded) {
+    if (jet15_b_DeepCSV_discriminant_branch != 0) {
+      jet15_b_DeepCSV_discriminant_branch->GetEntry(index);
+    } else {
+      printf("branch jet15_b_DeepCSV_discriminant_branch does not exist!\n");
+      exit(1);
+    }
+    jet15_b_DeepCSV_discriminant_isLoaded = true;
+  }
+  return jet15_b_DeepCSV_discriminant_;
+}
+
 const float &ttHHadronic::jet1_bbdiscriminant() {
   if (not jet1_bbdiscriminant_isLoaded) {
     if (jet1_bbdiscriminant_branch != 0) {
@@ -3420,6 +3556,45 @@ const float &ttHHadronic::jet15_udsgdiscriminant() {
   return jet15_udsgdiscriminant_;
 }
 
+const float &ttHHadronic::bjet1_csv() {
+  if (not bjet1_csv_isLoaded) {
+    if (bjet1_csv_branch != 0) {
+      bjet1_csv_branch->GetEntry(index);
+    } else {
+      printf("branch bjet1_csv_branch does not exist!\n");
+      exit(1);
+    }
+    bjet1_csv_isLoaded = true;
+  }
+  return bjet1_csv_;
+}
+
+const float &ttHHadronic::bjet2_csv() {
+  if (not bjet2_csv_isLoaded) {
+    if (bjet2_csv_branch != 0) {
+      bjet2_csv_branch->GetEntry(index);
+    } else {
+      printf("branch bjet2_csv_branch does not exist!\n");
+      exit(1);
+    }
+    bjet2_csv_isLoaded = true;
+  }
+  return bjet2_csv_;
+}
+
+const float &ttHHadronic::tthMVA() {
+  if (not tthMVA_isLoaded) {
+    if (tthMVA_branch != 0) {
+      tthMVA_branch->GetEntry(index);
+    } else {
+      printf("branch tthMVA_branch does not exist!\n");
+      exit(1);
+    }
+    tthMVA_isLoaded = true;
+  }
+  return tthMVA_;
+}
+
 const float &ttHHadronic::jet1_energy() {
   if (not jet1_energy_isLoaded) {
     if (jet1_energy_branch != 0) {
@@ -3615,45 +3790,6 @@ const float &ttHHadronic::jet15_energy() {
   return jet15_energy_;
 }
 
-const float &ttHHadronic::bjet1_csv() {
-  if (not bjet1_csv_isLoaded) {
-    if (bjet1_csv_branch != 0) {
-      bjet1_csv_branch->GetEntry(index);
-    } else {
-      printf("branch bjet1_csv_branch does not exist!\n");
-      exit(1);
-    }
-    bjet1_csv_isLoaded = true;
-  }
-  return bjet1_csv_;
-}
-
-const float &ttHHadronic::bjet2_csv() {
-  if (not bjet2_csv_isLoaded) {
-    if (bjet2_csv_branch != 0) {
-      bjet2_csv_branch->GetEntry(index);
-    } else {
-      printf("branch bjet2_csv_branch does not exist!\n");
-      exit(1);
-    }
-    bjet2_csv_isLoaded = true;
-  }
-  return bjet2_csv_;
-}
-
-const float &ttHHadronic::tthMVA() {
-  if (not tthMVA_isLoaded) {
-    if (tthMVA_branch != 0) {
-      tthMVA_branch->GetEntry(index);
-    } else {
-      printf("branch tthMVA_branch does not exist!\n");
-      exit(1);
-    }
-    tthMVA_isLoaded = true;
-  }
-  return tthMVA_;
-}
-
 const float &ttHHadronic::rho() {
   if (not rho_isLoaded) {
     if (rho_branch != 0) {
@@ -3836,9 +3972,6 @@ const float &lead_closest_gen_Pt() { return cms3.lead_closest_gen_Pt(); }
 const float &sublead_closest_gen_Pt() { return cms3.sublead_closest_gen_Pt(); }
 const float &lead_closest_gen_dR() { return cms3.lead_closest_gen_dR(); }
 const float &sublead_closest_gen_dR() { return cms3.sublead_closest_gen_dR(); }
-const float &lead_PhoGenPt() { return cms3.lead_PhoGenPt(); }
-const float &lead_PhoGenEta() { return cms3.lead_PhoGenEta(); }
-const float &lead_PhoGenPhi() { return cms3.lead_PhoGenPhi(); }
 const float &lead_Prompt() { return cms3.lead_Prompt(); }
 const float &lead_Mad() { return cms3.lead_Mad(); }
 const float &lead_Pythia() { return cms3.lead_Pythia(); }
@@ -3848,9 +3981,6 @@ const float &lead_MomID() { return cms3.lead_MomID(); }
 const float &lead_MomMomID() { return cms3.lead_MomMomID(); }
 const float &lead_PassFrix() { return cms3.lead_PassFrix(); }
 const float &lead_SmallestDr() { return cms3.lead_SmallestDr(); }
-const float &sublead_PhoGenPt() { return cms3.sublead_PhoGenPt(); }
-const float &sublead_PhoGenEta() { return cms3.sublead_PhoGenEta(); }
-const float &sublead_PhoGenPhi() { return cms3.sublead_PhoGenPhi(); }
 const float &sublead_Prompt() { return cms3.sublead_Prompt(); }
 const float &sublead_Mad() { return cms3.sublead_Mad(); }
 const float &sublead_Pythia() { return cms3.sublead_Pythia(); }
@@ -3860,16 +3990,15 @@ const float &sublead_MomID() { return cms3.sublead_MomID(); }
 const float &sublead_MomMomID() { return cms3.sublead_MomMomID(); }
 const float &sublead_PassFrix() { return cms3.sublead_PassFrix(); }
 const float &sublead_SmallestDr() { return cms3.sublead_SmallestDr(); }
+const float &topTag_score() { return cms3.topTag_score(); }
+const float &topTag_topMass() { return cms3.topTag_topMass(); }
+const float &topTag_WMass() { return cms3.topTag_WMass(); }
 const float &n_bjets() { return cms3.n_bjets(); }
 const float &n_jets() { return cms3.n_jets(); }
-const float &nGenJets() { return cms3.nGenJets(); }
 const float &bjet1_pt() { return cms3.bjet1_pt(); }
 const float &bjet2_pt() { return cms3.bjet2_pt(); }
 const float &MetPt() { return cms3.MetPt(); }
 const float &MetPhi() { return cms3.MetPhi(); }
-const float &topTag_score() { return cms3.topTag_score(); }
-const float &topTag_topMass() { return cms3.topTag_topMass(); }
-const float &topTag_WMass() { return cms3.topTag_WMass(); }
 const float &jet1_pt() { return cms3.jet1_pt(); }
 const float &jet2_pt() { return cms3.jet2_pt(); }
 const float &jet3_pt() { return cms3.jet3_pt(); }
@@ -3930,6 +4059,21 @@ const float &jet12_bdiscriminant() { return cms3.jet12_bdiscriminant(); }
 const float &jet13_bdiscriminant() { return cms3.jet13_bdiscriminant(); }
 const float &jet14_bdiscriminant() { return cms3.jet14_bdiscriminant(); }
 const float &jet15_bdiscriminant() { return cms3.jet15_bdiscriminant(); }
+const float &jet1_b_DeepCSV_discriminant() { return cms3.jet1_b_DeepCSV_discriminant(); }
+const float &jet2_b_DeepCSV_discriminant() { return cms3.jet2_b_DeepCSV_discriminant(); }
+const float &jet3_b_DeepCSV_discriminant() { return cms3.jet3_b_DeepCSV_discriminant(); }
+const float &jet4_b_DeepCSV_discriminant() { return cms3.jet4_b_DeepCSV_discriminant(); }
+const float &jet5_b_DeepCSV_discriminant() { return cms3.jet5_b_DeepCSV_discriminant(); }
+const float &jet6_b_DeepCSV_discriminant() { return cms3.jet6_b_DeepCSV_discriminant(); }
+const float &jet7_b_DeepCSV_discriminant() { return cms3.jet7_b_DeepCSV_discriminant(); }
+const float &jet8_b_DeepCSV_discriminant() { return cms3.jet8_b_DeepCSV_discriminant(); }
+const float &jet9_b_DeepCSV_discriminant() { return cms3.jet9_b_DeepCSV_discriminant(); }
+const float &jet10_b_DeepCSV_discriminant() { return cms3.jet10_b_DeepCSV_discriminant(); }
+const float &jet11_b_DeepCSV_discriminant() { return cms3.jet11_b_DeepCSV_discriminant(); }
+const float &jet12_b_DeepCSV_discriminant() { return cms3.jet12_b_DeepCSV_discriminant(); }
+const float &jet13_b_DeepCSV_discriminant() { return cms3.jet13_b_DeepCSV_discriminant(); }
+const float &jet14_b_DeepCSV_discriminant() { return cms3.jet14_b_DeepCSV_discriminant(); }
+const float &jet15_b_DeepCSV_discriminant() { return cms3.jet15_b_DeepCSV_discriminant(); }
 const float &jet1_bbdiscriminant() { return cms3.jet1_bbdiscriminant(); }
 const float &jet2_bbdiscriminant() { return cms3.jet2_bbdiscriminant(); }
 const float &jet3_bbdiscriminant() { return cms3.jet3_bbdiscriminant(); }
@@ -3975,6 +4119,9 @@ const float &jet12_udsgdiscriminant() { return cms3.jet12_udsgdiscriminant(); }
 const float &jet13_udsgdiscriminant() { return cms3.jet13_udsgdiscriminant(); }
 const float &jet14_udsgdiscriminant() { return cms3.jet14_udsgdiscriminant(); }
 const float &jet15_udsgdiscriminant() { return cms3.jet15_udsgdiscriminant(); }
+const float &bjet1_csv() { return cms3.bjet1_csv(); }
+const float &bjet2_csv() { return cms3.bjet2_csv(); }
+const float &tthMVA() { return cms3.tthMVA(); }
 const float &jet1_energy() { return cms3.jet1_energy(); }
 const float &jet2_energy() { return cms3.jet2_energy(); }
 const float &jet3_energy() { return cms3.jet3_energy(); }
@@ -3990,9 +4137,6 @@ const float &jet12_energy() { return cms3.jet12_energy(); }
 const float &jet13_energy() { return cms3.jet13_energy(); }
 const float &jet14_energy() { return cms3.jet14_energy(); }
 const float &jet15_energy() { return cms3.jet15_energy(); }
-const float &bjet1_csv() { return cms3.bjet1_csv(); }
-const float &bjet2_csv() { return cms3.bjet2_csv(); }
-const float &tthMVA() { return cms3.tthMVA(); }
 const float &rho() { return cms3.rho(); }
 const int &nvtx() { return cms3.nvtx(); }
 const unsigned long long &event() { return cms3.event(); }

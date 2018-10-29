@@ -97,3 +97,13 @@ Submitting ttH Babies version v94.1 using skims in /hadoop/cms/store/user/bemars
 Date: 2018-10-17 13:23:06.109310 
 Submitting ttH Babies version v3.16 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test and commit 77667c3420fbcf361183774d0f345913b351a9b4 of tth_dev_80X branch of flashgg
 
+# Note: Starting in v80.1, add top tagger info and tt+X overlap info
+Date: 2018-10-26 08:01:41.442605 
+Submitting ttH Babies version v80.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/2016_topTag_overlapRemoval and commit 36767180a2c559150b9d0514b86ef67135838e8a of tth_dev_80X branch of flashgg
+
+Date: 2018-10-28 13:19:17.614706 
+Submitting ttH Babies version v94.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit 5a7102e8bae4f6c1ecb900f45ccc1374eb8bc896 of tth_dev_94X branch of flashgg
+
+Date: 2018-10-28 13:24:34.320996 
+Submitting ttH Babies version v94.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit 5a7102e8bae4f6c1ecb900f45ccc1374eb8bc896 of tth_dev_94X branch of flashgg
+

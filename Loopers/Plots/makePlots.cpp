@@ -22,7 +22,8 @@ std::map<TString, TString> mLabels = {
 	{"TTGJets", "t#bar{t}+#gamma+Jets"},
 	{"VG", "V+#gamma"},
 	{"WJets", "W+Jets"},
-	{"TTJets", "t#bar{t} + Jets"} 
+	{"TTJets", "t#bar{t} + Jets"}, 
+	{"THQ", "tHq"},
 };
 
 std::map<TString, int> mColors = {
@@ -91,7 +92,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     hData_ref->Scale(45.966/41.5); 
   }
 
-  TH1D* hSig = (TH1D*)file->Get(hist_name + "_ttH" + mva_category);
+  TH1D* hSig_TTH = (TH1D*)file->Get(hist_name + "_ttH" + mva_category);
+  TH1D* hSig_THQ = (TH1D*)file->Get(hist_name + "_THQ" + mva_category);
+  vector<TH1D*> hSig = {hSig_TTH, hSig_THQ};
+
   vector<TH1D*> hBkg;
   Comparison* c;
   
@@ -100,11 +104,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   if (type =="std") {
     if (year != "All")
-      vLegendLabels = {year + " Data", "ttH (M125)"};
+      vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)"};
     else if (file_ref != nullptr) 
       vLegendLabels = {"2018 Data", "2017 Data", "ttH (M125)"};
     else
-      vLegendLabels = {"2016 + 2017 Data", "ttH (M125)"};
+      vLegendLabels = {"2016 + 2017 Data", "ttH (M125)", "tHq (M125)"};
     for (int i = 0; i < vBkgs.size(); i++) {
       hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + mva_category));
       vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
@@ -117,7 +121,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     if (hist_name == "hNVtx") {
       int n_bins = hData->GetSize()-2;
       double yield_data = hData->Integral(0, n_bins+1);
-      double yield_signal = hSig->Integral(0, n_bins+1);
+      double yield_signal = hSig[0]->Integral(0, n_bins+1);
       double yield_bkg = 0;
       vector<double> yield_mc;
       for (int i = 0; i < hBkg.size(); i++) {
@@ -151,7 +155,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
 
   else if (type == "individual_shape") {
-    hBkg.push_back(hSig);
+    hBkg.push_back(hSig[0]);
     vColors = {kBlack};
     vLegendLabels = {"ttH (M125)"}; 
     for (int i = 0; i < vBkgs.size(); i++) {
@@ -181,7 +185,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       double yield_data_unc(0), yield_signal_unc(0), yield_bkg_unc(0);
       vector<double> yield_mc_unc;
       double yield_data = hData->IntegralAndError(start_bin, n_bins+1, yield_data_unc);
-      double yield_signal = hSig->IntegralAndError(start_bin, n_bins+1, yield_signal_unc);
+      double yield_signal = hSig[0]->IntegralAndError(start_bin, n_bins+1, yield_signal_unc);
       double yield_bkg = 0;
       vector<double> yield_mc;
     
@@ -237,7 +241,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       double yield_data_unc(0), yield_signal_unc(0), yield_bkg_unc(0);
       vector<double> yield_mc_unc;
       double yield_data = hData->IntegralAndError(start_bin, n_bins+1, yield_data_unc);
-      double yield_signal = hSig->IntegralAndError(start_bin, n_bins+1, yield_signal_unc);
+      double yield_signal = hSig[0]->IntegralAndError(start_bin, n_bins+1, yield_signal_unc);
       double yield_bkg = 0;
       vector<double> yield_mc;
 
@@ -275,7 +279,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
  
   if (type == "std") {
     if (file_ref == nullptr)
-      c = new Comparison(c1, hData, hSig, hBkg);
+      c = new Comparison(c1, {hData}, hSig, hBkg);
     else
       c = new Comparison(c1, {hData, hData_ref}, hSig, hBkg);
     c->set_data_drawOpt("E");
@@ -283,7 +287,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_y_label("Events");
   }
   else if (type == "shape") {
-    c = new Comparison(c1, hSig, hBkg);
+    c = new Comparison(c1, hSig[0], hBkg);
     c->set_data_drawOpt("HIST");
     c->set_rat_label("#frac{Signal}{Background}");
     c->set_scale(-1);
@@ -301,7 +305,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_y_lim_range({0.0, 1.0}); 
   }
   else {
-    c = new Comparison(c1, hSig, hBkg);
+    c = new Comparison(c1, hSig[0], hBkg);
     c->set_data_drawOpt("HIST");
     c->set_rat_label("#frac{Signal}{Background}");
   }
@@ -315,9 +319,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9)));
   c->set_lumi(lumi);
 
+ 
   if (hist_name == "hNJets" || hist_name == "hNbLoose") {
     if (output.Contains("Leptonic"))
-      c->set_y_lim_range({0.5, pow(10,4)});
+      c->set_y_lim_range({0.01, pow(10,4)});
     else if (output.Contains("Hadronic"))
       c->set_y_lim_range({1, pow(10,6)});
   }
@@ -340,7 +345,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_x_bin_range({1,80});
     cout << "Data yield in [100,120], [130,180]: " << hData->Integral() << endl;
     cout << "Data yield in [115, 120], [130, 135]: " << hData->Integral(16,20) + hData->Integral(31,35) << endl;
-    cout << "Signal yield in [120, 130]: " << hSig->Integral(21,30) << endl;
+    cout << "Signal yield in [120, 130]: " << hSig[0]->Integral(21,30) << endl;
   }
   
 
@@ -405,8 +410,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   else
     c->plot(idx);
   delete hData;
-  if (type != "individual_shape")
-    delete hSig;
+  if (type != "individual_shape") {
+    //delete hSig;
+    for (int i = 0; i < hSig.size(); i++)
+      delete hSig[i];
+  }
   for (int i = 0; i < hBkg.size(); i++)
     delete hBkg[i];
   delete c;
@@ -606,6 +614,8 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hPixelSeed", "Pixel Seed Veto", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     make_plot(c1, vFiles[i], vNames[i], "hPixelSeedEB", "Pixel Seed Veto (EB)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     make_plot(c1, vFiles[i], vNames[i], "hPixelSeedEE", "Pixel Seed Veto (EE)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+
+    make_plot(c1, vFiles[i], vNames[i], "hDiphotonMassResolution", "#sigma_{m_{#gamma#gamma}} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref);
   }

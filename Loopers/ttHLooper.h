@@ -15,6 +15,8 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "WJets"));
   v.push_back(new Process(f, "TTJets"));
   v.push_back(new Process(f, "Data"));
+  v.push_back(new Process(f, "THQ"));
+  //v.push_back(new Process
 
   return v;
 }
@@ -35,6 +37,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hMetPt", 25, 0, 200);
     v[i]->add_histogram("hHT", 50, 0, 5000);
     v[i]->add_histogram("hMT", 50, 0, 500);
+    v[i]->add_histogram("hDiphotonMassResolution", 25, 0, 0.1);
+
 
     v[i]->add_histogram("hNJets", 16, -0.5, 15.5);
     v[i]->add_histogram("hNbLoose", 16, -0.5, 15.5);
@@ -168,6 +172,10 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonEta_passBothVeto", 10, -3, 3);
     v[i]->add_histogram("hPhotonEta_failBothVeto", 10, -3, 3); 
 
+    v[i]->add_histogram("hTopTagger_score", 20, -1, 1);
+    v[i]->add_histogram("hTopTagger_topMass", 40, 0, 400);
+    v[i]->add_histogram("hTopTagger_WMass", 20, 0, 200);
+
   }
 }
 
@@ -180,7 +188,7 @@ vector<TH1D*> generate_1Dhist_vector(TString name, int length, int nBins, float 
   return hVec;
 }
 
-int categorize_process(TString currentFileTitle) {
+int categorize_process(TString currentFileTitle, int genPhotonId) {
   if (currentFileTitle.Contains("ttHJet"))
     return 0;
   else if (currentFileTitle.Contains("DY"))
@@ -193,18 +201,29 @@ int categorize_process(TString currentFileTitle) {
   //  return 4;
   else if (currentFileTitle.Contains("QCD"))
     return 4;
-  else if (currentFileTitle.Contains("TTGG"))
-    return 5; // split into hadronic/semileptonic/dileptonic
-  else if (currentFileTitle.Contains("TTGJets"))
-    return 6; // split into hadronic/semileptonic/dileptonic 
+  else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || (currentFileTitle.Contains("TTJets"))) {
+    if (genPhotonId == 2) // pp
+      return 5;
+    if (genPhotonId == 1) // pf
+      return 6;
+    if (genPhotonId == 0) // ff
+      return 9;  
+  }
+
+  //else if (currentFileTitle.Contains("TTGG"))
+  //  return 5; // split into hadronic/semileptonic/dileptonic
+  //else if (currentFileTitle.Contains("TTGJets"))
+  //  return 6; // split into hadronic/semileptonic/dileptonic 
   else if (currentFileTitle.Contains("WG") || currentFileTitle.Contains("ZG"))
     return 7;
   else if (currentFileTitle.Contains("WJets"))
     return 8;
-  else if (currentFileTitle.Contains("TTJets"))
-    return 9; // split into hadronic/semileptonic/dileptonic
+  //else if (currentFileTitle.Contains("TTJets"))
+  //  return 9; // split into hadronic/semileptonic/dileptonic
   else if (currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"))
     return 10;
+  else if (currentFileTitle.Contains("THQ"))
+    return 11;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -439,6 +458,7 @@ double helicity(const TLorentzVector particle_1, const TLorentzVector particle_2
   return abs(cos_theta_1);  
 }
 
+/*
 const vector<TString> vSamples_2016 = {"DoubleEG", 
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2", 
 			"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8", 
@@ -454,7 +474,36 @@ const vector<TString> vSamples_2016 = {"DoubleEG",
 			"WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
 			"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
 			"TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"				
+}; */
+
+const vector<TString> vSamples_2016 = {
+			"TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8",
+                        "TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8",
 };
+
+const vector<TString> vSamples_2017 = {
+			"DoubleEG_Run2017B-31Mar2018-v1_MINIAOD_forHualin_2017",
+			"DoubleEG_Run2017C-31Mar2018-v1_MINIAOD_forHualin_2017",
+			"DoubleEG_Run2017D-31Mar2018-v1_MINIAOD_forHualin_2017",
+			"DoubleEG_Run2017E-31Mar2018-v1_MINIAOD_forHualin_2017",
+			"DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_forHualin_2017",
+			"DiPhotonJetsBox_M40_80-Sherpa_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			//"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM_forHualin_2017",
+			"TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+};
+
+/*
 const vector<TString> vSamples_2017 = {"DoubleEG",
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8",
 			"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
@@ -467,9 +516,11 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 			"QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
 			"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8",
 			"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8",
-			"TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8"
+			"TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+			
 			// No V + gamma samples for 2017 :(
 };
+*/
 
 const vector<TString> vSamples_2018 = {"EGamma",
                         "ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8",
@@ -517,7 +568,7 @@ bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
 
 void add_samples(TChain* ch, TString year) {
   //TString tag = year == "2018" ? "v102.1" : (year == "2017" ? "v1.2" : "v3.16");
-  TString tag = year == "2016" ? "v3.16" : "v1.2";
+  TString tag = year == "2016" ? "v80.1" : "v94.1";
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 

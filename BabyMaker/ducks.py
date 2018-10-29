@@ -13,6 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("tag", help = "job tag e.g. 'v7'", type=str)
 parser.add_argument("year", help = "which year to run on e.g. '2016'", type=str)
+parser.add_argument("--skip_data", action="store_true")
 parser.add_argument("--data_only", action="store_true")
 parser.add_argument("--do_all", help = "run on every single skim (not just important ones)", action="store_true")
 parser.add_argument("--soft_rerun", help = "don't remake tarball", action="store_true")
@@ -27,7 +28,7 @@ hadoop_path = "ttH"
 if args.year == "2016":
   cmssw_ver = "CMSSW_8_0_28"
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test"
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/2016_topTag_overlapRemoval"
 elif args.year == "2017":
   cmssw_ver = "CMSSW_9_4_6"
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
@@ -95,6 +96,8 @@ for sample in samples:
     subdir = default_subdir
 
   if "DoubleEG" in name or "EGamma" in name:
+    if args.skip_data:
+      continue
     nFilesPerOutput = 25
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
     print "here"
@@ -105,13 +108,13 @@ for sample in samples:
   else:
       nFilesPerOutput = 100
 
-  if args.year == "2016" and "test" not in base_path:
+  if args.year == "2016" and "topTag_overlapRemoval" not in base_path:
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
   elif args.year == "2017":
-    if "TTGG" in name:
-      dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
-    elif "forHualin" in base_path:
+    if "forHualin" in base_path:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput])
+    elif "TTGG" in name:
+      dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
     else:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])    
   else:

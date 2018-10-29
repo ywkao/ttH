@@ -39,6 +39,7 @@ class Comparison
     Comparison(TCanvas* c1, TH1D* hData, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData, TH1D* hSignal, vector<TH1D*> hMC);
+    Comparison(TCanvas* c1, vector<TH1D*> hData, vector<TH1D*> hSignal, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData);
     ~Comparison();
@@ -277,6 +278,34 @@ Comparison::Comparison(TCanvas* c1, vector<TH1D*> hData, TH1D* hSignal, vector<T
 
   mVHSignal.push_back((TH1D*)hSignal->Clone("mHSignal"));
 }
+
+inline
+Comparison::Comparison(TCanvas* c1, vector<TH1D*> hData, vector<TH1D*> hSignal, vector<TH1D*> hMC)
+{
+  default_options(c1);
+  //mVHData.push_back((TH1D*)hData->Clone("mHData"));
+  for (int i = 0; i < hData.size(); i++) {
+    TString name = "mHData" + to_string(i);
+    mVHData.push_back((TH1D*)hData[i]->Clone(name));
+  }
+
+  int nMCHists = hMC.size();
+  for (int i=0; i<nMCHists; i++) {
+    TString idx = Form("%d", i);
+    mVHMC.push_back((TH1D*)hMC[i]->Clone("mHMC"+idx));
+    //mVHRat.push_back((TH1D*)hData[i]->Clone("mHRat"+idx));
+  }
+
+  mHMC = (TH1D*)hMC[0]->Clone("mHMC");
+  for (int i=1; i<nMCHists; i++)
+    mHMC->Add(hMC[i]);
+
+  for (int i = 0; i < hSignal.size(); i++) {
+    TString idx = Form("%d", i);
+     mVHSignal.push_back((TH1D*)hSignal[i]->Clone("mHSignal" + idx));
+  }
+}
+
 
 inline
 Comparison::Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC)
@@ -635,10 +664,11 @@ void Comparison::set_histogram_options(int color1, int color2)
     mStack->GetXaxis()->SetLabelSize(0);
   }
 
+  vector<int> vColorsSignal = {kBlack, kRed, kBlue, kGreen, kViolet};
   for (int i=0; i<mVHSignal.size(); i++) {
     //mVHSignal[i]->SetFillColor(kBlack);
-    mVHSignal[i]->SetLineColor(kBlack);
-    mVHSignal[i]->SetMarkerColor(kBlack);
+    mVHSignal[i]->SetLineColor(vColorsSignal[i]);
+    mVHSignal[i]->SetMarkerColor(vColorsSignal[i]);
     if (mBothData) mVHSignal[i]->SetMarkerStyle(20);
     mVHSignal[i]->GetYaxis()->SetTitle(mYLabel);
     mVHSignal[i]->GetYaxis()->SetTitleSize(mYLabelFontSize);
