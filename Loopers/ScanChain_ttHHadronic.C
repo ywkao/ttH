@@ -359,7 +359,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
 
       // Fill rest of histograms //
-      double dipho_mass_resolution = pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), -0.5);
+      double dipho_mass_resolution = 0.5 * pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), -0.5);
       vProcess[processId]->fill_histogram("hDiphotonMassResolution", dipho_mass_resolution, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hTopTagger_score", topTag_score(), evt_weight, vId);
