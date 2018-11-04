@@ -17,7 +17,8 @@
     "/DiPhotonJetsBox_M40_80-Sherpa/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM": {
         "n_events_neg": 400, 
         "n_events_pos": 3911968, 
-        "n_events_tot": 3911968
+        "n_events_tot": 3912368,
+	"comment": "n_events_tot is given as n_events_pos from DBS. Using n_events_pos + n_events_neg instead"
     }, 
     "/DiPhotonJetsBox_M40_80-Sherpa/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
         "n_events_neg": 0, 
@@ -27,7 +28,8 @@
     "/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM": {
         "n_events_neg": 12103, 
         "n_events_pos": 50851711, 
-        "n_events_tot": 50851711
+        "n_events_tot": 50863814,
+	"comment": "n_events_tot is given as n_events_pos from DBS. Using n_events_pos + n_events_neg instead"
     }, 
     "/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
         "n_events_neg": 0, 
