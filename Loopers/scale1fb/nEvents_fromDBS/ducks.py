@@ -51,7 +51,11 @@ for input_json in input_jsons:
 
 for key, dict in mc_samples.iteritems():
   if dict["n_events_neg"] + dict["n_events_pos"] == dict["n_events_tot"]:
-    print "%s has trustworthy n_events data, skipping\n\n" % key
+    #print "%s has trustworthy n_events data, skipping\n\n" % key
+    continue
+  elif dict["n_events_tot"] > 0 and dict["n_events_pos"] > 0:
+    print "%s has already had n_event info calculated, but n_neg + n_pos != n_total" % key
+    print "Probably want to check it manually"
     continue
   print "Calculating n_events for %s\n\n" % key
   sample = DBSSample(dataset=key)
