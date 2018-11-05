@@ -1,3 +1,7 @@
+# Script to get "putarget" from data in order to implement pu reweighting in flashgg. Example usage:
+# 2016: python calculate_pileup_distribution.py --campaign "ReMiniAOD-03Feb2017-2_5_Y" --year "2016" --tag "test"
+# 2017: python calculate_pileup_distribution.py --campaign "RunIIFall17-3_1_0" --year "2017" --tag "test"
+
 import sys, os
 
 import argparse
