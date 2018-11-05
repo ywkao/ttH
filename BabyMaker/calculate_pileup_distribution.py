@@ -19,7 +19,7 @@ print("fggManageSamples.py -C %s getlumi /%s\* output=%s_%s_proc.json" % (args.c
 os.system("fggManageSamples.py -C %s getlumi /%s\* output=%s_%s_proc.json" % (args.campaign, data_name, data_name, args.tag))
 
 json_file = { 
-	"2016" : "/home/users/sjmay/ttH/BabyMaker/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt",
+	"2016" : "/home/users/sjmay/ttH/BabyMaker/Cert_271036-273730_13TeV_PromptReco_Collisions16_JSON.txt",
 	"2017" : "/home/users/sjmay/ttH/BabyMaker/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt",
 	"2018" : "/home/users/sjmay/ttH/BabyMaker/Cert_314472-324420_13TeV_PromptReco_Collisions18_JSON.txt",
 }
