@@ -37,8 +37,9 @@ if [ "$CMSSW_VER" = "94X" ]; then
   cd CMSSW_9_4_6/src/flashgg
   cmsenv
 
-  #INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8/RunIIFall17-3_1_0-3_1_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/microAOD_1.root'
-  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017/test_skim_1.root'
+  #INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017/test_skim_1.root'
+  #INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017/test_skim_1.root'
+  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/DoubleEG_Run2017C-31Mar2018-v1_MINIAOD_forHualin_2017/test_skim_433.root'
 
 fi
 
@@ -73,4 +74,6 @@ fi
 
 
 # Actually run the test
-cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} 1000
+cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES}
+#cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} 1000
+#cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} 1000 puTarget=6.246e-06,2.63e-05,4.92e-05,9.085e-05,9.855e-05,0.0001426,0.0001557,0.0001656,0.0002269,0.0005395,0.001076,0.002034,0.00322,0.004616,0.006528,0.009202,0.01283,0.01707,0.02125,0.0251,0.02847,0.03118,0.03325,0.03486,0.03625,0.03757,0.03869,0.03937,0.03946,0.03892,0.03782,0.03627,0.03435,0.03211,0.02967,0.0272,0.02483,0.02264,0.0207,0.01907,0.01784,0.01709,0.01686,0.0171,0.01771,0.01849,0.01916,0.01945,0.01911,0.01804,0.01627,0.01399,0.01147,0.008977,0.006728,0.004849,0.003375,0.002281,0.001504,0.0009715,0.0006179,0.0003883,0.000242,0.0001501,9.294e-05,5.768e-05,3.599e-05,2.263e-05,1.438e-05,9.234e-06,5.996e-06,3.933e-06,2.602e-06,1.731e-06,1.157e-06,7.744e-07,5.184e-07,3.466e-07,2.311e-07,1.535e-07,1.015e-07,6.677e-08,4.366e-08,2.836e-08,1.829e-08,1.171e-08,7.438e-09,4.686e-09,2.927e-09,1.812e-09,1.111e-09,6.754e-10,4.066e-10,2.424e-10,1.431e-10,8.363e-11,4.839e-11,2.771e-11,1.571e-11

@@ -26,6 +26,11 @@ std::map<TString, TString> mLatex = {
 	{"ttH", "ttH"},
 	{"Data", "Data"},
 	{"THQ", "tHq"},
+	{"THW", "tHW"},
+	{"ggH", "ggH"},
+	{"VBF", "VBF"},
+	{"VH", "VH"},
+	{"TGamma", "$t + \\gamma$"},
 };
 
 std::map<int, TString> mLeptons = {
@@ -343,9 +348,9 @@ int main(int argc, char* argv[])
     TFile* f = new TFile(file_path);
     vector<TString> vBkgs;
     if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW"};
     else if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH"};
 
     TString label = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", "");
     make_table_std(f, "hNVtx", vBkgs, label);
@@ -371,7 +376,7 @@ int main(int argc, char* argv[])
   
     vector<TString> vBkgs;
     if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW"};
     else if (year == "2017")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ"};
 

@@ -121,7 +121,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }
 
-
+  double dipho_yield = 0;
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
@@ -137,7 +137,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
-    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW");
+    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
 
     TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
 
@@ -169,6 +169,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Fill mva baby before any selections
       int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
       int processId = categorize_process(currentFileTitle, genPhotonId);
+
       int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
@@ -291,6 +292,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         cout << "Did not recognize tag name" << endl;
       }
  
+      if (processId == 2) {
+	cout << mass() << endl;
+	dipho_yield += scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
+      }
 
 
       // Evaluate MVA, if we choose
@@ -500,6 +505,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   f1->Write();
   f1->Close(); 
 
+  cout << "Diphoton yield: " << dipho_yield << endl;
  
   // return
   bmark->Stop("benchmark");

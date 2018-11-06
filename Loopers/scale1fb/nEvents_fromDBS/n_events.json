@@ -15,10 +15,10 @@
         "n_events_tot": 122055388
     }, 
     "/DiPhotonJetsBox_M40_80-Sherpa/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM": {
+        "comment": "n_events_tot is given as n_events_pos from DBS. Using n_events_pos + n_events_neg instead", 
         "n_events_neg": 400, 
         "n_events_pos": 3911968, 
-        "n_events_tot": 3912368,
-	"comment": "n_events_tot is given as n_events_pos from DBS. Using n_events_pos + n_events_neg instead"
+        "n_events_tot": 3912368
     }, 
     "/DiPhotonJetsBox_M40_80-Sherpa/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
         "n_events_neg": 0, 
@@ -26,10 +26,10 @@
         "n_events_tot": 4764442
     }, 
     "/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM": {
+        "comment": "n_events_tot is given as n_events_pos from DBS. Using n_events_pos + n_events_neg instead", 
         "n_events_neg": 12103, 
         "n_events_pos": 50851711, 
-        "n_events_tot": 50863814,
-	"comment": "n_events_tot is given as n_events_pos from DBS. Using n_events_pos + n_events_neg instead"
+        "n_events_tot": 50863814
     }, 
     "/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
         "n_events_neg": 0, 
@@ -81,6 +81,11 @@
         "n_events_pos": 1528162, 
         "n_events_tot": 1946414
     }, 
+    "/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM": {
+        "n_events_neg": 181924, 
+        "n_events_pos": 627460, 
+        "n_events_tot": 809384
+    }, 
     "/QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM": {
         "n_events_neg": 0, 
         "n_events_pos": 14669541, 
@@ -110,6 +115,11 @@
         "n_events_neg": 0, 
         "n_events_pos": 20632076, 
         "n_events_tot": 20632076
+    }, 
+    "/TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM": {
+        "n_events_neg": 768439, 
+        "n_events_pos": 1140561, 
+        "n_events_tot": 1909000
     }, 
     "/TGJets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
         "n_events_neg": 117194, 

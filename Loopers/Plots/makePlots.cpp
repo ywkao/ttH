@@ -24,6 +24,7 @@ std::map<TString, TString> mLabels = {
 	{"WJets", "W+Jets"},
 	{"TTJets", "t#bar{t} + Jets"}, 
 	{"THQ", "tHq"},
+	{"TGamma", "t+#gamma+Jets"},
 };
 
 std::map<TString, int> mColors = {
@@ -33,9 +34,10 @@ std::map<TString, int> mColors = {
         {"QCD", kCyan-7},
         {"TTGG", kGreen-2},
         {"TTGJets", kGreen-7},
-        {"VG", kGreen+3},
+        {"VG", kViolet+3},
         {"WJets", kBlue+2},
-        {"TTJets", kSpring+10}
+        {"TTJets", kSpring+10},
+	{"TGamma", kYellow-9},
 };
 
 std::map<TString, TString> mLatex = {
@@ -47,7 +49,8 @@ std::map<TString, TString> mLatex = {
         {"TTGJets", "$t\\bar{t}+\\gamma$ + Jets"},
         {"VG", "V + $\\gamma$"},
         {"WJets", "W + Jets"},
-        {"TTJets", "$t\\bar{t}$ + Jets"}
+        {"TTJets", "$t\\bar{t}$ + Jets"},
+        {"TGamma", "$t + \\gamma$"},
 };
 
 
@@ -327,6 +330,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_y_lim_range({1, pow(10,6)});
   }
 
+  if (hist_name == "hDiphotonMassResolution")
+    c->set_x_bin_range({1, 25});
+
   if (hist_name == "hMassAN") {
     c->set_no_flow();
     c->set_no_log();
@@ -462,7 +468,7 @@ int main(int argc, char* argv[])
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "WJets"}; 
     if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma"};
     if (year == "2017")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
     if (year == "All")
