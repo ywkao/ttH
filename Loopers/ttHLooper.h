@@ -110,6 +110,13 @@ void add_variables(vector<Process*> v, TString tag) {
 
     v[i]->add_histogram("hPhotonMaxIDMVA", 10, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_0jet", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_0jet", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_1jet", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_1jet", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_2jet", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_2jet", 10, -1, 1);
+
     v[i]->add_histogram("hPhotonMaxIDMVA_entries", 10, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_entries", 10, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_coarse", 5, -1, 1);
@@ -129,6 +136,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonEta_fake", 10, -3, 3);
 
     v[i]->add_histogram("hHadronicMVA", 25, -1.0, 1.0);
+    v[i]->add_histogram("hHadronicMVA2", 25, -1.0, 1.0);
     v[i]->add_histogram("hLeptonicMVA", 25, -1.0, 1.0);
 
     v[i]->add_histogram("hLeptonPt", 25, 0, 200);
@@ -437,14 +445,14 @@ const vector<TString> vSamples_2016 = {"DoubleEG",
 
 const vector<TString> vSamples_2017 = {"DoubleEG",
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8",
-			"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+				       //"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
 			"DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa",
 			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
 			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8",
 			"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
-			"QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
-			"QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8",
-			"QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+				       				       "QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+				       //				       "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8",
+				       "QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
 			"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8",
 			"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8",
 			"TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8"
@@ -453,9 +461,11 @@ const vector<TString> vSamples_2017 = {"DoubleEG",
 
 
 void add_samples(TChain* ch, TString year) {
-  TString tag = year == "2017" ? "v1.2" : "v3.16";
+  //  TString tag = year == "2017" ? "v1.2" : "v3.16";
+  TString tag = year == "2017" ? "topTagger_v1.1" : "v3.16";
 
-  TString location = "/home/users/hmei/ttH2/ttH/Loopers/merged_babies";
+  //  TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
+  TString location = "/home/users/hmei/ttH/Loopers/merged_babies";
 
   vector<TString> vSamples = year == "2017" ? vSamples_2017 : vSamples_2016;
 

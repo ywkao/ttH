@@ -104,8 +104,9 @@ double scale1fb_2017(TString currentFileTitle) {
   };
   TObjArray *tx = currentFileTitle.Tokenize("/");
   TString key = ((TObjString *)(tx->At(tx->GetEntries()-2)))->String();
-  TString tag = "v1.2";
-  TString to_replace = "__ttH_Babies_" + tag + "_2017";
+  //  TString tag = "v1.2"; 
+   TString tag = "topTagger_v1.1";
+   TString to_replace = "__ttH_Babies_" + tag + "_2017";
   TString replace_with = "";
   key = key.ReplaceAll(to_replace, replace_with);
   return m.find(key)->second;

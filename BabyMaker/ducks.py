@@ -31,8 +31,8 @@ if args.year == "2016":
 elif args.year == "2017":
   cmssw_ver = "CMSSW_9_4_6"
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
-  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
-
+#  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017"
 if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "_" + args.year)
   os.system("rm package.tar.gz")
@@ -94,10 +94,14 @@ for sample in samples:
   if args.year == "2016" and "test" not in base_path:
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
   elif args.year == "2017":
-    if "TTGG" in name:
-      dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
-    else:
-      dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])    
+#    if "TTGG" in name:
+#      print "test"
+#      dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
+#    else:
+#      dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])    
+# / and /* differences matter depending if there is subdirectories
+      dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput])    
+
   else:
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput]) 
 
@@ -147,7 +151,7 @@ while True:
         # save some information for the dashboard
         total_summary[ds] = task.get_task_summary()
     # parse the total summary and write out the dashboard
-    #StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
+    StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
     os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker")
     if allcomplete:
         print ""

@@ -13,10 +13,100 @@ import matplotlib.pyplot as plt
 import numpy
 import random
 
+def unc_ZA(s, b, ds, db):
+  Zs = math.log(1 + (s/b)) / Z_A(s,b)
+  Zb = (math.log(1 + (s/b)) - (s/b)) / Z_A(s,b)
+  return ((Zs*ds)**2 + (Zb*db)**2)**(0.5)
+
+def calc_significance2(tree, selection_base, index, mva_cut, name):
+
+  do_simple_estimate = True
+  train_frac = 0.5
+
+#  selection_signal = "label == 0"
+#  selection_bkg = "label >= 1 && label < 4"
+  selection_signal = "label_ == 1 && process_id_ == 0"
+  selection_bkg = "label_ == 0 && process_id_ != 10"
+  selection_sideband = "mass_ >= 100 && mass_ <= 180 && process_id_ != 10"
+  selection_data = "process_id_ == 10 && mass_ >= 100 && mass_ <= 180"                                                                                                                                              
+
+  sig_mass = root_numpy.tree2array(tree, branches = "mass_", selection = selection_signal + " && " + selection_base)
+  sig_weights = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_signal + " && " + selection_base)
+
+  # calculate effective width
+  mean_eff, sigma_eff = calc_sigma_eff(sig_mass, sig_weights, index, name)
+  if sigma_eff < 0:
+    sigma_eff = abs(sigma_eff)
+  selection_mass = "mass_ >= %.10f && mass_ <= %.10f" % (mean_eff - (1.645 * sigma_eff), mean_eff + (1.645 * sigma_eff))
+
+  # calculate s
+  sig_events = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_signal + " && " + selection_base + " && " + selection_mass)
+  s = (1 / (1 - train_frac)) * numpy.sum(sig_events)
+  s_unc = (1 / (1 - train_frac)) * math.sqrt(numpy.sum(sig_events**2))
+
+#  print s,s_unc
+  # calculate b from mc
+  selection_bkg_sidebands = selection_bkg + " && " + selection_base + " && " + selection_sideband
+  #selection_bkg_sidebands = selection_bkg + " && " + selection_base + " && " + selection_mass
+  bkg_weights = root_numpy.tree2array(tree, branches = "evt_weight_", selection = selection_bkg_sidebands) 
+  bkg_events = root_numpy.tree2array(tree, branches = "mass_", selection = selection_bkg_sidebands) 
+
+  if do_simple_estimate:
+    b_mc, unc_b_mc = constant_estimate2(bkg_events, bkg_weights, mean_eff, sigma_eff, 0)
+
+#    print b_mc, unc_b_mc
+    b_mc *= (1 / (1 - train_frac)) # account for train/test split
+    unc_b_mc *= (1 / (1 - train_frac)) # account for train/test split
+
+  else:
+    try:
+      b_mc = (1 / (1 - train_frac)) * fit_exp(bkg_events, bkg_weights, mean_eff, sigma_eff, i, name)
+    except:
+      print ("error in fit, continuing")
+      return
+
+  z_mc = Z_A(s, b_mc)
+  unc_z_mc = unc_ZA(s, b_mc, s_unc, unc_b_mc)
+
+  # calculate b from fit to data sidebands
+  
+  data_events = root_numpy.tree2array(tree, branches = "mass_", selection = selection_data + " && " + selection_base)
+  #print selection_data + " && " + selection_base
+  #print "data_events: ", data_events
+  if len(data_events) < 4:
+    #b_data = -1 
+    return 0, 0, 0, 0, 0# fit doesn't seem to work with less than 5 events
+
+  elif do_simple_estimate:
+    b_data, unc_b_data = constant_estimate2(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, 0)
+
+  else:
+    try: 
+      b_data = utils.fit_exp(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, i, name)
+    except:
+      print ("error in fit, continuing")
+      return
+
+  b_data = b_data/(1-train_frac)
+  unc_b_data = unc_b_data/(1-train_frac)
+
+  z_data = Z_A(s, b_data)
+  unc_z_data = unc_ZA(s, b_data, s_unc, unc_b_data)
+
+  #print s,b_mc,b_data
+  #print s, s_unc, b_mc, unc_b_mc, b_data, unc_b_data
+  #print z_mc, unc_z_mc, z_data, unc_z_data
+  #print (unc_z_mc * 100) / z_mc, (unc_z_data * 100) / z_data
+  
+  #print index, s, z_mc, unc_z_mc
+  return s, z_mc, unc_z_mc, z_data, unc_z_data
+
+
+
 # helper function to calculate Z_A
 def calc_significance(tree_test, selection_base, idx, idy, name):
 
-  do_simple_estimate = False #True
+  do_simple_estimate = True
 
 #  selection_signal = "label == 0"
 #  selection_bkg = "label >= 1 && label < 4"
@@ -42,6 +132,7 @@ def calc_significance(tree_test, selection_base, idx, idy, name):
   bkg_weights = root_numpy.tree2array(tree_test, branches = "evt_weight_", selection = selection_bkg_sidebands) 
   bkg_events = root_numpy.tree2array(tree_test, branches = "mass_", selection = selection_bkg_sidebands) 
 
+  #train_frac = 0.5
   #b_mc = (1 / (1 - train_frac)) * numpy.sum(bkg_weights)
 
   if do_simple_estimate:
@@ -57,13 +148,15 @@ def calc_significance(tree_test, selection_base, idx, idy, name):
   b_mc = b_mc*2
 
   z_mc = Z_A(s, b_mc)
+
 #  quants_mc.append(quantiles[i])
 #  n_sig_mc.append(s)
 #  sig_mc.append(z_mc)
 #  n_bkg_mc.append(b_mc)
 
-  print idx, idy, s, b_mc, z_mc
-
+#  print idx, idy, s, b_mc, z_mc
+  print selection_base, s, b_mc, z_mc, mean_eff, sigma_eff
+  return s, b_mc, z_mc
 
 def Z_A(s, b):
   if s < 0:
@@ -118,6 +211,13 @@ def exp(x, a, b):
 
 def gaus(x, a, b, c):
   return a * numpy.exp(-0.5 * (( (x - b) / c ) ** 2))
+
+def constant_estimate2(data, weights, mean_eff, sigma_eff, smear):
+  if numpy.sum(weights) < 0:
+    return 999, 999
+  est = numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  unc = math.sqrt(numpy.sum(weights**2)) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  return est, unc
 
 def constant_estimate(data, weights, mean_eff, sigma_eff):
   return numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))

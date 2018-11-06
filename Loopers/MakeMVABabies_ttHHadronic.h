@@ -36,19 +36,33 @@ class BabyMaker {
     TTree *BabyTree_;
 
     // Variable names
-    vector<string> mva_branches = {"dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"};
-    
+    vector<string> mva_branches = {"topTag_score_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "nb_loose_", "diphoptom_"};
 
+    vector<string> mva_branches_2 = {"topTag_pT_", "topTag_eta_", "topTag_phi_", "topTag_topMass_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_"};
+    
     int 	label_;
+    int 	label_ttH_ttgg_bdt_;
     double	evt_weight_;
     int 	process_id_;
     double 	rand_;
     double      super_rand_;
 
     double      mass_;
+    double      lead_sigmaEOverE_;
+    double      sublead_sigmaEOverE_;
+
+    double      lead_phi_;
+    double      sublead_phi_;
+
     int      eventCat_;
 
     // Variable declarations
+    float           topTag_score_;
+    float           topTag_pT_;
+    float           topTag_eta_;
+    float           topTag_phi_;
+    float           topTag_topMass_;
+
     float           dipho_delta_R;
     int		njets_;
     //int		nbjets_;
@@ -78,8 +92,8 @@ class BabyMaker {
 
     double	leadptoM_;
     double	subleadptoM_;
-    double	leadIDMVA_;
-    double 	subleadIDMVA_;
+    double	maxIDMVA_;
+    double 	minIDMVA_;
     double      lead_eta_;
     double      sublead_eta_;
  
@@ -88,7 +102,9 @@ class BabyMaker {
 
     double	dipho_cosphi_;
     double 	dipho_rapidity_;
+    double      diphoptom_;
     double      met_;    
+    int nb_loose_;
 };
 
 inline
@@ -98,14 +114,22 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_ = new TTree("t", "A Baby Ntuple");
 
   BabyTree_->Branch("mva_branches"	, &mva_branches );
+  BabyTree_->Branch("mva_branches_2"	, &mva_branches_2 );
 
   BabyTree_->Branch("evt_weight_"     	, &evt_weight_  );
   BabyTree_->Branch("label_"     	, &label_       );
+  BabyTree_->Branch("label_ttH_ttgg_bdt_"     	, &label_ttH_ttgg_bdt_       );
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
   BabyTree_->Branch("super_rand_"            , &super_rand_       );
 
   // Variable branches
+  BabyTree_->Branch("topTag_score_" ,&topTag_score_);
+  BabyTree_->Branch("topTag_pT_" ,&topTag_pT_);
+  BabyTree_->Branch("topTag_eta_" ,&topTag_eta_);
+  BabyTree_->Branch("topTag_phi_" ,&topTag_phi_);
+  BabyTree_->Branch("topTag_topMass_" ,&topTag_topMass_);
+
   BabyTree_->Branch("dipho_delta_R" ,&dipho_delta_R);
   BabyTree_->Branch("njets_"     	, &njets_       );
   //BabyTree_->Branch("nbjets_"		, &nbjets_	);
@@ -135,18 +159,26 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("max1_btag_"            , &max1_btag_   );
   BabyTree_->Branch("max2_btag_"            , &max2_btag_   );
 
+  BabyTree_->Branch("lead_sigmaEOverE_", &lead_sigmaEOverE_ );
+  BabyTree_->Branch("sublead_sigmaEOverE_", &sublead_sigmaEOverE_ );
+
   BabyTree_->Branch("leadptoM_"    	, &leadptoM_      );
   BabyTree_->Branch("subleadptoM_"    	, &subleadptoM_   );
-  BabyTree_->Branch("leadIDMVA_"    	, &leadIDMVA_    );
-  BabyTree_->Branch("subleadIDMVA_"    	, &subleadIDMVA_    );
+  BabyTree_->Branch("maxIDMVA_"    	, &maxIDMVA_    );
+  BabyTree_->Branch("minIDMVA_"    	, &minIDMVA_    );
   BabyTree_->Branch("lead_eta_"        , &lead_eta_    );
   BabyTree_->Branch("sublead_eta_"     , &sublead_eta_    ); 
+  BabyTree_->Branch("lead_phi_"        , &lead_eta_    );
+  BabyTree_->Branch("sublead_phi_"     , &sublead_eta_    ); 
+
   BabyTree_->Branch("leadPSV_"           , &leadPSV_      );
   BabyTree_->Branch("subleadPSV_"        , &subleadPSV_   );
   
+  BabyTree_->Branch("diphoptom_"           , &diphoptom_      );
   BabyTree_->Branch("dipho_cosphi_"           , &dipho_cosphi_      );
   BabyTree_->Branch("dipho_rapidity_"           , &dipho_rapidity_      );
   BabyTree_->Branch("met_"           , &met_      );
+  BabyTree_->Branch("nb_loose_" ,&nb_loose_);
 
   return;
 }

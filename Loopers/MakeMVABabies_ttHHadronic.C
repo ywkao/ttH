@@ -112,11 +112,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
 
-      //label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+      //      label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       int eventCat = -1;
       if (leadGenMatch() == 1 && subleadGenMatch() == 1) eventCat = 0; 
-      if (leadGenMatch() + subleadGenMatch() == 1) eventCat = 1; 
+      //      if ((leadGenMatch() + subleadGenMatch() == 1) || (leadGenMatch() + subleadGenMatch() == 3) ) eventCat = 1; 
+      if ((leadGenMatch() + subleadGenMatch() == 1) ) eventCat = 1; 
       if (leadGenMatch() != 1 && subleadGenMatch() != 1) eventCat = 2;
 
       // ttH: 0
@@ -126,7 +127,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       bool fromTTX = false;
       if (process_id_ == 5 || process_id_ == 6 || process_id_ == 9) fromTTX = true;
-
+      
+      
       label_ = 5;
       //if (process_id_ == 0) label_ = 1;
       //if (process_id_ == 9) label_ = 0;
@@ -136,12 +138,27 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       if (fromTTX && eventCat == 1) label_ = 2;
       if (fromTTX && eventCat == 2) label_ = 3;
       if (process_id_ == 0) label_ = 0;
+      
+      label_ttH_ttgg_bdt_ = 2;
+      if (process_id_ == 0) label_ttH_ttgg_bdt_ = 1;
+      if (eventCat == 0 && (process_id_ == 5 || process_id_ == 6) ) label_ttH_ttgg_bdt_ = 0;
 
+      TLorentzVector diPho = lead_photon + sublead_photon;
       // Variable definitions
+      topTag_score_ = topTag_score();
+      topTag_pT_ = topTag_pT();
+      topTag_eta_ = topTag_eta();
+      topTag_phi_ = topTag_phi();
+      topTag_topMass_ = topTag_topMass();
+
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
       ht_ = get_ht(jets);
       njets_ = n_jets();
       //nbjets_ = nb_medium();
+      nb_loose_ = nb_loose();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+
       jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
       jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
       jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
@@ -166,10 +183,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       leadptoM_ = lead_ptoM();
       subleadptoM_ = sublead_ptoM();
-      leadIDMVA_ = leadIDMVA(); 
-      subleadIDMVA_ = subleadIDMVA();
+      //      leadIDMVA_ = leadIDMVA(); 
+      //subleadIDMVA_ = subleadIDMVA();
       lead_eta_ = leadEta();
       sublead_eta_ = subleadEta();
+
+      lead_phi_ = leadPhi();
+      sublead_phi_ = subleadPhi();
 
       leadPSV_ = leadPixelSeed();
       subleadPSV_ = subleadPixelSeed();
@@ -182,6 +202,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
 
       mass_ = mass();
+      lead_sigmaEOverE_ = lead_sigmaEoE();
+      sublead_sigmaEOverE_ = sublead_sigmaEoE();
+
       eventCat_ = eventCat;
 
       FillBabyNtuple();

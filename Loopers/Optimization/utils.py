@@ -41,6 +41,7 @@ def calc_sigma_eff(signal_data, weights, idx, name):
 
   # fit
   #popt, pcov = curve_fit(gaus, x_fit, y_fit, p0 = [1, 125, 2])
+  print y_fit, y_err
   popt, pcov = curve_fit(gaus, x_fit, y_fit, sigma = y_err, p0 = [1, 125, 2])
 
   # plot

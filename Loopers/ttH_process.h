@@ -76,11 +76,11 @@ inline Process::Process(TFile* f, TString name)
   mFile = f;
   f->cd();
   mName = name;
-  mGenLepton = true;
+  mGenLepton = false;
   mGenPhoton = true;
-  mGenPhotonDetail = true;
-  mPhotonLocations = true; 
-  mMVACategories = true;
+  mGenPhotonDetail = false;
+  mPhotonLocations = false; 
+  mMVACategories = false;
 }
 
 inline void Process::add_histogram(TString name, int nBins, double xLow, double xHigh)
@@ -164,17 +164,20 @@ inline void Process::fill_histogram(TString name, double value, double weight, v
   int genPhotonDetailId = vId.size() > 2 ? vId[2] : -1;
   int photonLocationId = vId.size() > 3 ? vId[3]: -1;
   int mvaCategoryId = vId.size() > 4 ? vId[4]: -1;
-
-  if (genLeptonId >= 0)
-    mHGenLeptonComp[idx][genLeptonId]->Fill(value, weight);
+  
+  
+  //  if (genLeptonId >= 0)
+  //  mHGenLeptonComp[idx][genLeptonId]->Fill(value, weight);
   if (genPhotonId >= 0)
     mHGenPhotonComp[idx][genPhotonId]->Fill(value, weight);
-  if (genPhotonDetailId >= 0)
+  /*
+ if (genPhotonDetailId >= 0)
     mHGenPhotonDetailComp[idx][genPhotonDetailId]->Fill(value, weight);
   if (photonLocationId >= 0)
     mHPhotonLocations[idx][photonLocationId]->Fill(value, weight);
   if (mvaCategoryId >= 0)
     mHMVACategories[idx][mvaCategoryId]->Fill(value, weight);
+  */
 }
 
 #endif // _TTH_PROCESS_H_

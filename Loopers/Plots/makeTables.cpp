@@ -344,14 +344,14 @@ int main(int argc, char* argv[])
     if (year == "2016")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
     else if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets"};//Y"};
 
     TString label = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", "");
     make_table_std(f, "hNVtx", vBkgs, label);
-    make_table_components(f, "hNVtx", vBkgs, label, mLeptons, "GenLepton");
+    //  make_table_components(f, "hNVtx", vBkgs, label, mLeptons, "GenLepton");
     make_table_components(f, "hNVtx", vBkgs, label, mPhotons, "GenPhoton"); 
     make_table_components(f, "hNVtx", vBkgs, label, mPhotonsDetail, "GenPhotonDetail");
-    make_table_components(f, "hNVtx", vBkgs, label, mPhotonLocations, "PhotonLocations", true);
+    //ke_table_components(f, "hNVtx", vBkgs, label, mPhotonLocations, "PhotonLocations", true);
   }
 
   else if (argc >= 3) {

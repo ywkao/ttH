@@ -1,4 +1,4 @@
-{ 	
+ { 	
 	"QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8" : { "xs" : 162060000, "filter_eff" : 0.0016, "br" : 1, "kf" : 1 },
 	"QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8" : { "xs" : 108000000, "filter_eff" : 0.000225, "br" : 1, "kf" : 1 },
 	"QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8" : { "xs" : 54120000, "filter_eff" : 0.002, "br" : 1, "kf" : 1},

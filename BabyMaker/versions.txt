@@ -80,3 +80,33 @@ Submitting ttH Babies version v1.3 using skims in /hadoop/cms/store/user/bemarsh
 Date: 2018-09-11 14:42:36.116966 
 Submitting ttH Babies version v3.16_microAOD_test using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/test and commit 77667c3420fbcf361183774d0f345913b351a9b4 of tth_dev_80X branch of flashgg
 
+Date: 2018-09-26 13:29:54.220128 
+Submitting ttH Babies version topTagger_v1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e37124f201d541110ded972ea3feadb4b0e3ed53 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-09-27 00:04:35.022022 
+Submitting ttH Babies version topTagger_v2 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e37124f201d541110ded972ea3feadb4b0e3ed53 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-09-28 02:24:15.452691 
+Submitting ttH Babies version topTagger_v0.0 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e37124f201d541110ded972ea3feadb4b0e3ed53 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-09-28 10:57:29.219104 
+Submitting ttH Babies version topTagger_v0.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e37124f201d541110ded972ea3feadb4b0e3ed53 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-09-28 13:30:47.724463 
+Submitting ttH Babies version topTagger_v0.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e37124f201d541110ded972ea3feadb4b0e3ed53 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-10-01 05:57:04.520251 
+Submitting ttH Babies version topTagger_v0.2 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e37124f201d541110ded972ea3feadb4b0e3ed53 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-10-02 15:18:14.862347 
+Submitting ttH Babies version topTagger_v0.3 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e37124f201d541110ded972ea3feadb4b0e3ed53 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-10-04 00:35:36.927805 
+Submitting ttH Babies version topTagger_v1.0 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e37124f201d541110ded972ea3feadb4b0e3ed53 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-10-24 15:26:45.650152 
+Submitting ttH Babies version topTagger_v1.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit 164e4b23dc207d7ffba53a9c0d5745a8ef0ce6a5 of tth_dev_94X_topTagger branch of flashgg
+
+Date: 2018-10-24 15:58:52.605258 
+Submitting ttH Babies version topTagger_v1.1 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit 164e4b23dc207d7ffba53a9c0d5745a8ef0ce6a5 of tth_dev_94X_topTagger branch of flashgg
+

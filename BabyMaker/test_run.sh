@@ -21,7 +21,6 @@ if [ "$CMSSW_VER" = "80X" ]; then
   cd CMSSW_8_0_28/src/flashgg
   cmsenv
 
-  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20/TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8/RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/microAOD_1.root' # or change to your favorite file
 fi
 
 if [ "$CMSSW_VER" = "94X" ]; then
@@ -34,11 +33,14 @@ if [ "$CMSSW_VER" = "94X" ]; then
   cd CMSSW_9_4_6/src/flashgg
   cmsenv
 
+  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017/test_skim_1.root'
+#  INPUTFILENAMES='/home/users/hmei/test/CMSSW_9_4_9/src/flashgg/myMicroAODOutputFile.root'
+#  INPUTFILENAMES='/home/users/hmei/CMSSW_9_4_6/src/flashgg/myMicroAODOutputFile_ttGG.root'
 #  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1/TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8/RunIIFall17-3_1_0-3_1_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/microAOD_1.root' # or change to your favorite file
-  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/microAOD_1.root'
+#  INPUTFILENAMES='/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/microAOD_1.root'
 #  INPUTFILENAMES='/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIIFall17-3_2_0/3_2_0/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/180817_102411/0000/myMicroAODOutputFile_7.root'
 #  INPUTFILENAMES='/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIIFall17-3_2_0/3_2_0/TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8/RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/180817_112700/0000/myMicroAODOutputFile_37.root'
 fi
 
 # Actually run the test
-cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} #1000
+cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} 1000

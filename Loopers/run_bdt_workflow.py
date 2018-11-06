@@ -27,14 +27,18 @@ os.chdir("../MVAs")
 
 mva_baby = "../Loopers/MVABaby_ttH%s_%s.root" % (args.channel, args.ext)
 if args.randomize:
-  os.system("python prep.py %s --randomize" % (mva_baby))
+  os.system("python prep.py %s %s --randomize" % (args.channel, mva_baby))
 else:
-  os.system("python prep.py %s" % (mva_baby))
+  os.system("python prep.py %s %s" % (args.channel, mva_baby))
+
 
 hdf5_file = "ttH%s_%s_features.hdf5" % (args.channel, args.ext)
 os.system("python train.py %s %s %s %s" % (args.channel, hdf5_file, args.ext, args.tag))
+
+
 os.chdir("../Loopers")
 os.system("./ttH%sLooper %s %s %s %s" % (args.channel, args.selection, args.year, args.ext, args.channel + "_" + args.tag + "_" + args.ext + '_bdt.xml'))
+
 
 os.chdir("Optimization")
 if args.randomize:
@@ -42,8 +46,10 @@ if args.randomize:
 else:
   os.system("python estimate_significance.py MVAOptimizationBaby_%s_%s_%s_%s_bdt.root" % (args.ext, args.channel, args.tag, args.ext))
 
+
 # Cleanup
 os.chdir("../")
 os.system("rm MVABaby_ttH%s_%s.root" % (args.channel, args.ext))
 os.system("rm ../MVAs/ttH%s_%s_features.hdf5" % (args.channel, args.ext))
 #os.system("rm Utils/random_map_%s_%s.txt" % (args.channel, args.ext))  # save random maps so that we can train multiple BDTs with the same test/train splits
+

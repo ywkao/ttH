@@ -31,7 +31,7 @@ templates_dict = { "data" : [["Data"], ""],
 
 hists = {}
 
-f = ROOT.TFile("../ttHHadronicLoose_histograms.root")
+f = ROOT.TFile("../ttHHadronicLoose_test_histograms2017.root")
 
 hists_unweighted = {} 
 hists_weighted = {}
@@ -89,6 +89,7 @@ for i in range(4):
   fracs.append(f)
   frac_errs.append(ferr)
   scales.append(f/initial_fracs[i])
+
 
 # Print fit results
 print "Initial fractions", initial_fracs

@@ -18,6 +18,16 @@ from sklearn.multiclass import OneVsRestClassifier
 import math
 import argparse
 
+import argparse
+def ParseOption():
+
+    parser = argparse.ArgumentParser(description='submit all')
+    parser.add_argument('-f', dest='filename', type=str, help='filename')
+    parser.add_argument('-o', dest='outname', type=str, help='output name')
+
+    args = parser.parse_args()
+    return args
+
 
 def prec_xgb(n_trees, max_depth, X_train, y_train, X_test, y_test, weight_train, learning_rate=0.3):
     """
@@ -42,15 +52,16 @@ def prec_xgb(n_trees, max_depth, X_train, y_train, X_test, y_test, weight_train,
     return clf, y_pred, y_pred_prob
 
 
-def GetDatasets(extraBranches, mySelection):
+def GetDatasets(inputfile, extraBranches, mySelection):
     train_frac = 0.5
-    #f = ROOT.TFile(args.inputfile, 'UPDATE')
-    f = ROOT.TFile("/home/users/hmei/ttH/Loopers/MVABaby_ttHHadronic_multiClass_promptness.root", 'UPDATE')
+    f = ROOT.TFile(inputfile, 'UPDATE')
+    #f = ROOT.TFile("/home/users/hmei/ttH/Loopers/MVABaby_ttHHadronic_multiClass_promptness_toptag.root", 'UPDATE')
     tree = f.Get("t")
 
     # load tree to array
     feature_names = (root_numpy.tree2array(tree, branches = ["mva_branches"], start=0, stop=1))[0][0]
     feature_names = list(feature_names) 
+#    feature_names = feature_names[1:len(feature_names)]
     print feature_names
     allBranches = numpy.concatenate( (feature_names, extraBranches) )
     features_raw = root_numpy.tree2array(tree, branches = allBranches, selection = mySelection) 
@@ -88,7 +99,7 @@ def Train1(d_train, d_test, doBinary, n_round, sum_neg_weights = 1, sum_pos_weig
     	    'max_depth': 4,
             'eta': 0.3,
             'objective': 'binary:logistic',
-            'scale_pos_weight': sum_neg_weights / sum_pos_weights,
+#            'scale_pos_weight': sum_neg_weights / sum_pos_weights,
             'subsample': 1,
             'colsample_bytree': 1.0,
             'nthread' : 8,
@@ -110,12 +121,17 @@ def Train1(d_train, d_test, doBinary, n_round, sum_neg_weights = 1, sum_pos_weig
 
     return d_pred_train, d_pred_test
 
+args=ParseOption()
 
 nround1 = 100
 nround2 = 100
 
-features_train, labels_train, weights_train, extraArrays_train = GetDatasets( ["evt_weight_", "process_id_", "mass_"], "label_ < 5 && rand_ < 0.5")
-features_test, labels_test, weights_test, extraArrays_test = GetDatasets( ["evt_weight_", "process_id_", "mass_"], "label_ < 5 && rand_ > 0.5")
+features_train, labels_train, weights_train, extraArrays_train = GetDatasets(args.filename, ["evt_weight_", "process_id_", "mass_"], "label_ < 5 && rand_ < 0.5")
+
+#features_test, labels_test, weights_test, extraArrays_test = GetDatasets(args.filename, ["evt_weight_", "process_id_", "mass_"], "label_ < 5 && rand_ > 0.5")
+
+features_test, labels_test, weights_test, extraArrays_test = GetDatasets(args.filename, ["evt_weight_", "process_id_", "mass_"], "rand_ > 0.5 && (label_ < 5 || (label_ == 5 && process_id_ == 10) ) ")
+labels_test[labels_test == 5] = 0
 
 d_train = xgboost.DMatrix(features_train, label = labels_train, weight = weights_train)
 d_test = xgboost.DMatrix(features_test, label = labels_test)
@@ -147,9 +163,11 @@ arrays_forTree = []
 for key in extraArrays_test:
     arrays_forTree.append( extraArrays_test[key] )
 arrays_forTree.append( numpy.array( d_pred_test2, dtype = [("mva_score_", numpy.float64)] ) ) 
+arrays_forTree.append( numpy.array( d_pred_test[:,0], dtype = [("mva_score1_", numpy.float64)] ) ) 
 arrays_forTree.append( numpy.array( labels_test, dtype = [("label_", numpy.float64)] ) ) 
+#arrays_forTree.append( numpy.array( extraArrays_test["process_id_"], dtype = [("process_id__", numpy.float64)] ) ) 
 
-hfile = ROOT.TFile("Event_promptness.root","RECREATE");
+hfile = ROOT.TFile('rootfiles/' + args.outname + ".root","RECREATE");
 tree_out = root_numpy.array2tree(numpy.transpose(arrays_forTree[0]))
 for i in range(1, len(arrays_forTree)):
     root_numpy.array2tree(numpy.transpose(arrays_forTree[i]), tree=tree_out)

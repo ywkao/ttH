@@ -17,6 +17,8 @@ args = parser.parse_args()
 
 name = "Hadronic" if "Hadronic" in args.file else "Leptonic"
 
+
+
 def Z_A(s, b):
   if s < 0:
     s = 0
@@ -37,6 +39,7 @@ def quantiles_to_mva_score(n_quantiles, mva_scores): # return mva_scores corresp
     idx = int((float(i+1) / float(n_quantiles)) * len(sorted_mva)) - 1
     quantiles.append(float(i+1) / float(n_quantiles))
     mva.append(sorted_mva[idx])
+#  print quantiles, mva
   return quantiles, mva
 
 
@@ -53,11 +56,14 @@ selection_sideband = "mass_ >= 100 && mass_ <= 180"
 
 
 signal_mva_scores = root_numpy.tree2array(tree, branches = ["mva_score_"], selection = selection_signal)
+#signal_mva2_scores = root_numpy.tree2array(tree, branches = ["mva2_score_"], selection = selection_signal)
 signal_ref_mva_scores = root_numpy.tree2array(tree, branches = ["reference_mva_"], selection = selection_signal)
+#signal_ref_mva_scores = root_numpy.tree2array(tree, branches = ["mva2_score_"], selection = selection_signal + " && mva_score_ > 0.6")
 
 n_quantiles = 100
 quantiles, mva_cut = quantiles_to_mva_score(n_quantiles, signal_mva_scores)
 quantiles_ref, mva_cut_ref = quantiles_to_mva_score(n_quantiles, signal_ref_mva_scores)
+
 
 quants_mc = []
 quants_data = []
@@ -149,9 +155,15 @@ def calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, qua
 ### Now calculate significances ###
 # Calculate for our BDT
 print "Significance estimates for our BDT: s, b_mc, b_data, z_mc, z_data"
-for i in range(len(quantiles)):
-  selection_base = "mva_score_ >= %.10f" % mva_cut[i][0]
-  calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, quants_data, n_sig_data, n_bkg_data, sig_data, name)
+
+nGrid = 10
+step1 = 0.000005
+step2 = 0.00001
+for i in range(nGrid):
+  for j in range(nGrid):
+#  selection_base = "mva_score_ >= %.10f" % mva_cut[i][0]
+    selection_base = "mva_score_ >= %.10f && mva2_score_ >= %0.10f " % (1- (j+1)*step1, 1 - (i+250)*step2)
+    calc_significance(selection_base, quants_mc, n_sig_mc, n_bkg_mc, sig_mc, quants_data, n_sig_data, n_bkg_data, sig_data, name)
 
 do_reference_bdt = False
 
@@ -159,6 +171,7 @@ if do_reference_bdt:
   print "Significance estimates for reference BDT: s, b_mc, b_data, z_mc, z_data"
   # Calculate for reference BDT
   for i in range(len(quantiles_ref)):
+#    selection_base = "mva2_score_ >= %.10f" % mva_cut_ref[i][0]
     selection_base = "reference_mva_ >= %.10f && pass_ref_presel_ == 1" % mva_cut_ref[i][0]
     calc_significance(selection_base, quants_mc_ref, n_sig_mc_ref, n_bkg_mc_ref, sig_mc_ref, quants_data_ref, n_sig_data_ref, n_bkg_data_ref, sig_data_ref, name + "_ref")
 

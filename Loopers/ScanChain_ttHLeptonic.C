@@ -183,7 +183,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
       double evt_weight = 1.;
-      if (!no_weights && !isData) {
+      if (/*!no_weights &&*/ !isData) {
         if (year == "2016")
           evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
         else if (year == "2017")
@@ -213,7 +213,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       for (int i = 0; i < jets.size(); i++)
         objects.push_back(jets[i]);
       for (int i = 0; i < leps.size(); i++)
-        objects.push_back(leps[i]);
+	        objects.push_back(leps[i]);
 
       // Selection
       // NOTE: need to implement overlap removal for all microAOD at some point
