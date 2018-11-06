@@ -51,8 +51,10 @@ with open(datafile_path, 'w+') as datafile_id:
         selection_base = var + "> %.10f" % ( mva_cut[i][0])#, mva_cut2[n_quantiles2-j-1][0])
 #    print selection_base
 #        s,b,z = utils.calc_significance(tree_test, selection_base, i, mva_cut[i][0], args.outname)
-        s,z_mc,z_unc_mc,z_data,z_unc_data = utils.calc_significance2(tree_test, selection_base, i, mva_cut[i][0], args.outname)
-        print s,z_mc,z_unc_mc,z_data,z_unc_data
-#        datafile_id.write(str(s) + ' ' + str(b) + ' ' + str(z) + '\n')
+        s,b_mc,z_mc,z_unc_mc,b_data,z_data,z_unc_data = utils.calc_significance2(tree_test, selection_base, i, mva_cut[i][0], args.outname)
+#        print s,z_mc,z_unc_mc,z_data,z_unc_data
+        datafile_id.write(str(s) + ' ' + str(b_mc) + ' ' + str(z_mc) + ' ' + str(z_unc_mc) )
+        datafile_id.write(         ' ' + str(b_data) + ' ' + str(z_data) + ' ' + str(z_unc_data) + '\n')
+
 datafile_id.close()
     

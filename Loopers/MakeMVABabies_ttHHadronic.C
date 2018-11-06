@@ -8,7 +8,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
   bmark->Start("benchmark");
 
   // Make baby ntuple
-  MakeBabyNtuple( Form("%s.root", ("MVABaby_ttHHadronic_" + ext).Data()));
+  MakeBabyNtuple( Form("%s.root", ("MVABabies/MVABaby_ttHHadronic_" + ext).Data()));
 
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;
@@ -177,12 +177,19 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
       jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
       jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
+      jet1_phi_ =  jet1_phi() > 0 ? abs(diPho.Phi() - jet1_phi()) : -999;
+      jet2_phi_ =  jet2_phi() > 0 ? abs(diPho.Phi() - jet2_phi()) : -999;
+      jet3_phi_ =  jet3_phi() > 0 ? abs(diPho.Phi() - jet3_phi()) : -999;
+      jet4_phi_ =  jet4_phi() > 0 ? abs(diPho.Phi() - jet4_phi()) : -999;
+      jet5_phi_ =  jet5_phi() > 0 ? abs(diPho.Phi() - jet5_phi()) : -999;
+      jet6_phi_ =  jet6_phi() > 0 ? abs(diPho.Phi() - jet6_phi()) : -999;
 
       max1_btag_ = bjet1_csv();
       max2_btag_ = bjet2_csv();
 
       leadptoM_ = lead_ptoM();
       subleadptoM_ = sublead_ptoM();
+      
       //      leadIDMVA_ = leadIDMVA(); 
       //subleadIDMVA_ = subleadIDMVA();
       lead_eta_ = leadEta();
@@ -196,6 +203,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       dipho_cosphi_ = dipho_cosphi();
       dipho_rapidity_ = dipho_rapidity();
+      diphoptom_ = dipho_sumpt()/mass();
       met_ = MetPt();
 
       rand_ = cms3.rand();

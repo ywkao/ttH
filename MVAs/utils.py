@@ -75,7 +75,7 @@ def calc_significance2(tree, selection_base, index, mva_cut, name):
   #print "data_events: ", data_events
   if len(data_events) < 4:
     #b_data = -1 
-    return 0, 0, 0, 0, 0# fit doesn't seem to work with less than 5 events
+    return 0, 0, 0, 0, 0, 0, 0# fit doesn't seem to work with less than 5 events
 
   elif do_simple_estimate:
     b_data, unc_b_data = constant_estimate2(data_events, numpy.ones(len(data_events)), mean_eff, sigma_eff, 0)
@@ -99,7 +99,9 @@ def calc_significance2(tree, selection_base, index, mva_cut, name):
   #print (unc_z_mc * 100) / z_mc, (unc_z_data * 100) / z_data
   
   #print index, s, z_mc, unc_z_mc
-  return s, z_mc, unc_z_mc, z_data, unc_z_data
+  #print  s, b_mc, z_mc, unc_z_mc, b_data, z_data, unc_z_data
+
+  return s, b_mc, z_mc, unc_z_mc, b_data, z_data, unc_z_data
 
 
 

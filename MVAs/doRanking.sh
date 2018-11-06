@@ -1,0 +1,10 @@
+python doRanking.py -t extraVars_diPho &
+python doRanking.py -t extraVars_perPho &
+python doRanking.py -t extraVars_perTop &
+python doRanking.py -t extraVars_perEvent &
+python doRanking.py -t extraVars_jet1 &
+python doRanking.py -t extraVars_jet2 &
+python doRanking.py -t extraVars_jet3 &
+python doRanking.py -t extraVars_jet4 &
+python doRanking.py -t extraVars_jet5 &
+python doRanking.py -t extraVars_jet6 &

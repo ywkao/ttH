@@ -24,6 +24,7 @@ def ParseOption():
     parser = argparse.ArgumentParser(description='submit all')
     parser.add_argument('-f', dest='filename', type=str, help='filename')
     parser.add_argument('-o', dest='outname', type=str, help='output name')
+    parser.add_argument('-l','--list', dest='trainVars', nargs='+', help='list of training variables', required=True)
 
     args = parser.parse_args()
     return args
@@ -52,7 +53,7 @@ def prec_xgb(n_trees, max_depth, X_train, y_train, X_test, y_test, weight_train,
     return clf, y_pred, y_pred_prob
 
 
-def GetDatasets(inputfile, extraBranches, mySelection):
+def GetDatasets(inputfile, extraBranches, mySelection, trainVars):
     train_frac = 0.5
     f = ROOT.TFile(inputfile, 'UPDATE')
     #f = ROOT.TFile("/home/users/hmei/ttH/Loopers/MVABaby_ttHHadronic_multiClass_promptness_toptag.root", 'UPDATE')
@@ -63,12 +64,14 @@ def GetDatasets(inputfile, extraBranches, mySelection):
     feature_names = list(feature_names) 
 #    feature_names = feature_names[1:len(feature_names)]
     print feature_names
+    print trainVars
     allBranches = numpy.concatenate( (feature_names, extraBranches) )
     features_raw = root_numpy.tree2array(tree, branches = allBranches, selection = mySelection) 
     # print features_raw
     features = []
     for feature in feature_names:
-        features.append(features_raw[feature])
+        if feature in trainVars:
+            features.append(features_raw[feature])
 
     #features = numpy.asarray(features)
     features = numpy.transpose(features)
@@ -126,11 +129,12 @@ args=ParseOption()
 nround1 = 100
 nround2 = 100
 
-features_train, labels_train, weights_train, extraArrays_train = GetDatasets(args.filename, ["evt_weight_", "process_id_", "mass_"], "label_ < 5 && rand_ < 0.5")
+features_train, labels_train, weights_train, extraArrays_train = GetDatasets(args.filename, ["evt_weight_", "process_id_", "mass_"], "label_ < 5 && rand_ < 0.5", args.trainVars)
 
 #features_test, labels_test, weights_test, extraArrays_test = GetDatasets(args.filename, ["evt_weight_", "process_id_", "mass_"], "label_ < 5 && rand_ > 0.5")
 
-features_test, labels_test, weights_test, extraArrays_test = GetDatasets(args.filename, ["evt_weight_", "process_id_", "mass_"], "rand_ > 0.5 && (label_ < 5 || (label_ == 5 && process_id_ == 10) ) ")
+features_test, labels_test, weights_test, extraArrays_test = GetDatasets(args.filename, ["evt_weight_", "process_id_", "mass_"], "rand_ > 0.5 && (label_ < 5 || (label_ == 5 && process_id_ == 10) ) ", args.trainVars)
+
 labels_test[labels_test == 5] = 0
 
 d_train = xgboost.DMatrix(features_train, label = labels_train, weight = weights_train)
@@ -148,6 +152,7 @@ labels_test[labels_test > 0] = -1
 labels_test[labels_test == 0] = 1
 labels_test[labels_test == -1] = 0
 
+'''
 # change training weight for binary output BDT
 sum_neg_weights = utils.sum_of_weights(weights_train, labels_train, 0)
 sum_pos_weights = utils.sum_of_weights(weights_train, labels_train, 1)
@@ -157,12 +162,13 @@ d_test2 = xgboost.DMatrix(d_pred_test, label = labels_test)
 
 # second training of a binary BDT
 d_pred_train2, d_pred_test2 = Train1(d_train2, d_test2, True, nround2, sum_neg_weights, sum_pos_weights)
+'''
 
 # save information into a root tree
 arrays_forTree = []
 for key in extraArrays_test:
     arrays_forTree.append( extraArrays_test[key] )
-arrays_forTree.append( numpy.array( d_pred_test2, dtype = [("mva_score_", numpy.float64)] ) ) 
+#arrays_forTree.append( numpy.array( d_pred_test2, dtype = [("mva_score_", numpy.float64)] ) ) 
 arrays_forTree.append( numpy.array( d_pred_test[:,0], dtype = [("mva_score1_", numpy.float64)] ) ) 
 arrays_forTree.append( numpy.array( labels_test, dtype = [("label_", numpy.float64)] ) ) 
 #arrays_forTree.append( numpy.array( extraArrays_test["process_id_"], dtype = [("process_id__", numpy.float64)] ) ) 

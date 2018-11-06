@@ -36,7 +36,7 @@ class BabyMaker {
     TTree *BabyTree_;
 
     // Variable names
-    vector<string> mva_branches = {"topTag_score_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "nb_loose_", "diphoptom_"};
+    vector<string> mva_branches = {"topTag_score_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "nb_loose_", "diphoptom_", "jet1_phi_", "jet2_phi_", "jet3_phi_", "jet4_phi_", "jet5_phi_", "jet6_phi_"};
 
     vector<string> mva_branches_2 = {"topTag_pT_", "topTag_eta_", "topTag_phi_", "topTag_topMass_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_"};
     
@@ -86,6 +86,12 @@ class BabyMaker {
     double      jet6_pt_;
     double      jet6_eta_;
     double      jet6_btag_;
+    double      jet1_phi_;
+    double      jet2_phi_;
+    double      jet3_phi_;
+    double      jet4_phi_;
+    double      jet5_phi_;
+    double      jet6_phi_;
 
     double	max1_btag_;
     double	max2_btag_;
@@ -155,6 +161,12 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("jet6_pt_"            , &jet6_pt_   );
   BabyTree_->Branch("jet6_eta_"            , &jet6_eta_ );
   BabyTree_->Branch("jet6_btag_"            , &jet6_btag_ );
+  BabyTree_->Branch("jet1_phi_"            , &jet1_phi_ );
+  BabyTree_->Branch("jet2_phi_"            , &jet2_phi_ );
+  BabyTree_->Branch("jet3_phi_"            , &jet3_phi_ );
+  BabyTree_->Branch("jet4_phi_"            , &jet4_phi_ );
+  BabyTree_->Branch("jet5_phi_"            , &jet5_phi_ );
+  BabyTree_->Branch("jet6_phi_"            , &jet6_phi_ );
  
   BabyTree_->Branch("max1_btag_"            , &max1_btag_   );
   BabyTree_->Branch("max2_btag_"            , &max2_btag_   );
