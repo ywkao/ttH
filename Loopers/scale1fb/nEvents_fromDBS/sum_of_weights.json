@@ -48,8 +48,8 @@
         "sum_of_weights": 0
     }, 
     "/GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
-        "n_events_tot": -1, 
-        "sum_of_weights": 0
+        "n_events_tot": 37274572, 
+        "sum_of_weights": 37274572.0
     }, 
     "/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM": {
         "n_events_tot": -1, 
@@ -300,8 +300,8 @@
         "sum_of_weights": 0
     }, 
     "/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISummer16MiniAODv2-BS2016_BSandPUSummer16_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
-        "n_events_tot": -1, 
-        "sum_of_weights": 0
+        "n_events_tot": 280760, 
+        "sum_of_weights": 284931.24198475585
     }, 
     "/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
         "n_events_tot": -1, 
