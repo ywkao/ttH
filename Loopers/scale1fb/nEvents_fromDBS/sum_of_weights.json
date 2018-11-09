@@ -136,8 +136,8 @@
         "sum_of_weights": 0
     }, 
     "/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
-        "n_events_tot": -1, 
-        "sum_of_weights": 0
+        "n_events_tot": 4870911, 
+        "sum_of_weights": 33378088.325547017
     }, 
     "/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM": {
         "n_events_tot": -1, 
