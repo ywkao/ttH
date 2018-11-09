@@ -28,11 +28,11 @@ def get_sum_of_weights(files):
       print "bad file: %s" % file.get_name()
       return -(10**12)
     tree = f.Get("Events")
-    tree.Draw("GenEventInfoProduct_generator__SIM.obj.weights_")
+    tree.Draw("GenEventInfoProduct_generator__SIM.obj.weights_[0]")
     hist = r.gPad.GetPrimitive("htemp")
     mean = hist.GetMean()
     #mean = tree.GetMean("GenEventInfoProduct_generator__SIM.obj.weights_")
-    total_evts = tree.GetEntries("GenEventInfoProduct_generator__SIM.obj.weights_")
+    total_evts = tree.GetEntries("GenEventInfoProduct_generator__SIM.obj.weights_[0]")
     print "Mean: %.6f, total entries: %d" % (mean, total_evts)
     sum += mean * total_evts
     del hist
@@ -72,6 +72,8 @@ for input_json in input_jsons:
           mc_samples[sample] = { "n_events_tot" : -1, "sum_of_weights" : 0}
 
 for key, dict in mc_samples.iteritems():
+  if not dict["n_events_tot"] == -1:
+    continue
   #if dict["n_events_neg"] + dict["n_events_pos"] == dict["n_events_tot"]:
     #print "%s has trustworthy n_events data, skipping\n\n" % key
     #continue
