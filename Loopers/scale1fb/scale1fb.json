@@ -4,18 +4,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1": {
-                "n_events_neg": 4339408, 
-                "n_events_pos": 22584527, 
-                "n_events_tot": 26923935
+                "n_events_tot": 26923935, 
+                "sum_of_weights": 480415913902.77966
             }, 
             "RunIIFall17MiniAOD-94X_mc2017_realistic_v10_ext1-v1": {
-                "n_events_neg": 29974443, 
-                "n_events_pos": 156024182, 
-                "n_events_tot": 185998625
+                "n_events_tot": 185998625, 
+                "sum_of_weights": 3319041139655.7124
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 0.0399556857389887, 
+        "scale1fb_2017": 1.5174273373086944e-06, 
         "scale1fb_2018": 0, 
         "xs": 5765.4
     }, 
@@ -24,12 +22,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1": {
-                "n_events_neg": 20137162, 
-                "n_events_pos": 101918226, 
-                "n_events_tot": 122055388
+                "n_events_tot": 122055388, 
+                "sum_of_weights": 1917228158524.67
             }
         }, 
-        "scale1fb_2016": 0.07367231123331924, 
+        "scale1fb_2016": 3.142557641463137e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 6025.0
@@ -39,19 +36,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2": {
-                "comment": "n_events_tot is given as n_events_pos from DBS. Using n_events_pos + n_events_neg instead", 
-                "n_events_neg": 400, 
-                "n_events_pos": 3911968, 
-                "n_events_tot": 3912368
+                "n_events_tot": 3911968, 
+                "sum_of_weights": 2748241.999999251
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 4764442, 
-                "n_events_tot": 4764442
+                "n_events_tot": 4764442, 
+                "sum_of_weights": 3601376.2999992673
             }
         }, 
-        "scale1fb_2016": 0.0636380923516332, 
-        "scale1fb_2017": 0.07751367226646705, 
+        "scale1fb_2016": 0.08419003590379091, 
+        "scale1fb_2017": 0.1103250732650482, 
         "scale1fb_2018": 0, 
         "xs": 303.2
     }, 
@@ -60,19 +54,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2": {
-                "comment": "n_events_tot is given as n_events_pos from DBS. Using n_events_pos + n_events_neg instead", 
-                "n_events_neg": 12103, 
-                "n_events_pos": 50851711, 
-                "n_events_tot": 50863814
+                "n_events_tot": 50851711, 
+                "sum_of_weights": 21983985.999994837
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 57924220, 
-                "n_events_tot": 57924220
+                "n_events_tot": 57924220, 
+                "sum_of_weights": 27392822.699993182
             }
         }, 
-        "scale1fb_2016": 0.0014570761591610555, 
-        "scale1fb_2017": 0.001660122949807166, 
+        "scale1fb_2016": 0.0030810990500815022, 
+        "scale1fb_2017": 0.0038391581945157634, 
         "scale1fb_2018": 0, 
         "xs": 84.4
     }, 
@@ -81,18 +72,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 857009, 
-                "n_events_pos": 3026526, 
-                "n_events_tot": 3883535
+                "n_events_tot": 3883535, 
+                "sum_of_weights": 1118685276.675881
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 7996037, 
-                "n_events_pos": 27621438, 
-                "n_events_tot": 35617475
+                "n_events_tot": 35617475, 
+                "sum_of_weights": 10009588017.951416
             }
         }, 
-        "scale1fb_2016": 0.006883935772828285, 
-        "scale1fb_2017": 0.062271925041380176, 
+        "scale1fb_2016": 1.349705899560588e-05, 
+        "scale1fb_2017": 0.00012076676328613451, 
         "scale1fb_2018": 0, 
         "xs": 135.1
     }, 
@@ -101,9 +90,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 17678702, 
-                "n_events_tot": 17678702
+                "n_events_tot": 17678702, 
+                "sum_of_weights": 17678702.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -116,9 +104,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 24989649, 
-                "n_events_tot": 24989649
+                "n_events_tot": 24989649, 
+                "sum_of_weights": 24989649.0
             }
         }, 
         "scale1fb_2016": 0.00880364506120114, 
@@ -131,9 +118,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 42345735, 
-                "n_events_tot": 42345735
+                "n_events_tot": 42345735, 
+                "sum_of_weights": 42345735.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -146,9 +132,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 37274572, 
-                "n_events_tot": 37274572
+                "n_events_tot": 37274572, 
+                "sum_of_weights": 37274572.0
             }
         }, 
         "scale1fb_2016": 0.08627865666707052, 
@@ -161,9 +146,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2": {
-                "n_events_neg": 0, 
-                "n_events_pos": 79243357, 
-                "n_events_tot": 79243357
+                "n_events_tot": 79243357, 
+                "sum_of_weights": 79243357.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -176,9 +160,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 72358076, 
-                "n_events_tot": 72358076
+                "n_events_tot": 72358076, 
+                "sum_of_weights": 72358076.0
             }
         }, 
         "scale1fb_2016": 0.01175818992202059, 
@@ -191,18 +174,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 418252, 
-                "n_events_pos": 1528162, 
-                "n_events_tot": 1946414
+                "n_events_tot": 1946414, 
+                "sum_of_weights": 214099996.333316
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1": {
-                "n_events_neg": 181924, 
-                "n_events_pos": 627460, 
-                "n_events_tot": 809384
+                "n_events_tot": 809384, 
+                "sum_of_weights": 88845273.84093486
             }
         }, 
-        "scale1fb_2016": 0.0002475144544997486, 
-        "scale1fb_2017": 9.935634420808893e-05, 
+        "scale1fb_2016": 1.2412207789176828e-06, 
+        "scale1fb_2017": 5.150705366118677e-07, 
         "scale1fb_2018": 0, 
         "xs": 48.58
     }, 
@@ -211,9 +192,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 14669541, 
-                "n_events_tot": 14669541
+                "n_events_tot": 14669541, 
+                "sum_of_weights": 14669541.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -226,12 +206,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 18009301, 
-                "n_events_tot": 18009301
+                "n_events_tot": 18009301, 
+                "sum_of_weights": 18009320.773069702
             }
         }, 
-        "scale1fb_2016": 1.2276989540016017, 
+        "scale1fb_2016": 1.2276976060675349, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 22110.0
@@ -241,9 +220,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 42048105, 
-                "n_events_tot": 42048105
+                "n_events_tot": 42048105, 
+                "sum_of_weights": 42048105.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -256,9 +234,8 @@
         "filter_eff": 1, 
         "productions": {
             "": {
-                "n_events_neg": 0, 
-                "n_events_pos": 0, 
-                "n_events_tot": 0
+                "n_events_tot": 0, 
+                "sum_of_weights": 0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -271,9 +248,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 20622034, 
-                "n_events_tot": 20622034
+                "n_events_tot": 20622034, 
+                "sum_of_weights": 20622034.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -286,9 +262,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 20632076, 
-                "n_events_tot": 20632076
+                "n_events_tot": 20632076, 
+                "sum_of_weights": 20632076.0
             }
         }, 
         "scale1fb_2016": 5.496296155558946, 
@@ -301,13 +276,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2": {
-                "n_events_neg": 768439, 
-                "n_events_pos": 1140561, 
-                "n_events_tot": 1909000
+                "n_events_tot": 1909000, 
+                "sum_of_weights": 5919452.569380678
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 0.0026872907272346164, 
+        "scale1fb_2017": 0.00016893454053043032, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -316,17 +290,15 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 117194, 
-                "n_events_pos": 175314, 
-                "n_events_tot": 292508
+                "n_events_tot": 292508, 
+                "sum_of_weights": 873069.0502000757
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1": {
-                "n_events_neg": 623277, 
-                "n_events_pos": 933719, 
-                "n_events_tot": 1556996
+                "n_events_tot": 1556996, 
+                "sum_of_weights": 4663408.501069907
             }
         }, 
-        "scale1fb_2016": 0.008050205935500676, 
+        "scale1fb_2016": 0.0005359003034915974, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 2.967
@@ -336,9 +308,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 500000, 
-                "n_events_tot": 500000
+                "n_events_tot": 500000, 
+                "sum_of_weights": 500000.0
             }
         }, 
         "scale1fb_2016": 3.37095e-07, 
@@ -351,9 +322,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 5229, 
-                "n_events_pos": 1892270, 
-                "n_events_tot": 1897499
+                "n_events_tot": 1897499, 
+                "sum_of_weights": 1887041.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -366,9 +336,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 499800, 
-                "n_events_tot": 499800
+                "n_events_tot": 499800, 
+                "sum_of_weights": 499800.0
             }
         }, 
         "scale1fb_2016": 6.889935974389756e-08, 
@@ -381,9 +350,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 564, 
-                "n_events_pos": 964983, 
-                "n_events_tot": 965547
+                "n_events_tot": 965547, 
+                "sum_of_weights": 964419.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -396,13 +364,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2": {
-                "n_events_neg": 337842, 
-                "n_events_pos": 1158158, 
-                "n_events_tot": 1496000
+                "n_events_tot": 1496000, 
+                "sum_of_weights": 25145.49908388039
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 2.056524558828549e-05, 
+        "scale1fb_2017": 0.000670895413279531, 
         "scale1fb_2018": 0, 
         "xs": 0.01687
     }, 
@@ -411,12 +378,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 324315, 
-                "n_events_pos": 1099579, 
-                "n_events_tot": 1423894
+                "n_events_tot": 1423894, 
+                "sum_of_weights": 24505.83067497273
             }
         }, 
-        "scale1fb_2016": 2.232787798736946e-05, 
+        "scale1fb_2016": 0.0007063625073390523, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.01731
@@ -426,18 +392,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 1413878, 
-                "n_events_pos": 3209467, 
-                "n_events_tot": 4623345
+                "n_events_tot": 4623345, 
+                "sum_of_weights": 32952331.50875322
             }, 
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1": {
-                "n_events_neg": 2878361, 
-                "n_events_pos": 6524411, 
-                "n_events_tot": 9402772
+                "n_events_tot": 9402772, 
+                "sum_of_weights": 66911664.24916359
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 0.0007018106125746305, 
+        "scale1fb_2017": 3.8242010756887274e-05, 
         "scale1fb_2018": 0, 
         "xs": 3.819
     }, 
@@ -446,12 +410,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 1646539, 
-                "n_events_pos": 3224372, 
-                "n_events_tot": 4870911
+                "n_events_tot": 4870911, 
+                "sum_of_weights": 33378088.325547017
             }
         }, 
-        "scale1fb_2016": 0.002420408243457958, 
+        "scale1fb_2016": 0.0001144163788756291, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 3.819
@@ -461,9 +424,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 6094476, 
-                "n_events_tot": 6094476
+                "n_events_tot": 6094476, 
+                "sum_of_weights": 6094476.0
             }
         }, 
         "scale1fb_2016": 0.0001640830155045323, 
@@ -476,9 +438,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 11957043, 
-                "n_events_tot": 11957043
+                "n_events_tot": 11957043, 
+                "sum_of_weights": 11957043.0
             }
         }, 
         "scale1fb_2016": 8.363271755399726e-05, 
@@ -491,9 +452,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 11944041, 
-                "n_events_tot": 11944041
+                "n_events_tot": 11944041, 
+                "sum_of_weights": 11944041.0
             }
         }, 
         "scale1fb_2016": 8.372375814851941e-05, 
@@ -506,13 +466,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 48112836, 
-                "n_events_pos": 105418554, 
-                "n_events_tot": 153531390
+                "n_events_tot": 153531390, 
+                "sum_of_weights": 317143166991.462
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 0.0145140839174199, 
+        "scale1fb_2017": 2.62260104132211e-06, 
         "scale1fb_2018": 0, 
         "xs": 831.74
     }, 
@@ -521,12 +480,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 14247946, 
-                "n_events_pos": 29313662, 
-                "n_events_tot": 43561608
+                "n_events_tot": 43561608, 
+                "sum_of_weights": 96178141884.98058
             }
         }, 
-        "scale1fb_2016": 0.05509197173237568, 
+        "scale1fb_2016": 8.629819455158501e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 830
@@ -536,13 +494,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 36504, 
-                "n_events_pos": 8963496, 
-                "n_events_tot": 9000000
+                "n_events_tot": 9000000, 
+                "sum_of_weights": 648729877.2950546
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 0.009769248140919135, 
+        "scale1fb_2017": 0.00013443191542777556, 
         "scale1fb_2018": 0, 
         "xs": 87.21
     }, 
@@ -551,13 +508,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 176656, 
-                "n_events_pos": 43555789, 
-                "n_events_tot": 43732445
+                "n_events_tot": 43732445, 
+                "sum_of_weights": 13154404989.320726
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 2.3052558473217987e-05, 
+        "scale1fb_2017": 7.602016212909973e-08, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -566,23 +522,20 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 666391, 
-                "n_events_pos": 1258911, 
-                "n_events_tot": 1925302
+                "n_events_tot": 1925302, 
+                "sum_of_weights": 7715490.292199839
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1": {
-                "n_events_neg": 693424, 
-                "n_events_pos": 1305776, 
-                "n_events_tot": 1999200
+                "n_events_tot": 1999200, 
+                "sum_of_weights": 7744121.815043309
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1": {
-                "n_events_neg": 414490, 
-                "n_events_pos": 779110, 
-                "n_events_tot": 1193600
+                "n_events_tot": 1193600, 
+                "sum_of_weights": 4611174.122401166
             }
         }, 
-        "scale1fb_2016": 8.787498515822356e-06, 
-        "scale1fb_2017": 1.448919867683791e-05, 
+        "scale1fb_2016": 6.948550680993011e-07, 
+        "scale1fb_2017": 1.1127147692324043e-06, 
         "scale1fb_2018": 0, 
         "xs": 3.782
     }, 
@@ -591,18 +544,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 110549, 
-                "n_events_pos": 455045, 
-                "n_events_tot": 565594
+                "n_events_tot": 565594, 
+                "sum_of_weights": 4100171.4112348263
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 58282, 
-                "n_events_pos": 220529, 
-                "n_events_tot": 278811
+                "n_events_tot": 278811, 
+                "sum_of_weights": 1862202.435518574
             }
         }, 
-        "scale1fb_2016": 3.1576318822536e-05, 
-        "scale1fb_2017": 1.4871473108541171e-05, 
+        "scale1fb_2016": 2.7511310812851204e-06, 
+        "scale1fb_2017": 1.2494997126125233e-06, 
         "scale1fb_2018": 0, 
         "xs": 2.2569
     }, 
@@ -611,9 +562,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 115, 
-                "n_events_pos": 6282968, 
-                "n_events_tot": 6283083
+                "n_events_tot": 6283083, 
+                "sum_of_weights": 6282853.0
             }
         }, 
         "scale1fb_2016": 0, 
@@ -626,22 +576,19 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1": {
-                "n_events_neg": 906657, 
-                "n_events_pos": 4141813, 
-                "n_events_tot": 5048470
+                "n_events_tot": 5048470, 
+                "sum_of_weights": 4856247379.417135
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1": {
-                "n_events_neg": 1833440, 
-                "n_events_pos": 8398554, 
-                "n_events_tot": 10231994
+                "n_events_tot": 10231994, 
+                "sum_of_weights": 9854800713.800169
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext3-v1": {
-                "n_events_neg": 2178690, 
-                "n_events_pos": 9968064, 
-                "n_events_tot": 12146754
+                "n_events_tot": 12146754, 
+                "sum_of_weights": 11692520260.164915
             }
         }, 
-        "scale1fb_2016": 0.02780044894598208, 
+        "scale1fb_2016": 1.8520223988488306e-05, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 489.0
@@ -651,9 +598,8 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 0, 
-                "n_events_pos": 6103817, 
-                "n_events_tot": 6103817
+                "n_events_tot": 6103817, 
+                "sum_of_weights": 6103817.0
             }
         }, 
         "scale1fb_2016": 0.06639632217020923, 
@@ -666,17 +612,15 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 363853, 
-                "n_events_pos": 1943305, 
-                "n_events_tot": 2307158
+                "n_events_tot": 2307158, 
+                "sum_of_weights": 549507145.3201982
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1": {
-                "n_events_neg": 2270283, 
-                "n_events_pos": 12102399, 
-                "n_events_tot": 14372682
+                "n_events_tot": 14372682, 
+                "sum_of_weights": 3420691477.5612435
             }
         }, 
-        "scale1fb_2016": 0.010328466692745467, 
+        "scale1fb_2016": 2.968717970952751e-05, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 117.864
@@ -686,18 +630,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 130082, 
-                "n_events_pos": 269407, 
-                "n_events_tot": 399489
+                "n_events_tot": 399489, 
+                "sum_of_weights": 724168.1174523574
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 130677, 
-                "n_events_pos": 260058, 
-                "n_events_tot": 390735
+                "n_events_tot": 390735, 
+                "sum_of_weights": 694743.3798966109
             }
         }, 
-        "scale1fb_2016": 0.007729110147548713, 
-        "scale1fb_2017": 0.007177462766911897, 
+        "scale1fb_2016": 0.001439380394166284, 
+        "scale1fb_2017": 0.0013808948169632576, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -706,18 +648,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 133765, 
-                "n_events_pos": 278087, 
-                "n_events_tot": 411852
+                "n_events_tot": 411852, 
+                "sum_of_weights": 663325.964401531
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 124057, 
-                "n_events_pos": 246007, 
-                "n_events_tot": 370064
+                "n_events_tot": 370064, 
+                "sum_of_weights": 579241.4059458015
             }
         }, 
-        "scale1fb_2016": 0.008200082000820008, 
-        "scale1fb_2017": 0.006928950541151037, 
+        "scale1fb_2016": 0.001726395920138292, 
+        "scale1fb_2017": 0.0015075544357776264, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -726,18 +666,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 128029, 
-                "n_events_pos": 264708, 
-                "n_events_tot": 392737
+                "n_events_tot": 392737, 
+                "sum_of_weights": 556479.6917007545
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 118052, 
-                "n_events_pos": 234568, 
-                "n_events_tot": 352620
+                "n_events_tot": 352620, 
+                "sum_of_weights": 495134.44123399677
             }
         }, 
-        "scale1fb_2016": 0.008582512272992551, 
-        "scale1fb_2017": 0.007316412909078937, 
+        "scale1fb_2016": 0.0020196534854407503, 
+        "scale1fb_2017": 0.0017970107713072617, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -746,13 +684,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 134526, 
-                "n_events_pos": 277705, 
-                "n_events_tot": 412231
+                "n_events_tot": 412231, 
+                "sum_of_weights": 517947.45527806395
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 0.006984264452189218, 
+        "scale1fb_2017": 0.001930697776018887, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -761,18 +698,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 100188, 
-                "n_events_pos": 207801, 
-                "n_events_tot": 307989
+                "n_events_tot": 307989, 
+                "sum_of_weights": 346330.9609453077
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 67696, 
-                "n_events_pos": 125457, 
-                "n_events_tot": 193153
+                "n_events_tot": 193153, 
+                "sum_of_weights": 219392.70522839113
             }
         }, 
-        "scale1fb_2016": 2.1876259067536915e-05, 
-        "scale1fb_2017": 1.1742025591703602e-05, 
+        "scale1fb_2016": 5.759510548377525e-06, 
+        "scale1fb_2017": 3.6485175814227758e-06, 
         "scale1fb_2018": 0, 
         "xs": 0.5697
     }, 
@@ -781,12 +716,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 67574, 
-                "n_events_pos": 124604, 
-                "n_events_tot": 192178
+                "n_events_tot": 192178, 
+                "sum_of_weights": 216616.15933203272
             }
         }, 
-        "scale1fb_2016": 2.2156664913203573e-05, 
+        "scale1fb_2016": 5.833334890141514e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.5697
@@ -796,18 +730,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 101324, 
-                "n_events_pos": 208874, 
-                "n_events_tot": 310198
+                "n_events_tot": 310198, 
+                "sum_of_weights": 323957.39930991153
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 98639, 
-                "n_events_pos": 194908, 
-                "n_events_tot": 293547
+                "n_events_tot": 293547, 
+                "sum_of_weights": 306577.86269701604
             }
         }, 
-        "scale1fb_2016": 1.2466391050078426e-05, 
-        "scale1fb_2017": 1.1158781961878196e-05, 
+        "scale1fb_2016": 3.914591188816716e-06, 
+        "scale1fb_2017": 3.7045827709337395e-06, 
         "scale1fb_2018": 0, 
         "xs": 0.5315
     }, 
@@ -816,18 +748,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 101378, 
-                "n_events_pos": 207996, 
-                "n_events_tot": 309374
+                "n_events_tot": 309374, 
+                "sum_of_weights": 314363.25829435384
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 95837, 
-                "n_events_pos": 189149, 
-                "n_events_tot": 284986
+                "n_events_tot": 284986, 
+                "sum_of_weights": 290985.69911043963
             }
         }, 
-        "scale1fb_2016": 1.2610744598765432e-05, 
-        "scale1fb_2017": 1.1036914967453901e-05, 
+        "scale1fb_2016": 4.043957498933261e-06, 
+        "scale1fb_2017": 3.743229429497025e-06, 
         "scale1fb_2018": 0, 
         "xs": 0.5193
     }, 
@@ -836,13 +766,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 135887, 
-                "n_events_pos": 278302, 
-                "n_events_tot": 414189
+                "n_events_tot": 414189, 
+                "sum_of_weights": 409277.2400080042
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 8.082835375487133e-06, 
+        "scale1fb_2017": 2.8125605029429137e-06, 
         "scale1fb_2018": 0, 
         "xs": 0.5071
     }, 
@@ -851,13 +780,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2": {
-                "n_events_neg": 4882, 
-                "n_events_pos": 9932, 
-                "n_events_tot": 14814
+                "n_events_tot": 14814, 
+                "sum_of_weights": 14512.867760000123
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 0.19801980198019803, 
+        "scale1fb_2017": 0.06890436931811411, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -866,12 +794,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 117599, 
-                "n_events_pos": 216762, 
-                "n_events_tot": 334361
+                "n_events_tot": 334361, 
+                "sum_of_weights": 336918.2317251588
             }
         }, 
-        "scale1fb_2016": 1.160833173663564e-05, 
+        "scale1fb_2016": 3.416606439211708e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.5071
@@ -881,12 +808,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 125060, 
-                "n_events_pos": 231025, 
-                "n_events_tot": 356085
+                "n_events_tot": 356085, 
+                "sum_of_weights": 360028.8456859484
             }
         }, 
-        "scale1fb_2016": 1.0863181239088378e-05, 
+        "scale1fb_2016": 3.1972910331860307e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.5071
@@ -896,12 +822,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 180287, 
-                "n_events_pos": 327201, 
-                "n_events_tot": 507488
+                "n_events_tot": 507488, 
+                "sum_of_weights": 499158.0034455497
             }
         }, 
-        "scale1fb_2016": 7.835311815075486e-06, 
+        "scale1fb_2016": 2.306117485954663e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.5071
@@ -911,13 +836,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1": {
-                "n_events_neg": 327098, 
-                "n_events_pos": 677856, 
-                "n_events_tot": 1004954
+                "n_events_tot": 1004954, 
+                "sum_of_weights": 1007049.9498238858
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 0.0028509684739906147, 
+        "scale1fb_2017": 0.000992999404026465, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -926,12 +850,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 239395, 
-                "n_events_pos": 446058, 
-                "n_events_tot": 685453
+                "n_events_tot": 685453, 
+                "sum_of_weights": 702162.4247250947
             }
         }, 
-        "scale1fb_2016": 5.5700197906737055e-06, 
+        "scale1fb_2016": 1.6393884939808286e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.5071
@@ -942,17 +865,15 @@
         "productions": {
             "RunIISummer16MiniAODv2-BS2016_BSandPUSummer16_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
                 "comment": "unused in scale1fb calc", 
-                "n_events_neg": 98449, 
-                "n_events_pos": 182311, 
-                "n_events_tot": 280760
+                "n_events_tot": 280760, 
+                "sum_of_weights": 284931.24198475585
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 130622, 
-                "n_events_pos": 241290, 
-                "n_events_tot": 371912
+                "n_events_tot": 371912, 
+                "sum_of_weights": 376007.8544271225
             }
         }, 
-        "scale1fb_2016": 1.0401534318863628e-05, 
+        "scale1fb_2016": 3.0614174317018378e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.5071
@@ -962,18 +883,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 101281, 
-                "n_events_pos": 208525, 
-                "n_events_tot": 309806
+                "n_events_tot": 309806, 
+                "sum_of_weights": 301463.34514920466
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 131754, 
-                "n_events_pos": 259350, 
-                "n_events_tot": 391104
+                "n_events_tot": 391104, 
+                "sum_of_weights": 380472.55366677436
             }
         }, 
-        "scale1fb_2016": 8.831217279538543e-06, 
-        "scale1fb_2017": 1.0507142590727685e-05, 
+        "scale1fb_2016": 2.9616538410991373e-06, 
+        "scale1fb_2017": 3.737860732097608e-06, 
         "scale1fb_2018": 0, 
         "xs": 0.4964
     }, 
@@ -982,18 +901,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 101251, 
-                "n_events_pos": 208856, 
-                "n_events_tot": 310107
+                "n_events_tot": 310107, 
+                "sum_of_weights": 296117.4247439565
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 89762, 
-                "n_events_pos": 177571, 
-                "n_events_tot": 267333
+                "n_events_tot": 267333, 
+                "sum_of_weights": 255657.93188794347
             }
         }, 
-        "scale1fb_2016": 1.2524020316824014e-05, 
-        "scale1fb_2017": 1.0219986989452163e-05, 
+        "scale1fb_2016": 4.301535617842732e-06, 
+        "scale1fb_2017": 3.7138027285996257e-06, 
         "scale1fb_2018": 0, 
         "xs": 0.4851
     }, 
@@ -1002,18 +919,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 99833, 
-                "n_events_pos": 204699, 
-                "n_events_tot": 304532
+                "n_events_tot": 304532, 
+                "sum_of_weights": 270488.1829602061
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 34847, 
-                "n_events_pos": 63903, 
-                "n_events_tot": 98750
+                "n_events_tot": 98750, 
+                "sum_of_weights": 88655.58874880758
             }
         }, 
-        "scale1fb_2016": 3.4961047632158586e-05, 
-        "scale1fb_2017": 9.686916636469397e-06, 
+        "scale1fb_2016": 1.1458140590303877e-05, 
+        "scale1fb_2017": 3.7555363376057254e-06, 
         "scale1fb_2018": 0, 
         "xs": 0.4539
     }, 
@@ -1022,12 +937,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 68393, 
-                "n_events_pos": 124772, 
-                "n_events_tot": 193165
+                "n_events_tot": 193165, 
+                "sum_of_weights": 172023.45257668846
             }
         }, 
-        "scale1fb_2016": 1.801784707071782e-05, 
+        "scale1fb_2016": 5.905172723743242e-06, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.4539
@@ -1037,18 +951,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 114602, 
-                "n_events_pos": 241500, 
-                "n_events_tot": 356102
+                "n_events_tot": 356102, 
+                "sum_of_weights": 2030955.2839439115
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 121013, 
-                "n_events_pos": 246137, 
-                "n_events_tot": 367150
+                "n_events_tot": 367150, 
+                "sum_of_weights": 2041939.9064339735
             }
         }, 
-        "scale1fb_2016": 0.007992071864710208, 
-        "scale1fb_2017": 0.007880344843890368, 
+        "scale1fb_2016": 0.0004897303769073163, 
+        "scale1fb_2017": 0.0004923791320792155, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -1057,18 +969,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 131315, 
-                "n_events_pos": 276162, 
-                "n_events_tot": 407477
+                "n_events_tot": 407477, 
+                "sum_of_weights": 1982884.3101225684
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 121930, 
-                "n_events_pos": 244919, 
-                "n_events_tot": 366849
+                "n_events_tot": 366849, 
+                "sum_of_weights": 1716934.4679370043
             }
         }, 
-        "scale1fb_2016": 0.008130808446283814, 
-        "scale1fb_2017": 0.00690383646192189, 
+        "scale1fb_2016": 0.000582433411801417, 
+        "scale1fb_2017": 0.0005043158569035159, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -1077,18 +987,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 111930, 
-                "n_events_pos": 235998, 
-                "n_events_tot": 347928
+                "n_events_tot": 347928, 
+                "sum_of_weights": 1459738.4309756595
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 51693, 
-                "n_events_pos": 97946, 
-                "n_events_tot": 149639
+                "n_events_tot": 149639, 
+                "sum_of_weights": 633779.7898741931
             }
         }, 
-        "scale1fb_2016": 0.02162021922902298, 
-        "scale1fb_2017": 0.00806009607634523, 
+        "scale1fb_2016": 0.0015778351029440407, 
+        "scale1fb_2017": 0.0006850542390198088, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -1097,18 +1005,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 131991, 
-                "n_events_pos": 276073, 
-                "n_events_tot": 408064
+                "n_events_tot": 408064, 
+                "sum_of_weights": 1464609.2349375503
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 122064, 
-                "n_events_pos": 245794, 
-                "n_events_tot": 367858
+                "n_events_tot": 367858, 
+                "sum_of_weights": 1304590.8089039875
             }
         }, 
-        "scale1fb_2016": 0.008082114281095934, 
-        "scale1fb_2017": 0.006940492219708222, 
+        "scale1fb_2016": 0.0007665238733669446, 
+        "scale1fb_2017": 0.0006827759761071281, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -1117,18 +1023,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 158741, 
-                "n_events_pos": 329208, 
-                "n_events_tot": 487949
+                "n_events_tot": 487949, 
+                "sum_of_weights": 1505200.1026009466
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 153751, 
-                "n_events_pos": 308735, 
-                "n_events_tot": 462486
+                "n_events_tot": 462486, 
+                "sum_of_weights": 1426228.270538644
             }
         }, 
-        "scale1fb_2016": 0.006452278944923347, 
-        "scale1fb_2017": 0.005866238040207195, 
+        "scale1fb_2016": 0.0007011500337336111, 
+        "scale1fb_2017": 0.0006643634944430485, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -1137,12 +1041,11 @@
         "filter_eff": 1, 
         "productions": {
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 123270, 
-                "n_events_pos": 246149, 
-                "n_events_tot": 369419
+                "n_events_tot": 369419, 
+                "sum_of_weights": 975777.8169372074
             }
         }, 
-        "scale1fb_2016": 0.008138087061255381, 
+        "scale1fb_2016": 0.0010248234614912868, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 1
@@ -1152,18 +1055,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 166454, 
-                "n_events_pos": 347215, 
-                "n_events_tot": 513669
+                "n_events_tot": 513669, 
+                "sum_of_weights": 1214859.5049089675
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 159584, 
-                "n_events_pos": 318356, 
-                "n_events_tot": 477940
+                "n_events_tot": 477940, 
+                "sum_of_weights": 1101701.6812777026
             }
         }, 
-        "scale1fb_2016": 0.006298339757639886, 
-        "scale1fb_2017": 0.005532166783764197, 
+        "scale1fb_2016": 0.0009076867331637784, 
+        "scale1fb_2017": 0.0008231404503642028, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -1172,18 +1073,16 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 124662, 
-                "n_events_pos": 258541, 
-                "n_events_tot": 383203
+                "n_events_tot": 383203, 
+                "sum_of_weights": 789479.6165800757
             }, 
             "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1": {
-                "n_events_neg": 124271, 
-                "n_events_pos": 246720, 
-                "n_events_tot": 370991
+                "n_events_tot": 370991, 
+                "sum_of_weights": 744679.5508716045
             }
         }, 
-        "scale1fb_2016": 0.008166665305555782, 
-        "scale1fb_2017": 0.007469431352191158, 
+        "scale1fb_2016": 0.0013428594874527677, 
+        "scale1fb_2017": 0.0012666571485808228, 
         "scale1fb_2018": 0, 
         "xs": 1
     }, 
@@ -1192,13 +1091,12 @@
         "filter_eff": 1, 
         "productions": {
             "RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1": {
-                "n_events_neg": 10057, 
-                "n_events_pos": 947132, 
-                "n_events_tot": 957189
+                "n_events_tot": 957189, 
+                "sum_of_weights": 504098.30106297275
             }
         }, 
         "scale1fb_2016": 0, 
-        "scale1fb_2017": 1.2284150148067123e-06, 
+        "scale1fb_2017": 2.2835169203559777e-06, 
         "scale1fb_2018": 0, 
         "xs": 0.5071
     }

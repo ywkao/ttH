@@ -5,7 +5,13 @@ import json
 
 
 scale1fb = {}
-samples_file = "nEvents_fromDBS/n_events.json"
+
+old_weights = False
+
+if old_weights:
+  samples_file = "nEvents_fromDBS/n_events.json"
+else:
+  samples_file = "nEvents_fromDBS/sum_of_weights.json"
 with open(samples_file) as f_in:
   samples = json.load(f_in)
 
@@ -54,6 +60,7 @@ years = {
 	}
 for year, year_info in years.iteritems():
   for sample, sample_info in scale1fb.iteritems():
+    sum_of_weights = 0
     n_events_pos = 0
     n_events_neg = 0
     for production, production_info in sample_info["productions"].iteritems():
@@ -61,13 +68,24 @@ for year, year_info in years.iteritems():
         continue
       if "BSandPUSummer16" in production: #skip this one, not sure what it is
 	production_info["comment"] = "unused in scale1fb calc"
-	continue 
-      n_events_pos += production_info["n_events_pos"]
-      n_events_neg += production_info["n_events_neg"]
-    if n_events_pos > 0:
-      sample_info["scale1fb_" + year] = float(sample_info["xs"] * sample_info["br"] * sample_info["filter_eff"] * 1000) / float(n_events_pos - n_events_neg)
+	continue
+      if old_weights:
+        n_events_pos += production_info["n_events_pos"]
+	n_events_neg += production_info["n_events_neg"]
+      else: 
+        sum_of_weights += production_info["sum_of_weights"]
+      #n_events_pos += production_info["n_events_pos"]
+      #n_events_neg += production_info["n_events_neg"]
+    if old_weights:
+      if n_events_pos > 0:
+        sample_info["scale1fb_" + year] = float(sample_info["xs"] * sample_info["br"] * sample_info["filter_eff"] * 1000) / float(n_events_pos - n_events_neg)
+    else:
+      if sum_of_weights > 0:
+	sample_info["scale1fb_" + year] = float(sample_info["xs"] * sample_info["br"] * sample_info["filter_eff"] * 1000) / float(sum_of_weights)
+      else:
+	sample_info["scale1fb_" + year] = 0
 
-with open("scale1fb_new.json", "w") as f_out:
+with open("scale1fb.json", "w") as f_out:
   json.dump(scale1fb, f_out, indent=4, sort_keys=True)
 
 for year in ["2016", "2017"]:
