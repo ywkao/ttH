@@ -97,7 +97,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   TH1D* hSig_TTH = (TH1D*)file->Get(hist_name + "_ttH" + mva_category);
   TH1D* hSig_THQ = (TH1D*)file->Get(hist_name + "_THQ" + mva_category);
-  vector<TH1D*> hSig = {hSig_TTH, hSig_THQ};
+  TH1D* hSig_THW = (TH1D*)file->Get(hist_name + "_THW" + mva_category);
+  vector<TH1D*> hSig = {hSig_TTH, hSig_THQ, hSig_THW};
 
   vector<TH1D*> hBkg;
   Comparison* c;
@@ -107,11 +108,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   if (type =="std") {
     if (year != "All")
-      vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)"};
+      vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
     else if (file_ref != nullptr) 
       vLegendLabels = {"2018 Data", "2017 Data", "ttH (M125)"};
     else
-      vLegendLabels = {"2016 + 2017 Data", "ttH (M125)", "tHq (M125)"};
+      vLegendLabels = {"2016 + 2017 Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
     for (int i = 0; i < vBkgs.size(); i++) {
       hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + mva_category));
       vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
@@ -288,6 +289,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_data_drawOpt("E");
     c->set_rat_label("#frac{Data}{MC}");
     c->set_y_label("Events");
+    c->set_log_rat();
+    c->set_rat_lim_range({0.2, 5.0});
   }
   else if (type == "shape") {
     c = new Comparison(c1, hSig[0], hBkg);
@@ -324,7 +327,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
  
   if (hist_name == "hNJets" || hist_name == "hNbLoose") {
-    if (output.Contains("Leptonic"))
+    if (output.Contains("ttHHadronic_2017_Presel")) {
+      c->set_no_log();
+      c->set_y_lim_range({0.0, 200000});
+    }
+    else if (output.Contains("Leptonic"))
       c->set_y_lim_range({0.01, pow(10,4)});
     else if (output.Contains("Hadronic"))
       c->set_y_lim_range({1, pow(10,6)});
@@ -348,6 +355,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_y_lim_range({0, 3.5});
     if (output.Contains("dilep"))
       c->set_y_lim_range({0, 3.5});
+    else if (output.Contains("Leptonic") && output.Contains("2016"))
+      c->set_y_lim_range({0, 10});
     c->set_x_bin_range({1,80});
     cout << "Data yield in [100,120], [130,180]: " << hData->Integral() << endl;
     cout << "Data yield in [115, 120], [130, 135]: " << hData->Integral(16,20) + hData->Integral(31,35) << endl;
@@ -623,6 +632,13 @@ int main(int argc, char* argv[])
 
     make_plot(c1, vFiles[i], vNames[i], "hDiphotonMassResolution", "#sigma_{m_{#gamma#gamma}} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
+    if (tag == "Hadronic") {
+      make_plot(c1, vFiles[i], vNames[i], "hDiphotonMassResolutionHighMVA", "#sigma_{m_{#gamma#gamma}} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hDiphotonMassResolutionMedMVA", "#sigma_{m_{#gamma#gamma}} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+      make_plot(c1, vFiles[i], vNames[i], "hDiphotonMassResolutionLowMVA", "#sigma_{m_{#gamma#gamma}} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    }
+
+    make_plot(c2, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, 1,type, year, loose_mva_cut, f_ref);
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref);
   }
 }

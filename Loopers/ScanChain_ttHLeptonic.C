@@ -119,6 +119,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
       double evt_weight = 1.;
+     
+	/* 
       if (!no_weights && !isData) {
 	if (year == "2018") // temporary hack to use 2017 mc with 2018 data
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
@@ -128,6 +130,26 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
 	else if (mYear == "2018")
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
+      } 
+	*/
+	
+      if (!isData) {
+        if (year == "2018") // temporary hack to use 2017 mc with 2018 data
+          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+        else if (mYear == "2016")
+          evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
+        else if (mYear == "2017") 
+          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
+        else if (mYear == "2018")
+          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+      }
+
+      bool pu_weight = true;
+      if (pu_weight) {
+	evt_weight *= puweight();
+      }
+      if (isnan(evt_weight) || isinf(evt_weight)) {
+	continue; //some pu weights are nan/inf and this causes problems for histos 
       }
 
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
@@ -178,6 +200,18 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (MetPt() < 40)		continue;
 	if (leadPixelSeed() || subleadPixelSeed())      continue;
       }
+
+      else if (tag == "ttHLeptonic_2017_SR_like") {
+	if (mass() < 100)		continue;
+        //if (!(n_ele() + n_muons() == 1))        continue;
+        if (isData && blind && mass() > 115 && mass() < 135)      continue;
+        if (n_jets() < 1)                continue;
+        if (nb_medium() < 1)            continue;
+        if (leadIDMVA() < -0.2)         continue;
+        if (subleadIDMVA() < -0.2)      continue;
+        if (tthMVA() < mva_thresh_2017[0])      continue;
+      }
+
       else if (tag == "ttHLeptonicLoose_2018studies") {
 	if (mass() < 100)        continue;
         if (n_jets() < 2)       continue;
@@ -258,8 +292,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (diphoMVARes() < -0.405)        continue;
         if (leadIDMVA() < -0.9)         continue;
         if (subleadIDMVA() < -0.9)         continue;  
+	if (n_jets() < 2)		continue;
 	if (nb_medium() < 1)            continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leps[0].Pt() < 20)          continue;
+	if (lead_ptoM() < 0.5)		continue;
       }
       else if (tag == "ttHLeptonic_v2") {
 	if (mass() < 80)        continue;

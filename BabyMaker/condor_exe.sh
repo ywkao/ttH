@@ -32,27 +32,15 @@ tar -xvf package.tar.gz
 cd $CMSSW_VER/src/flashgg
 echo "[wrapper] in directory: " ${PWD}
 cd ../..
-#echo "[wrapper] setting CMSSW_BASE as: " ${PWD}
-#export CMSSW_BASE=${PWD}
-#export LOCALTOP=${PWD}
-echo "[wrapper] CMSSW_BASE is: " ${CMSSW_BASE}
 cd src/flashgg
 echo "[wrapper] attempting to build"
-echo "[wrapper] local top set as: " ${LOCALTOP}
 eval `scramv1 runtime -sh`
 scramv1 b ProjectRename
 scram b
 eval `scramv1 runtime -sh`
-#echo "[wrapper] LOCALTOP is: " ${LOCALTOP}
-#echo "[wrapper] CMSSW_BASE is: " ${CMSSW_BASE}
-#cd ../..
-#echo "[wrapper] setting LOCALTOP as: " ${PWD}
-#export LOCALTOP=${PWD}
-#echo "[wrapper] LOCALTOP is: " ${LOCALTOP}
-#echo "[wrapper] setting CMSSW_BASE as: " ${PWD}
-#export CMSSW_BASE=${PWD}
-#echo "[wrapper] CMSSW_BASE is: " ${CMSSW_BASE}
 cd $CMSSW_BASE/src/flashgg
+export PYTHONPATH=$PYTHONPATH:$CMSSW_BASE/src/flashgg/Taggers/test/
+
 
 # Check python env
 #python check_python.py

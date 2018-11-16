@@ -21,6 +21,7 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "ggH"));
   v.push_back(new Process(f, "VBF"));
   v.push_back(new Process(f, "VH"));
+  v.push_back(new Process(f, "GammaJets_HT_binned"));
   //v.push_back(new Process
 
   return v;
@@ -43,6 +44,10 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hHT", 50, 0, 5000);
     v[i]->add_histogram("hMT", 50, 0, 500);
     v[i]->add_histogram("hDiphotonMassResolution", 25, 0, 0.1);
+    v[i]->add_histogram("hDiphotonMassResolutionLowMVA", 25, 0, 0.1);
+    v[i]->add_histogram("hDiphotonMassResolutionMedMVA", 25, 0, 0.1);
+    v[i]->add_histogram("hDiphotonMassResolutionHighMVA", 25, 0, 0.1);
+
 
 
     v[i]->add_histogram("hNJets", 16, -0.5, 15.5);
@@ -200,12 +205,13 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
     return 1;
   else if (currentFileTitle.Contains("DiPhoton"))
     return 2;
-  else if (currentFileTitle.Contains("GJet_"))
+  else if (currentFileTitle.Contains("GJet_Pt"))
     return 3;
   //else if (currentFileTitle.Contains("GGJet") && !currentFileTitle.Contains("TTG"))
   //  return 4;
   else if (currentFileTitle.Contains("QCD"))
     return 4;
+
   else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || (currentFileTitle.Contains("TTJets"))) {
     if (genPhotonId == 2) // pp
       return 5;
@@ -239,6 +245,8 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
     return 15;
   else if (currentFileTitle.Contains("VHToGG"))
     return 16;
+  else if (currentFileTitle.Contains("GJets_HT"))
+    return 17;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -535,6 +543,8 @@ const vector<TString> vSamples_2016 = {
 			"THW_HToGG_13TeV-madgraph-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"VBFHToGG_M125_13TeV_amcatnlo_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"VBFHToGG_M125_13TeV_amcatnlo_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 };
 
 const vector<TString> vSamples_2017 = {
@@ -574,6 +584,7 @@ const vector<TString> vSamples_2017 = {
 			"THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"VBFHToGG_M125_13TeV_amcatnlo_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 };
 
 /*
@@ -623,7 +634,7 @@ void set_json(TString year) {
 }
 
 bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
-  if (year == "2018" || year == "2017") { 
+  if (year == "2018" || year == "2017" || year == "2016") { 
     bool pass = goodrun(run, lumi_block);
     if (!pass)
       cout << run << " " << lumi_block << " failed golden json" << endl;
@@ -641,7 +652,7 @@ bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
 
 void add_samples(TChain* ch, TString year) {
   //TString tag = year == "2018" ? "v102.1" : (year == "2017" ? "v1.2" : "v3.16");
-  TString tag = year == "2016" ? "v80.2" : "v94.2";
+  TString tag = year == "2016" ? "v80.2" : "v94.3";
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 

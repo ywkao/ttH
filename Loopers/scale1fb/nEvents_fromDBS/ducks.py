@@ -16,6 +16,21 @@ output_json = "n_events.json"
 with open(output_json, "r") as f_in:
   mc_samples = json.load(f_in)
 
+def get_sum_of_weights(files):
+  for file in files:
+    idx += 1
+    print ("checking file %d / %d" % (idx, len(files)))
+    sys.stdout.write("\033[F")
+    f = r.TFile.Open("root://cmsxrootd.fnal.gov//" + file.get_name())
+    if not f:
+      print "bad file: %s" % file.get_name()
+      return -(10**12)
+    tree = f.Get("Events")
+    mean = tree.GetMean("GenEventInfoProduct_generator__SIM.obj.weights_[0]")
+    total_evts = tree.GetEntries("GenEventInfoProduct_generator__SIM.obj.weights_[0]")
+    print "Mean: %.6f, total entries: %d" % (mean, total_evts)
+    return mean * total_evts
+
 def get_negative_events(files):
   n_events_neg = 0
   n_events_pos = 0
@@ -50,13 +65,13 @@ for input_json in input_jsons:
           mc_samples[sample] = { "n_events_tot" : -1, "n_events_neg" : -1 , "n_events_pos" : -1}
 
 for key, dict in mc_samples.iteritems():
-  if dict["n_events_neg"] + dict["n_events_pos"] == dict["n_events_tot"]:
+  #if dict["n_events_neg"] + dict["n_events_pos"] == dict["n_events_tot"]:
     #print "%s has trustworthy n_events data, skipping\n\n" % key
-    continue
-  elif dict["n_events_tot"] > 0 and dict["n_events_pos"] > 0:
-    print "%s has already had n_event info calculated, but n_neg + n_pos != n_total" % key
-    print "Probably want to check it manually"
-    continue
+  #  continue
+  #elif dict["n_events_tot"] > 0 and dict["n_events_pos"] > 0:
+  #  print "%s has already had n_event info calculated, but n_neg + n_pos != n_total" % key
+  #  print "Probably want to check it manually"
+  #  continue
   print "Calculating n_events for %s\n\n" % key
   sample = DBSSample(dataset=key)
   files = sample.get_files()
@@ -65,6 +80,7 @@ for key, dict in mc_samples.iteritems():
     n_events += file.get_nevents()
   dict["n_events_tot"] = n_events
   dict["n_events_neg"], dict["n_events_pos"] = get_negative_events(files)
+  dict["sum_of_weights"] = get_sum_of_weights(files)
   if dict["n_events_neg"] + dict["n_events_pos"] == dict["n_events_tot"]:
     print "%s has: \n Total events: %d \n Positive Events: %d \n Negative Events: %d \n" % (key, dict["n_events_tot"], dict["n_events_pos"], dict["n_events_neg"])
   else:

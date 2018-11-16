@@ -37,7 +37,7 @@ if not os.path.isfile("pileup_latest.txt"):
   os.system("scp smay@lxplus.cern.ch:/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions" + args.year[2:] + "/13TeV/PileUp/pileup_latest.txt .")
 
 minBiasXsec = 69000
-nPileupBins = 99
+nPileupBins = 100
 
 print("pileupCalc.py -i %s_%s_cert.json --inputLumiJSON %s --calcMode true --minBiasXsec %d --maxPileupBin %d --numPileupBins %d %s_%s_cert.root" % (data_name, args.tag, "pileup_latest.txt", minBiasXsec, nPileupBins, nPileupBins, data_name, args.tag))
 os.system("pileupCalc.py -i %s_%s_cert.json --inputLumiJSON %s --calcMode true --minBiasXsec %d --maxPileupBin %d --numPileupBins %d %s_%s_cert.root" % (data_name, args.tag, "pileup_latest.txt", minBiasXsec, nPileupBins, nPileupBins, data_name, args.tag))

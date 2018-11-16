@@ -42,6 +42,17 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
+
+    if (tag == "GJet_Reweight_Preselection") {
+      if (!(currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJet_HT") || currentFileTitle.Contains("TTGJets"))) {
+	cout << "Skipping " << currentFileTitle << endl;
+	continue;
+      }
+      else {
+	cout << "Looping over " << currentFileTitle << endl;
+      }
+    }
+
     for (unsigned int event = 0; event < nEventsTree; ++event) {
 
 
@@ -77,6 +88,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (subleadIDMVA() < -0.9)         continue;
 	if (nb_loose() < 1)	continue;
       }
+      else if (tag == "GJet_Reweight_Preselection") {
+	if (n_jets() < 2)	continue;
+      }
+
       else {
         cout << "Did not recognize tag name" << endl;
       }
