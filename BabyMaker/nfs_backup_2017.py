@@ -4,10 +4,10 @@ import glob
 import datetime
 
 # Changeable parameters
-hadoop_dir = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1/"
+hadoop_dir = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/"
 magic_string = "*"
 
-nfs_dir = "/home/users/snt/ttH/MicroAOD_skim/2017_skim_v1/"
+nfs_dir = "/home/users/snt/ttH/MicroAOD/forHualin_2017/"
 breathing_room = 5
     
 def find_corrupt_files(paths):
