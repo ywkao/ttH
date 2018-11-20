@@ -15,17 +15,21 @@ output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
 
-feature_names = ["mass_", "njets_", "ht_", "jet1_pt_", "jet1_eta_", "max1_btag_", "max2_btag_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "leadptoM_", "subleadptoM_"]
+#feature_names = ["mass_", "njets_", "ht_", "jet1_pt_", "jet1_eta_", "max1_btag_", "max2_btag_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "leadptoM_", "subleadptoM_"]
+
+feature_names = ["njets_", "ht_", "jet1_pt_", "jet1_eta_"]
 
 label = root_numpy.tree2array(tree, branches = "process_id_")
 features = root_numpy.tree2array(tree, branches = feature_names)
 
 label = numpy.transpose(label)
 for i in range(len(label)):
-  if label[i] == 3:
+  if label[i] == 3: # Pythia sample is bkg
+    label[i] = 0
+  elif label[i] == 17: # Madgraph sample is signal
     label[i] = 1
   else:
-    label[i] = 0
+     print "Sample other than GJets, shouldn't be here"
 
 features = numpy.transpose(features)
 

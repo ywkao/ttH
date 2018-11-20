@@ -44,7 +44,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     unsigned int nEventsTree = tree->GetEntriesFast();
 
     if (tag == "GJet_Reweight_Preselection") {
-      if (!(currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJet_HT") || currentFileTitle.Contains("TTGJets"))) {
+      if (!(currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT"))) { 
 	cout << "Skipping " << currentFileTitle << endl;
 	continue;
       }
@@ -101,9 +101,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       process_id_ = categorize_process(currentFileTitle, genPhotonId);
 
       vector<TLorentzVector> jets;
+      vector<double> btag_scores;
+      vector<std::pair<int, double>> btag_scores_sorted;
       TLorentzVector lead_photon;
       TLorentzVector sublead_photon;
-      jets = make_jets();
+      jets = make_jets(btag_scores);
+      btag_scores_sorted = sortVector(btag_scores);
       lead_photon = make_lead_photon();
       sublead_photon = make_sublead_photon();
       TLorentzVector diphoton = lead_photon + sublead_photon;

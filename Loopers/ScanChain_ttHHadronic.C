@@ -10,6 +10,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   bool evaluate_mva = xml_file != "none";
 
+  bool reweight_GJets = tag.Contains("GJet_Reweight_Preselection_wWeights");
+
   // Make MVA Optimization Baby
   OptimizationBabyMaker* baby = new OptimizationBabyMaker();
   TString xml_file_noExt = xml_file;
@@ -34,6 +36,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   // MVA Business
   unique_ptr<TMVA::Reader> mva;
+  unique_ptr<TMVA::Reader> gjet_mva;
 
   // Declare BDT vars
   float dipho_delta_R;
@@ -121,6 +124,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }
 
+  gjet_mva.reset(new TMVA::Reader( "!Color:Silent" )); 
+
+  gjet_mva->AddVariable("njets_", &njets_);
+  gjet_mva->AddVariable("ht_", &ht_);
+  gjet_mva->AddVariable("jet1_pt_", &jet1_pt_);
+  gjet_mva->AddVariable("jet1_eta_", &jet1_eta_);
+
+  gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight__bdt.xml");
+
   double dipho_yield = 0;
 
   // File Loop
@@ -143,6 +155,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     // Set json file
     set_json(mYear);
+
+    if (tag.Contains("GJet_Reweight_Preselection")) {
+      if (!(currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT"))) {
+        cout << "Skipping " << currentFileTitle << endl;
+        continue;
+      }
+    }
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -189,6 +208,20 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       } 
 	*/
 
+
+      int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+
+      vector<TLorentzVector> jets;
+      TLorentzVector lead_photon;
+      TLorentzVector sublead_photon;
+      lead_photon = make_lead_photon();
+      sublead_photon = make_sublead_photon();
+      TLorentzVector diphoton = lead_photon + sublead_photon;
+
+      vector<double> btag_scores;
+      vector<std::pair<int, double>> btag_scores_sorted;
+      jets = make_jets(btag_scores);
+      btag_scores_sorted = sortVector(btag_scores);
       
       if (!isData) {
         if (year == "2018") // temporary hack to use 2017 mc with 2018 data
@@ -205,20 +238,85 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (pu_weight) {
         evt_weight *= puweight();
       }
-      if (isnan(evt_weight) || isinf(evt_weight)) {
+
+
+      // Evaluate MVA, if we choose
+      double mva_value = -999;
+
+      // Calculate MVA value
+      dipho_delta_R = lead_photon.DeltaR(sublead_photon);
+      ht_ = get_ht(jets);
+      njets_ = n_jets();
+      //nbjets_ = nb_medium();
+      jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
+      jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
+      jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
+      jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
+      jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
+      jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
+      jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
+      jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
+      jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
+      jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
+      jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
+      jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;
+      jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
+      jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
+      jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
+      jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
+      jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
+      jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
+
+      max1_btag_ = bjet1_csv();
+      max2_btag_ = bjet2_csv();
+
+      leadptoM_ = lead_ptoM();
+      subleadptoM_ = sublead_ptoM();
+      leadIDMVA_ = leadIDMVA();
+      subleadIDMVA_ = subleadIDMVA();
+      lead_eta_ = leadEta();
+      sublead_eta_ = subleadEta();
+
+      leadPSV_ = leadPixelSeed();
+      subleadPSV_ = subleadPixelSeed();
+
+      dipho_cosphi_ = dipho_cosphi();
+      dipho_rapidity_ = dipho_rapidity();
+      met_ = MetPt();
+
+      if (evaluate_mva) 
+        mva_value = mva->EvaluateMVA( "BDT" );
+      double reference_mva = tthMVA();
+      bool pass_ref_presel = mYear == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
+      double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
+
+      int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
+      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
+
+
+      // Gamma + jets reweighting
+      double gjet_mva_value = -999;	
+
+      njets_ = n_jets();
+      jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;	
+      ht_ = get_ht(jets);
+      max1_btag_ = bjet1_csv(); 
+
+      gjet_mva_value = gjet_mva->EvaluateMVA( "BDT" ); 
+
+      if (processId == 3 && reweight_GJets) {
+	cout << "MVA value: " << gjet_mva_value << " , prob ratio: " << prob_ratio_from_madgraph(gjet_mva_value) << endl;
+	evt_weight *= prob_ratio_from_madgraph(gjet_mva_value);
+      } 
+
+      if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) {
         continue; //some pu weights are nan/inf and this causes problems for histos 
       }
 
+      if (evaluate_mva) 
+        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
 
-      int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
-
-      vector<TLorentzVector> jets;
-      TLorentzVector lead_photon;
-      TLorentzVector sublead_photon;
-      jets = make_jets();
-      lead_photon = make_lead_photon();
-      sublead_photon = make_sublead_photon();
-      TLorentzVector diphoton = lead_photon + sublead_photon;
+      vProcess[processId]->fill_histogram("hGJet_BDT", gjet_mva_value, evt_weight, vId);
 
 
       // Selection
@@ -244,12 +342,17 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (subleadIDMVA() < -0.2)              continue;
       }
 
+      else if (tag == "ttHHadronic_GJet_Reweight_Preselection" || tag == "ttHHadronic_GJet_Reweight_Preselection_wWeights") {
+        if (n_jets() < 2)       continue;
+      }
+
       else if (tag == "ttHHadronic_2017_Presel") {
-	if (mass() < 100) 		continue;
+	if (mass() < 100 || mass() > 180 || (mass() > 115 && mass() < 135)) 	continue;
 	if (leadIDMVA() < -0.2)                 continue;
         if (subleadIDMVA() < -0.2)              continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (n_jets() < 2)                       continue;
+	if (btag_scores_sorted[1].second <= 0)		continue;
       }
 
       else if (tag == "ttHHadronic_2017_SR_like") {
@@ -344,60 +447,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         cout << "Did not recognize tag name" << endl;
       }
  
-      // Evaluate MVA, if we choose
-      double mva_value = -999;
-      if (evaluate_mva) {
-
-        // Calculate MVA value
-        dipho_delta_R = lead_photon.DeltaR(sublead_photon);
-        ht_ = get_ht(jets);
-        njets_ = n_jets();
-        //nbjets_ = nb_medium();
-        jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
-        jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
-        jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
-        jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
-        jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
-        jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
-        jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
-        jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
-        jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
-        jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
-        jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
-        jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;
-        jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
-        jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
-        jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
-        jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
-        jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
-        jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
-
-        max1_btag_ = bjet1_csv();
-        max2_btag_ = bjet2_csv();
-
-        leadptoM_ = lead_ptoM();
-        subleadptoM_ = sublead_ptoM();
-        leadIDMVA_ = leadIDMVA();
-        subleadIDMVA_ = subleadIDMVA();
-        lead_eta_ = leadEta();
-        sublead_eta_ = subleadEta();
-
-        leadPSV_ = leadPixelSeed();
-        subleadPSV_ = subleadPixelSeed();
-
-        dipho_cosphi_ = dipho_cosphi();
-        dipho_rapidity_ = dipho_rapidity();
-        met_ = MetPt();
-
-        mva_value = mva->EvaluateMVA( "BDT" );
-        double reference_mva = tthMVA();
-        bool pass_ref_presel = mYear == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
-	double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
-        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
-      }
-
-      int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
-      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
  
 
       // Fill histograms //

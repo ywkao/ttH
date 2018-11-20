@@ -17,6 +17,7 @@ std::map<TString, TString> mLabels = {
 	{"DY", "Drell-Yan"}, 
 	{"DiPhoton", "#gamma#gamma + Jets"},
 	{"GammaJets", "#gamma + Jets"},
+	{"GammaJets_Madgraph", "#gamma + Jets (Madgraph)"},
 	{"QCD", "QCD"},
 	{"TTGG", "t#bar{t} + #gamma#gamma"},
 	{"TTGJets", "t#bar{t}+#gamma+Jets"},
@@ -31,6 +32,7 @@ std::map<TString, int> mColors = {
         {"DY", kViolet-9},
         {"DiPhoton", kBlue - 4},
         {"GammaJets", kAzure + 1},
+	{"GammaJets_Madgraph", kRed},
         {"QCD", kCyan-7},
         {"TTGG", kGreen-2},
         {"TTGJets", kGreen-7},
@@ -44,6 +46,7 @@ std::map<TString, TString> mLatex = {
         {"DY", "Drell-Yan"},
         {"DiPhoton", "$\\gamma\\gamma$ + Jets"},
         {"GammaJets", "$\\gamma$ + Jets"},
+	{"GammaJets_Madgraph", "$\\gamma$ + Jets (Madgraph)"},
         {"QCD", "QCD"},
         {"TTGG", "$t\\bar{t}+\\gamma\\gamma$"},
         {"TTGJets", "$t\\bar{t}+\\gamma$ + Jets"},
@@ -154,6 +157,14 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     for (int i = 0; i < vBkgs.size(); i++) {
       hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i]));
       vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
+      vColors.push_back(mColors.find(vBkgs[i])->second);
+    }
+  }
+
+  else if (type == "GJet_shape") {
+    vLegendLabels = {"#gamma + jets (Pythia)", "#gamma + jets (Madgraph)"};
+    for (int i = 0; i < vBkgs.size(); i++) {
+      hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i]));
       vColors.push_back(mColors.find(vBkgs[i])->second);
     }
   }
@@ -300,6 +311,17 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_log_rat();
     c->set_rat_lim_range({0.1, 10.0});
   }
+  else if (type == "GJet_shape") {
+    hBkg[0]->Scale(1/hBkg[0]->Integral(0, hBkg[0]->GetSize()-1));
+    c = new Comparison(c1, hBkg[0], hBkg[1]);
+    c->set_x_label(x_label);
+    c->set_y_label("Fraction of Events");
+    c->set_no_lumi();
+    c->set_scale(-1);
+    c->set_rat_label("#frac{Pythia}{Madgraph}");
+    c->set_both_data();
+    c->set_y_lim_range({0.001, 1.5});
+  }
   else if (type == "individual_shape") {
     c = new Comparison(c1, hBkg);
     c->set_data_drawOpt("HIST");
@@ -326,10 +348,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   c->set_lumi(lumi);
 
  
-  if (hist_name == "hNJets" || hist_name == "hNbLoose") {
+  if ((hist_name == "hNJets" || hist_name == "hNbLoose") && !output.Contains("GJet_Reweight")) {
     if (output.Contains("ttHHadronic_2017_Presel")) {
       c->set_no_log();
-      c->set_y_lim_range({0.0, 200000});
+      c->set_y_lim_range({0.0, 90000});
     }
     else if (output.Contains("Leptonic"))
       c->set_y_lim_range({0.01, pow(10,4)});
@@ -485,6 +507,7 @@ int main(int argc, char* argv[])
     if (year == "2018")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
   }
+
   else if (type == "individual_shape") {
     vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets"};
   }
@@ -499,6 +522,10 @@ int main(int argc, char* argv[])
     //vBkgs = {"TTGG"};
     vBkgs = {"TTJets"};
     //vBkgs = {"TTGG", "TTGJets"};
+  }
+
+  else if (type == "GJet_shape") {
+    vBkgs = {"GammaJets", "GammaJets_Madgraph"};
   }
 
   // Style options
@@ -639,6 +666,8 @@ int main(int argc, char* argv[])
     }
 
     make_plot(c2, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, 1,type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hGJet_BDT", "#gamma + jets BDT Score", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref);
   }
 }

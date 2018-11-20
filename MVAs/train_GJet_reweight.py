@@ -13,7 +13,8 @@ from sklearn import metrics
 import utils
 import tmva_utils
 import ks_test
-import significance_utils
+import probability_utils 
+
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -47,8 +48,8 @@ d_test = xgboost.DMatrix(X_test, label = y_test)
 
 # Define BDT parameters
 param = { 
-    	'max_depth': 4,
-	'eta': 0.2,
+    	'max_depth': 3,
+	'eta': 0.1,
 	'objective': 'binary:logistic',
 	'scale_pos_weight': 1, # might want to change later 
 	'subsample': 1.0,
@@ -59,7 +60,7 @@ param = {
 
 print param
 
-n_round = 75
+n_round = 20
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -81,6 +82,12 @@ pred_test = bdt.predict(d_test, output_margin=False)
 print pred_test.shape
 
 # analysis
+# derive s/b probability ratios as a function of BDT score
+prob_ratios, bins = probability_utils.calculate_prob_ratios(pred_test, y_test)
+
+for i in range(len(prob_ratios)):
+  print "Events scoring below %.6f get scaled by %.6f" % (bins[i], prob_ratios[i])
+
 # ks test
 d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(pred_train, pred_test, y_train, y_test)
 print "Results of ks-test (d-score) for signal: %.10f and background: %.10f" % (d_sig, d_bkg)
@@ -119,8 +126,8 @@ plt.plot(fpr_test, tpr_test, color='green', label='Testing Set', lw = 3)
 
 plt.xscale('log')
 
-plt.xlim([0.005, 1.0])
-plt.ylim([0.3, 1.05])
+plt.xlim([0.01, 1.0])
+plt.ylim([0.1, 1.05])
 plt.xlabel('False Positive Rate (background efficiency)')
 plt.ylabel('True Positive Rate (signal efficiency)')
 plt.legend(loc='lower right')

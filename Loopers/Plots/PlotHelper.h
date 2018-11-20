@@ -643,6 +643,17 @@ void Comparison::set_histogram_options(int color1, int color2)
     }
   }
 
+  if (mBothData) {
+    mHMC->SetMarkerStyle(20);
+    mHMC->SetMarkerColor(dataColors[1]);
+    mHMC->SetLineColor(dataColors[1]);
+    mHMC->SetLineWidth(2);
+    mHMC->SetMarkerSize(1.25);
+    mHMC->GetYaxis()->SetTitle(mYLabel);
+    mHMC->GetYaxis()->SetTitleSize(mYLabelFontSize);
+    mHMC->GetYaxis()->SetTitleOffset(1.2);
+  }
+
   vector<int> vDefaultColors = {kRed - 7, kAzure+1, kViolet -4, kCyan-7, kOrange+6, kGreen, kYellow, kBlue+2, kPink+9};
   if (mColorData.size() > 0)
     vDefaultColors = mColorData;
@@ -961,6 +972,9 @@ void Comparison::annotate_plot()
     for (int i=0; i<mVHMC.size(); i++) {
       if (!mBothData) l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC+i], "f");
       else l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC], "lep");
+    }
+    if (mVHMC.size() == 0 && mBothData) {
+      l1->AddEntry(mHMC, mVLegendLabels[1], "lep");
     }
     if (mVLegendLabels.size() > 7)
       l1->SetNColumns(2);
