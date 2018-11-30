@@ -28,30 +28,33 @@ f = h5py.File(args.input.replace(".hdf5", "") + ".hdf5", "r")
 feature_names = f['feature_names']
 features = f['features']
 label = f['label']
+evt_weight = f['evt_weight']
 
 feature_names = numpy.asarray(feature_names)
 features = numpy.asarray(features)
 label = numpy.asarray(label)
+evt_weight = numpy.asarray(evt_weight)
 
-x_train, x_test, y_train, y_test = train_test_split(features, label, test_size = 0.5)
+x_train, y_train, weights_train = features, label, evt_weight
+#x_train, x_test, y_train, y_test, weights_train, weights_test = train_test_split(features, label, evt_weight, test_size = 0.01, random_state = 1)
 
 X_train = pandas.DataFrame(data=x_train, columns = feature_names)
-X_test = pandas.DataFrame(data=x_test, columns = feature_names)
+#X_test = pandas.DataFrame(data=x_test, columns = feature_names)
 
-#sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
-#sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
+sum_neg_weights = utils.sum_of_weights(evt_weight, label, 0)
+sum_pos_weights = utils.sum_of_weights(evt_weight, label, 1)
 
-#print sum_pos_weights, sum_neg_weights
+print sum_pos_weights, sum_neg_weights
 
-d_train = xgboost.DMatrix(X_train, label = y_train) 
-d_test = xgboost.DMatrix(X_test, label = y_test)
+d_train = xgboost.DMatrix(X_train, label = y_train, weight = weights_train) 
+#d_test = xgboost.DMatrix(X_test, label = y_test)
 
 # Define BDT parameters
 param = { 
-    	'max_depth': 3,
+    	'max_depth': 4,
 	'eta': 0.1,
 	'objective': 'binary:logistic',
-	'scale_pos_weight': 1, # might want to change later 
+	'scale_pos_weight': sum_neg_weights / sum_pos_weights, 
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
 	'nthread' : 8,
@@ -60,8 +63,9 @@ param = {
 
 print param
 
-n_round = 20
-evallist = [(d_train, 'train'), (d_test, 'test')]
+n_round = 100
+evallist = [(d_train, 'train')]
+#evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
 # train
@@ -77,31 +81,34 @@ tmva_utils.convert_model(model, input_variables = input_variables, output_xml = 
 
 # predict
 pred_train = bdt.predict(d_train, output_margin=False)
-pred_test = bdt.predict(d_test, output_margin=False)
+#pred_test = bdt.predict(d_test, output_margin=False)
 
-print pred_test.shape
+#print pred_test.shape
+
+#for i in range(10):
+#  print pred_train[i]
 
 # analysis
 # derive s/b probability ratios as a function of BDT score
-prob_ratios, bins = probability_utils.calculate_prob_ratios(pred_test, y_test)
+#prob_ratios, bins = probability_utils.calculate_prob_ratios(pred_test, y_test)
 
-for i in range(len(prob_ratios)):
-  print "Events scoring below %.6f get scaled by %.6f" % (bins[i], prob_ratios[i])
+#for i in range(len(prob_ratios)):
+#  print "Events scoring below %.6f get scaled by %.6f" % (bins[i], prob_ratios[i])
 
 # ks test
-d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(pred_train, pred_test, y_train, y_test)
-print "Results of ks-test (d-score) for signal: %.10f and background: %.10f" % (d_sig, d_bkg)
-print "Results of ks-test (p-value) for signal: %.10f and background: %.10f" % (p_value_sig, p_value_bkg)
+#d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(pred_train, pred_test, y_train, y_test)
+#print "Results of ks-test (d-score) for signal: %.10f and background: %.10f" % (d_sig, d_bkg)
+#print "Results of ks-test (p-value) for signal: %.10f and background: %.10f" % (p_value_sig, p_value_bkg)
 
 # roc curves
 fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train)
-fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test)
+#fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test)
 
 auc_train = metrics.auc(fpr_train, tpr_train)
-auc_test = metrics.auc(fpr_test, tpr_test)
+#auc_test = metrics.auc(fpr_test, tpr_test)
 
 print("Training AUC: %.4f" % auc_train)
-print("Testing  AUC: %.4f" % auc_test)
+#print("Testing  AUC: %.4f" % auc_test)
 
 ### Make diagnostic plots ###
 import matplotlib
@@ -119,16 +126,16 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.yaxis.set_ticks_position('both')
 ax.grid(True)
-plt.grid(color='black', linestyle='--', linewidth = 0.1, which = 'both')
+#plt.grid(color='black', linestyle='--', linewidth = 0.1, which = 'both')
 
-plt.plot(fpr_train, tpr_train, color='red', label='Training Set', lw = 3)
-plt.plot(fpr_test, tpr_test, color='green', label='Testing Set', lw = 3)
+#plt.plot(fpr_train, tpr_train, color='red', label='Training Set', lw = 3)
+#plt.plot(fpr_test, tpr_test, color='green', label='Testing Set', lw = 3)
 
-plt.xscale('log')
+#plt.xscale('log')
 
-plt.xlim([0.01, 1.0])
-plt.ylim([0.1, 1.05])
-plt.xlabel('False Positive Rate (background efficiency)')
-plt.ylabel('True Positive Rate (signal efficiency)')
-plt.legend(loc='lower right')
-plt.savefig('roc_GJetReweight.pdf', bbox_inches='tight')
+#plt.xlim([0.01, 1.0])
+#plt.ylim([0.1, 1.05])
+#plt.xlabel('False Positive Rate (background efficiency)')
+#plt.ylabel('True Positive Rate (signal efficiency)')
+#plt.legend(loc='lower right')
+#plt.savefig('roc_GJetReweight.pdf', bbox_inches='tight')

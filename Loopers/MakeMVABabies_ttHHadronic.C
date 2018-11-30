@@ -67,11 +67,16 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       InitBabyNtuple();
 
+      // Decide what type of sample this is
+      int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
+      process_id_ = categorize_process(currentFileTitle, genPhotonId);
+
       // Blinded region
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
       // Selection
-      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))			continue;
 
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
@@ -89,6 +94,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	if (nb_loose() < 1)	continue;
       }
       else if (tag == "GJet_Reweight_Preselection") {
+	if (mass() < 100)	continue;
 	if (n_jets() < 2)	continue;
       }
 
@@ -96,16 +102,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         cout << "Did not recognize tag name" << endl;
       }
  
-      // Decide what type of sample this is
-      int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
-      process_id_ = categorize_process(currentFileTitle, genPhotonId);
-
       vector<TLorentzVector> jets;
       vector<double> btag_scores;
       vector<std::pair<int, double>> btag_scores_sorted;
       TLorentzVector lead_photon;
       TLorentzVector sublead_photon;
-      jets = make_jets(btag_scores);
+      jets = make_jets(btag_scores, year);
       btag_scores_sorted = sortVector(btag_scores);
       lead_photon = make_lead_photon();
       sublead_photon = make_sublead_photon();
@@ -115,9 +117,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       evt_weight_ = 1.;
       if (!isData) {
 	if (year == "2016")
-          evt_weight_ = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
+          evt_weight_ = scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
         else if (year == "2017")
-          evt_weight_ = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
+          evt_weight_ = scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
+      }
+
+      bool pu_weight = true;
+      if (pu_weight) {
+        evt_weight_ *= puweight();
       }
 
       // Skip blinded region for MC after filling mass histogram
@@ -127,6 +134,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
 
       // Variable definitions
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      max2_btag_ = btag_scores_sorted[1].second;
+      max1_btag_ = btag_scores_sorted[0].second;
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
       ht_ = get_ht(jets);
       njets_ = n_jets();
@@ -150,9 +161,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
       jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
 
-      max1_btag_ = bjet1_csv();
-      max2_btag_ = bjet2_csv();
-
+      lead_pT_ = leadPt();
+      sublead_pT_ = subleadPt();
       leadptoM_ = lead_ptoM();
       subleadptoM_ = sublead_ptoM();
       leadIDMVA_ = leadIDMVA(); 
@@ -165,6 +175,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       dipho_cosphi_ = dipho_cosphi();
       dipho_rapidity_ = dipho_rapidity();
+      dipho_pt_ = diphoton.Pt();
       met_ = MetPt();
 
       rand_ = cms3.rand();

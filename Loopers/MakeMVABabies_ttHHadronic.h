@@ -36,7 +36,7 @@ class BabyMaker {
     TTree *BabyTree_;
 
     // Variable names
-    vector<string> mva_branches = {"dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "max1_btag_", "max2_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"};
+    vector<string> mva_branches = {"maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"};
     
 
     int 	label_;
@@ -50,6 +50,10 @@ class BabyMaker {
     double      sublead_sigmaEtoE_;
 
     // Variable declarations
+    double           maxIDMVA_;
+    double           minIDMVA_;
+    double           max2_btag_;
+    double           max1_btag_;
     float           dipho_delta_R;
     int		njets_;
     //int		nbjets_;
@@ -74,9 +78,8 @@ class BabyMaker {
     double      jet6_eta_;
     double      jet6_btag_;
 
-    double	max1_btag_;
-    double	max2_btag_;
-
+    double      lead_pT_;
+    double      sublead_pT_;
     double	leadptoM_;
     double	subleadptoM_;
     double	leadIDMVA_;
@@ -89,6 +92,7 @@ class BabyMaker {
 
     double	dipho_cosphi_;
     double 	dipho_rapidity_;
+    double      dipho_pt_;
     double      met_;    
 };
 
@@ -111,6 +115,10 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("sublead_sigmaEtoE_"             , &sublead_sigmaEtoE_        );
 
   // Variable branches
+  BabyTree_->Branch("maxIDMVA_" ,&maxIDMVA_);
+  BabyTree_->Branch("minIDMVA_" ,&minIDMVA_);
+  BabyTree_->Branch("max2_btag_" ,&max2_btag_);
+  BabyTree_->Branch("max1_btag_" ,&max1_btag_);
   BabyTree_->Branch("dipho_delta_R" ,&dipho_delta_R);
   BabyTree_->Branch("njets_"     	, &njets_       );
   //BabyTree_->Branch("nbjets_"		, &nbjets_	);
@@ -135,9 +143,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("jet6_eta_"            , &jet6_eta_ );
   BabyTree_->Branch("jet6_btag_"            , &jet6_btag_ );
  
-  BabyTree_->Branch("max1_btag_"            , &max1_btag_   );
-  BabyTree_->Branch("max2_btag_"            , &max2_btag_   );
-
+  BabyTree_->Branch("lead_pT_"         , &lead_pT_      );
+  BabyTree_->Branch("sublead_pT_"      , &sublead_pT_   );
   BabyTree_->Branch("leadptoM_"    	, &leadptoM_      );
   BabyTree_->Branch("subleadptoM_"    	, &subleadptoM_   );
   BabyTree_->Branch("leadIDMVA_"    	, &leadIDMVA_    );
@@ -149,6 +156,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   
   BabyTree_->Branch("dipho_cosphi_"           , &dipho_cosphi_      );
   BabyTree_->Branch("dipho_rapidity_"           , &dipho_rapidity_      );
+  BabyTree_->Branch("dipho_pt_"           , &dipho_pt_      );
   BabyTree_->Branch("met_"           , &met_      );
 
   return;

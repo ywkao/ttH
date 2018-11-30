@@ -291,7 +291,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       cout << "\\end{tabular} \\end{center}" << endl;
     }
   }
- 
+
+  TString output = output_name;
+  double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9))); 
   if (type == "std") {
     if (file_ref == nullptr)
       c = new Comparison(c1, {hData}, hSig, hBkg);
@@ -300,8 +302,13 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_data_drawOpt("E");
     c->set_rat_label("#frac{Data}{MC}");
     c->set_y_label("Events");
+    c->set_lumi(lumi);
     c->set_log_rat();
     c->set_rat_lim_range({0.2, 5.0});
+    if (hist_name.Contains("SigmaEOverE") || hist_name.Contains("DiphotonMassResolution")) {
+      c->set_no_log();
+    }
+
   }
   else if (type == "shape") {
     c = new Comparison(c1, hSig[0], hBkg);
@@ -320,7 +327,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_scale(-1);
     c->set_rat_label("#frac{Pythia}{Madgraph}");
     c->set_both_data();
-    c->set_y_lim_range({0.001, 1.5});
+    if (output.Contains("wWeights"))
+      c->give_info("Pythia Reweighted");
+    c->set_y_lim_range({0.005, 3.0});
   }
   else if (type == "individual_shape") {
     c = new Comparison(c1, hBkg);
@@ -342,10 +351,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   c->set_filename(output_name);
   c->set_x_label(x_label);
-  c->set_y_label("Events");
-  TString output = output_name;
-  double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9)));
-  c->set_lumi(lumi);
+  //c->set_y_label("Events");
+  //double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9)));
+  //c->set_lumi(lumi);
 
  
   if ((hist_name == "hNJets" || hist_name == "hNbLoose") && !output.Contains("GJet_Reweight")) {
@@ -360,7 +368,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
 
   if (hist_name == "hDiphotonMassResolution")
-    c->set_x_bin_range({1, 25});
+    c->set_x_bin_range({1, 100});
 
   if (hist_name == "hMassAN") {
     c->set_no_flow();
@@ -666,7 +674,9 @@ int main(int argc, char* argv[])
     }
 
     make_plot(c2, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, 1,type, year, loose_mva_cut, f_ref);
-    make_plot(c1, vFiles[i], vNames[i], "hGJet_BDT", "#gamma + jets BDT Score", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+
+    if (file_path.Contains("GJet_Reweight_Preselection"))
+      make_plot(c1, vFiles[i], vNames[i], "hGJet_BDT", "#gamma + jets BDT Score", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref);
   }

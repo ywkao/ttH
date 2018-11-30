@@ -348,9 +348,9 @@ int main(int argc, char* argv[])
     TFile* f = new TFile(file_path);
     vector<TString> vBkgs;
     if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF"};
+      vBkgs = {"DiPhoton", "GammaJets", "GammaJets_Madgraph", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF"};
     else if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF"};
+      vBkgs = {"DiPhoton", "GammaJets", "GammaJets_Madgraph", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF"};
 
     TString label = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", "");
     make_table_std(f, "hNVtx", vBkgs, label);

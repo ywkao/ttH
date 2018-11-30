@@ -39,10 +39,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   unique_ptr<TMVA::Reader> gjet_mva;
 
   // Declare BDT vars
+  float maxIDMVA_;
+  float minIDMVA_;
+  float max2_btag_;
+  float max1_btag_;
   float dipho_delta_R;
   float njets_;
   //float nbjets_;
   float ht_;
+  float lead_pT_;
+  float sublead_pT_;
   float leadptoM_;
   float subleadptoM_;
   float leadIDMVA_;
@@ -69,18 +75,21 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   float jet6_eta_;
   float jet6_btag_;
 
-  float max1_btag_;
-  float max2_btag_;
   
   float leadPSV_;
   float subleadPSV_;
   
   float dipho_cosphi_;
   float dipho_rapidity_;
+  float dipho_pt_;
   float met_;
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
+    mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+    mva->AddVariable("minIDMVA_", &minIDMVA_);
+    mva->AddVariable("max2_btag_", &max2_btag_);
+    mva->AddVariable("max1_btag_", &max1_btag_);
     mva->AddVariable("dipho_delta_R", &dipho_delta_R);
     mva->AddVariable("njets_", &njets_);
     //mva->AddVariable("nbjets_", &nbjets_);
@@ -111,8 +120,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("jet6_eta_", &jet6_eta_);
     mva->AddVariable("jet6_btag_", &jet6_btag_);
 
-    mva->AddVariable("max1_btag_", &max1_btag_);
-    mva->AddVariable("max2_btag_", &max2_btag_);
 
     mva->AddVariable("leadPSV_", &leadPSV_);
     mva->AddVariable("subleadPSV_", &subleadPSV_);
@@ -129,7 +136,23 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   gjet_mva->AddVariable("njets_", &njets_);
   gjet_mva->AddVariable("ht_", &ht_);
   gjet_mva->AddVariable("jet1_pt_", &jet1_pt_);
+  gjet_mva->AddVariable("jet2_pt_", &jet2_pt_);
   gjet_mva->AddVariable("jet1_eta_", &jet1_eta_);
+  gjet_mva->AddVariable("jet2_eta_", &jet2_eta_);
+  gjet_mva->AddVariable("max1_btag_", &max1_btag_);
+  gjet_mva->AddVariable("max2_btag_", &max2_btag_);
+  gjet_mva->AddVariable("leadptoM_", &leadptoM_);
+  gjet_mva->AddVariable("subleadptoM_", &subleadptoM_);
+  gjet_mva->AddVariable("lead_eta_", &lead_eta_);
+  gjet_mva->AddVariable("sublead_eta_", &sublead_eta_);
+  gjet_mva->AddVariable("minIDMVA_", &minIDMVA_);
+  gjet_mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+  gjet_mva->AddVariable("lead_pT_", &lead_pT_); 
+  gjet_mva->AddVariable("sublead_pT_", &sublead_pT_);
+  gjet_mva->AddVariable("dipho_pt_", &dipho_pt_);
+  gjet_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
+  gjet_mva->AddVariable("dipho_cosphi_", &dipho_cosphi_); 
+
 
   gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight__bdt.xml");
 
@@ -220,7 +243,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       vector<double> btag_scores;
       vector<std::pair<int, double>> btag_scores_sorted;
-      jets = make_jets(btag_scores);
+      jets = make_jets(btag_scores, year);
       btag_scores_sorted = sortVector(btag_scores);
       
       if (!isData) {
@@ -244,6 +267,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       double mva_value = -999;
 
       // Calculate MVA value
+        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+        max2_btag_ = btag_scores_sorted[1].second;
+        max1_btag_ = btag_scores_sorted[0].second;
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
       ht_ = get_ht(jets);
       njets_ = n_jets();
@@ -267,9 +294,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
       jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
 
-      max1_btag_ = bjet1_csv();
-      max2_btag_ = bjet2_csv();
 
+      lead_pT_ = leadPt();
+      sublead_pT_ = subleadPt();
       leadptoM_ = lead_ptoM();
       subleadptoM_ = sublead_ptoM();
       leadIDMVA_ = leadIDMVA();
@@ -282,6 +309,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       dipho_cosphi_ = dipho_cosphi();
       dipho_rapidity_ = dipho_rapidity();
+      dipho_pt_ = diphoton.Pt();
       met_ = MetPt();
 
       if (evaluate_mva) 
@@ -300,13 +328,19 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       njets_ = n_jets();
       jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;	
       ht_ = get_ht(jets);
-      max1_btag_ = bjet1_csv(); 
 
-      gjet_mva_value = gjet_mva->EvaluateMVA( "BDT" ); 
+      gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" )); 
 
       if (processId == 3 && reweight_GJets) {
-	cout << "MVA value: " << gjet_mva_value << " , prob ratio: " << prob_ratio_from_madgraph(gjet_mva_value) << endl;
-	evt_weight *= prob_ratio_from_madgraph(gjet_mva_value);
+	//cout << "MVA value: " << gjet_mva_value << " , prob ratio: " << prob_ratio_from_madgraph(gjet_mva_value) << endl;
+	//double prob = convert_tmva_to_prob(gjet_mva_value);
+	double prob = gjet_mva_value;
+	//cout << "Probability that it is from madgraph: " << prob << endl;
+	double prob_ratio = prob / ( 1 - prob);
+	//cout << "Prob ratio from logistic transformation: " << prob_ratio << endl; 
+	//evt_weight *= prob_ratio_from_madgraph(gjet_mva_value);
+	evt_weight *= prob_ratio;
+	//cout << "MVA value: " << gjet_mva_value << " , prob ratio: " << prob_ratio << endl; 
       } 
 
       if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) {
@@ -315,9 +349,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       if (evaluate_mva) 
         baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
-
-      vProcess[processId]->fill_histogram("hGJet_BDT", gjet_mva_value, evt_weight, vId);
-
 
       // Selection
       if ((currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets"))) {
@@ -343,6 +374,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       }
 
       else if (tag == "ttHHadronic_GJet_Reweight_Preselection" || tag == "ttHHadronic_GJet_Reweight_Preselection_wWeights") {
+	if (mass() < 100)	continue;
         if (n_jets() < 2)       continue;
       }
 
@@ -450,13 +482,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
  
 
       // Fill histograms //
+      vProcess[processId]->fill_histogram("hGJet_BDT", gjet_mva_value, evt_weight, vId);
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   
       vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
       cout.setf(ios::fixed);
       cout << std::setprecision(6);
 
       // Skip blinded region for MC after filling mass histogram
-      if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
+      if (!(tag.Contains("GJet_Reweight_Preselection"))) {
+        if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
+      }
 
       // Fill rest of histograms //
       double dipho_mass_resolution = 0.5* pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), 0.5);

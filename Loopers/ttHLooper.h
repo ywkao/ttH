@@ -43,12 +43,12 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hMetPt", 25, 0, 200);
     v[i]->add_histogram("hHT", 50, 0, 5000);
     v[i]->add_histogram("hMT", 50, 0, 500);
-    v[i]->add_histogram("hDiphotonMassResolution", 25, 0, 0.1);
+    v[i]->add_histogram("hDiphotonMassResolution", 250, 0, 0.1);
     v[i]->add_histogram("hDiphotonMassResolutionLowMVA", 25, 0, 0.1);
     v[i]->add_histogram("hDiphotonMassResolutionMedMVA", 25, 0, 0.1);
     v[i]->add_histogram("hDiphotonMassResolutionHighMVA", 25, 0, 0.1);
 
-    v[i]->add_histogram("hGJet_BDT", 10, -1, 1);
+    v[i]->add_histogram("hGJet_BDT", 100, 0, 1);
 
     v[i]->add_histogram("hNJets", 16, -0.5, 15.5);
     v[i]->add_histogram("hNbLoose", 16, -0.5, 15.5);
@@ -100,7 +100,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonLeadR9", 25, 0, 1);
     v[i]->add_histogram("hPhotonLeadIDMVA", 20, -1, 1);
     v[i]->add_histogram("hPhotonLeadPToM", 25, 0, 5);
-    v[i]->add_histogram("hPhotonLeadSigmaEOverE", 25, 0, 1);
+    v[i]->add_histogram("hPhotonLeadSigmaEOverE", 100, 0, 1);
     v[i]->add_histogram("hPhotonLeadPtGen", 25, 0, 350);
 
     // Subleading photon
@@ -113,7 +113,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonSubleadR9", 25, 0, 1);
     v[i]->add_histogram("hPhotonSubleadIDMVA", 20, -1, 1);
     v[i]->add_histogram("hPhotonSubleadPToM", 25, 0, 5);
-    v[i]->add_histogram("hPhotonSubleadSigmaEOverE", 25, 0, 1);
+    v[i]->add_histogram("hPhotonSubleadSigmaEOverE", 100, 0, 1);
     v[i]->add_histogram("hPhotonSubleadPtGen", 25, 0, 350);
 
     v[i]->add_histogram("hPhotonPtRatio", 50, 0.0, 2.0);
@@ -284,7 +284,7 @@ bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
   if (!(currentFileTitle.Contains("QCD") || currentFileTitle.Contains("GJet_Pt"))) {
     return false;
   }
-  else if (currentFileTitle.Contains("GJet_Pt")) {
+  else if (currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT")) {
     if (genPhotonId == 2) // PP
       return true;
   }
@@ -481,6 +481,15 @@ double helicity(const TLorentzVector particle_1, const TLorentzVector particle_2
   return abs(cos_theta_1);  
 }
 
+double convert_tmva_to_prob(double score) {
+  // Undo TMVA transformation
+  double raw_score = -0.5 * log( 0.5 * (( 2 / (score + 1)) - 1));
+
+  // Apply logistic (sigmoid) transformation
+  double prob = 1 / (1 + exp(-raw_score));
+  return prob;
+}
+
 /*
 const vector<TString> vSamples_2016 = {"DoubleEG", 
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2", 
@@ -576,6 +585,12 @@ const vector<TString> vSamples_2017 = {
 			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			// gamma + jets MadGraph samples
+			"GJets_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"GJets_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"GJets_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"GJets_HT-40To100_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"GJets_HT-600ToInf_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			// jets
 			"QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
