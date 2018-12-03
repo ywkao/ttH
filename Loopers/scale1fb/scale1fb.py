@@ -26,6 +26,7 @@ for sample, info in samples.iteritems():
     scale1fb[process]["scale1fb_2017"] = 0
     scale1fb[process]["scale1fb_2018"] = 0
     scale1fb[process]["productions"] = {}
+    scale1fb[process]["matched_xs"] = False
 
 # Take cross sections from flashgg repository instead of Twiki
 def copy_entry(dict1, dict2, key):
@@ -34,17 +35,13 @@ def copy_entry(dict1, dict2, key):
 
 with open("cross_sections_flashgg.json") as json_file:
   cross_sections = json.load(json_file)
-  for key, info in cross_sections.iteritems():
-    for sample, sample_info in scale1fb.iteritems():
+  for sample, sample_info in scale1fb.iteritems():
+    for key, info in cross_sections.iteritems():
       if key == sample and sample in cross_sections.keys():
 	copy_entry(info, sample_info, "xs")
         copy_entry(info, sample_info, "br")
         copy_entry(info, sample_info, "filter_eff")
-	#if sample_info["n_events_neg"] + sample_info["n_events_pos"] == sample_info["n_events_tot"] and sample_info["n_events_tot"] > 0:
-	#  print key
-        #  sample_info["scale1fb"] = (sample_info["xs"] * sample_info["br"] * sample_info["filter_eff"] * 1000) / (sample_info["n_events_pos"] - sample_info["n_events_neg"])
-	#else:
-	#  sample_info["scale1fb"] = 0
+	sample_info["matched_xs"] = True
 
 # Now calculate n_events and scale1fb
 for sample, info in samples.iteritems():
