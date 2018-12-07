@@ -295,7 +295,7 @@ bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
   return false;
 }
 
-const double gjet_normalization = 1.0;
+const double gjet_normalization = 3.110413;
 double qcd_factor(TString currentFileTitle) {
   if (currentFileTitle.Contains("GJet_Pt"))
     return 5.423306276115452;

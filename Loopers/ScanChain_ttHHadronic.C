@@ -10,7 +10,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   bool evaluate_mva = xml_file != "none";
 
-  bool reweight_GJets = tag.Contains("GJet_Reweight_Preselection_wWeights");
+  bool reweight_GJets = tag != "ttHHadronic_GJet_Reweight_Preselection"; 
 
   // Make MVA Optimization Baby
   OptimizationBabyMaker* baby = new OptimizationBabyMaker();
