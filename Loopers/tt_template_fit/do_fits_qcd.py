@@ -24,14 +24,16 @@ ff_template = "QCD"
 hist_names = ["hPhotonMinIDMVA", "hPhotonMaxIDMVA"]
 templates_dict = { "data" : [["Data"], ""], 
 		"pp" : [["DiPhoton"], "GenPhoton_2"], 
-		"fp" : [["GammaJets"], "GenPhoton_1"], 
+		#"fp" : [["GammaJets"], "GenPhoton_1"],
+		"fp" : [["GammaJets_Madgraph"], "GenPhoton_1"], 
 		"ff" : [["QCD"], "GenPhoton_0"], 
 		"bkg" : [["TTGG", "DY", "TTGJets", "VG", "TTJets"], ""] 
 }
 
 hists = {}
 
-f = ROOT.TFile("../ttHHadronicLoose_histograms.root")
+f = ROOT.TFile("../ttHHadronic_QCDFits_Presel__histograms2017.root")
+
 
 hists_unweighted = {} 
 hists_weighted = {}

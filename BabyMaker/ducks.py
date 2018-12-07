@@ -15,6 +15,8 @@ parser.add_argument("tag", help = "job tag e.g. 'v7'", type=str)
 parser.add_argument("year", help = "which year to run on e.g. '2016'", type=str)
 parser.add_argument("--skip_data", action="store_true")
 parser.add_argument("--data_only", action="store_true")
+parser.add_argument("--central_microAOD", action="store_true")
+parser.add_argument("--old_data", action="store_true")
 parser.add_argument("--do_all", help = "run on every single skim (not just important ones)", action="store_true")
 parser.add_argument("--soft_rerun", help = "don't remake tarball", action="store_true")
 parser.add_argument("--tH_only", help = "only jobs for THW, THQ", action="store_true")
@@ -25,6 +27,8 @@ exec_path = "condor_exe.sh"
 tar_path = "package.tar.gz"
 hadoop_path = "ttH"
 
+old_data_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
+
 if args.year == "2016":
   cmssw_ver = "CMSSW_8_0_28"
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2016_skim_v3_jetPt20"
@@ -34,10 +38,11 @@ elif args.year == "2017":
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
   #base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall17-3_2_0_skim_v1" # new version of microAOD with required gen info for tt+X overlap removal
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017" # microAOD with tt+X overlap and top tagger info
+  if args.central_microAOD:
+    base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
 elif args.year == "2018":
   cmssw_ver = "CMSSW_10_2_1"
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/"
-
 
 if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "_" + args.year)
@@ -59,8 +64,8 @@ subdir_map = { 	"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_
 		"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
 		"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-BS2016_BSandPUSummer16_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 		"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1",
-		#"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8" : "RunIIFall17-3_1_0-3_1_0-v1-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2",
-		"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8" : "RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2",
+		"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8" : "RunIIFall17-3_1_0-3_1_0-v1-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2",
+		#"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8" : "RunIIFall17-3_2_0-3_2_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2",
 }
 default_subdir = "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1"
 
@@ -82,6 +87,8 @@ def important_sample(name):
   return False
  
 samples = glob.glob(base_path + "/*")
+if args.old_data:
+  samples = glob.glob(old_data_path + "/*")
 dslocs = []
 for sample in samples:
   name = sample.split("/")[-1]
@@ -99,8 +106,10 @@ for sample in samples:
     if args.skip_data:
       continue
     nFilesPerOutput = 25
-    dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
-    print "here"
+    if not args.old_data:
+      dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
+    else:
+      dslocs.append(["/" + name + "/", old_data_path + "/" + name + "/*", nFilesPerOutput])
   if "ttH" in name or "TTGG" in name:
     nFilesPerOutput = 1
   elif "DiPhoton" in name: 
@@ -122,25 +131,9 @@ for sample in samples:
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput]) 
 
 
-  #if "DoubleEG" in name:
-  #  nFilesPerOutput = 25
-  #  dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
-  #elif not args.year == "2016": # in 2016 there are some samples we want to exclude. For 2017, use everything that is there (usually there is only one subdirectory, but e.g. for DY, there is a nominal sample and an ext1 sample and we want to use both)
-  #  if "ttH" in name:
-  #    nFilesPerOutput = 1
-  #  elif "DiPhoton" in name: 
-  #    nFilesPerOutput = 5
-  #  else:
-  #    nFilesPerOutput = 100
-  #  dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
-  #elif not args.data_only:
-  #  if "ttH" in name:
-  #    nFilesPerOutput = 1
-  #  elif "DiPhoton" in name or "TTGG" in name:
-  #    nFilesPerOutput = 5
-  #  else:
-  #    nFilesPerOutput = 100
-  #  dslocs.append(["/" + name + "/", base_path + "/" + name + "/" + subdir + "/", nFilesPerOutput])
+print dslocs
+#time.sleep(300)
+
 
 total_summary = {}
 while True:

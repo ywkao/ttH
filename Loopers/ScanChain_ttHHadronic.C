@@ -154,7 +154,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   gjet_mva->AddVariable("dipho_cosphi_", &dipho_cosphi_); 
 
 
-  gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight__bdt.xml");
+  gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight_binary_crossEntropy_bdt.xml");
 
   double dipho_yield = 0;
 
@@ -262,6 +262,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         evt_weight *= puweight();
       }
 
+      bool scale_qcd = false;
+      if (scale_qcd) {
+	evt_weight *= qcd_factor(currentFileTitle);
+      }
 
       // Evaluate MVA, if we choose
       double mva_value = -999;
@@ -331,16 +335,17 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" )); 
 
+      bool do_binned_probabilities = false;
       if (processId == 3 && reweight_GJets) {
-	//cout << "MVA value: " << gjet_mva_value << " , prob ratio: " << prob_ratio_from_madgraph(gjet_mva_value) << endl;
-	//double prob = convert_tmva_to_prob(gjet_mva_value);
-	double prob = gjet_mva_value;
-	//cout << "Probability that it is from madgraph: " << prob << endl;
-	double prob_ratio = prob / ( 1 - prob);
-	//cout << "Prob ratio from logistic transformation: " << prob_ratio << endl; 
-	//evt_weight *= prob_ratio_from_madgraph(gjet_mva_value);
-	evt_weight *= prob_ratio;
-	//cout << "MVA value: " << gjet_mva_value << " , prob ratio: " << prob_ratio << endl; 
+	if (!do_binned_probabilities) {
+	  double prob = gjet_mva_value;
+	  double prob_ratio = prob / ( 1 - prob);
+	  evt_weight *= prob_ratio;
+	  evt_weight *= gjet_normalization;
+	}
+	else {
+	  evt_weight *= prob_ratio_from_madgraph(gjet_mva_value);
+	}
       } 
 
       if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) {
@@ -363,6 +368,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+
+      else if (tag == "ttHHadronic_QCDFits_Presel") {
+	if (mass() < 100)		continue; 
+	if (n_jets() < 2)               continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
       else if (tag == "ttHHadronicTight") {
         if (mass() < 100)                continue;
         if (n_jets() < 4)               continue;

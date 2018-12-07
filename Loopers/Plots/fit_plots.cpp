@@ -33,6 +33,7 @@ std::map<TString, TString> mLabels = {
         {"QCDGenPhoton_0", "QCD (F/F)"},
 	{"QCDGenPhoton_1", "QCD (F/P)"},
         {"GammaJetsGenPhoton_1", "#gamma + Jets (F/P)"},
+	{"GammaJets_MadgraphGenPhoton_1", "#gamma + Jets (F/P) (Madgraph)"},
         {"DiPhotonGenPhoton_2", "#gamma#gamma + Jets (P/P)"},
 	{"DiPhotonGenPhoton_1", "#gamma#gamma + Jets (F/P)"}
 };
@@ -42,6 +43,7 @@ std::map<TString, int> mColors = {
         {"DiPhotonGenPhoton_2", kAzure+1},
 	{"DiPhotonGenPhoton_1", kRed},
         {"GammaJetsGenPhoton_1", kViolet -4},
+	{"GammaJets_MadgraphGenPhoton_1", kViolet-4},
         {"QCDGenPhoton_0", kCyan-7},
 	{"QCDGenPhoton_1", kOrange},
         {"TTGG", kOrange+1},
@@ -95,9 +97,10 @@ void make_prefit_plot(TCanvas* c1, TFile* file, string output_name, TString hist
   c->set_filename(output_name);
   c->set_x_label(x_label);
   c->set_y_label("Events");
-  c->set_lumi(35.9);
+  c->set_lumi(41.5);
  
-  c->give_info("ttH Hadronic Loose");
+  c->give_info("ttH Hadronic");
+  //c->give_info("2017 Preselection"
   for (int i = 0; i < vInfo.size(); i++)
     c->give_info(vInfo[i]);
   //c->give_info("t#bar{t}-Enriched Region");
@@ -106,10 +109,8 @@ void make_prefit_plot(TCanvas* c1, TFile* file, string output_name, TString hist
   else
     c->give_info("Post-Fit");
 
-  if (!hist_name.Contains("Jets")) {
-    c->set_no_log();
-    c->set_lower_lim(0.0);
-  }
+  c->set_no_log();
+  c->set_lower_lim(0.0);
   c->plot(idx);
   delete hData;
   delete hSig;
@@ -132,33 +133,33 @@ int main(int argc, char* argv[]) {
   gStyle->SetTitleFontSize(0.03);
 
   TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
-  TFile* f1 = new TFile("../ttHHadronicLoose_histograms.root");
+  TFile* f1 = new TFile("../ttHHadronicPresel_2017__histograms2017.root");
 
   //make_prefit_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, vector<TString> vOtherBkgs, int idx, vector<double> scales = {})
   TString ff_template = "QCDGenPhoton_0";
-  //TString fp_template = "QCDGenPhoton_1";
+  //TString fp_template = "GammaJets_MadgraphGenPhoton_1";
   TString fp_template = "GammaJetsGenPhoton_1";
-  //TString fp_template = "DiPhotonGenPhoton_1";
   TString pp_template = "DiPhotonGenPhoton_2";
   vector<TString> vOtherBkgs = {"DY", "TTGG", "TTGJets", "TTJets", "VG"};
 
   // Diphoton PP, Gamma Jets FP, QCD FF
-  vector<double> scales_1 = {1.641040148450026, 8.112919043144519, 0.36046715009367847, 1.0000003023824828};
-  vector<double> scales_2 = {1.3496496760286325, 9.296097204033499, 0.40000000009581543, 1.0000001758387995};
-
-  // Diphoton PP, Diphoton FP, QCD FF
-  //vector<double> scales_1 = {0.29559462500900724, 45.726195718631274, 0.6806121442633202, 1.000000318702647};
-  //vector<double> scales_2 = {1,1,1,1};
-
-  // Diphoton PP, QCD FP, QCD FF
-  //vector<double> scales_3 = {1.6284709515128826, 0.8243114508164996, 0.36392374575587044, 1.0000003186830242};
-  vector<double> scales_3 = {1.5230841089657836, 0.95609767216492, 0.31881376589991667, 1.000000317540502};
+  vector<double> scales_1 = {2.34, 1.76, 1.26, 1.0};
+  //vector<double> scales_1 = {2.7868180709164525, 5.423306276115452, 1.0297565943087545, 0.9999988851697946};
+  //vector<double> scales_1 = {2.473192678034093, 1.8847607139999762, 1.0894306753054561, 1.0000011138433376}; // Madgraph
 
 
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 0); 
-  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {"Constrain fit by hand"}, 1, scales_2); 
-  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {"No constraints on fit"}, 1, scales_1); 
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hNJets", "N_{jets}", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hNbMedium", "N_{b-jets} (medium)", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);
+ 
 
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_1); 
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_1);
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hNJets", "N_{jets}", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_1);
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hNbMedium", "N_{b-jets} (medium)", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 2, scales_1);
+
+  /*
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);  
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {"Constrain fit by hand"}, 1, scales_2); 
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {"No constraints on fit"}, 1, scales_1);
@@ -176,4 +177,5 @@ int main(int argc, char* argv[]) {
   vector<double> scales_4 = {1.6284709515128826, 7.99453, 0.36392374575587044, 1.0000003186830242};
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_4);
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 2, scales_4);
+  */
 }

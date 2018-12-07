@@ -53,7 +53,9 @@ d_train = xgboost.DMatrix(X_train, label = y_train, weight = weights_train)
 param = { 
     	'max_depth': 4,
 	'eta': 0.1,
+	#'objective' : 'reg:linear',
 	'objective': 'binary:logistic',
+	'eval_metric': 'logloss',
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights, 
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
@@ -83,17 +85,9 @@ tmva_utils.convert_model(model, input_variables = input_variables, output_xml = 
 pred_train = bdt.predict(d_train, output_margin=False)
 #pred_test = bdt.predict(d_test, output_margin=False)
 
-#print pred_test.shape
+for i in range(5):
+  print pred_train[i]
 
-#for i in range(10):
-#  print pred_train[i]
-
-# analysis
-# derive s/b probability ratios as a function of BDT score
-#prob_ratios, bins = probability_utils.calculate_prob_ratios(pred_test, y_test)
-
-#for i in range(len(prob_ratios)):
-#  print "Events scoring below %.6f get scaled by %.6f" % (bins[i], prob_ratios[i])
 
 # ks test
 #d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(pred_train, pred_test, y_train, y_test)

@@ -303,8 +303,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_rat_label("#frac{Data}{MC}");
     c->set_y_label("Events");
     c->set_lumi(lumi);
-    c->set_log_rat();
-    c->set_rat_lim_range({0.2, 5.0});
+    //c->set_log_rat();
+    c->set_rat_lim_range({0.0, 2.0});
     if (hist_name.Contains("SigmaEOverE") || hist_name.Contains("DiphotonMassResolution")) {
       c->set_no_log();
     }

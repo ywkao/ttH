@@ -281,7 +281,7 @@ bool has_ttX_overlap(TString currentFileTitle, int lead_prompt, int sublead_prom
 }
 
 bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
-  if (!(currentFileTitle.Contains("QCD") || currentFileTitle.Contains("GJet_Pt"))) {
+  if (!(currentFileTitle.Contains("QCD") || currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT"))) {
     return false;
   }
   else if (currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT")) {
@@ -293,6 +293,20 @@ bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
       return true;
   }
   return false;
+}
+
+const double gjet_normalization = 1.0;
+double qcd_factor(TString currentFileTitle) {
+  if (currentFileTitle.Contains("GJet_Pt"))
+    return 5.423306276115452;
+  else if (currentFileTitle.Contains("GJets_HT"))
+    return 1.8847607139999762;
+  else if (currentFileTitle.Contains("QCD"))
+    return 2.34; 
+  else if (currentFileTitle.Contains("DiPhotonJetsBox"))
+    return 1.26; 
+  else
+    return 1.0;
 }
 
 bool is_low_stats_process(TString currentFileTitle) {
@@ -570,6 +584,8 @@ const vector<TString> vSamples_2016 = {
 
 const vector<TString> vSamples_2017 = {
 			// Data
+			//"DoubleEG"
+			
 			"DoubleEG_Run2017B-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017C-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017D-31Mar2018-v1_MINIAOD_forHualin_2017",
@@ -612,7 +628,7 @@ const vector<TString> vSamples_2017 = {
 			"GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"VBFHToGG_M125_13TeV_amcatnlo_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
-
+			
 };
 
 /*
@@ -663,13 +679,8 @@ void set_json(TString year) {
 
 bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
   if (year == "2018" || year == "2017" || year == "2016") { 
-    bool pass = goodrun(run, lumi_block);
-    if (!pass)
-      cout << run << " " << lumi_block << " failed golden json" << endl;
-    return pass;
+    return goodrun(run, lumi_block);
   }
-  else
-    return true;
 }
 
 /*const vector<TString> vSamples_2018 = {
