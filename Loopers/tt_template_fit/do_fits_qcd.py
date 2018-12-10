@@ -2,12 +2,31 @@ import os, sys
 import ROOT
 import numpy
 
-def combine_hists(hist1, hist2, name):
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--jet_bin", help = "n_jet bin to do fit in", type = str, default = "2+")
+parser.add_argument("--input_file", help = "input root file containing histograms to fit", type = str, default = "../ttHHadronic_2017_Presel__histograms2017.root")
+args = parser.parse_args()
+
+def find_jet_bin(jet_bin):
+  if jet_bin >=4:
+    return 3
+  else:
+    return jet_bin - 1
+
+def combine_hists(hist1, hist2, name, jet_bin, overflow):
   target_hist = ROOT.TH1D(name, "", hist1.GetNbinsX() + hist2.GetNbinsX(), 0, 1)
+  jet_bin_number = find_jet_bin(jet_bin)
   for i in range(hist1.GetNbinsX()):
-    target_hist.SetBinContent(i+1, hist1.GetBinContent(i+1))
+    target_hist.SetBinContent(i+1, hist1.GetBinContent(i+1, jet_bin_number))
+    if overflow:
+      for j in range(jet_bin_number, hist1.GetNbinsY()):
+        target_hist.AddBinContent(i+1, hist1.GetBinContent(i+1, jet_bin_number + j + 1))
   for i in range(hist2.GetNbinsX()):
-    target_hist.SetBinContent(hist1.GetNbinsX() + i + 1, hist2.GetBinContent(i+1))
+    target_hist.SetBinContent(hist1.GetNbinsX() + i + 1, hist2.GetBinContent(i+1, jet_bin_number))
+    if overflow:
+      for j in range(jet_bin_number, hist2.GetNbinsY()):
+        target_hist.AddBinContent(hist1.GetNbinsX() + i + 1, hist2.GetBinContent(i+1, jet_bin_number + j + 1))
   for i in range(hist1.GetNbinsX() + hist2.GetNbinsX()):
     if target_hist.GetBinContent(i+1) < 0:
       target_hist.SetBinContent(i+1, 0)
@@ -21,31 +40,38 @@ pp_template = "DiPhoton"
 fp_template = "GammaJets"
 ff_template = "QCD"
 
-hist_names = ["hPhotonMinIDMVA", "hPhotonMaxIDMVA"]
+hist_names = ["hPhotonMinIDMVA_NJets", "hPhotonMaxIDMVA_NJets"]
+#if fit_2D:
+#  hist_names = ["hPhotonMinIDMVA_NJets", "hPhotonMaxIDMVA_NJets"]
+#else:
+#  hist_names = ["hPhotonMinIDMVA_fine", "hPhotonMaxIDMVA_fine"]
+
 templates_dict = { "data" : [["Data"], ""], 
 		"pp" : [["DiPhoton"], "GenPhoton_2"], 
-		#"fp" : [["GammaJets"], "GenPhoton_1"],
-		"fp" : [["GammaJets_Madgraph"], "GenPhoton_1"], 
+		"fp" : [["GammaJets"], "GenPhoton_1"],
+		#"fp" : [["GammaJets_Madgraph"], "GenPhoton_1"], 
 		"ff" : [["QCD"], "GenPhoton_0"], 
 		"bkg" : [["TTGG", "DY", "TTGJets", "VG", "TTJets"], ""] 
 }
 
 hists = {}
 
-f = ROOT.TFile("../ttHHadronic_QCDFits_Presel__histograms2017.root")
-
+f = ROOT.TFile(args.input_file)
 
 hists_unweighted = {} 
 hists_weighted = {}
 hists_weights = {}
 
+overflow = "+" in args.jet_bin
+jet_bin = int(args.jet_bin.replace("+",""))
+
 # Grab our histos
 for template, info in templates_dict.iteritems():
-  hists_unweighted[template] = combine_hists(f.Get(hist_names[0] + "_entries_" + info[0][0] + info[1]), f.Get(hist_names[1] + "_entries_" + info[0][0] + info[1]), template + "unweighted")
-  hists_weighted[template] = combine_hists(f.Get(hist_names[0] + "_" + info[0][0] + info[1]), f.Get(hist_names[1] + "_" + info[0][0] + info[1]), template + "weighted")
+  hists_unweighted[template] = combine_hists(f.Get(hist_names[0] + "_entries_" + info[0][0] + info[1]), f.Get(hist_names[1] + "_entries_" + info[0][0] + info[1]), template + "unweighted", jet_bin, overflow)
+  hists_weighted[template] = combine_hists(f.Get(hist_names[0] + "_" + info[0][0] + info[1]), f.Get(hist_names[1] + "_" + info[0][0] + info[1]), template + "weighted", jet_bin, overflow)
   for i in range(len(info[0]) - 1):
-    hists_unweighted[template].Add(combine_hists(f.Get(hist_names[0] + "_entries_" + info[0][i+1] + info[1]), f.Get(hist_names[1] + "_entries_" + info[0][i+1] + info[1]), template + "unweighted" + str(i)))
-    hists_weighted[template].Add(combine_hists(f.Get(hist_names[0] + "_" + info[0][i+1] + info[1]), f.Get(hist_names[1] + "_" + info[0][i+1] + info[1]), template + "weighted" + str(i)))
+    hists_unweighted[template].Add(combine_hists(f.Get(hist_names[0] + "_entries_" + info[0][i+1] + info[1]), f.Get(hist_names[1] + "_entries_" + info[0][i+1] + info[1]), template + "unweighted" + str(i), jet_bin, overflow))
+    hists_weighted[template].Add(combine_hists(f.Get(hist_names[0] + "_" + info[0][i+1] + info[1]), f.Get(hist_names[1] + "_" + info[0][i+1] + info[1]), template + "weighted" + str(i), jet_bin, overflow))
 
   hists_weights[template] = hists_weighted[template].Clone(template + "weights")
   hists_weights[template].Divide(hists_unweighted[template])
@@ -93,6 +119,7 @@ for i in range(4):
   scales.append(f/initial_fracs[i])
 
 # Print fit results
+print "N_jets == %s" % args.jet_bin 
 print "Initial fractions", initial_fracs
 print "Fitted fractions", fracs
 print "Errors", frac_errs

@@ -2,6 +2,8 @@
 #define _TTH_PROCESS_H_
 
 #include "TFile.h"
+#include "TH1D.h"
+#include "TH2D.h"
 
 using namespace std;
 
@@ -19,19 +21,24 @@ class Process
     ~Process();  
 
     void add_histogram(TString name, int nBins, double xLow, double xHigh);
+    void add_2D_histogram(TString name, int nBinsX, double xLow, double xHigh, int nBinsY, double yLow, double yHigh);
     void fill_histogram(TString name, double value, double weight, int genLeptonId = -1, int genPhotonId = -1, int genPhotonDetailId = -1, int photonLocationId = -1, int mvaCategoryId = -1);
     void fill_histogram(TString name, double value, double weight, vector<int> vId);
+    void fill_2D_histogram(TString name, double valueX, double valueY, double weight, vector<int> vId);
 
   private:
     TFile* mFile;
     TString mName;
 
     vector<TH1D*> mH;
+    vector<TH2D*> mH_2D;
 
     bool mGenLepton;
     vector<vector<TH1D*>> mHGenLeptonComp;
+
     bool mGenPhoton;
     vector<vector<TH1D*>> mHGenPhotonComp;
+
     bool mGenPhotonDetail;
     vector<vector<TH1D*>> mHGenPhotonDetailComp;
 
@@ -40,8 +47,15 @@ class Process
 
     bool mMVACategories;
     vector<vector<TH1D*>> mHMVACategories;
+
+    vector<vector<TH2D*>> mHGenLeptonComp_2D;
+    vector<vector<TH2D*>> mHGenPhotonComp_2D;
+    vector<vector<TH2D*>> mHGenPhotonDetailComp_2D;
+    vector<vector<TH2D*>> mHPhotonLocations_2D;
+    vector<vector<TH2D*>> mHMVACategories_2D;
     
     std::map<TString, int> mMap;
+    std::map<TString, int> mMap_2D;
 };
 
 inline Process::~Process()
@@ -68,6 +82,28 @@ inline Process::~Process()
     for (int j = 0; j < mHMVACategories[i].size(); j++)
     delete mHMVACategories[i][j];
   }
+  for (int i = 0; i < mHGenLeptonComp_2D.size(); i ++ ) {
+    for (int j = 0; j < mHGenLeptonComp_2D.size(); j++)
+      delete mHGenLeptonComp_2D[i][j];
+  }
+  for (int i = 0; i < mHGenPhotonComp_2D.size(); i ++ ) {
+    for (int j = 0; j < mHGenPhotonComp_2D.size(); j++)
+      delete mHGenPhotonComp_2D[i][j];
+  }
+  for (int i = 0; i < mHGenPhotonDetailComp_2D.size(); i ++ ) {
+    for (int j = 0; j < mHGenPhotonDetailComp_2D.size(); j++)
+      delete mHGenPhotonDetailComp_2D[i][j];
+  }
+  for (int i = 0; i < mHPhotonLocations_2D.size(); i ++ ) {
+    for (int j = 0; j < mHPhotonLocations_2D.size(); j++)
+    delete mHPhotonLocations_2D[i][j];
+  }
+  for (int i = 0; i < mHMVACategories_2D.size(); i ++ ) {
+    for (int j = 0; j < mHMVACategories_2D.size(); j++)
+    delete mHMVACategories_2D[i][j];
+  }
+
+
 
 }
 
@@ -133,8 +169,61 @@ inline void Process::add_histogram(TString name, int nBins, double xLow, double 
     mHMVACategories.push_back(vTemp);
   }
 
-
   mMap[name] = mH.size() - 1;
+}
+
+inline void Process::add_2D_histogram(TString name, int nBinsX, double xLow, double xHigh, int nBinsY, double yLow, double yHigh)
+{
+  mH_2D.push_back(new TH2D(name + "_" + mName, "", nBinsX, xLow, xHigh, nBinsY, yLow, yHigh));
+  mH_2D[mH_2D.size() - 1]->Sumw2();
+
+  if (mGenLepton) {
+    vector<TH2D*> vTemp;
+    for (int i = 0; i < nGenLeptonCats; i++) {
+      vTemp.push_back(new TH2D(name + "_" + mName + "GenLepton_" + to_string(i), "", nBinsX, xLow, xHigh, nBinsY, yLow, yHigh));
+      vTemp[i]->Sumw2();
+    }
+    mHGenLeptonComp_2D.push_back(vTemp);
+  }
+
+  if (mGenPhoton) {
+    vector<TH2D*> vTemp;
+    for (int i = 0; i < nGenPhotonCats; i++) {
+      vTemp.push_back(new TH2D(name + "_" + mName + "GenPhoton_" + to_string(i), "", nBinsX, xLow, xHigh, nBinsY, yLow, yHigh));
+      vTemp[i]->Sumw2();
+    }
+    mHGenPhotonComp_2D.push_back(vTemp);
+  }
+
+  if (mGenPhotonDetail) {
+    vector<TH2D*> vTemp;
+    for (int i = 0; i < nGenPhotonDetailCats; i++) {
+      vTemp.push_back(new TH2D(name + "_" + mName + "GenPhotonDetail_" + to_string(i), "", nBinsX, xLow, xHigh, nBinsY, yLow, yHigh));
+      vTemp[i]->Sumw2();
+    }
+    mHGenPhotonDetailComp_2D.push_back(vTemp);
+  }
+
+  if (mPhotonLocations) {
+    vector<TH2D*> vTemp;
+    for (int i = 0; i < nPhotonLocations; i++) {
+      vTemp.push_back(new TH2D(name + "_" + mName + "PhotonLocations_" + to_string(i), "", nBinsX, xLow, xHigh, nBinsY, yLow, yHigh));
+      vTemp[i]->Sumw2();
+    }
+    mHPhotonLocations_2D.push_back(vTemp);
+  }
+
+  if (mMVACategories) {
+    vector<TH2D*> vTemp;
+    for (int i = 0; i < nMVACategories; i++) {
+      vTemp.push_back(new TH2D(name + "_" + mName + "MVACategories_" + to_string(i), "", nBinsX, xLow, xHigh, nBinsY, yLow, yHigh));
+      vTemp[i]->Sumw2();
+    }
+    mHMVACategories_2D.push_back(vTemp);
+  }
+
+  mMap_2D[name] = mH_2D.size() - 1;
+
 }
 
 inline void Process::fill_histogram(TString name, double value, double weight, int genLeptonId, int genPhotonId, int genPhotonDetailId, int photonLocationId, int mvaCategoryId)
@@ -175,6 +264,29 @@ inline void Process::fill_histogram(TString name, double value, double weight, v
     mHPhotonLocations[idx][photonLocationId]->Fill(value, weight);
   if (mvaCategoryId >= 0)
     mHMVACategories[idx][mvaCategoryId]->Fill(value, weight);
+}
+
+inline void Process::fill_2D_histogram(TString name, double valueX, double valueY, double weight, vector<int> vId)
+{
+  int idx = mMap_2D.find(name)->second;
+  mH_2D[idx]->Fill(valueX, valueY, weight);
+
+  int genLeptonId = vId.size() > 0 ? vId[0] : -1;
+  int genPhotonId = vId.size() > 1 ? vId[1] : -1;
+  int genPhotonDetailId = vId.size() > 2 ? vId[2] : -1;
+  int photonLocationId = vId.size() > 3 ? vId[3]: -1;
+  int mvaCategoryId = vId.size() > 4 ? vId[4]: -1;
+
+  if (genLeptonId >= 0)
+    mHGenLeptonComp_2D[idx][genLeptonId]->Fill(valueX, valueY, weight);
+  if (genPhotonId >= 0)
+    mHGenPhotonComp_2D[idx][genPhotonId]->Fill(valueX, valueY, weight);
+  if (genPhotonDetailId >= 0)
+    mHGenPhotonDetailComp_2D[idx][genPhotonDetailId]->Fill(valueX, valueY, weight);
+  if (photonLocationId >= 0)
+    mHPhotonLocations_2D[idx][photonLocationId]->Fill(valueX, valueY, weight);
+  if (mvaCategoryId >= 0)
+    mHMVACategories_2D[idx][mvaCategoryId]->Fill(valueX, valueY, weight); 
 }
 
 #endif // _TTH_PROCESS_H_

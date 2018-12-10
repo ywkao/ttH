@@ -125,10 +125,19 @@ void add_variables(vector<Process*> v, TString tag) {
 
     v[i]->add_histogram("hPhotonMaxIDMVA", 10, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_fine", 30, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_fine", 30, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_entries", 10, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_entries", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_fine_entries", 30, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_fine_entries", 30, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_coarse", 5, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_coarse", 5, -1, 1);
+    v[i]->add_2D_histogram("hPhotonMaxIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5); 
+    v[i]->add_2D_histogram("hPhotonMinIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5);
+    v[i]->add_2D_histogram("hPhotonMaxIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5);
+    v[i]->add_2D_histogram("hPhotonMinIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5); 
+
     v[i]->add_histogram("hDiphoMVA", 25, -1, 1);
 
     v[i]->add_histogram("hPhotonIDMVA_prompt", 5, -1, 1);
@@ -295,16 +304,20 @@ bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
   return false;
 }
 
-const double gjet_normalization = 3.110413;
-double qcd_factor(TString currentFileTitle) {
+//const double gjet_normalization = 3.110413;
+const double gjet_normalization = 2.67547;
+const double qcd_factor = 2.5065976174203226;
+const double gjets_factor = 1.86391094661595;
+const double diphoton_factor = 1.0995475862628403;
+double qcdX_factor(TString currentFileTitle, TString qcd_scale) {
   if (currentFileTitle.Contains("GJet_Pt"))
-    return 5.423306276115452;
+    return gjets_factor; 
   else if (currentFileTitle.Contains("GJets_HT"))
     return 1.8847607139999762;
   else if (currentFileTitle.Contains("QCD"))
-    return 2.34; 
+    return qcd_factor; 
   else if (currentFileTitle.Contains("DiPhotonJetsBox"))
-    return 1.26; 
+    return diphoton_factor; 
   else
     return 1.0;
 }
@@ -585,7 +598,7 @@ const vector<TString> vSamples_2016 = {
 const vector<TString> vSamples_2017 = {
 			// Data
 			//"DoubleEG"
-			
+
 			"DoubleEG_Run2017B-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017C-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017D-31Mar2018-v1_MINIAOD_forHualin_2017",
@@ -628,7 +641,6 @@ const vector<TString> vSamples_2017 = {
 			"GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"VBFHToGG_M125_13TeV_amcatnlo_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
-			
 };
 
 /*

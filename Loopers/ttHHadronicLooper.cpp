@@ -16,6 +16,16 @@ int main(int argc, char* argv[]) {
   else
     cout << "Not evaluating BDT" << endl;
 
+  TString scale_qcd = argc <= 5 ? "none" : argv[5];
+  if (scale_qcd != "none") {
+    cout << "Scaling QCD + X by the following: " << endl;
+    cout << "QCD: " << qcd_factor << endl;
+    cout << "Gamma + jets: " << gjets_factor << endl;
+    cout << "DiPhoton + jets: " << diphoton_factor << endl;
+  }
+  else
+    cout << "Not scaling normalization of QCD samples" << endl;
+
   TChain *ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 
   if (year == "All") {
     add_samples(ch, "2016");
@@ -24,5 +34,5 @@ int main(int argc, char* argv[]) {
   else
     add_samples(ch, year);
 
-  ScanChain(ch, tag, year, ext, xml_file); 
+  ScanChain(ch, tag, year, ext, xml_file, scale_qcd); 
 }

@@ -1,6 +1,6 @@
 #include "ScanChain_ttHHadronic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString scale_qcd, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
@@ -262,9 +262,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         evt_weight *= puweight();
       }
 
-      bool scale_qcd = false;
-      if (scale_qcd) {
-	evt_weight *= qcd_factor(currentFileTitle);
+      bool do_scale_qcd = scale_qcd != "none";
+      if (do_scale_qcd) {
+	evt_weight *= qcdX_factor(currentFileTitle, scale_qcd);
       }
 
       // Evaluate MVA, if we choose
@@ -610,10 +610,20 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       double minID = leadIDMVA() >= subleadIDMVA() ? subleadIDMVA() : leadIDMVA();
 
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_fine", maxID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_entries", maxID, 1, vId);
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_fine_entries", maxID, 1, vId);
 
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_fine", minID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA_entries", minID, 1, vId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_fine_entries", minID, 1, vId);
+
+      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets", maxID, n_jets(), evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets", minID, n_jets(), evt_weight, vId); 
+      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets_entries", maxID, n_jets(), 1, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets_entries", minID, n_jets(), 1, vId);
+
       vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, vId);
 
       // ttH-Hadronic Specific

@@ -133,7 +133,8 @@ int main(int argc, char* argv[]) {
   gStyle->SetTitleFontSize(0.03);
 
   TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
-  TFile* f1 = new TFile("../ttHHadronicPresel_2017__histograms2017.root");
+  //TFile* f1 = new TFile("../ttHHadronicPresel_2017__histograms2017.root");
+  TFile* f1 = new TFile("../ttHHadronic_QCDFits_Presel__histograms2017.root");
 
   //make_prefit_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, vector<TString> vOtherBkgs, int idx, vector<double> scales = {})
   TString ff_template = "QCDGenPhoton_0";
@@ -143,19 +144,20 @@ int main(int argc, char* argv[]) {
   vector<TString> vOtherBkgs = {"DY", "TTGG", "TTGJets", "TTJets", "VG"};
 
   // Diphoton PP, Gamma Jets FP, QCD FF
-  vector<double> scales_1 = {2.34, 1.76, 1.26, 1.0};
-  //vector<double> scales_1 = {2.7868180709164525, 5.423306276115452, 1.0297565943087545, 0.9999988851697946};
-  //vector<double> scales_1 = {2.473192678034093, 1.8847607139999762, 1.0894306753054561, 1.0000011138433376}; // Madgraph
+  //vector<double> scales_1 = {2.34, 1.76, 1.26, 1.0};
 
+  //vector<double> scales_1 = {2.5065976174203226, 1.86391094661595, 1.0995475862628403, 0.9999988851693541}; // Pythia
+  //vector<double> scales_1 = {2.473192678034093, 1.8847607139999762, 1.0894306753054561, 1.0000011138433376}; // MadGraph
+  //vector<double> scales_1 = {2.5870951952922523, 1.8534316644570374, 1.0721464900550817, 1.0000011136519826}; // fine binning, Pythia
 
-  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 0); 
-  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA_fine", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 0); 
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA_fine", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hNJets", "N_{jets}", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hNbMedium", "N_{b-jets} (medium)", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);
  
 
-  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_1); 
-  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_1);
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA_fine", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_1); 
+  make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA_fine", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_1);
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hNJets", "N_{jets}", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1, scales_1);
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hNbMedium", "N_{b-jets} (medium)", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 2, scales_1);
 
