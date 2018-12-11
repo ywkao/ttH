@@ -367,6 +367,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_y_lim_range({1, pow(10,6)});
   }
 
+  if (hist_name.Contains("IDMVA"))
+    c->set_no_log();
+
   if (hist_name == "hDiphotonMassResolution")
     c->set_x_bin_range({1, 100});
 
@@ -613,8 +616,8 @@ int main(int argc, char* argv[])
     //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_elec", "#gamma ID (Elec)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     //make_plot(c1, vFiles[i], vNames[i], "hPhotonIDMVA_fake", "#gamma ID (Fake)", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     make_plot(c1, vFiles[i], vNames[i], "hMT", "m_{T}(E_{T}^{miss}, lep) [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
-    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA_fine", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_fine", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
     make_plot(c1, vFiles[i], vNames[i], "hDiphoMVA", "Diphoton MVA", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 

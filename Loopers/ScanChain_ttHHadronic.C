@@ -264,7 +264,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       bool do_scale_qcd = scale_qcd != "none";
       if (do_scale_qcd) {
-	evt_weight *= qcdX_factor(currentFileTitle, scale_qcd);
+	evt_weight *= qcdX_factor(currentFileTitle, scale_qcd, n_jets());
       }
 
       // Evaluate MVA, if we choose

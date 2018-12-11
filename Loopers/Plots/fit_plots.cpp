@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 
   //vector<double> scales_1 = {2.5065976174203226, 1.86391094661595, 1.0995475862628403, 0.9999988851693541}; // Pythia
   //vector<double> scales_1 = {2.473192678034093, 1.8847607139999762, 1.0894306753054561, 1.0000011138433376}; // MadGraph
-  //vector<double> scales_1 = {2.5870951952922523, 1.8534316644570374, 1.0721464900550817, 1.0000011136519826}; // fine binning, Pythia
+  vector<double> scales_1 = {2.5870951952922523, 1.8534316644570374, 1.0721464900550817, 1.0000011136519826}; // fine binning, Pythia
 
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMinIDMVA_fine", "Min. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 0); 
   make_prefit_plot(c1, f1, "qcd_fits.pdf", "hPhotonMaxIDMVA_fine", "Max. #gamma ID MVA", {ff_template, fp_template, pp_template}, vOtherBkgs, {}, 1);

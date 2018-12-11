@@ -309,17 +309,47 @@ const double gjet_normalization = 2.67547;
 const double qcd_factor = 2.5065976174203226;
 const double gjets_factor = 1.86391094661595;
 const double diphoton_factor = 1.0995475862628403;
-double qcdX_factor(TString currentFileTitle, TString qcd_scale) {
-  if (currentFileTitle.Contains("GJet_Pt"))
-    return gjets_factor; 
-  else if (currentFileTitle.Contains("GJets_HT"))
-    return 1.8847607139999762;
-  else if (currentFileTitle.Contains("QCD"))
-    return qcd_factor; 
-  else if (currentFileTitle.Contains("DiPhotonJetsBox"))
-    return diphoton_factor; 
+const vector<double> qcd_factor_Njets = {2.269533145160364, 2.024662382399548, 1.352544126969397};
+const vector<double> gjets_factor_Njets = {1.7165242253403157, 2.6453778798237244, 3.8916874358473503};
+const vector<double> diphoton_factor_Njets = {1.1361539930556246, 0.8483317609911921, 0.628699806603429};
+
+double qcdX_njets_bin(int n_jets) {
+  if (n_jets == 2)
+    return 0;
+  else if (n_jets == 3)
+    return 1;
+  else if (n_jets >= 4) 
+    return 2;
   else
-    return 1.0;
+    return 0;
+}
+
+double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
+  if (qcd_scale == "inclusive_NJets") {
+    if (currentFileTitle.Contains("GJet_Pt")) 
+      return gjets_factor; 
+    else if (currentFileTitle.Contains("GJets_HT"))
+      return 1.8847607139999762;
+    else if (currentFileTitle.Contains("QCD"))
+      return qcd_factor; 
+    else if (currentFileTitle.Contains("DiPhotonJetsBox"))
+      return diphoton_factor; 
+    else
+      return 1.0;
+  }
+  else if (qcd_scale == "binned_NJets") {
+    int jet_idx = qcdX_njets_bin(n_jets);
+    if (currentFileTitle.Contains("GJet_Pt"))
+      return gjets_factor_Njets[jet_idx];
+    else if (currentFileTitle.Contains("GJets_HT"))
+      return 1.8847607139999762;
+    else if (currentFileTitle.Contains("QCD"))
+      return qcd_factor_Njets[jet_idx];
+    else if (currentFileTitle.Contains("DiPhotonJetsBox"))
+      return diphoton_factor_Njets[jet_idx];  
+    else
+      return 1.0; 
+  }
 }
 
 bool is_low_stats_process(TString currentFileTitle) {

@@ -17,11 +17,17 @@ int main(int argc, char* argv[]) {
     cout << "Not evaluating BDT" << endl;
 
   TString scale_qcd = argc <= 5 ? "none" : argv[5];
-  if (scale_qcd != "none") {
+  if (scale_qcd == "inclusive_NJets") {
     cout << "Scaling QCD + X by the following: " << endl;
     cout << "QCD: " << qcd_factor << endl;
     cout << "Gamma + jets: " << gjets_factor << endl;
     cout << "DiPhoton + jets: " << diphoton_factor << endl;
+  }
+  else if (scale_qcd == "binned_NJets") {
+    cout << "Scaling QCD + X by the following (2, 3, 4+ jet bins): " << endl;
+    cout << "QCD: " << qcd_factor_Njets[0] << " , " << qcd_factor_Njets[1] << " , " << qcd_factor_Njets[2] << endl;
+    cout << "Gamma + jets: " << gjets_factor_Njets[0] << " , " << gjets_factor_Njets[1] << " , " << gjets_factor_Njets[2] << endl;
+    cout << "DiPhoton + jets: " << diphoton_factor_Njets[0] << " , " << diphoton_factor_Njets[1] << " , " << diphoton_factor_Njets[2] << endl;
   }
   else
     cout << "Not scaling normalization of QCD samples" << endl;

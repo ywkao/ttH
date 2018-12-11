@@ -5,14 +5,11 @@ import numpy
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--jet_bin", help = "n_jet bin to do fit in", type = str, default = "2+")
-parser.add_argument("--input_file", help = "input root file containing histograms to fit", type = str, default = "../ttHHadronic_2017_Presel__histograms2017.root")
+parser.add_argument("--input_file", help = "input root file containing histograms to fit", type = str, default = "../ttHHadronic_QCDFits_Presel__histograms2017.root")
 args = parser.parse_args()
 
 def find_jet_bin(jet_bin):
-  if jet_bin >=4:
-    return 3
-  else:
-    return jet_bin - 1
+  return jet_bin + 1
 
 def combine_hists(hist1, hist2, name, jet_bin, overflow):
   target_hist = ROOT.TH1D(name, "", hist1.GetNbinsX() + hist2.GetNbinsX(), 0, 1)
