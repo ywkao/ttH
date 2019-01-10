@@ -20,11 +20,38 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
   int nLowID = 0;
 
+  // MVA Businesss
+  unique_ptr<TMVA::Reader> gjet_mva;
+  gjet_mva.reset(new TMVA::Reader( "!Color:Silent" ));
+
+  gjet_mva->AddVariable("njets_", &njets_);
+  gjet_mva->AddVariable("ht_", &ht_);
+  gjet_mva->AddVariable("jet1_pt_", &jet1_pt_);
+  gjet_mva->AddVariable("jet2_pt_", &jet2_pt_);
+  gjet_mva->AddVariable("jet1_eta_", &jet1_eta_);
+  gjet_mva->AddVariable("jet2_eta_", &jet2_eta_);
+  gjet_mva->AddVariable("max1_btag_", &max1_btag_);
+  gjet_mva->AddVariable("max2_btag_", &max2_btag_);
+  gjet_mva->AddVariable("leadptoM_", &leadptoM_);
+  gjet_mva->AddVariable("subleadptoM_", &subleadptoM_);
+  gjet_mva->AddVariable("lead_eta_", &lead_eta_);
+  gjet_mva->AddVariable("sublead_eta_", &sublead_eta_);
+  gjet_mva->AddVariable("minIDMVA_", &minIDMVA_);
+  gjet_mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+  gjet_mva->AddVariable("lead_pT_", &lead_pT_);
+  gjet_mva->AddVariable("sublead_pT_", &sublead_pT_);
+  gjet_mva->AddVariable("dipho_pt_", &dipho_pt_);
+  gjet_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
+  gjet_mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
+
+  gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight_binary_crossEntropy_bdt.xml");
+
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
     // Get File Content
     TString currentFileTitle = currentFile->GetTitle();
+    cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
     TTree *tree = (TTree*)file.Get("tthHadronicTagDumper/trees/tth_13TeV_all");
     if (fast) TTreeCache::SetLearnEntries(10);
@@ -53,6 +80,16 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       }
     }
 
+    if (tag == "ttHHadronic_DNN_presel") {
+      if (!(currentFileTitle.Contains("ttHJet") || currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"))) {
+	cout << "Skipping " << currentFileTitle << endl;
+        continue;
+      }
+      else {
+        cout << "Looping over " << currentFileTitle << endl;
+      }
+    }
+
     for (unsigned int event = 0; event < nEventsTree; ++event) {
 
 
@@ -70,6 +107,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       // Decide what type of sample this is
       int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
       process_id_ = categorize_process(currentFileTitle, genPhotonId);
+      if (is_low_stats_process(currentFileTitle))       continue;
+      if (process_id_ == 17)				continue; // skip MadGraph G+Jets
 
       // Blinded region
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
@@ -84,6 +123,26 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+
+      else if (tag == "ttHHadronic_data_sideband_0b") {
+	if (mass() < 100)                continue;
+	if (n_jets() < 2)               continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHHadronic_data_sideband_tt_enriched") {
+	if (mass() < 100)                continue;
+	if (n_jets() < 3)		 continue;
+	if (nb_medium() < 1)		 continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue; 
+      }
+
+      else if (tag == "ttHHadronic_DNN_presel") {
+	if (mass() < 100)                continue;
+	if (n_jets() < 3)               continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
       else if (tag == "ttHHadronic") {
 	if (mass() < 100)                continue;
         if (n_jets() < 3)       continue;
@@ -127,11 +186,36 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         evt_weight_ *= puweight();
       }
 
+      TString scale_qcd = "binned_NJets";
+      bool do_scale_qcd = true;
+      if (do_scale_qcd) {
+        evt_weight_ *= qcdX_factor(currentFileTitle, scale_qcd, n_jets());
+      }
+
+      if (isnan(evt_weight_) || isinf(evt_weight_) || evt_weight_ == 0) {
+        continue; //some pu weights are nan/inf and this causes problems for histos 
+      }
+
+
       // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
+
+      if (tag == "ttHHadronic_data_sideband_0b") {
+	if (nb_tight() == 0)
+	  data_sideband_label_ = 1;
+	else if (nb_tight() > 0)
+	  data_sideband_label_ = 0; 
+      }
+
+      else if (tag == "ttHHadronic_data_sideband_tt_enriched") {
+	if (!(leadIDMVA() > -0.2 && subleadIDMVA() > -0.2))
+	  data_sideband_label_ = 1;
+	else
+	  data_sideband_label_ = 1;
+      }
 
       // Variable definitions
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
@@ -183,6 +267,36 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       mass_ = mass();
       lead_sigmaEtoE_ = lead_sigmaEoE();
       sublead_sigmaEtoE_ = sublead_sigmaEoE();
+  
+      // Gamma + jets reweighting
+      double gjet_mva_value = -999;
+      gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" ));
+      if (process_id_ == 3) {
+	double prob = gjet_mva_value;
+	double prob_ratio = prob / ( 1 - prob);
+	evt_weight_ *= prob_ratio;
+	evt_weight_ *= gjet_normalization;
+      } 
+
+      // DNN Business
+      vector<vector<float>> unordered_objects;
+    
+      vector<vector<float>> jet_objects = make_jet_objects(year); 
+      for (int i = 0; i < jet_objects.size(); i++)
+        unordered_objects.push_back(jet_objects[i]);
+
+
+      TLorentzVector lead_photon_modified, sublead_photon_modified;
+      lead_photon_modified.SetPtEtaPhiE(lead_ptoM(), leadEta(), leadPhi(), -999);
+      sublead_photon_modified.SetPtEtaPhiE(sublead_ptoM(), subleadEta(), subleadPhi(), -999);
+      unordered_objects.push_back(make_object(lead_photon_modified,    {-999, -999, -999, -999},    leadIDMVA(), -999));
+      unordered_objects.push_back(make_object(sublead_photon_modified, {-999, -999, -999, -999}, subleadIDMVA(), -999));
+
+      TLorentzVector Met;
+      Met.SetPtEtaPhiE(MetPt(), 0.0, MetPhi(), MetPt());
+      unordered_objects.push_back(make_object(Met,	      	       {-999, -999, -999, -999},           -999,  1.0));
+
+      objects_ = sort_objects(unordered_objects);
 
       FillBabyNtuple();
 

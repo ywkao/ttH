@@ -60,7 +60,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
       // Selection
-      //if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
 
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
@@ -162,6 +162,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       if (pu_weight) {
         evt_weight_ *= puweight();
       }
+
+      if (isnan(evt_weight_) || isinf(evt_weight_) || evt_weight_ == 0) {
+        continue; //some pu weights are nan/inf and this causes problems for histos 
+      }
+
 
       bool isSignal = process_id_ == 0;
 

@@ -369,10 +369,50 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
+      else if (tag == "ttHHadronic_data_sideband_train") {
+	if (mass() < 100)                continue;
+	if (n_jets() < 2)		 continue;
+	if (nb_tight() != 0)		 continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHHadronic_data_sideband_test") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_tight() < 1)              continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
       else if (tag == "ttHHadronic_QCDFits_Presel") {
 	if (mass() < 100)		continue; 
 	if (n_jets() < 2)               continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHHadronic_QCDFits_Presel_QCDEnriched") {
+        if (mass() < 100)               continue;
+        if (n_jets() < 2)               continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() >= 0.25)	continue;
+	if (subleadIDMVA() >= 0.25)	continue;
+      }
+
+      else if (tag == "ttHHadronic_QCDFits_Presel_GJetEnriched") {
+        if (mass() < 100)               continue;
+        if (n_jets() < 2)               continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	double maxID = leadIDMVA() >= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+	double minID = leadIDMVA() < subleadIDMVA() ? leadIDMVA() : subleadIDMVA(); 
+        if (maxID < 0.25)		continue;
+        if (minID > 0.25)		continue;
+      }
+
+      else if (tag == "ttHHadronic_QCDFits_Presel_DiphoEnriched") {
+        if (mass() < 100)               continue;
+        if (n_jets() < 2)               continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < 0.25)        continue;
+        if (subleadIDMVA() < 0.25)     continue;
       }
 
       else if (tag == "ttHHadronicTight") {
@@ -623,6 +663,19 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets", minID, n_jets(), evt_weight, vId); 
       vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets_entries", maxID, n_jets(), 1, vId);
       vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets_entries", minID, n_jets(), 1, vId);
+
+      if (n_jets() == 2) {
+	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets2", maxID, evt_weight, vId);
+	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets2", minID, evt_weight, vId);
+      }
+      else if (n_jets() == 3) {
+	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets3", maxID, evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets3", minID, evt_weight, vId);
+      }
+      else if (n_jets() >= 4) {
+	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets4+", maxID, evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets4+", minID, evt_weight, vId);
+      }
 
       vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, vId);
 

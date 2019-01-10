@@ -18,12 +18,12 @@ def combine_hists(hist1, hist2, name, jet_bin, overflow):
     target_hist.SetBinContent(i+1, hist1.GetBinContent(i+1, jet_bin_number))
     if overflow:
       for j in range(jet_bin_number, hist1.GetNbinsY()):
-        target_hist.AddBinContent(i+1, hist1.GetBinContent(i+1, jet_bin_number + j + 1))
+        target_hist.AddBinContent(i+1, hist1.GetBinContent(i+1, j + 1))
   for i in range(hist2.GetNbinsX()):
     target_hist.SetBinContent(hist1.GetNbinsX() + i + 1, hist2.GetBinContent(i+1, jet_bin_number))
     if overflow:
       for j in range(jet_bin_number, hist2.GetNbinsY()):
-        target_hist.AddBinContent(hist1.GetNbinsX() + i + 1, hist2.GetBinContent(i+1, jet_bin_number + j + 1))
+        target_hist.AddBinContent(hist1.GetNbinsX() + i + 1, hist2.GetBinContent(i+1, j + 1))
   for i in range(hist1.GetNbinsX() + hist2.GetNbinsX()):
     if target_hist.GetBinContent(i+1) < 0:
       target_hist.SetBinContent(i+1, 0)
@@ -87,6 +87,10 @@ initial_fracs = []
 for hist in hist_weighted_list:
   initial_fracs.append(hist.Integral() / h_data.Integral())
 
+#hists["ff"][0].Draw()
+#hists["ff"][1].Draw()
+#hists["ff"][2].Draw()
+
 # Fit
 mc = ROOT.TObjArray(4)
 mc.Add(hists["ff"][0])
@@ -99,8 +103,8 @@ for i in range(4):
   fit.SetWeight(i, hist_weights_list[i]) # set bin-by-bin weights for raw MC counts 
   if i == 3: # other bkgs, fix
     fit.Constrain(i, initial_fracs[i]-0.00000001, initial_fracs[i]+0.00000001)
-  else:
-    fit.Constrain(i, 0.0, 1.0)
+  #else:
+  #  fit.Constrain(i, 0.0, 1.0)
 
 fit.Fit()
 

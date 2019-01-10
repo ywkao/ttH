@@ -5,6 +5,8 @@ def sum_of_weights(weights, label, label_index):
   sum = 0
   for i in range(len(weights)):
     if label[i] == label_index:
+      if weights[i] > 999:
+        print weights[i]
       sum += weights[i]
   return sum
 

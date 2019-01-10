@@ -85,7 +85,7 @@ std::map<int, TString> mLeptonsLatex = {
 };
 
 
-void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, int idx, TString type = "std", TString year = "2016", bool loose_mva_cut = false, TFile* file_ref = nullptr) {
+void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, int idx, TString type = "std", TString year = "2016", bool loose_mva_cut = false, TFile* file_ref = nullptr, vector<TString> vExtraInfo = {}) {
 
   TString mva_category = loose_mva_cut ? "MVACategories_1" : "";
 
@@ -102,6 +102,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   TH1D* hSig_THQ = (TH1D*)file->Get(hist_name + "_THQ" + mva_category);
   TH1D* hSig_THW = (TH1D*)file->Get(hist_name + "_THW" + mva_category);
   vector<TH1D*> hSig = {hSig_TTH, hSig_THQ, hSig_THW};
+  hSig = {hSig_TTH};
 
   vector<TH1D*> hBkg;
   Comparison* c;
@@ -109,15 +110,27 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   vector<TString> vLegendLabels; 
   vector<int> vColors;
 
+  TString output = output_name;
+
   if (type =="std") {
-    if (year != "All")
-      vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
+    if (year != "All") {
+      vLegendLabels = {year + " Data", "ttH (M125)"};
+      //vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
+    }
     else if (file_ref != nullptr) 
       vLegendLabels = {"2018 Data", "2017 Data", "ttH (M125)"};
     else
       vLegendLabels = {"2016 + 2017 Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
     for (int i = 0; i < vBkgs.size(); i++) {
       hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + mva_category));
+      /*
+      if (output.Contains("Enriched") && vBkgs[i] == "QCD")
+        hBkg[i]->Scale(2.77);
+      if (output.Contains("Enriched") && vBkgs[i] == "GammaJets")
+        hBkg[i]->Scale(1.98);
+      if (output.Contains("Enriched") && vBkgs[i] == "DiPhoton")
+        hBkg[i]->Scale(1.18);
+      */
       vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
       vColors.push_back(mColors.find(vBkgs[i])->second);
     }
@@ -292,7 +305,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     }
   }
 
-  TString output = output_name;
+  //TString output = output_name;
   double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9))); 
   if (type == "std") {
     if (file_ref == nullptr)
@@ -452,6 +465,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->give_info("Loose MVA cut applied");
 
   if (hist_name.Contains("SigmaIEtaIEta"))      c->set_x_bin_range({1,50});
+
+  for (int i = 0; i < vExtraInfo.size(); i++)
+    c->give_info(vExtraInfo[i]);
 
   if (type == "individual_shape")
     c->plot(idx, false);
@@ -674,6 +690,15 @@ int main(int argc, char* argv[])
       make_plot(c1, vFiles[i], vNames[i], "hDiphotonMassResolutionHighMVA", "#sigma_{m_{#gamma#gamma}} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref);
       make_plot(c1, vFiles[i], vNames[i], "hDiphotonMassResolutionMedMVA", "#sigma_{m_{#gamma#gamma}} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref);
       make_plot(c1, vFiles[i], vNames[i], "hDiphotonMassResolutionLowMVA", "#sigma_{m_{#gamma#gamma}} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+
+      /*
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA_NJets2", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, {"N_{jets} == 2"});
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_NJets2", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, {"N_{jets} == 2"});     
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA_NJets3", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, {"N_{jets} == 3"});
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_NJets3", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, {"N_{jets} == 3"});
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA_NJets4+", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, {"N_{jets} #geq 4"});
+      make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_NJets4+", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, {"N_{jets} #geq 4"});
+      */
     }
 
     make_plot(c2, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, 1,type, year, loose_mva_cut, f_ref);

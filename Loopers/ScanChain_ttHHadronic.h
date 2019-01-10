@@ -54,6 +54,52 @@ bool pass_2017_mva_presel() {
   return true;
 }
 
+
+
+vector<float> make_object(TLorentzVector p4, vector<float> b_disc, float photon_idmva, float met_bool) { 
+// 0: pT, 1: eta, 2: phi, 3: E, 4: b disc, 5: bb disc, 6: c disc, 7: udsg disc, 8: photon ID MVA, 9: MET bool
+  vector<float> object;
+  object.push_back(p4.Pt());
+  object.push_back(p4.Eta());
+  object.push_back(p4.Phi());
+  object.push_back(p4.E());
+  object.push_back(b_disc[0]);
+  object.push_back(b_disc[1]);
+  object.push_back(b_disc[2]);
+  object.push_back(b_disc[3]);
+  object.push_back(photon_idmva);
+  object.push_back(met_bool); 
+
+  return object;
+}
+
+vector<vector<float>> sort_objects(vector<vector<float>> unordered_objects) { // sorts physics objects by pT
+  vector<vector<float>> ordered_objects;
+
+  std::vector<std::pair<int, double> > pt_ordering;
+
+  for (int i = 0; i < unordered_objects.size(); i++)
+    pt_ordering.push_back(std::pair<int, double>(i, unordered_objects[i][0]));
+
+  // sort
+  std::sort(pt_ordering.begin(), pt_ordering.end(), sortByValue);
+  for (int i = 0; i < unordered_objects.size(); i++)
+    ordered_objects.push_back(unordered_objects.at(pt_ordering[i].first));
+
+  return ordered_objects;
+}
+
+/*
+vector<float> make_objects(vector<TLorentzVector> jets, vector<TLorentzVector> photons, TLorentzVector met, 
+				vector<float> jet_discs, 
+) { // makes pT-ordered list of photons, jets + met in the event
+// 0: pT, 1: eta, 2: phi, 3: E, 4: b disc, 5: bb disc, 6: c disc, 7: udsg disc, 8: photon ID MVA, 9: MET bool
+
+
+}
+*/
+
+
 TLorentzVector make_lead_photon() {
   TLorentzVector pho;
   pho.SetPtEtaPhiE(leadPt(), leadEta(), leadPhi(), leadEnergy());
@@ -64,6 +110,267 @@ TLorentzVector make_sublead_photon() {
   TLorentzVector pho;
   pho.SetPtEtaPhiE(subleadPt(), subleadEta(), subleadPhi(), subleadEnergy());
   return pho;
+}
+
+vector<vector<float>> make_jet_objects(TString year) {
+  vector<vector<float>> jet_objects;
+
+  if (jet1_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet1_pt());
+    jet.push_back(jet1_eta());
+    jet.push_back(jet1_phi());
+    jet.push_back(jet1_energy());   
+    if (year == "2016")
+      jet.push_back(jet1_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet1_bdiscriminant());
+    jet.push_back(jet1_bbdiscriminant());
+    jet.push_back(jet1_cdiscriminant());
+    jet.push_back(jet1_udsgdiscriminant());   
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet2_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet2_pt());
+    jet.push_back(jet2_eta());
+    jet.push_back(jet2_phi());
+    jet.push_back(jet2_energy());
+    if (year == "2016")
+      jet.push_back(jet2_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet2_bdiscriminant());
+    jet.push_back(jet2_bbdiscriminant());
+    jet.push_back(jet2_cdiscriminant());
+    jet.push_back(jet2_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet3_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet3_pt());
+    jet.push_back(jet3_eta());
+    jet.push_back(jet3_phi());
+    jet.push_back(jet3_energy());
+    if (year == "2016")
+      jet.push_back(jet3_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet3_bdiscriminant());
+    jet.push_back(jet3_bbdiscriminant());
+    jet.push_back(jet3_cdiscriminant());
+    jet.push_back(jet3_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet4_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet4_pt());
+    jet.push_back(jet4_eta());
+    jet.push_back(jet4_phi());
+    jet.push_back(jet4_energy());
+    if (year == "2016")
+      jet.push_back(jet4_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet4_bdiscriminant());
+    jet.push_back(jet4_bbdiscriminant());
+    jet.push_back(jet4_cdiscriminant());
+    jet.push_back(jet4_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet5_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet5_pt());
+    jet.push_back(jet5_eta());
+    jet.push_back(jet5_phi());
+    jet.push_back(jet5_energy());
+    if (year == "2016")
+      jet.push_back(jet5_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet5_bdiscriminant());
+    jet.push_back(jet5_bbdiscriminant());
+    jet.push_back(jet5_cdiscriminant());
+    jet.push_back(jet5_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet6_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet6_pt());
+    jet.push_back(jet6_eta());
+    jet.push_back(jet6_phi());
+    jet.push_back(jet6_energy());
+    if (year == "2016")
+      jet.push_back(jet6_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet6_bdiscriminant());
+    jet.push_back(jet6_bbdiscriminant());
+    jet.push_back(jet6_cdiscriminant());
+    jet.push_back(jet6_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet7_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet7_pt());
+    jet.push_back(jet7_eta());
+    jet.push_back(jet7_phi());
+    jet.push_back(jet7_energy());
+    if (year == "2016")
+      jet.push_back(jet7_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet7_bdiscriminant());
+    jet.push_back(jet7_bbdiscriminant());
+    jet.push_back(jet7_cdiscriminant());
+    jet.push_back(jet7_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet8_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet8_pt());
+    jet.push_back(jet8_eta());
+    jet.push_back(jet8_phi());
+    jet.push_back(jet8_energy());
+    if (year == "2016")
+      jet.push_back(jet8_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet8_bdiscriminant());
+    jet.push_back(jet8_bbdiscriminant());
+    jet.push_back(jet8_cdiscriminant());
+    jet.push_back(jet8_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet9_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet9_pt());
+    jet.push_back(jet9_eta());
+    jet.push_back(jet9_phi());
+    jet.push_back(jet9_energy());
+    if (year == "2016")
+      jet.push_back(jet9_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet9_bdiscriminant());
+    jet.push_back(jet9_bbdiscriminant());
+    jet.push_back(jet9_cdiscriminant());
+    jet.push_back(jet9_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet10_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet10_pt());
+    jet.push_back(jet10_eta());
+    jet.push_back(jet10_phi());
+    jet.push_back(jet10_energy());
+    if (year == "2016")
+      jet.push_back(jet10_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet10_bdiscriminant());
+    jet.push_back(jet10_bbdiscriminant());
+    jet.push_back(jet10_cdiscriminant());
+    jet.push_back(jet10_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet11_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet11_pt());
+    jet.push_back(jet11_eta());
+    jet.push_back(jet11_phi());
+    jet.push_back(jet11_energy());
+    if (year == "2016")
+      jet.push_back(jet11_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet11_bdiscriminant());
+    jet.push_back(jet11_bbdiscriminant());
+    jet.push_back(jet11_cdiscriminant());
+    jet.push_back(jet11_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet12_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet12_pt());
+    jet.push_back(jet12_eta());
+    jet.push_back(jet12_phi());
+    jet.push_back(jet12_energy());
+    if (year == "2016")
+      jet.push_back(jet12_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet12_bdiscriminant());
+    jet.push_back(jet12_bbdiscriminant());
+    jet.push_back(jet12_cdiscriminant());
+    jet.push_back(jet12_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet13_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet13_pt());
+    jet.push_back(jet13_eta());
+    jet.push_back(jet13_phi());
+    jet.push_back(jet13_energy());
+    if (year == "2016")
+      jet.push_back(jet13_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet13_bdiscriminant());
+    jet.push_back(jet13_bbdiscriminant());
+    jet.push_back(jet13_cdiscriminant());
+    jet.push_back(jet13_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet14_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet14_pt());
+    jet.push_back(jet14_eta());
+    jet.push_back(jet14_phi());
+    jet.push_back(jet14_energy());
+    if (year == "2016")
+      jet.push_back(jet14_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet14_bdiscriminant());
+    jet.push_back(jet14_bbdiscriminant());
+    jet.push_back(jet14_cdiscriminant());
+    jet.push_back(jet14_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  if (jet15_pt() > 0) {
+    vector<float> jet;
+    jet.push_back(jet15_pt());
+    jet.push_back(jet15_eta());
+    jet.push_back(jet15_phi());
+    jet.push_back(jet15_energy());
+    if (year == "2016")
+      jet.push_back(jet15_b_DeepCSV_discriminant());
+    else
+      jet.push_back(jet15_bdiscriminant());
+    jet.push_back(jet15_bbdiscriminant());
+    jet.push_back(jet15_cdiscriminant());
+    jet.push_back(jet15_udsgdiscriminant());
+    jet.push_back(-999);
+    jet.push_back(-999);
+    jet_objects.push_back(jet);
+  }
+  return jet_objects;
 }
 
 vector<TLorentzVector> make_jets(vector<double> &btag_scores, TString year) {

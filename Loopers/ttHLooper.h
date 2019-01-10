@@ -138,6 +138,14 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_2D_histogram("hPhotonMaxIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5);
     v[i]->add_2D_histogram("hPhotonMinIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5); 
 
+    v[i]->add_histogram("hPhotonMaxIDMVA_NJets2", 30, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_NJets2", 30, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_NJets3", 30, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_NJets3", 30, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_NJets4+", 30, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_NJets4+", 30, -1, 1);
+
+
     v[i]->add_histogram("hDiphoMVA", 25, -1, 1);
 
     v[i]->add_histogram("hPhotonIDMVA_prompt", 5, -1, 1);
@@ -221,7 +229,7 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
   else if (currentFileTitle.Contains("QCD"))
     return 4;
 
-  else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || (currentFileTitle.Contains("TTJets"))) {
+  else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || (currentFileTitle.Contains("TTJets")) || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic")) {
     if (genPhotonId == 2) // pp
       return 5;
     if (genPhotonId == 1) // pf
@@ -265,7 +273,7 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
 int multiclassifier_label(TString currentFileTitle, int genPhotonId) {
   if (currentFileTitle.Contains("ttHJet"))
     return 0;
-  else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || currentFileTitle.Contains("TTJets")) {
+  else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic")) {
     if (genPhotonId == 2) // pp
       return 1;
     else if (genPhotonId == 1) // pf
@@ -304,14 +312,13 @@ bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
   return false;
 }
 
-//const double gjet_normalization = 3.110413;
-const double gjet_normalization = 2.67547;
-const double qcd_factor = 2.5065976174203226;
-const double gjets_factor = 1.86391094661595;
-const double diphoton_factor = 1.0995475862628403;
-const vector<double> qcd_factor_Njets = {2.269533145160364, 2.024662382399548, 1.352544126969397};
-const vector<double> gjets_factor_Njets = {1.7165242253403157, 2.6453778798237244, 3.8916874358473503};
-const vector<double> diphoton_factor_Njets = {1.1361539930556246, 0.8483317609911921, 0.628699806603429};
+const double gjet_normalization = 2.67547; // scale factor to make Pythia yield match MadGraph yield
+const double qcd_factor = 2.6302765969200204; 
+const double gjets_factor = 1.9817470714424696; 
+const double diphoton_factor = 1.1645911726186993; 
+const vector<double> qcd_factor_Njets = {2.2940045704500824, 1.7784105604582408, 1.7659539814519811}; 
+const vector<double> gjets_factor_Njets = {1.945909958008661, 2.865798441193098, 3.6723528776911034}; 
+const vector<double> diphoton_factor_Njets = {1.195047195435529, 0.9420013195895437, 0.8631697452232668}; 
 
 double qcdX_njets_bin(int n_jets) {
   if (n_jets == 2)
@@ -353,7 +360,8 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
 }
 
 bool is_low_stats_process(TString currentFileTitle) {
-  if (currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("QCD") || currentFileTitle.Contains("DY"))
+  //if (currentFileTitle.Contains("QCD") || currentFileTitle.Contains("DY") || currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic"))
+  if (currentFileTitle.Contains("QCD"))
     return true;
   return false;
 }
@@ -607,6 +615,9 @@ const vector<TString> vSamples_2016 = {
 			"TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			//"TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			//"TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			//"TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",	
 			// V + gamma
 			"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
@@ -627,8 +638,27 @@ const vector<TString> vSamples_2016 = {
 
 const vector<TString> vSamples_2017 = {
 			// Data
-			//"DoubleEG"
+			/*
+			"DoubleEG",
+			"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+			"DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa",
+			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8",
+			"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+			"GJets_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+			"GJets_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+			"GJets_HT-40To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+			"GJets_HT-600ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+			"QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+			"QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8",
+			"QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",
+			"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8",
+			"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8",
+			"TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8"
+			*/
 
+			
 			"DoubleEG_Run2017B-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017C-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017D-31Mar2018-v1_MINIAOD_forHualin_2017",
@@ -658,6 +688,8 @@ const vector<TString> vSamples_2017 = {
 			"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM_forHualin_2017",
 			"TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			//"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			//"TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
 			// V + gamma
 			"WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",

@@ -41,59 +41,63 @@ class BabyMaker {
 
     int 	label_;
     int         multi_label_;
-    double	evt_weight_;
+    int		data_sideband_label_;
+    float	evt_weight_;
     int 	process_id_;
-    double 	rand_;
-    double      super_rand_;
-    double      mass_;
-    double      lead_sigmaEtoE_;
-    double      sublead_sigmaEtoE_;
+    float 	rand_;
+    float      super_rand_;
+    float      mass_;
+    float      lead_sigmaEtoE_;
+    float      sublead_sigmaEtoE_;
+
+    // DNN Business
+    vector<vector<float>>  objects_;
 
     // Variable declarations
-    double           maxIDMVA_;
-    double           minIDMVA_;
-    double           max2_btag_;
-    double           max1_btag_;
+    float           maxIDMVA_;
+    float           minIDMVA_;
+    float           max2_btag_;
+    float           max1_btag_;
     float           dipho_delta_R;
-    int		njets_;
+    float		njets_;
     //int		nbjets_;
-    double	ht_;
+    float	ht_;
 
-    double	jet1_pt_;
-    double      jet1_eta_;
-    double 	jet1_btag_;
-    double      jet2_pt_;
-    double      jet2_eta_;
-    double      jet2_btag_;
-    double      jet3_pt_;
-    double      jet3_eta_;
-    double      jet3_btag_;
-    double      jet4_pt_;
-    double      jet4_eta_;
-    double      jet4_btag_;
-    double      jet5_pt_;
-    double      jet5_eta_;
-    double      jet5_btag_;
-    double      jet6_pt_;
-    double      jet6_eta_;
-    double      jet6_btag_;
+    float	jet1_pt_;
+    float      jet1_eta_;
+    float 	jet1_btag_;
+    float      jet2_pt_;
+    float      jet2_eta_;
+    float      jet2_btag_;
+    float      jet3_pt_;
+    float      jet3_eta_;
+    float      jet3_btag_;
+    float      jet4_pt_;
+    float      jet4_eta_;
+    float      jet4_btag_;
+    float      jet5_pt_;
+    float      jet5_eta_;
+    float      jet5_btag_;
+    float      jet6_pt_;
+    float      jet6_eta_;
+    float      jet6_btag_;
 
-    double      lead_pT_;
-    double      sublead_pT_;
-    double	leadptoM_;
-    double	subleadptoM_;
-    double	leadIDMVA_;
-    double 	subleadIDMVA_;
-    double      lead_eta_;
-    double      sublead_eta_;
+    float      lead_pT_;
+    float      sublead_pT_;
+    float	leadptoM_;
+    float	subleadptoM_;
+    float	leadIDMVA_;
+    float 	subleadIDMVA_;
+    float      lead_eta_;
+    float      sublead_eta_;
  
-    double      leadPSV_;
-    double      subleadPSV_;
+    float      leadPSV_;
+    float      subleadPSV_;
 
-    double	dipho_cosphi_;
-    double 	dipho_rapidity_;
-    double      dipho_pt_;
-    double      met_;    
+    float	dipho_cosphi_;
+    float 	dipho_rapidity_;
+    float      dipho_pt_;
+    float      met_;    
 };
 
 inline
@@ -106,6 +110,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("evt_weight_"     	, &evt_weight_  );
   BabyTree_->Branch("label_"     	, &label_       );
+  BabyTree_->Branch("multi_label_"            , &multi_label_       );
+  BabyTree_->Branch("data_sideband_label_"            , &data_sideband_label_       );
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
   BabyTree_->Branch("super_rand_"            , &super_rand_       );
@@ -113,6 +119,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("lead_sigmaEtoE_"             , &lead_sigmaEtoE_        );
   BabyTree_->Branch("sublead_sigmaEtoE_"             , &sublead_sigmaEtoE_        );
+
+  BabyTree_->Branch("objects_"             , &objects_        );
 
   // Variable branches
   BabyTree_->Branch("maxIDMVA_" ,&maxIDMVA_);

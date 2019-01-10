@@ -148,7 +148,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (pu_weight) {
 	evt_weight *= puweight();
       }
-      if (isnan(evt_weight) || isinf(evt_weight)) {
+      if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) {
 	continue; //some pu weights are nan/inf and this causes problems for histos 
       }
 

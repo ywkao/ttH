@@ -24,6 +24,7 @@ parser.add_argument("tag", help = "tag to identify this training", type=str)
 parser.add_argument("-m", "--multi", help = "run a multiclassifier based BDT", action="store_true")
 parser.add_argument("-d", "--data", help = "check ZA on data also", action="store_true")
 parser.add_argument("-r", "--res", help = "weight signal events by relative mass resolution", action = "store_true")
+parser.add_argument("-s", "--sideband", help = "use data sideband for training", action = "store_true")
 args = parser.parse_args()
 
 # Read features
@@ -38,6 +39,13 @@ weights = f['weights']
 mass = f['mass']
 lead_sigmaEtoE = f['lead_sigmaEtoE']
 sublead_sigmaEtoE = f['sublead_sigmaEtoE']
+
+if args.sideband:
+  global_features = f['global_data_sideband_mc']
+  label = f['label_data_sideband_mc']
+  multi_label = f['multi_label_data_sideband_mc']
+  weights = f['weights_data_sideband_mc']
+  mass = f['mass_data_sideband_mc']
 
 global_features_validation = f['global_validation']
 label_validation = f['label_validation']
@@ -288,8 +296,10 @@ if estimate_za:
   za = numpy.asarray(za)
 
   max_za = numpy.max(za)
-  print max_za
+  max_za_unc = za_unc[numpy.argmax(za)]
+  print max_za, max_za_unc
 
+  numpy.savez("za_%s.npz" % (args.channel + "_" + args.ext + "_" + args.tag), za = za, za_unc = za_unc, signal = s, bkg = b, sigma_eff = sigma_eff, za_data = za_data, za_unc_data = za_unc_data, signal_data = s_data, bkg_data = b_data, sigma_eff_data = sigma_eff_data)
   numpy.savez("sigma_eff.npz", sigma_eff = sigma_eff, n_sig = s)
 
   import matplotlib
@@ -298,21 +308,21 @@ if estimate_za:
 
   fig = plt.figure()
   ax1 = fig.add_subplot(111)
-  if not args.data:
-    ax1.plot(s, za, label='Best Guess of Optimal BDT', color = 'red')
-    ax1.fill_between(s, numpy.asarray(za) - numpy.asarray(za_unc), numpy.asarray(za) + numpy.asarray(za_unc), color = 'red', alpha = 0.25)
-    ax1.plot(s_ref, za_ref, label='Reproduce 2017 BDT (MC)', color = 'blue')
-    ax1.fill_between(s_ref, numpy.asarray(za_ref) - numpy.asarray(za_ref_unc), numpy.asarray(za_ref) + numpy.asarray(za_ref_unc), color = 'blue', alpha = 0.25)
-    ax1.plot(s_ref2, za_ref2, label='2017 ttH BDT (MC)', color = 'black', linestyle = '--', dashes = (5,2))
-    ax1.fill_between(s_ref2, numpy.asarray(za_ref2) - numpy.asarray(za_ref2_unc), numpy.asarray(za_ref2) + numpy.asarray(za_ref2_unc), color = 'black', alpha = 0.25)
+  #if not args.data:
+  ax1.plot(s, za, label='MC', color = 'red')
+  ax1.fill_between(s, numpy.asarray(za) - numpy.asarray(za_unc), numpy.asarray(za) + numpy.asarray(za_unc), color = 'red', alpha = 0.25)
+    #ax1.plot(s_ref, za_ref, label='Reproduce 2017 BDT (MC)', color = 'blue')
+    #ax1.fill_between(s_ref, numpy.asarray(za_ref) - numpy.asarray(za_ref_unc), numpy.asarray(za_ref) + numpy.asarray(za_ref_unc), color = 'blue', alpha = 0.25)
+    #ax1.plot(s_ref2, za_ref2, label='2017 ttH BDT (MC)', color = 'black', linestyle = '--', dashes = (5,2))
+    #ax1.fill_between(s_ref2, numpy.asarray(za_ref2) - numpy.asarray(za_ref2_unc), numpy.asarray(za_ref2) + numpy.asarray(za_ref2_unc), color = 'black', alpha = 0.25)
 
-  else:
-    ax1.plot(s_data, za_data, label='Best Guess of Optimal BDT', color = 'red')
-    ax1.fill_between(s_data, numpy.asarray(za_data) - numpy.asarray(za_unc_data), numpy.asarray(za_data) + numpy.asarray(za_unc_data), color = 'red', alpha = 0.25)
-    ax1.plot(s_ref_data, za_ref_data, label='Reproduce 2017 BDT (Data)', color = 'blue')
-    ax1.fill_between(s_ref_data, numpy.asarray(za_ref_data) - numpy.asarray(za_ref_unc_data), numpy.asarray(za_ref_data) + numpy.asarray(za_ref_unc_data), color = 'blue', alpha = 0.25)
-    ax1.plot(s_ref2_data, za_ref2_data, label='2017 ttH BDT (Data)', color = 'black', linestyle = '--', dashes = (5,2))
-    ax1.fill_between(s_ref2_data, numpy.asarray(za_ref2_data) - numpy.asarray(za_ref2_unc_data), numpy.asarray(za_ref2_data) + numpy.asarray(za_ref2_unc_data), color = 'black', alpha = 0.25)
+  #else:
+  ax1.plot(s_data, za_data, label='Data', color = 'black')
+  ax1.fill_between(s_data, numpy.asarray(za_data) - numpy.asarray(za_unc_data), numpy.asarray(za_data) + numpy.asarray(za_unc_data), color = 'black', alpha = 0.25)
+    #ax1.plot(s_ref_data, za_ref_data, label='Reproduce 2017 BDT (Data)', color = 'blue')
+    #ax1.fill_between(s_ref_data, numpy.asarray(za_ref_data) - numpy.asarray(za_ref_unc_data), numpy.asarray(za_ref_data) + numpy.asarray(za_ref_unc_data), color = 'blue', alpha = 0.25)
+    #ax1.plot(s_ref2_data, za_ref2_data, label='2017 ttH BDT (Data)', color = 'black', linestyle = '--', dashes = (5,2))
+    #ax1.fill_between(s_ref2_data, numpy.asarray(za_ref2_data) - numpy.asarray(za_ref2_unc_data), numpy.asarray(za_ref2_data) + numpy.asarray(za_ref2_unc_data), color = 'black', alpha = 0.25)
 
 
   plt.xlabel('# Signal Events')
