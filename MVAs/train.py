@@ -17,69 +17,51 @@ import significance_utils
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("channel", help = "e.g. Hadronic or Leptonic", type=str)
-parser.add_argument("input", help = "input hdf5 file", type=str)
-parser.add_argument("ext", help = "extension, e.g. '1'", type=str)
-parser.add_argument("tag", help = "tag to identify this training", type=str)
+parser.add_argument("--channel", help = "e.g. Hadronic or Leptonic", type=str)
+parser.add_argument("--input", help = "input hdf5 file", type=str)
+parser.add_argument("--ext", help = "extension, e.g. '1'", type=str)
+parser.add_argument("--tag", help = "tag to identify this training", type=str)
 parser.add_argument("-m", "--multi", help = "run a multiclassifier based BDT", action="store_true")
-parser.add_argument("-d", "--data", help = "check ZA on data also", action="store_true")
 parser.add_argument("-r", "--res", help = "weight signal events by relative mass resolution", action = "store_true")
 parser.add_argument("-s", "--sideband", help = "use data sideband for training", action = "store_true")
+parser.add_argument("--optimization_vars", help = "csv list of additional variables to perform N-d Z_A optimization scan in (along with BDT score)", type=str)
 args = parser.parse_args()
 
-# Read features
+### Read features ###
 f = h5py.File(args.input.replace(".hdf5", "") + ".hdf5", "r")
 
-feature_names = f['feature_names']
+feature_names = utils.load_array(f, 'feature_names')
+training_feature_names = utils.load_array(f, 'training_feature_names')
 
-global_features = f['global']
-label = f['label']
-multi_label = f['multi_label']
-weights = f['weights']
-mass = f['mass']
-lead_sigmaEtoE = f['lead_sigmaEtoE']
-sublead_sigmaEtoE = f['sublead_sigmaEtoE']
+global_features = utils.load_array(f, 'global')
+label = utils.load_array(f, 'label')
+multi_label = utils.load_array(f, 'multi_label')
+weights = utils.load_array(f, 'weights')
+mass = utils.load_array(f, 'mass')
+lead_sigmaEtoE = utils.load_array(f, 'lead_sigmaEtoE')
+sublead_sigmaEtoE = utils.load_array(f, 'sublead_sigmaEtoE')
 
 if args.sideband:
-  global_features = f['global_data_sideband_mc']
-  label = f['label_data_sideband_mc']
-  multi_label = f['multi_label_data_sideband_mc']
-  weights = f['weights_data_sideband_mc']
-  mass = f['mass_data_sideband_mc']
+  global_features = utils.load_array(f, 'global_data_sideband')
+  label = utils.load_array(f, 'label_data_sideband')
+  multi_label = utils.load_array(f, 'multi_label_data_sideband')
+  weights = utils.load_array(f, 'weights_data_sideband')
+  mass = utils.load_array(f, 'mass_data_sideband')
+  #lead_sigmaEtoE = utils.load_array(f, 'lead_sigmaEtoE_data_sideband')
+  #sublead_sigmaEtoE = utils.load_array(f, 'sublead_sigmaEtoE_data_sideband')
 
-global_features_validation = f['global_validation']
-label_validation = f['label_validation']
-multi_label_validation = f['multi_label_validation']
-weights_validation = f['weights_validation']
-mass_validation = f['mass_validation']
+global_features_validation = utils.load_array(f, 'global_validation')
+label_validation = utils.load_array(f, 'label_validation')
+multi_label_validation = utils.load_array(f, 'multi_label_validation')
+weights_validation = utils.load_array(f, 'weights_validation')
+mass_validation = utils.load_array(f, 'mass_validation')
 
-global_features_data = f['global_data']
-label_data = f['label_data']
-multi_label_data = f['multi_label_data']
-weights_data = f['weights_data']
-mass_data = f['mass_data']
+global_features_data = utils.load_array(f, 'global_data')
+label_data = utils.load_array(f, 'label_data')
+multi_label_data = utils.load_array(f, 'multi_label_data')
+weights_data = utils.load_array(f, 'weights_data')
+mass_data = utils.load_array(f, 'mass_data')
 
-global_features = numpy.asarray(global_features)
-label = numpy.asarray(label)
-multi_label = numpy.asarray(multi_label)
-weights = numpy.asarray(weights)
-mass = numpy.asarray(mass)
-lead_sigmaEtoE = numpy.asarray(lead_sigmaEtoE)
-sublead_sigmaEtoE = numpy.asarray(sublead_sigmaEtoE)
-
-global_features_validation = numpy.asarray(global_features_validation)
-label_validation = numpy.asarray(label_validation)
-multi_label_validation = numpy.asarray(multi_label_validation)
-weights_validation = numpy.asarray(weights_validation)
-mass_validation = numpy.asarray(mass_validation)
-
-global_features_data = numpy.asarray(global_features_data)
-label_data = numpy.asarray(label_data)
-multi_label_data = numpy.asarray(multi_label_data)
-weights_data = numpy.asarray(weights_data)
-mass_data = numpy.asarray(mass_data)
-
-feature_names = numpy.asarray(feature_names)
 
 train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
 nTrain = int(len(label)*train_frac)
@@ -96,13 +78,12 @@ print global_features_data.shape
 print label_data.shape
 print weights_data.shape
 
-
 x_train, y_train, y_train_multi, weights_train = global_features, label, multi_label, weights
 x_test, y_test, y_test_multi, weights_test  = global_features_validation, label_validation, multi_label_validation, weights_validation
 
-X_train = pandas.DataFrame(data=x_train, columns = feature_names)
-X_test = pandas.DataFrame(data=x_test, columns = feature_names)
-X_data = pandas.DataFrame(data=global_features_data, columns = feature_names)
+X_train = pandas.DataFrame(data=x_train, columns = training_feature_names)
+X_test = pandas.DataFrame(data=x_test, columns = training_feature_names)
+X_data = pandas.DataFrame(data=global_features_data, columns = training_feature_names)
 
 if args.multi:
   Y_train = y_train_multi 
@@ -256,30 +237,10 @@ plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
 estimate_za = True
 if estimate_za:
-  ref_file = "/home/users/sjmay/ttH/Loopers/Optimization/ZA_curves/MVAOptimizationBaby_1_Leptonic_reproduce_1_bdt.npz"
-  ref2_file = "/home/users/sjmay/ttH/Loopers/Optimization/ZA_curves/MVAOptimizationBaby_1_Leptonic_baseline_20var_14Oct2018_1_bdt.npz"
-  ref_results = numpy.load(ref_file)
-  ref2_results = numpy.load(ref2_file)
-
-  s_ref = ref_results["n_sig_mc"]
-  za_ref = ref_results["za_mc"]
-  za_ref_unc = ref_results["za_unc_mc"]
-
-  s_ref_data = ref_results["n_sig_data"]
-  za_ref_data = ref_results["za_data"]
-  za_ref_unc_data = ref_results["za_unc_data"]
-
-  s_ref2 = ref2_results["n_sig_mc_ref"]
-  za_ref2 = ref2_results["za_mc_ref"]
-  za_ref2_unc = ref2_results["za_unc_mc_ref"]
-
-  s_ref2_data = ref2_results["n_sig_data_ref"]
-  za_ref2_data = ref2_results["za_data_ref"]
-  za_ref2_unc_data = ref2_results["za_unc_data_ref"]
-
-  n_quantiles = 100
-  signal_mva_scores = ks_test.logical_vector(pred_test, y_test, 1)
-  bkg_mva_scores = ks_test.logical_vector(pred_test, y_test, 0)
+  n_quantiles = 15
+  signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
+  bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}
+  data_mva_scores = {"bdt_score" : pred_data}
 
   signal_mass = ks_test.logical_vector(mass_validation, y_test, 1)
   bkg_mass = ks_test.logical_vector(mass_validation, y_test, 0)
@@ -287,9 +248,15 @@ if estimate_za:
   signal_weights = ks_test.logical_vector(weights_validation, y_test, 1)
   bkg_weights = ks_test.logical_vector(weights_validation, y_test, 0)
 
-  signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores }
-  bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores }
-  data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : pred_data }  
+  optimization_vars = args.optimization_vars.split(",")
+  for var in optimization_vars: 
+    signal_mva_scores[var] = ks_test.logical_vector(utils.load_array(f, var + '_validation'), y_test, 1)
+    bkg_mva_scores[var]    = ks_test.logical_vector(utils.load_array(f, var + '_validation'), y_test, 0)
+    data_mva_scores[var]   = utils.load_array(f, var + '_data')
+
+  signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores } 
+  bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores } 
+  data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores } 
 
   za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False)
   za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True)
@@ -308,22 +275,10 @@ if estimate_za:
 
   fig = plt.figure()
   ax1 = fig.add_subplot(111)
-  #if not args.data:
   ax1.plot(s, za, label='MC', color = 'red')
   ax1.fill_between(s, numpy.asarray(za) - numpy.asarray(za_unc), numpy.asarray(za) + numpy.asarray(za_unc), color = 'red', alpha = 0.25)
-    #ax1.plot(s_ref, za_ref, label='Reproduce 2017 BDT (MC)', color = 'blue')
-    #ax1.fill_between(s_ref, numpy.asarray(za_ref) - numpy.asarray(za_ref_unc), numpy.asarray(za_ref) + numpy.asarray(za_ref_unc), color = 'blue', alpha = 0.25)
-    #ax1.plot(s_ref2, za_ref2, label='2017 ttH BDT (MC)', color = 'black', linestyle = '--', dashes = (5,2))
-    #ax1.fill_between(s_ref2, numpy.asarray(za_ref2) - numpy.asarray(za_ref2_unc), numpy.asarray(za_ref2) + numpy.asarray(za_ref2_unc), color = 'black', alpha = 0.25)
-
-  #else:
   ax1.plot(s_data, za_data, label='Data', color = 'black')
   ax1.fill_between(s_data, numpy.asarray(za_data) - numpy.asarray(za_unc_data), numpy.asarray(za_data) + numpy.asarray(za_unc_data), color = 'black', alpha = 0.25)
-    #ax1.plot(s_ref_data, za_ref_data, label='Reproduce 2017 BDT (Data)', color = 'blue')
-    #ax1.fill_between(s_ref_data, numpy.asarray(za_ref_data) - numpy.asarray(za_ref_unc_data), numpy.asarray(za_ref_data) + numpy.asarray(za_ref_unc_data), color = 'blue', alpha = 0.25)
-    #ax1.plot(s_ref2_data, za_ref2_data, label='2017 ttH BDT (Data)', color = 'black', linestyle = '--', dashes = (5,2))
-    #ax1.fill_between(s_ref2_data, numpy.asarray(za_ref2_data) - numpy.asarray(za_ref2_unc_data), numpy.asarray(za_ref2_data) + numpy.asarray(za_ref2_unc_data), color = 'black', alpha = 0.25)
-
 
   plt.xlabel('# Signal Events')
   ax1.set_ylabel('Significance (Z_A)')

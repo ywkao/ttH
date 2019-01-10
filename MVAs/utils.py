@@ -19,3 +19,8 @@ def shuffle(x, y, weights):
   weights = numpy.asarray(weights)
   weights = weights[rand]
   return x, y, weights
+
+def load_array(file, name):
+  array = file[name]
+  array = numpy.asarray(array)
+  return array

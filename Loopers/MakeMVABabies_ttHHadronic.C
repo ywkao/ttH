@@ -214,7 +214,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	if (!(leadIDMVA() > -0.2 && subleadIDMVA() > -0.2))
 	  data_sideband_label_ = 1;
 	else
-	  data_sideband_label_ = 1;
+	  data_sideband_label_ = 0;
       }
 
       // Variable definitions
