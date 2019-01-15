@@ -1,0 +1,154 @@
+####################
+### Leptonic BDT ###
+####################
+
+Trained on MC, using weights as calculated from flashgg.
+Does not use QCD for training.
+No external normalization applied to QCD + X samples. Apply simple overlap removal for QCD + X samples.
+Apply overlap removal for tt+X samples.
+List of samples used for bkg in training:
+ - QCD + X: DiPhoton + jets, Gamma + jets (Pythia)
+ - tt  + X: TT + jets (semileptonic and dileptonic MC samples), TT + gamma + jets, TT + gamma gamma
+ - X + gamma: Drell-Yan, W + gamma, t + gamma (no Z + gamma available for 2017 yet) 
+ - Other signal modes: tHW, tHQ, VBF, VH, ggH
+
+List of 20 BDT scores and respective signal/bkg yields along with Z_A estimate of significance (bkg estimated from data)
+{'bdt_score': 0.98455888}
+s: 0.257 +/- 0.026, b: 999999.000 +/- 999999.000, mean_eff: 124.755, sigma_eff: 1.692
+za: 0.000 +/- 0.000
+{'bdt_score': 0.97783047}
+s: 0.540 +/- 0.037, b: 0.068 +/- 0.068, mean_eff: 124.639, sigma_eff: 1.643
+za: 1.261 +/- 0.317
+{'bdt_score': 0.97028226}
+s: 0.781 +/- 0.045, b: 0.206 +/- 0.119, mean_eff: 124.635, sigma_eff: 1.674
+za: 1.236 +/- 0.221
+{'bdt_score': 0.96224397}
+s: 1.021 +/- 0.051, b: 0.345 +/- 0.154, mean_eff: 124.689, sigma_eff: 1.676
+za: 1.311 +/- 0.194
+{'bdt_score': 0.95329118}
+s: 1.322 +/- 0.057, b: 0.499 +/- 0.188, mean_eff: 124.681, sigma_eff: 1.732
+za: 1.440 +/- 0.185
+{'bdt_score': 0.9432382}
+s: 1.575 +/- 0.062, b: 0.728 +/- 0.230, mean_eff: 124.690, sigma_eff: 1.771
+za: 1.467 +/- 0.166
+{'bdt_score': 0.93280071}
+s: 1.795 +/- 0.067, b: 1.034 +/- 0.276, mean_eff: 124.682, sigma_eff: 1.795
+za: 1.451 +/- 0.147
+{'bdt_score': 0.92154443}
+s: 2.014 +/- 0.072, b: 1.276 +/- 0.309, mean_eff: 124.684, sigma_eff: 1.825
+za: 1.485 +/- 0.139
+{'bdt_score': 0.90875262}
+s: 2.268 +/- 0.076, b: 1.454 +/- 0.334, mean_eff: 124.713, sigma_eff: 1.861
+za: 1.569 +/- 0.140
+{'bdt_score': 0.8944633}
+s: 2.526 +/- 0.080, b: 1.939 +/- 0.388, mean_eff: 124.764, sigma_eff: 1.886
+za: 1.548 +/- 0.125
+{'bdt_score': 0.8773641}
+s: 2.764 +/- 0.084, b: 2.340 +/- 0.427, mean_eff: 124.782, sigma_eff: 1.896
+za: 1.560 +/- 0.118
+{'bdt_score': 0.85659814}
+s: 3.024 +/- 0.088, b: 3.227 +/- 0.504, mean_eff: 124.793, sigma_eff: 1.914
+za: 1.489 +/- 0.101
+{'bdt_score': 0.83237553}
+s: 3.275 +/- 0.091, b: 4.090 +/- 0.567, mean_eff: 124.793, sigma_eff: 1.913
+za: 1.454 +/- 0.091
+{'bdt_score': 0.80189115}
+s: 3.594 +/- 0.095, b: 5.023 +/- 0.633, mean_eff: 124.779, sigma_eff: 1.939
+za: 1.454 +/- 0.084
+{'bdt_score': 0.76153493}
+s: 3.833 +/- 0.098, b: 6.295 +/- 0.708, mean_eff: 124.773, sigma_eff: 1.938
+za: 1.402 +/- 0.075
+{'bdt_score': 0.70994711}
+s: 4.083 +/- 0.101, b: 8.301 +/- 0.814, mean_eff: 124.771, sigma_eff: 1.941
+za: 1.320 +/- 0.064
+{'bdt_score': 0.63714975}
+s: 4.394 +/- 0.104, b: 10.486 +/- 0.920, mean_eff: 124.760, sigma_eff: 1.961
+za: 1.276 +/- 0.057
+{'bdt_score': 0.53064644}
+s: 4.632 +/- 0.108, b: 14.357 +/- 1.085, mean_eff: 124.752, sigma_eff: 1.995
+za: 1.164 +/- 0.048
+{'bdt_score': 0.37436581}
+s: 4.954 +/- 0.110, b: 22.171 +/- 1.357, mean_eff: 124.759, sigma_eff: 2.019
+za: 1.016 +/- 0.036
+{'bdt_score': 0.019689571}
+s: 5.210 +/- 0.113, b: 75.365 +/- 2.509, mean_eff: 124.765, sigma_eff: 2.032
+za: 0.593 +/- 0.016
+
+
+
+####################
+### Hadronic BDT ###
+####################
+
+Trained on MC, using weights as calculated from flashgg. 
+Use BDT-reweighted Gamma + Jets Pythia sample (reweighted to match MadGraph)
+Scale normalization of Gamma + Jets and DiPhoton events based on results from NJets-binned templated fits in min/max photon IDMVA.
+Does not use QCD for training.
+Apply overlap removal for tt+X samples.
+List of samples used for bkg in training:
+ - QCD + X: DiPhoton + jets, Gamma + jets (reweighted Pythia)
+ - tt  + X: TT + jets (inclusive decay MC samples), TT + gamma + jets, TT + gamma gamma
+ - X + gamma: Drell-Yan, W + gamma, t + gamma (no Z + gamma available for 2017 yet)
+ - Other signal modes: tHW, tHQ, VBF, VH, ggH
+
+List of 20 BDT scores and respective signal/bkg yields along with Z_A estimate of significance (bkg estimated from data)
+{'bdt_score': 0.99816787}
+s: 0.629 +/- 0.040, b: 999999.000 +/- 999999.000, mean_eff: 124.671, sigma_eff: 1.596
+za: 0.001 +/- 0.000
+{'bdt_score': 0.99745768}
+s: 1.135 +/- 0.056, b: 0.420 +/- 0.172, mean_eff: 124.712, sigma_eff: 1.703
+za: 1.342 +/- 0.186
+{'bdt_score': 0.99680448}
+s: 1.741 +/- 0.068, b: 0.835 +/- 0.241, mean_eff: 124.744, sigma_eff: 1.692
+za: 1.524 +/- 0.160
+{'bdt_score': 0.99610561}
+s: 2.377 +/- 0.079, b: 1.812 +/- 0.355, mean_eff: 124.765, sigma_eff: 1.695
+za: 1.506 +/- 0.120
+{'bdt_score': 0.99538201}
+s: 2.896 +/- 0.088, b: 2.787 +/- 0.441, mean_eff: 124.739, sigma_eff: 1.694
+za: 1.519 +/- 0.103
+{'bdt_score': 0.99455774}
+s: 3.503 +/- 0.096, b: 3.480 +/- 0.497, mean_eff: 124.742, sigma_eff: 1.727
+za: 1.649 +/- 0.102
+{'bdt_score': 0.99358845}
+s: 4.084 +/- 0.104, b: 4.859 +/- 0.594, mean_eff: 124.750, sigma_eff: 1.763
+za: 1.656 +/- 0.091
+{'bdt_score': 0.99243236}
+s: 4.669 +/- 0.111, b: 7.206 +/- 0.724, mean_eff: 124.731, sigma_eff: 1.770
+za: 1.589 +/- 0.076
+{'bdt_score': 0.99105668}
+s: 5.263 +/- 0.118, b: 10.899 +/- 0.893, mean_eff: 124.717, sigma_eff: 1.779
+za: 1.487 +/- 0.062
+{'bdt_score': 0.98933512}
+s: 5.819 +/- 0.124, b: 15.430 +/- 1.067, mean_eff: 124.719, sigma_eff: 1.795
+za: 1.401 +/- 0.052
+{'bdt_score': 0.98708689}
+s: 6.408 +/- 0.130, b: 21.592 +/- 1.266, mean_eff: 124.729, sigma_eff: 1.804
+za: 1.318 +/- 0.044
+{'bdt_score': 0.98417735}
+s: 7.025 +/- 0.136, b: 30.330 +/- 1.502, mean_eff: 124.740, sigma_eff: 1.808
+za: 1.230 +/- 0.037
+{'bdt_score': 0.97994459}
+s: 7.652 +/- 0.141, b: 41.900 +/- 1.772, mean_eff: 124.746, sigma_eff: 1.823
+za: 1.149 +/- 0.031
+{'bdt_score': 0.97394675}
+s: 8.231 +/- 0.146, b: 55.940 +/- 2.056, mean_eff: 124.752, sigma_eff: 1.838
+za: 1.075 +/- 0.027
+{'bdt_score': 0.96423119}
+s: 8.838 +/- 0.151, b: 81.739 +/- 2.499, mean_eff: 124.753, sigma_eff: 1.858
+za: 0.961 +/- 0.022
+{'bdt_score': 0.94762599}
+s: 9.489 +/- 0.156, b: 121.696 +/- 3.073, mean_eff: 124.760, sigma_eff: 1.887
+za: 0.849 +/- 0.017
+{'bdt_score': 0.91664082}
+s: 10.118 +/- 0.161, b: 182.348 +/- 3.780, mean_eff: 124.771, sigma_eff: 1.905
+za: 0.742 +/- 0.014
+{'bdt_score': 0.84297496}
+s: 10.771 +/- 0.166, b: 303.361 +/- 4.901, mean_eff: 124.770, sigma_eff: 1.925
+za: 0.615 +/- 0.011
+{'bdt_score': 0.62675124}
+s: 11.394 +/- 0.170, b: 593.696 +/- 6.887, mean_eff: 124.759, sigma_eff: 1.942
+za: 0.466 +/- 0.007
+{'bdt_score': 0.002003175}
+s: 12.093 +/- 0.175, b: 6139.267 +/- 22.211, mean_eff: 124.760, sigma_eff: 1.954
+za: 0.154 +/- 0.002

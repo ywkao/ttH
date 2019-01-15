@@ -16,7 +16,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   OptimizationBabyMaker* baby = new OptimizationBabyMaker();
   TString xml_file_noExt = xml_file;
   xml_file_noExt.ReplaceAll(".xml", "");
-  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt;
+  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt + "_" + tag;
   baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
 
   // Create "process" objects
@@ -39,13 +39,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   unique_ptr<TMVA::Reader> gjet_mva;
 
   // Declare BDT vars
+  float top_tag_score_;
+
   float maxIDMVA_;
   float minIDMVA_;
   float max2_btag_;
   float max1_btag_;
   float dipho_delta_R;
   float njets_;
-  //float nbjets_;
+  float nbjets_;
   float ht_;
   float lead_pT_;
   float sublead_pT_;
@@ -86,6 +88,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   if (evaluate_mva) {
     mva.reset(new TMVA::Reader( "!Color:Silent" ));
+
     mva->AddVariable("maxIDMVA_", &maxIDMVA_);
     mva->AddVariable("minIDMVA_", &minIDMVA_);
     mva->AddVariable("max2_btag_", &max2_btag_);
@@ -113,12 +116,12 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("jet4_pt_", &jet4_pt_);
     mva->AddVariable("jet4_eta_", &jet4_eta_);
     mva->AddVariable("jet4_btag_", &jet4_btag_);
-    mva->AddVariable("jet5_pt_", &jet5_pt_);
-    mva->AddVariable("jet5_eta_", &jet5_eta_);
-    mva->AddVariable("jet5_btag_", &jet5_btag_);
-    mva->AddVariable("jet6_pt_", &jet6_pt_);
-    mva->AddVariable("jet6_eta_", &jet6_eta_);
-    mva->AddVariable("jet6_btag_", &jet6_btag_);
+    //mva->AddVariable("jet5_pt_", &jet5_pt_);
+    //mva->AddVariable("jet5_eta_", &jet5_eta_);
+    //mva->AddVariable("jet5_btag_", &jet5_btag_);
+    //mva->AddVariable("jet6_pt_", &jet6_pt_);
+    //mva->AddVariable("jet6_eta_", &jet6_eta_);
+    //mva->AddVariable("jet6_btag_", &jet6_btag_);
 
 
     mva->AddVariable("leadPSV_", &leadPSV_);
@@ -127,6 +130,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
     mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
     mva->AddVariable("met_", &met_);
+
+    mva->AddVariable("top_tag_score_", &top_tag_score_);
 
     mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }
@@ -271,33 +276,33 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       double mva_value = -999;
 
       // Calculate MVA value
-        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        max2_btag_ = btag_scores_sorted[1].second;
-        max1_btag_ = btag_scores_sorted[0].second;
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      max2_btag_ = btag_scores_sorted[1].second;
+      max1_btag_ = btag_scores_sorted[0].second;
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
       ht_ = get_ht(jets);
       njets_ = n_jets();
-      //nbjets_ = nb_medium();
-      jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
-      jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
-      jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
-      jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
-      jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
-      jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
-      jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
-      jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
-      jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
-      jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
-      jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
-      jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;
-      jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
-      jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
-      jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
-      jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
-      jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
-      jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
+      nbjets_ = nb_medium();
 
+      jet1_pt_   = njets_ >= 1 ? jets[0].Pt()   : -999;
+      jet1_eta_  = njets_ >= 1 ? jets[0].Eta()  : -999;
+      jet1_btag_ = njets_ >= 1 ? btag_scores[0] : -999;
+      jet2_pt_   = njets_ >= 2 ? jets[1].Pt()   : -999; 
+      jet2_eta_  = njets_ >= 2 ? jets[1].Eta()  : -999;
+      jet2_btag_ = njets_ >= 2 ? btag_scores[1] : -999;
+      jet3_pt_   = njets_ >= 3 ? jets[2].Pt()   : -999;
+      jet3_eta_  = njets_ >= 3 ? jets[2].Eta()  : -999;
+      jet3_btag_ = njets_ >= 3 ? btag_scores[2] : -999;
+      jet4_pt_   = njets_ >= 4 ? jets[3].Pt()   : -999;
+      jet4_eta_  = njets_ >= 4 ? jets[3].Eta()  : -999;
+      jet4_btag_ = njets_ >= 4 ? btag_scores[3] : -999;
+      jet5_pt_   = njets_ >= 5 ? jets[4].Pt()   : -999;
+      jet5_eta_  = njets_ >= 5 ? jets[4].Eta()  : -999;
+      jet5_btag_ = njets_ >= 5 ? btag_scores[4] : -999;
+      jet6_pt_   = njets_ >= 6 ? jets[5].Pt()   : -999;
+      jet6_eta_  = njets_ >= 6 ? jets[5].Eta()  : -999;
+      jet6_btag_ = njets_ >= 6 ? btag_scores[5] : -999;
 
       lead_pT_ = leadPt();
       sublead_pT_ = subleadPt();
@@ -317,7 +322,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       met_ = MetPt();
 
       if (evaluate_mva) 
-        mva_value = mva->EvaluateMVA( "BDT" );
+        mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       double reference_mva = tthMVA();
       bool pass_ref_presel = mYear == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
       double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
@@ -356,17 +361,79 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
 
       // Selection
-      if ((currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTGJets"))) {
-        if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
-      }
 
+      // Skipping events/samples
+      //if (is_low_stats_process(currentFileTitle))       continue;
+      //if (tag != "GJet_Reweight_Preselection") {
+      //  if (process_id_ == 17)                          continue; // skip MadGraph G+Jets
+      //}
+      if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
+      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
       if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
+
+
+
 
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHHadronic_baseline_maxZA") {
+	if (mass() < 100)                continue;
+	if (n_jets() < 3)               continue;
+	if (nb_loose() < 1)             continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (mva_value <= 0.99222237)      continue; // should give about 4.054 signal events
+      }
+      else if (tag == "ttHHadronic_data_sideband_0b_train") {
+	if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_medium() != 0)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+      else if (tag == "ttHHadronic_data_sideband_0b_test") {
+	if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_medium() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+      else if (tag == "ttHHadronic_data_sideband_0b_maxZA") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_medium() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (max1_btag_ < 0.8970)	 continue;
+	if (max2_btag_ < 0.0059)	 continue;
+	//cout << convert_tmva_to_prob(mva_value) << endl;
+	if (mva_value <= 0.98858553)	 continue; // should give about 4.377 signal events
+      }
+      else if (tag == "ttHHadronic_data_sideband_phoID_train") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 3)                continue;
+        if (nb_medium() < 1)             continue;
+	//if (minIDMVA_ > -0.2)		 continue;
+	if (leadIDMVA() >= -0.2 || subleadIDMVA() >= -0.2)	continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+      else if (tag == "ttHHadronic_data_sideband_phoID_test") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 3)                continue;
+        if (nb_medium() < 1)             continue;
+	//if (minIDMVA_ < -0.2)		 continue;
+	if (leadIDMVA() < -0.2 && subleadIDMVA() < -0.2)        continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+      else if (tag == "ttHHadronic_data_sideband_phoID_maxZA") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 3)                continue;
+        if (nb_medium() < 1)             continue;
+	if (maxIDMVA_ <= 0.8988)	 continue;
+	if (minIDMVA_ <= -0.1999)	 continue;
+	if (mva_value <= 0.96921831)	 continue; // should give about 4.2 signal events
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
       else if (tag == "ttHHadronic_data_sideband_train") {

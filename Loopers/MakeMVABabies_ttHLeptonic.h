@@ -40,25 +40,67 @@ class BabyMaker {
     
     int 	label_;
     int 	multi_label_;
-    double	evt_weight_;
+    float	evt_weight_;
     int 	process_id_;
-    double	rand_;
-    double 	super_rand_;
-    double	mass_;
-    double 	lead_sigmaEtoE_;
-    double 	sublead_sigmaEtoE_;
+    float	rand_;
+    float 	super_rand_;
+    float	mass_;
+    float 	lead_sigmaEtoE_;
+    float 	sublead_sigmaEtoE_;
 
 
     // Variable declarations
-    double           lep_pt_;
-    double           minIDMVA_;
-    double           maxIDMVA_;
-    int           subleadPSV_;
-    int           leadPSV_;
-    int           nb_loose_;
-    int           njets_;
+    float       maxIDMVA_;
+    float       minIDMVA_;
+    float       max2_btag_;
+    float       max1_btag_;
+    float       dipho_delta_R;
+    float       njets_;
+    int         nbjets_;
+    float       ht_;
 
+    float	top_tag_score_;
 
+    float       lep_pt_;
+    float 	lep_eta_;
+
+    float      	jet1_pt_;
+    float	jet1_eta_;
+    float       jet1_btag_;
+    float      	jet2_pt_;
+    float      	jet2_eta_;
+    float      	jet2_btag_;
+    float      	jet3_pt_;
+    float      	jet3_eta_;
+    float      	jet3_btag_;
+    float      	jet4_pt_;
+    float      	jet4_eta_;
+    float      	jet4_btag_;
+    float      	jet5_pt_;
+    float      	jet5_eta_;
+    float      	jet5_btag_;
+    float      	jet6_pt_;
+    float      	jet6_eta_;
+    float      	jet6_btag_;
+
+    float      	lead_pT_;
+    float      	sublead_pT_;
+    float       leadptoM_;
+    float       subleadptoM_;
+    float       leadIDMVA_;
+    float       subleadIDMVA_;
+    float      	lead_eta_;
+    float      	sublead_eta_;
+    float       lead_phi_;
+    float       sublead_phi_;
+
+    float       leadPSV_;
+    float       subleadPSV_;
+
+    float       dipho_cosphi_;
+    float       dipho_rapidity_;
+    float       dipho_pt_;
+    float       met_;
  
 
 
@@ -84,14 +126,56 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("sublead_sigmaEtoE_"             , &sublead_sigmaEtoE_        );
 
   // Variable branches
-  BabyTree_->Branch("lep_pt_" ,&lep_pt_);
-  BabyTree_->Branch("minIDMVA_" ,&minIDMVA_);
   BabyTree_->Branch("maxIDMVA_" ,&maxIDMVA_);
-  BabyTree_->Branch("subleadPSV_" ,&subleadPSV_);
-  BabyTree_->Branch("leadPSV_" ,&leadPSV_);
-  BabyTree_->Branch("nb_loose_" ,&nb_loose_);
-  BabyTree_->Branch("njets_" ,&njets_);
-  //BabyTree_->Branch("nbjets_"		, &nbjets_	);
+  BabyTree_->Branch("minIDMVA_" ,&minIDMVA_);
+  BabyTree_->Branch("max2_btag_" ,&max2_btag_);
+  BabyTree_->Branch("max1_btag_" ,&max1_btag_);
+  BabyTree_->Branch("dipho_delta_R" ,&dipho_delta_R);
+  BabyTree_->Branch("njets_"            , &njets_       );
+  BabyTree_->Branch("nbjets_"         , &nbjets_      );
+  BabyTree_->Branch("ht_"               , &ht_          );
+
+  BabyTree_->Branch("lep_pt_"               , &ht_          );
+  BabyTree_->Branch("lep_eta_"               , &lep_eta_          );
+
+  BabyTree_->Branch("top_tag_score_"               , &top_tag_score_          );
+
+  BabyTree_->Branch("jet1_pt_"            , &jet1_pt_   );
+  BabyTree_->Branch("jet1_eta_"            , &jet1_eta_ );
+  BabyTree_->Branch("jet1_btag_"            , &jet1_btag_ );
+  BabyTree_->Branch("jet2_pt_"            , &jet2_pt_   );
+  BabyTree_->Branch("jet2_eta_"            , &jet2_eta_ );
+  BabyTree_->Branch("jet2_btag_"            , &jet2_btag_ );
+  BabyTree_->Branch("jet3_pt_"            , &jet3_pt_   );
+  BabyTree_->Branch("jet3_eta_"            , &jet3_eta_ );
+  BabyTree_->Branch("jet3_btag_"            , &jet3_btag_ );
+  BabyTree_->Branch("jet4_pt_"            , &jet4_pt_   );
+  BabyTree_->Branch("jet4_eta_"            , &jet4_eta_ );
+  BabyTree_->Branch("jet4_btag_"            , &jet4_btag_ );
+  BabyTree_->Branch("jet5_pt_"            , &jet5_pt_   );
+  BabyTree_->Branch("jet5_eta_"            , &jet5_eta_ );
+  BabyTree_->Branch("jet5_btag_"            , &jet5_btag_ );
+  BabyTree_->Branch("jet6_pt_"            , &jet6_pt_   );
+  BabyTree_->Branch("jet6_eta_"            , &jet6_eta_ );
+  BabyTree_->Branch("jet6_btag_"            , &jet6_btag_ );
+
+  BabyTree_->Branch("lead_pT_"         , &lead_pT_      );
+  BabyTree_->Branch("sublead_pT_"      , &sublead_pT_   );
+  BabyTree_->Branch("leadptoM_"         , &leadptoM_      );
+  BabyTree_->Branch("subleadptoM_"      , &subleadptoM_   );
+  BabyTree_->Branch("leadIDMVA_"        , &leadIDMVA_    );
+  BabyTree_->Branch("subleadIDMVA_"     , &subleadIDMVA_    );
+  BabyTree_->Branch("lead_eta_"        , &lead_eta_    );
+  BabyTree_->Branch("sublead_eta_"     , &sublead_eta_    );
+  BabyTree_->Branch("leadPSV_"           , &leadPSV_      );
+  BabyTree_->Branch("subleadPSV_"        , &subleadPSV_   );
+  BabyTree_->Branch("lead_phi_"        , &lead_phi_    );
+  BabyTree_->Branch("sublead_phi_"     , &sublead_phi_    );
+
+  BabyTree_->Branch("dipho_cosphi_"           , &dipho_cosphi_      );
+  BabyTree_->Branch("dipho_rapidity_"           , &dipho_rapidity_      );
+  BabyTree_->Branch("dipho_pt_"           , &dipho_pt_      );
+  BabyTree_->Branch("met_"           , &met_      );
 
  
   

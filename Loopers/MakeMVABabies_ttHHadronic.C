@@ -107,16 +107,20 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       // Decide what type of sample this is
       int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
       process_id_ = categorize_process(currentFileTitle, genPhotonId);
+
+      // Skipping events/samples
       if (is_low_stats_process(currentFileTitle))       continue;
-      if (process_id_ == 17)				continue; // skip MadGraph G+Jets
+      if (tag != "GJet_Reweight_Preselection") {
+        if (process_id_ == 17)				continue; // skip MadGraph G+Jets
+      }
+      if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic")) 			continue;
+      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
+      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
 
       // Blinded region
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
       // Selection
-      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
-      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))			continue;
-
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
@@ -130,7 +134,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
-      else if (tag == "ttHHadronic_data_sideband_tt_enriched") {
+      else if (tag == "ttHHadronic_data_sideband_phoID") {
 	if (mass() < 100)                continue;
 	if (n_jets() < 3)		 continue;
 	if (nb_medium() < 1)		 continue;
@@ -196,7 +200,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         continue; //some pu weights are nan/inf and this causes problems for histos 
       }
 
-
       // Skip blinded region for MC after filling mass histogram
       bool isSignal = process_id_ == 0;
 
@@ -204,13 +207,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
 
       if (tag == "ttHHadronic_data_sideband_0b") {
-	if (nb_tight() == 0)
+	if (nb_medium() == 0)
 	  data_sideband_label_ = 1;
-	else if (nb_tight() > 0)
+	else if (nb_medium() > 0)
 	  data_sideband_label_ = 0; 
       }
 
-      else if (tag == "ttHHadronic_data_sideband_tt_enriched") {
+      else if (tag == "ttHHadronic_data_sideband_phoID") {
 	if (!(leadIDMVA() > -0.2 && subleadIDMVA() > -0.2))
 	  data_sideband_label_ = 1;
 	else
@@ -218,6 +221,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       }
 
       // Variable definitions
+      top_tag_score_ = topTag_score();
+
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       max2_btag_ = btag_scores_sorted[1].second;
@@ -225,25 +230,26 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
       ht_ = get_ht(jets);
       njets_ = n_jets();
-      //nbjets_ = nb_medium();
-      jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;
-      jet1_eta_ =  jet1_pt() > 0 ? jet1_eta() : -999;
-      jet1_btag_ =  jet1_pt() > 0 ? jet1_bdiscriminant() : -999;
-      jet2_pt_  = jet2_pt() > 0 ? jet2_pt() : -999;
-      jet2_eta_ =  jet2_pt() > 0 ? jet2_eta() : -999;
-      jet2_btag_ =  jet2_pt() > 0 ? jet2_bdiscriminant() : -999;
-      jet3_pt_  = jet3_pt() > 0 ? jet3_pt() : -999;
-      jet3_eta_ =  jet3_pt() > 0 ? jet3_eta() : -999;
-      jet3_btag_ =  jet3_pt() > 0 ? jet3_bdiscriminant() : -999;
-      jet4_pt_  = jet4_pt() > 0 ? jet4_pt() : -999;
-      jet4_eta_ =  jet4_pt() > 0 ? jet4_eta() : -999;
-      jet4_btag_ =  jet4_pt() > 0 ? jet4_bdiscriminant() : -999;     
-      jet5_pt_  = jet5_pt() > 0 ? jet5_pt() : -999;
-      jet5_eta_ =  jet5_pt() > 0 ? jet5_eta() : -999;
-      jet5_btag_ =  jet5_pt() > 0 ? jet5_bdiscriminant() : -999;
-      jet6_pt_  = jet6_pt() > 0 ? jet6_pt() : -999;
-      jet6_eta_ =  jet6_pt() > 0 ? jet6_eta() : -999;
-      jet6_btag_ =  jet6_pt() > 0 ? jet6_bdiscriminant() : -999;
+      nbjets_ = nb_medium();
+
+      jet1_pt_   = njets_ >= 1 ? jets[0].Pt()   : -999;
+      jet1_eta_  = njets_ >= 1 ? jets[0].Eta()  : -999;
+      jet1_btag_ = njets_ >= 1 ? btag_scores[0] : -999;
+      jet2_pt_   = njets_ >= 2 ? jets[1].Pt()   : -999; 
+      jet2_eta_  = njets_ >= 2 ? jets[1].Eta()  : -999;
+      jet2_btag_ = njets_ >= 2 ? btag_scores[1] : -999;
+      jet3_pt_   = njets_ >= 3 ? jets[2].Pt()   : -999;
+      jet3_eta_  = njets_ >= 3 ? jets[2].Eta()  : -999;
+      jet3_btag_ = njets_ >= 3 ? btag_scores[2] : -999;
+      jet4_pt_   = njets_ >= 4 ? jets[3].Pt()   : -999;
+      jet4_eta_  = njets_ >= 4 ? jets[3].Eta()  : -999;
+      jet4_btag_ = njets_ >= 4 ? btag_scores[3] : -999;
+      jet5_pt_   = njets_ >= 5 ? jets[4].Pt()   : -999;
+      jet5_eta_  = njets_ >= 5 ? jets[4].Eta()  : -999;
+      jet5_btag_ = njets_ >= 5 ? btag_scores[4] : -999;
+      jet6_pt_   = njets_ >= 6 ? jets[5].Pt()   : -999;
+      jet6_eta_  = njets_ >= 6 ? jets[5].Eta()  : -999;
+      jet6_btag_ = njets_ >= 6 ? btag_scores[5] : -999;
 
       lead_pT_ = leadPt();
       sublead_pT_ = subleadPt();
@@ -253,6 +259,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       subleadIDMVA_ = subleadIDMVA();
       lead_eta_ = leadEta();
       sublead_eta_ = subleadEta();
+      lead_phi_ = leadPhi();
+      sublead_phi_ = subleadPhi();
 
       leadPSV_ = leadPixelSeed();
       subleadPSV_ = subleadPixelSeed();
@@ -281,22 +289,26 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       // DNN Business
       vector<vector<float>> unordered_objects;
     
-      vector<vector<float>> jet_objects = make_jet_objects(year); 
+      vector<vector<float>> jet_objects = make_jet_objects(year, diphoton); 
       for (int i = 0; i < jet_objects.size(); i++)
         unordered_objects.push_back(jet_objects[i]);
 
 
-      TLorentzVector lead_photon_modified, sublead_photon_modified;
-      lead_photon_modified.SetPtEtaPhiE(lead_ptoM(), leadEta(), leadPhi(), -999);
-      sublead_photon_modified.SetPtEtaPhiE(sublead_ptoM(), subleadEta(), subleadPhi(), -999);
-      unordered_objects.push_back(make_object(lead_photon_modified,    {-999, -999, -999, -999},    leadIDMVA(), -999));
-      unordered_objects.push_back(make_object(sublead_photon_modified, {-999, -999, -999, -999}, subleadIDMVA(), -999));
+      //unordered_objects.push_back(make_object(lead_photon_modified,    {-999, -999, -999, -999},    leadIDMVA(), -999));
+      //unordered_objects.push_back(make_object(sublead_photon_modified, {-999, -999, -999, -999}, subleadIDMVA(), -999));
 
       TLorentzVector Met;
       Met.SetPtEtaPhiE(MetPt(), 0.0, MetPhi(), MetPt());
-      unordered_objects.push_back(make_object(Met,	      	       {-999, -999, -999, -999},           -999,  1.0));
+      unordered_objects.push_back(make_object(Met,	      	       {-999, -999, -999, -999},           -999,  1.0, diphoton));
 
       objects_ = sort_objects(unordered_objects);
+
+      //TLorentzVector lead_photon_modified, sublead_photon_modified;
+      //lead_photon_modified.SetPtEtaPhiE(lead_ptoM(), leadEta(), leadPhi(), -999);
+      //sublead_photon_modified.SetPtEtaPhiE(sublead_ptoM(), subleadEta(), subleadPhi(), -999);
+      
+      //objects_.insert(objects_.begin(), make_object(sublead_photon_modified, {-999, -999, -999, -999}, subleadIDMVA(), -999, diphoton));
+      //objects_.insert(objects_.begin(), make_object(lead_photon_modified,    {-999, -999, -999, -999},    leadIDMVA(), -999, diphoton));
 
       FillBabyNtuple();
 

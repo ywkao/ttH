@@ -54,50 +54,54 @@ class BabyMaker {
     vector<vector<float>>  objects_;
 
     // Variable declarations
-    float           maxIDMVA_;
-    float           minIDMVA_;
-    float           max2_btag_;
-    float           max1_btag_;
-    float           dipho_delta_R;
-    float		njets_;
-    //int		nbjets_;
+    float       maxIDMVA_;
+    float       minIDMVA_;
+    float       max2_btag_;
+    float       max1_btag_;
+    float       dipho_delta_R;
+    float	njets_;
+    int		nbjets_;
     float	ht_;
 
-    float	jet1_pt_;
-    float      jet1_eta_;
-    float 	jet1_btag_;
-    float      jet2_pt_;
-    float      jet2_eta_;
-    float      jet2_btag_;
-    float      jet3_pt_;
-    float      jet3_eta_;
-    float      jet3_btag_;
-    float      jet4_pt_;
-    float      jet4_eta_;
-    float      jet4_btag_;
-    float      jet5_pt_;
-    float      jet5_eta_;
-    float      jet5_btag_;
-    float      jet6_pt_;
-    float      jet6_eta_;
-    float      jet6_btag_;
+    float       top_tag_score_;
 
-    float      lead_pT_;
-    float      sublead_pT_;
+    float	jet1_pt_;
+    float       jet1_eta_;
+    float 	jet1_btag_;
+    float       jet2_pt_;
+    float       jet2_eta_;
+    float       jet2_btag_;
+    float       jet3_pt_;
+    float       jet3_eta_;
+    float       jet3_btag_;
+    float       jet4_pt_;
+    float       jet4_eta_;
+    float       jet4_btag_;
+    float       jet5_pt_;
+    float       jet5_eta_;
+    float       jet5_btag_;
+    float       jet6_pt_;
+    float       jet6_eta_;
+    float       jet6_btag_;
+
+    float       lead_pT_;
+    float       sublead_pT_;
     float	leadptoM_;
     float	subleadptoM_;
     float	leadIDMVA_;
     float 	subleadIDMVA_;
-    float      lead_eta_;
-    float      sublead_eta_;
+    float       lead_eta_;
+    float       sublead_eta_;
+    float	lead_phi_;
+    float	sublead_phi_;
  
-    float      leadPSV_;
-    float      subleadPSV_;
+    float       leadPSV_;
+    float       subleadPSV_;
 
     float	dipho_cosphi_;
     float 	dipho_rapidity_;
-    float      dipho_pt_;
-    float      met_;    
+    float       dipho_pt_;
+    float       met_;    
 };
 
 inline
@@ -129,8 +133,10 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("max1_btag_" ,&max1_btag_);
   BabyTree_->Branch("dipho_delta_R" ,&dipho_delta_R);
   BabyTree_->Branch("njets_"     	, &njets_       );
-  //BabyTree_->Branch("nbjets_"		, &nbjets_	);
+  BabyTree_->Branch("nbjets_"		, &nbjets_	);
   BabyTree_->Branch("ht_"    		, &ht_       	);
+
+  BabyTree_->Branch("top_tag_score_"               , &top_tag_score_          );
 
   BabyTree_->Branch("jet1_pt_"            , &jet1_pt_   );
   BabyTree_->Branch("jet1_eta_"            , &jet1_eta_ );
@@ -161,7 +167,9 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("sublead_eta_"     , &sublead_eta_    ); 
   BabyTree_->Branch("leadPSV_"           , &leadPSV_      );
   BabyTree_->Branch("subleadPSV_"        , &subleadPSV_   );
-  
+  BabyTree_->Branch("lead_phi_"        , &lead_phi_    );
+  BabyTree_->Branch("sublead_phi_"     , &sublead_phi_    ); 
+ 
   BabyTree_->Branch("dipho_cosphi_"           , &dipho_cosphi_      );
   BabyTree_->Branch("dipho_rapidity_"           , &dipho_rapidity_      );
   BabyTree_->Branch("dipho_pt_"           , &dipho_pt_      );

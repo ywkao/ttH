@@ -5,11 +5,15 @@ from scipy.optimize import curve_fit
 import itertools
 
 def Z_A(s, b):
-  if s < 0:
-    s = 0
-  if b < 0:
-    b = 0
-  return math.sqrt(2 * ( ((s+b) * math.log(1 + (s/b) )) - s) )
+  if s <= 0:
+    return 0
+  if b <= 0:
+    return 0
+  q1 = 2 * ( ((s+b) * math.log(1 + (s/b) )) - s)
+  if q1 <= 0:
+    return 0
+  else:
+    return math.sqrt(q1)
 
 def unc_ZA(s, b, ds, db):
   Zs = math.log(1 + (s/b)) / Z_A(s,b)
@@ -120,7 +124,7 @@ def scan_za(cut_combos, signal_events, background_events, is_data):
 
     # Calculate Z_A
     z_mc = Z_A(s, b)
-    z_mc_unc = unc_ZA(s, b, s_unc, b_unc)
+    z_mc_unc = unc_ZA(s, b, s_unc, b_unc) if z_mc > 0 else 0
     print "s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)
     print "za: %.3f +/- %.3f" % (z_mc, z_mc_unc)
     za_dict.append({"z_mc": z_mc, "cut_list" : cut_list}) 
@@ -167,5 +171,7 @@ def za_scores(n_quantiles, signal_events, background_events, is_data):
         mva_cut_list_1d.append([(mva_name, mva_values_at_max[mva_name])])
     cut_combos_1d = list(itertools.product(*mva_cut_list_1d))
     za_dict_1d = scan_za(cut_combos_1d, signal_events, background_events, is_data)
+  else:
+    za_dict_1d = full_za_dict
 
   return za_dict_1d["za"], za_dict_1d["za_unc"], za_dict_1d["n_sig"], za_dict_1d["n_bkg"], za_dict_1d["sigma_eff"]

@@ -237,7 +237,7 @@ plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
 estimate_za = True
 if estimate_za:
-  n_quantiles = 15
+  n_quantiles = 20
   signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
   bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}
   data_mva_scores = {"bdt_score" : pred_data}
@@ -248,7 +248,7 @@ if estimate_za:
   signal_weights = ks_test.logical_vector(weights_validation, y_test, 1)
   bkg_weights = ks_test.logical_vector(weights_validation, y_test, 0)
 
-  optimization_vars = args.optimization_vars.split(",")
+  optimization_vars = args.optimization_vars.split(",") if args.optimization_vars else []
   for var in optimization_vars: 
     signal_mva_scores[var] = ks_test.logical_vector(utils.load_array(f, var + '_validation'), y_test, 1)
     bkg_mva_scores[var]    = ks_test.logical_vector(utils.load_array(f, var + '_validation'), y_test, 0)

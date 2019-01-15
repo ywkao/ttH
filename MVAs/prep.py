@@ -7,6 +7,7 @@ import root_numpy
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input root file", type=str)
+parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str, default = "Hadronic")
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
 parser.add_argument("-i", "--invert", help = "invert the test/train split", action="store_true")
 parser.add_argument("-s", "--sideband", help = "use data sideband for training", action = "store_true")
@@ -23,17 +24,21 @@ tree = f.Get("t")
 #feature_names = (root_numpy.tree2array(tree, branches = ["mva_branches"], start=0, stop=1))[0][0]
 #feature_names = list(feature_names) 
 
-feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"] 
+feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "top_tag_score_"] 
 
-training_feature_names = feature_names
+
+to_remove = []
+if args.channel == "Leptonic":
+  feature_names += ["lep_pt_", "lep_eta_"]
+  to_remove += ["jet4_pt_", "jet4_eta_", "jet4_btag_"]
+
 if args.sideband: # remove b-tagging features
   if args.sideband_name == "0b":
-    to_remove = ["max2_btag_", "max1_btag_", "jet1_btag_", "jet2_btag_", "jet3_btag_", "jet4_btag_"]
+    to_remove += ["max2_btag_", "max1_btag_", "jet1_btag_", "jet2_btag_", "jet3_btag_", "jet4_btag_"]
   elif args.sideband_name == "tt_enriched":
-    to_remove = ["leadIDMVA_", "subleadIDMVA_", "maxIDMVA_", "minIDMVA_"]
+    to_remove += ["leadIDMVA_", "subleadIDMVA_", "maxIDMVA_", "minIDMVA_"]
 
-  training_feature_names = [feature for feature in feature_names if feature not in to_remove] 
-
+training_feature_names = [feature for feature in feature_names if feature not in to_remove] 
 
 print training_feature_names
 
@@ -47,10 +52,9 @@ data_label = 2
 features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")) 
 features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, "&& data_sideband_label_ == 0" if args.sideband else ""))
 
-features_data_sideband = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 2) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (rand_branch, train_frac)) 
-features_data_sideband_mc = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 0) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (rand_branch, train_frac))
-#features_sideband = root_numpy.tree2array(tree, branches = branches, selection = '(label_ == 1 || data_sideband_label_ == 1) && %s < %.6f' % (rand_branch, train_frac))
-#features_sideband_validation = root_numpy.tree2array(tree, branches = branches, selection = '(label_ == 1 || data_sideband_label_ == 1) && %s > %.6f' % (rand_branch, train_frac)) 
+if args.sideband:
+  features_data_sideband = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 2) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (rand_branch, train_frac)) 
+  features_data_sideband_mc = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 0) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (rand_branch, train_frac))
 
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d %s' % (data_label, "&& data_sideband_label_ == 0" if args.sideband else ""))
 
@@ -69,14 +73,17 @@ for feature in training_feature_names:
   global_features.append(features[feature])
   global_features_validation.append(features_validation[feature])
   global_features_data.append(features_data[feature])
-  global_features_data_sideband.append(features_data_sideband[feature])
-  global_features_data_sideband_mc.append(features_data_sideband_mc[feature])
+  if args.sideband:
+    global_features_data_sideband.append(features_data_sideband[feature])
+    global_features_data_sideband_mc.append(features_data_sideband_mc[feature])
   
 global_features = numpy.asarray(global_features)
 global_features_validation = numpy.asarray(global_features_validation)
 global_features_data = numpy.asarray(global_features_data)
-global_features_data_sideband = numpy.asarray(global_features_data_sideband)
-global_features_data_sideband_mc = numpy.asarray(global_features_data_sideband_mc)
+
+if args.sideband:
+  global_features_data_sideband = numpy.asarray(global_features_data_sideband)
+  global_features_data_sideband_mc = numpy.asarray(global_features_data_sideband_mc)
 
 mva_names = ["max1_btag_", "max2_btag_", "maxIDMVA_", "minIDMVA_"]
 
@@ -106,30 +113,33 @@ mvas_data = {}
 for name in mva_names:
   mvas_data[name] = numpy.asarray(features_data[name])
 
-label_data_sideband = features_data_sideband["label_"]
-multi_label_data_sideband = features_data_sideband["multi_label_"]
-weights_data_sideband = features_data_sideband["evt_weight_"]
-mass_data_sideband = features_data_sideband["mass_"]
-mvas_data_sideband = {}
-for name in mva_names:
-  mvas_data_sideband[name] = numpy.asarray(features_data_sideband[name])
+if args.sideband:
+  label_data_sideband = features_data_sideband["label_"]
+  multi_label_data_sideband = features_data_sideband["multi_label_"]
+  weights_data_sideband = features_data_sideband["evt_weight_"]
+  mass_data_sideband = features_data_sideband["mass_"]
+  mvas_data_sideband = {}
+  for name in mva_names:
+    mvas_data_sideband[name] = numpy.asarray(features_data_sideband[name])
 
-label_data_sideband_mc = features_data_sideband_mc["label_"]
-multi_label_data_sideband_mc = features_data_sideband_mc["multi_label_"]
-weights_data_sideband_mc = features_data_sideband_mc["evt_weight_"]
-mass_data_sideband_mc = features_data_sideband_mc["mass_"]
-mvas_data_sideband_mc = {}
-for name in mva_names:
-  mvas_data_sideband_mc[name] = numpy.asarray(features_data_sideband_mc[name])
+  label_data_sideband_mc = features_data_sideband_mc["label_"]
+  multi_label_data_sideband_mc = features_data_sideband_mc["multi_label_"]
+  weights_data_sideband_mc = features_data_sideband_mc["evt_weight_"]
+  mass_data_sideband_mc = features_data_sideband_mc["mass_"]
+  mvas_data_sideband_mc = {}
+  for name in mva_names:
+    mvas_data_sideband_mc[name] = numpy.asarray(features_data_sideband_mc[name])
 
-label_data_sideband[label_data_sideband == 2] = 0 # reassign label so that it plays nice with xgboost
+  label_data_sideband[label_data_sideband == 2] = 0 # reassign label so that it plays nice with xgboost
 
 # reorganize features
 global_features = numpy.transpose(global_features)
 global_features_validation = numpy.transpose(global_features_validation)
 global_features_data = numpy.transpose(global_features_data)
-global_features_data_sideband = numpy.transpose(global_features_data_sideband)
-global_features_data_sideband_mc = numpy.transpose(global_features_data_sideband_mc)
+
+if args.sideband:
+  global_features_data_sideband = numpy.transpose(global_features_data_sideband)
+  global_features_data_sideband_mc = numpy.transpose(global_features_data_sideband_mc)
 
 f_out = h5py.File(output_file, "w")
 
@@ -164,20 +174,21 @@ for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_data", data=mvas_data[name])
 
 
-dset_global_data_sideband = f_out.create_dataset("global_data_sideband", data=global_features_data_sideband)
-dset_label_data_sideband = f_out.create_dataset("label_data_sideband", data=label_data_sideband)
-dset_multi_label_data_sideband = f_out.create_dataset("multi_label_data_sideband", data=multi_label_data_sideband)
-dset_weights_data_sideband = f_out.create_dataset("weights_data_sideband", data=weights_data_sideband)
-dset_mass_data_sideband = f_out.create_dataset("mass_data_sideband", data=mass_data_sideband)
-for name in mva_names:
-  dset_mva = f_out.create_dataset(name+"_data_sideband", data=mvas_data_sideband[name])
+if args.sideband:
+  dset_global_data_sideband = f_out.create_dataset("global_data_sideband", data=global_features_data_sideband)
+  dset_label_data_sideband = f_out.create_dataset("label_data_sideband", data=label_data_sideband)
+  dset_multi_label_data_sideband = f_out.create_dataset("multi_label_data_sideband", data=multi_label_data_sideband)
+  dset_weights_data_sideband = f_out.create_dataset("weights_data_sideband", data=weights_data_sideband)
+  dset_mass_data_sideband = f_out.create_dataset("mass_data_sideband", data=mass_data_sideband)
+  for name in mva_names:
+    dset_mva = f_out.create_dataset(name+"_data_sideband", data=mvas_data_sideband[name])
 
-dset_global_data_sideband_mc = f_out.create_dataset("global_data_sideband_mc", data=global_features_data_sideband_mc)
-dset_label_data_sideband_mc = f_out.create_dataset("label_data_sideband_mc", data=label_data_sideband_mc)
-dset_multi_label_data_sideband_mc = f_out.create_dataset("multi_label_data_sideband_mc", data=multi_label_data_sideband_mc)
-dset_weights_data_sideband_mc = f_out.create_dataset("weights_data_sideband_mc", data=weights_data_sideband_mc)
-dset_mass_data_sideband_mc = f_out.create_dataset("mass_data_sideband_mc", data=mass_data_sideband_mc)
-for name in mva_names:
-  dset_mva = f_out.create_dataset(name+"_data_sideband_mc", data=mvas_data_sideband_mc[name])
+  dset_global_data_sideband_mc = f_out.create_dataset("global_data_sideband_mc", data=global_features_data_sideband_mc)
+  dset_label_data_sideband_mc = f_out.create_dataset("label_data_sideband_mc", data=label_data_sideband_mc)
+  dset_multi_label_data_sideband_mc = f_out.create_dataset("multi_label_data_sideband_mc", data=multi_label_data_sideband_mc)
+  dset_weights_data_sideband_mc = f_out.create_dataset("weights_data_sideband_mc", data=weights_data_sideband_mc)
+  dset_mass_data_sideband_mc = f_out.create_dataset("mass_data_sideband_mc", data=mass_data_sideband_mc)
+  for name in mva_names:
+    dset_mva = f_out.create_dataset(name+"_data_sideband_mc", data=mvas_data_sideband_mc[name])
 
 f_out.close()
