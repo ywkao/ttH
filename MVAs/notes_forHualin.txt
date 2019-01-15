@@ -12,6 +12,14 @@ List of samples used for bkg in training:
  - X + gamma: Drell-Yan, W + gamma, t + gamma (no Z + gamma available for 2017 yet) 
  - Other signal modes: tHW, tHQ, VBF, VH, ggH
 
+Trained with following list of features:
+['maxIDMVA_', 'minIDMVA_', 'max2_btag_', 'max1_btag_', 'dipho_delta_R', 'njets_', 'ht_', 'leadptoM_', 'subleadptoM_', 'leadIDMVA_', 'subleadIDMVA_', 'lead_eta_', 'sublead_eta_', 'jet1_pt_', 'jet1_eta_', 'jet1_btag_', 'jet2_pt_', 'jet2_eta_', 'jet2_btag_', 'jet3_pt_', 'jet3_eta_', 'jet3_btag_', 'leadPSV_', 'subleadPSV_', 'dipho_cosphi_', 'dipho_rapidity_', 'met_', 'top_tag_score_', 'lep_pt_', 'lep_eta_']
+
+Implementing BDT in ROOT:
+Set-up: https://github.com/sam-may/ttH/blob/master/Loopers/ScanChain_ttHLeptonic.C#L35-L140 
+Evaluation: https://github.com/sam-may/ttH/blob/master/Loopers/ScanChain_ttHLeptonic.C#L562 
+Note that you need to undo the TMVA transformation (bounds score in [-1, 1]) and apply the xgboost transformation (bounds score in [0,1]): https://github.com/sam-may/ttH/blob/master/Loopers/ttHLooper.h#L566-L573
+
 List of 20 BDT scores and respective signal/bkg yields along with Z_A estimate of significance (bkg estimated from data)
 {'bdt_score': 0.98455888}
 s: 0.257 +/- 0.026, b: 999999.000 +/- 999999.000, mean_eff: 124.755, sigma_eff: 1.692
@@ -90,6 +98,15 @@ List of samples used for bkg in training:
  - tt  + X: TT + jets (inclusive decay MC samples), TT + gamma + jets, TT + gamma gamma
  - X + gamma: Drell-Yan, W + gamma, t + gamma (no Z + gamma available for 2017 yet)
  - Other signal modes: tHW, tHQ, VBF, VH, ggH
+
+Trained with following list of features:
+['maxIDMVA_', 'minIDMVA_', 'max2_btag_', 'max1_btag_', 'dipho_delta_R', 'njets_', 'ht_', 'leadptoM_', 'subleadptoM_', 'leadIDMVA_', 'subleadIDMVA_', 'lead_eta_', 'sublead_eta_', 'jet1_pt_', 'jet1_eta_', 'jet1_btag_', 'jet2_pt_', 'jet2_eta_', 'jet2_btag_', 'jet3_pt_', 'jet3_eta_', 'jet3_btag_', 'jet4_pt_', 'jet4_eta_', 'jet4_btag_', 'leadPSV_', 'subleadPSV_', 'dipho_cosphi_', 'dipho_rapidity_', 'met_', 'top_tag_score_']
+
+Implementing BDT in ROOT:
+Set-up: https://github.com/sam-may/ttH/blob/master/Loopers/ScanChain_ttHHadronic.C#L38-L137
+Evaluation: https://github.com/sam-may/ttH/blob/master/Loopers/ScanChain_ttHHadronic.C#L325
+Note that you need to undo the TMVA transformation (bounds score in [-1, 1]) and apply the xgboost transformation (bounds score in [0,1]): https://github.com/sam-may/ttH/blob/master/Loopers/ttHLooper.h#L566-L573
+
 
 List of 20 BDT scores and respective signal/bkg yields along with Z_A estimate of significance (bkg estimated from data)
 {'bdt_score': 0.99816787}
