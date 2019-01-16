@@ -33,6 +33,8 @@ f = h5py.File(args.input.replace(".hdf5", "") + ".hdf5", "r")
 feature_names = utils.load_array(f, 'feature_names')
 training_feature_names = utils.load_array(f, 'training_feature_names')
 
+print training_feature_names
+
 global_features = utils.load_array(f, 'global')
 label = utils.load_array(f, 'label')
 multi_label = utils.load_array(f, 'multi_label')

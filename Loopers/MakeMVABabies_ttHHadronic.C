@@ -46,6 +46,162 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
   gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight_binary_crossEntropy_bdt.xml");
 
+  // ttH MVA Business
+  unique_ptr<TMVA::Reader> tth_qcdX_mva;
+  unique_ptr<TMVA::Reader> tth_ttX_mva;
+  unique_ptr<TMVA::Reader> tth_ttPP_mva;
+
+  bool do_tth_ttX_mva = true;
+  if (do_tth_ttX_mva) {
+    tth_ttX_mva.reset(new TMVA::Reader( "!Color:Silent" ));
+
+    tth_ttX_mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+    tth_ttX_mva->AddVariable("minIDMVA_", &minIDMVA_);
+    tth_ttX_mva->AddVariable("max2_btag_", &max2_btag_);
+    tth_ttX_mva->AddVariable("max1_btag_", &max1_btag_);
+    tth_ttX_mva->AddVariable("dipho_delta_R", &dipho_delta_R);
+    tth_ttX_mva->AddVariable("njets_", &njets_);
+    //tth_ttX_mva->AddVariable("nbjets_", &nbjets_);
+    tth_ttX_mva->AddVariable("ht_", &ht_);
+    tth_ttX_mva->AddVariable("leadptoM_", &leadptoM_);
+    tth_ttX_mva->AddVariable("subleadptoM_", &subleadptoM_);
+    tth_ttX_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    tth_ttX_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
+    tth_ttX_mva->AddVariable("lead_eta_", &lead_eta_);
+    tth_ttX_mva->AddVariable("sublead_eta_", &sublead_eta_);
+
+    tth_ttX_mva->AddVariable("jet1_pt_", &jet1_pt_);
+    tth_ttX_mva->AddVariable("jet1_eta_", &jet1_eta_);
+    tth_ttX_mva->AddVariable("jet1_btag_", &jet1_btag_);
+    tth_ttX_mva->AddVariable("jet2_pt_", &jet2_pt_);
+    tth_ttX_mva->AddVariable("jet2_eta_", &jet2_eta_);
+    tth_ttX_mva->AddVariable("jet2_btag_", &jet2_btag_);
+    tth_ttX_mva->AddVariable("jet3_pt_", &jet3_pt_);
+    tth_ttX_mva->AddVariable("jet3_eta_", &jet3_eta_);
+    tth_ttX_mva->AddVariable("jet3_btag_", &jet3_btag_);
+    tth_ttX_mva->AddVariable("jet4_pt_", &jet4_pt_);
+    tth_ttX_mva->AddVariable("jet4_eta_", &jet4_eta_);
+    tth_ttX_mva->AddVariable("jet4_btag_", &jet4_btag_);
+    //tth_ttX_mva->AddVariable("jet5_pt_", &jet5_pt_);
+    //tth_ttX_mva->AddVariable("jet5_eta_", &jet5_eta_);
+    //tth_ttX_mva->AddVariable("jet5_btag_", &jet5_btag_);
+    //tth_ttX_mva->AddVariable("jet6_pt_", &jet6_pt_);
+    //tth_ttX_mva->AddVariable("jet6_eta_", &jet6_eta_);
+    //tth_ttX_mva->AddVariable("jet6_btag_", &jet6_btag_);
+
+    tth_ttX_mva->AddVariable("leadPSV_", &leadPSV_);
+    tth_ttX_mva->AddVariable("subleadPSV_", &subleadPSV_);
+
+    tth_ttX_mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
+    tth_ttX_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
+    tth_ttX_mva->AddVariable("met_", &met_);
+
+    //tth_ttX_mva->AddVariable("top_tag_score_", &top_tag_score_);
+
+    tth_ttX_mva->BookMVA("BDT", "../MVAs/Hadronic_DataSideband_Data_PhoID_3dOpt_20_1_bdt.xml");
+  }
+
+  bool do_tth_qcdX_mva = true;
+  if (do_tth_qcdX_mva) {
+    tth_qcdX_mva.reset(new TMVA::Reader( "!Color:Silent" ));
+    
+    tth_qcdX_mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+    tth_qcdX_mva->AddVariable("minIDMVA_", &minIDMVA_);
+    tth_qcdX_mva->AddVariable("max2_btag_", &max2_btag_);
+    tth_qcdX_mva->AddVariable("max1_btag_", &max1_btag_);
+    tth_qcdX_mva->AddVariable("dipho_delta_R", &dipho_delta_R);
+    tth_qcdX_mva->AddVariable("njets_", &njets_);
+    //tth_qcdX_mva->AddVariable("nbjets_", &nbjets_);
+    tth_qcdX_mva->AddVariable("ht_", &ht_);
+    tth_qcdX_mva->AddVariable("leadptoM_", &leadptoM_);
+    tth_qcdX_mva->AddVariable("subleadptoM_", &subleadptoM_);
+    tth_qcdX_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    tth_qcdX_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
+    tth_qcdX_mva->AddVariable("lead_eta_", &lead_eta_);
+    tth_qcdX_mva->AddVariable("sublead_eta_", &sublead_eta_);
+    
+    tth_qcdX_mva->AddVariable("jet1_pt_", &jet1_pt_);
+    tth_qcdX_mva->AddVariable("jet1_eta_", &jet1_eta_);
+    tth_qcdX_mva->AddVariable("jet1_btag_", &jet1_btag_);
+    tth_qcdX_mva->AddVariable("jet2_pt_", &jet2_pt_);
+    tth_qcdX_mva->AddVariable("jet2_eta_", &jet2_eta_);
+    tth_qcdX_mva->AddVariable("jet2_btag_", &jet2_btag_);
+    tth_qcdX_mva->AddVariable("jet3_pt_", &jet3_pt_);
+    tth_qcdX_mva->AddVariable("jet3_eta_", &jet3_eta_);
+    tth_qcdX_mva->AddVariable("jet3_btag_", &jet3_btag_);
+    tth_qcdX_mva->AddVariable("jet4_pt_", &jet4_pt_);
+    tth_qcdX_mva->AddVariable("jet4_eta_", &jet4_eta_);
+    tth_qcdX_mva->AddVariable("jet4_btag_", &jet4_btag_);
+    //tth_qcdX_mva->AddVariable("jet5_pt_", &jet5_pt_);
+    //tth_qcdX_mva->AddVariable("jet5_eta_", &jet5_eta_);
+    //tth_qcdX_mva->AddVariable("jet5_btag_", &jet5_btag_);
+    //tth_qcdX_mva->AddVariable("jet6_pt_", &jet6_pt_);
+    //tth_qcdX_mva->AddVariable("jet6_eta_", &jet6_eta_);
+    //tth_qcdX_mva->AddVariable("jet6_btag_", &jet6_btag_);
+    
+    tth_qcdX_mva->AddVariable("leadPSV_", &leadPSV_);
+    tth_qcdX_mva->AddVariable("subleadPSV_", &subleadPSV_);
+    
+    tth_qcdX_mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
+    tth_qcdX_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
+    tth_qcdX_mva->AddVariable("met_", &met_);
+    
+    //tth_qcdX_mva->AddVariable("top_tag_score_", &top_tag_score_);
+    
+    tth_qcdX_mva->BookMVA("BDT", "../MVAs/Hadronic_DataSideband_Data_MediumB_3dOpt_20_1_bdt.xml");
+  }
+
+  bool do_tth_ttPP_mva = false;
+  if (do_tth_ttPP_mva) {
+    tth_ttPP_mva.reset(new TMVA::Reader( "!Color:Silent" ));
+    
+    tth_ttPP_mva->AddVariable("maxIDMVA_", &maxIDMVA_);
+    tth_ttPP_mva->AddVariable("minIDMVA_", &minIDMVA_);
+    tth_ttPP_mva->AddVariable("max2_btag_", &max2_btag_);
+    tth_ttPP_mva->AddVariable("max1_btag_", &max1_btag_);
+    tth_ttPP_mva->AddVariable("dipho_delta_R", &dipho_delta_R);
+    tth_ttPP_mva->AddVariable("njets_", &njets_);
+    //tth_ttPP_mva->AddVariable("nbjets_", &nbjets_);
+    tth_ttPP_mva->AddVariable("ht_", &ht_);
+    tth_ttPP_mva->AddVariable("leadptoM_", &leadptoM_);
+    tth_ttPP_mva->AddVariable("subleadptoM_", &subleadptoM_);
+    tth_ttPP_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    tth_ttPP_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
+    tth_ttPP_mva->AddVariable("lead_eta_", &lead_eta_);
+    tth_ttPP_mva->AddVariable("sublead_eta_", &sublead_eta_);
+    
+    tth_ttPP_mva->AddVariable("jet1_pt_", &jet1_pt_);
+    tth_ttPP_mva->AddVariable("jet1_eta_", &jet1_eta_);
+    tth_ttPP_mva->AddVariable("jet1_btag_", &jet1_btag_);
+    tth_ttPP_mva->AddVariable("jet2_pt_", &jet2_pt_);
+    tth_ttPP_mva->AddVariable("jet2_eta_", &jet2_eta_);
+    tth_ttPP_mva->AddVariable("jet2_btag_", &jet2_btag_);
+    tth_ttPP_mva->AddVariable("jet3_pt_", &jet3_pt_);
+    tth_ttPP_mva->AddVariable("jet3_eta_", &jet3_eta_);
+    tth_ttPP_mva->AddVariable("jet3_btag_", &jet3_btag_);
+    tth_ttPP_mva->AddVariable("jet4_pt_", &jet4_pt_);
+    tth_ttPP_mva->AddVariable("jet4_eta_", &jet4_eta_);
+    tth_ttPP_mva->AddVariable("jet4_btag_", &jet4_btag_);
+    //tth_ttPP_mva->AddVariable("jet5_pt_", &jet5_pt_);
+    //tth_ttPP_mva->AddVariable("jet5_eta_", &jet5_eta_);
+    //tth_ttPP_mva->AddVariable("jet5_btag_", &jet5_btag_);
+    //tth_ttPP_mva->AddVariable("jet6_pt_", &jet6_pt_);
+    //tth_ttPP_mva->AddVariable("jet6_eta_", &jet6_eta_);
+    //tth_ttPP_mva->AddVariable("jet6_btag_", &jet6_btag_);
+    
+    tth_ttPP_mva->AddVariable("leadPSV_", &leadPSV_);
+    tth_ttPP_mva->AddVariable("subleadPSV_", &subleadPSV_);
+    
+    tth_ttPP_mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
+    tth_ttPP_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
+    tth_ttPP_mva->AddVariable("met_", &met_);
+    
+    //tth_ttPP_mva->AddVariable("top_tag_score_", &top_tag_score_);
+    
+    tth_ttPP_mva->BookMVA("BDT", "../MVAs/blahblahblah.xml");
+  }
+
+
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -64,7 +220,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    TString year = currentFileTitle.Contains("2017") ? "2017" : "2016";
+    TString year = currentFileTitle.Contains("2016") ? "2016" : "2017";
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -117,6 +273,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
       if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
 
+      if (tag == "ttHHadronic_ttPP") {
+        if (!isSignal && !isData) {
+	  if (!(currentFileTitle.Contains("TTGG")))
+	    continue;	
+        }
+      }
+
       // Blinded region
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
 
@@ -125,6 +288,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
 	if (nb_loose() < 1)		continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHHadronic_ttPP") {
+	if (mass() < 100)                continue;
+	if (n_jets() < 2)		 continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
@@ -139,6 +308,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	if (n_jets() < 3)		 continue;
 	if (nb_medium() < 1)		 continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue; 
+      }
+
+      else if (tag == "ttHHadronic_data_sideband_phoID_v2") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_tight() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
       else if (tag == "ttHHadronic_DNN_presel") {
@@ -156,6 +332,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (subleadIDMVA() < -0.9)         continue;
 	if (nb_loose() < 1)	continue;
       }
+
       else if (tag == "GJet_Reweight_Preselection") {
 	if (mass() < 100)	continue;
 	if (n_jets() < 2)	continue;
@@ -213,7 +390,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	  data_sideband_label_ = 0; 
       }
 
-      else if (tag == "ttHHadronic_data_sideband_phoID") {
+      else if (tag == "ttHHadronic_data_sideband_phoID" || tag == "ttHHadronic_data_sideband_phoID_v2") {
 	if (!(leadIDMVA() > -0.2 && subleadIDMVA() > -0.2))
 	  data_sideband_label_ = 1;
 	else
@@ -285,6 +462,19 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	evt_weight_ *= prob_ratio;
 	evt_weight_ *= gjet_normalization;
       } 
+
+      if (do_tth_ttX_mva)
+        tth_ttX_mva_ = convert_tmva_to_prob(tth_ttX_mva->EvaluateMVA( "BDT" ));
+      else
+	tth_ttX_mva_ = -999;
+      if (do_tth_qcdX_mva)
+        tth_qcdX_mva_ = convert_tmva_to_prob(tth_qcdX_mva->EvaluateMVA( "BDT" ));
+      else
+	tth_qcdX_mva_ = -999;
+      if (do_tth_ttPP_mva)
+        tth_ttPP_mva_ = convert_tmva_to_prob(tth_ttPP_mva->EvaluateMVA( "BDT" ));
+      else
+	tth_ttPP_mva_ = -999;
 
       // DNN Business
       vector<vector<float>> unordered_objects;

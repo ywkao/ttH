@@ -34,15 +34,15 @@ if args.channel == "Leptonic":
 
 if args.sideband: # remove b-tagging features
   if args.sideband_name == "0b":
-    to_remove += ["max2_btag_", "max1_btag_", "jet1_btag_", "jet2_btag_", "jet3_btag_", "jet4_btag_"]
-  elif args.sideband_name == "tt_enriched":
+    to_remove += ["max2_btag_", "max1_btag_", "jet1_btag_", "jet2_btag_", "jet3_btag_", "jet4_btag_", "top_tag_score_"]
+  elif args.sideband_name == "phoID":
     to_remove += ["leadIDMVA_", "subleadIDMVA_", "maxIDMVA_", "minIDMVA_"]
 
 training_feature_names = [feature for feature in feature_names if feature not in to_remove] 
 
 print training_feature_names
 
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_"]))
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_"]))
 
 # grab features
 train_frac = 0.5
@@ -85,7 +85,7 @@ if args.sideband:
   global_features_data_sideband = numpy.asarray(global_features_data_sideband)
   global_features_data_sideband_mc = numpy.asarray(global_features_data_sideband_mc)
 
-mva_names = ["max1_btag_", "max2_btag_", "maxIDMVA_", "minIDMVA_"]
+mva_names = ["max1_btag_", "max2_btag_", "maxIDMVA_", "minIDMVA_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_"]
 
 label = features["label_"]
 multi_label = features["multi_label_"]

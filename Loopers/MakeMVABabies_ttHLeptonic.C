@@ -37,7 +37,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    TString year = currentFileTitle.Contains("2017") ? "2017" : "2016";
+    TString year = currentFileTitle.Contains("2016") ? "2016" : "2017";
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
