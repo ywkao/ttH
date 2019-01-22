@@ -45,10 +45,10 @@ class BabyMaker {
     float	evt_weight_;
     int 	process_id_;
     float 	rand_;
-    float      super_rand_;
-    float      mass_;
-    float      lead_sigmaEtoE_;
-    float      sublead_sigmaEtoE_;
+    float       super_rand_;
+    float       mass_;
+    float       lead_sigmaEtoE_;
+    float       sublead_sigmaEtoE_;
 
     float	tth_qcdX_mva_;
     float	tth_ttX_mva_;
@@ -56,6 +56,7 @@ class BabyMaker {
 
     // DNN Business
     vector<vector<float>>  objects_;
+    vector<vector<float>>  objects_boosted_;
 
     // Variable declarations
     float       maxIDMVA_;
@@ -105,7 +106,8 @@ class BabyMaker {
     float	dipho_cosphi_;
     float 	dipho_rapidity_;
     float       dipho_pt_;
-    float       met_;    
+    float       met_;
+    float	met_phi_; 
 };
 
 inline
@@ -133,6 +135,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("sublead_sigmaEtoE_"             , &sublead_sigmaEtoE_        );
 
   BabyTree_->Branch("objects_"             , &objects_        );
+  BabyTree_->Branch("objects_boosted_"             , &objects_boosted_        );
 
   // Variable branches
   BabyTree_->Branch("maxIDMVA_" ,&maxIDMVA_);
@@ -182,6 +185,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("dipho_rapidity_"           , &dipho_rapidity_      );
   BabyTree_->Branch("dipho_pt_"           , &dipho_pt_      );
   BabyTree_->Branch("met_"           , &met_      );
+  BabyTree_->Branch("met_phi_"           , &met_phi_      );
 
   return;
 }

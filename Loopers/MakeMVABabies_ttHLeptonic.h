@@ -40,6 +40,7 @@ class BabyMaker {
     
     int 	label_;
     int 	multi_label_;
+    int         data_sideband_label_;
     float	evt_weight_;
     int 	process_id_;
     float	rand_;
@@ -48,6 +49,9 @@ class BabyMaker {
     float 	lead_sigmaEtoE_;
     float 	sublead_sigmaEtoE_;
 
+    float       tth_qcdX_mva_;
+    float       tth_ttX_mva_;
+    float       tth_ttPP_mva_;
 
     // Variable declarations
     float       maxIDMVA_;
@@ -117,10 +121,15 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("evt_weight_"     	, &evt_weight_  );
   BabyTree_->Branch("label_"     	, &label_       );
   BabyTree_->Branch("multi_label_"            , &multi_label_       );
+  BabyTree_->Branch("data_sideband_label_"            , &data_sideband_label_       );
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
   BabyTree_->Branch("super_rand_"            , &super_rand_       );
   BabyTree_->Branch("mass_"		, &mass_	);
+
+  BabyTree_->Branch("tth_qcdX_mva_"             , &tth_qcdX_mva_        );
+  BabyTree_->Branch("tth_ttX_mva_"             , &tth_ttX_mva_        );
+  BabyTree_->Branch("tth_ttPP_mva_"             , &tth_ttPP_mva_        );
 
   BabyTree_->Branch("lead_sigmaEtoE_"             , &lead_sigmaEtoE_        );
   BabyTree_->Branch("sublead_sigmaEtoE_"             , &sublead_sigmaEtoE_        );

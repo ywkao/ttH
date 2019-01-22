@@ -56,23 +56,26 @@ bool pass_2017_mva_presel() {
 
 
 
-vector<float> make_object(TLorentzVector p4, vector<float> b_disc, float photon_idmva, float met_bool, const TLorentzVector diphoton) { 
-// 0: pT, 1: eta, 2: phi, 3: E, 4: b disc, 5: bb disc, 6: c disc, 7: udsg disc, 8: photon ID MVA, 9: MET bool
+vector<float> make_object(TLorentzVector p4, vector<float> b_disc, const TLorentzVector diphoton, bool boost) { 
+// 0: pT, 1: eta, 2: phi, 3: E, 4: b disc, 5: bb disc, 6: c disc, 7: udsg disc,
   vector<float> object;
-  TLorentzVector p4_boost = p4;
-  TVector3 boost_to_higgs = -(diphoton.BoostVector());
-  p4_boost.Boost(boost_to_higgs);
-  
-  object.push_back(p4_boost.Pt());
-  object.push_back(p4_boost.Eta());
-  object.push_back(p4_boost.Phi());
-  object.push_back(p4_boost.E());
+  TLorentzVector p4_mod = p4;
+
+  if (boost) {
+    TVector3 boost_to_higgs = -(diphoton.BoostVector());
+    p4_mod.Boost(boost_to_higgs);
+  }  
+
+  object.push_back(p4_mod.Pt());
+  object.push_back(p4_mod.Eta());
+  object.push_back(p4_mod.Phi());
+  object.push_back(p4_mod.E());
   object.push_back(b_disc[0]);
   object.push_back(b_disc[1]);
   object.push_back(b_disc[2]);
   object.push_back(b_disc[3]);
-  object.push_back(photon_idmva);
-  object.push_back(met_bool); 
+  //object.push_back(photon_idmva);
+  //object.push_back(met_bool); 
 
   return object;
 }
@@ -116,7 +119,7 @@ TLorentzVector make_sublead_photon() {
   return pho;
 }
 
-vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
+vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bool boost) {
   vector<vector<float>> jet_objects;
 
   if (jet1_pt() > 0) {
@@ -132,7 +135,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet1_cdiscriminant());
     jet_discs.push_back(jet1_udsgdiscriminant());   
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet2_pt() > 0) {
     TLorentzVector jet_p4;
@@ -147,7 +150,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet2_cdiscriminant());
     jet_discs.push_back(jet2_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet3_pt() > 0) {
     TLorentzVector jet_p4;
@@ -162,7 +165,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet3_cdiscriminant());
     jet_discs.push_back(jet3_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet4_pt() > 0) {
     TLorentzVector jet_p4;
@@ -177,7 +180,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet4_cdiscriminant());
     jet_discs.push_back(jet4_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet5_pt() > 0) {
     TLorentzVector jet_p4;
@@ -192,7 +195,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet5_cdiscriminant());
     jet_discs.push_back(jet5_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet6_pt() > 0) {
     TLorentzVector jet_p4;
@@ -207,7 +210,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet6_cdiscriminant());
     jet_discs.push_back(jet6_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet7_pt() > 0) {
     TLorentzVector jet_p4;
@@ -222,7 +225,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet7_cdiscriminant());
     jet_discs.push_back(jet7_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet8_pt() > 0) {
     TLorentzVector jet_p4;
@@ -237,7 +240,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet8_cdiscriminant());
     jet_discs.push_back(jet8_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet9_pt() > 0) {
     TLorentzVector jet_p4;
@@ -252,7 +255,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet9_cdiscriminant());
     jet_discs.push_back(jet9_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet10_pt() > 0) {
     TLorentzVector jet_p4;
@@ -267,7 +270,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet10_cdiscriminant());
     jet_discs.push_back(jet10_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet11_pt() > 0) {
     TLorentzVector jet_p4;
@@ -282,7 +285,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet11_cdiscriminant());
     jet_discs.push_back(jet11_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet12_pt() > 0) {
     TLorentzVector jet_p4;
@@ -297,7 +300,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet12_cdiscriminant());
     jet_discs.push_back(jet12_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet13_pt() > 0) {
     TLorentzVector jet_p4;
@@ -312,7 +315,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet13_cdiscriminant());
     jet_discs.push_back(jet13_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet14_pt() > 0) {
     TLorentzVector jet_p4;
@@ -327,7 +330,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet14_cdiscriminant());
     jet_discs.push_back(jet14_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   if (jet15_pt() > 0) {
     TLorentzVector jet_p4;
@@ -342,7 +345,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton) {
     jet_discs.push_back(jet15_cdiscriminant());
     jet_discs.push_back(jet15_udsgdiscriminant());
 
-    jet_objects.push_back(make_object(jet_p4, jet_discs, -999, -999, diphoton));
+    jet_objects.push_back(make_object(jet_p4, jet_discs,  diphoton, boost));
   }
   return jet_objects;
 }

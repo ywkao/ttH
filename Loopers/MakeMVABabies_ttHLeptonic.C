@@ -78,6 +78,19 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
+      else if (tag == "ttHLeptonic_data_sideband_0b") {
+	if (mass() < 100)                continue;
+	if (n_jets() < 2)               continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHLeptonic_data_sideband_phoID") {
+	if (mass() < 100)                continue;
+	if (n_jets() < 2)                continue;
+	if (nb_loose() < 1)             continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
       else if (tag == "ttHLeptonic_2017_MVA_presel") {
         if (mass() < 100)               continue;
         if (n_jets() < 1)               continue;
@@ -178,6 +191,21 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
 
+
+      if (tag == "ttHLeptonic_data_sideband_0b") {
+	if (nb_medium() == 0)
+	  data_sideband_label_ = 1;
+	else
+	  data_sideband_label_ = 0;
+      }
+      else if (tag == "ttHLeptonic_data_sideband_phoID") {
+	if (minIDMVA_ < -0.2)
+          data_sideband_label_ = 1;
+        else
+          data_sideband_label_ = 0;
+      }
+
+
       // Variable definitions
       lep_pt_ = leps[0].Pt();
       lep_eta_ = leps[0].Eta();
@@ -236,7 +264,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       mass_ = mass();
 
       lead_sigmaEtoE_ = lead_sigmaEoE();
-      sublead_sigmaEtoE_ = sublead_sigmaEoE();
+      sublead_sigmaEtoE_ = sublead_sigmaEoE(); 
+
 
       FillBabyNtuple();
 

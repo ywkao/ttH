@@ -383,7 +383,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (n_jets() < 3)               continue;
 	if (nb_loose() < 1)             continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (mva_value <= 0.99222237)      continue; // should give about 4.054 signal events
+	if (mva_value <= 0.9947173)      continue; // should give about 6 * 1.5 signal events 
       }
       else if (tag == "ttHHadronic_data_sideband_0b_train") {
 	if (mass() < 100)                continue;
@@ -402,34 +402,40 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (n_jets() < 2)                continue;
         if (nb_medium() < 1)             continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (max1_btag_ < 0.8970)	 continue;
-	if (max2_btag_ < 0.0059)	 continue;
+	if (max1_btag_ < 0.83357537)	 continue;
+	//if (max2_btag_ < 0.0059)	 continue;
 	//cout << convert_tmva_to_prob(mva_value) << endl;
-	if (mva_value <= 0.98858553)	 continue; // should give about 4.377 signal events
+	if (mva_value <= 0.99688774)	 continue; // should give about 6.3 * 1.5 signal events
       }
       else if (tag == "ttHHadronic_data_sideband_phoID_train") {
         if (mass() < 100)                continue;
-        if (n_jets() < 3)                continue;
-        if (nb_medium() < 1)             continue;
-	//if (minIDMVA_ > -0.2)		 continue;
-	if (leadIDMVA() >= -0.2 || subleadIDMVA() >= -0.2)	continue;
+        if (n_jets() < 2)                continue;
+        if (nb_tight() < 1)             continue;
+	if (minIDMVA_ >= -0.2)		 continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+      else if (tag == "ttHHadronic_data_sideband_phoID_v3_train") {
+	if (mass() < 100)               continue;
+	if (n_jets() < 2)		continue;
+	if (nb_loose() < 1)		continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (minIDMVA_ >= -0.2)           continue;
+      }	
+
       else if (tag == "ttHHadronic_data_sideband_phoID_test") {
         if (mass() < 100)                continue;
-        if (n_jets() < 3)                continue;
-        if (nb_medium() < 1)             continue;
-	//if (minIDMVA_ < -0.2)		 continue;
-	if (leadIDMVA() < -0.2 && subleadIDMVA() < -0.2)        continue;
+        if (n_jets() < 2)                continue;
+        if (nb_tight() < 1)             continue;
+	if (minIDMVA_ < -0.2)		 continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
       else if (tag == "ttHHadronic_data_sideband_phoID_maxZA") {
         if (mass() < 100)                continue;
-        if (n_jets() < 3)                continue;
-        if (nb_medium() < 1)             continue;
-	if (maxIDMVA_ <= 0.8988)	 continue;
-	if (minIDMVA_ <= -0.1999)	 continue;
-	if (mva_value <= 0.96921831)	 continue; // should give about 4.2 signal events
+        if (n_jets() < 2)                continue;
+        if (nb_tight() < 1)              continue;
+	if (maxIDMVA_ <= 0.874744)	 continue;
+	if (minIDMVA_ <= -0.2)	 	 continue;
+	if (mva_value <= 0.98031139)	 continue; // should give about 6 * 1.5 signal events 
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 

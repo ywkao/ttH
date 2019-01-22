@@ -4,7 +4,7 @@ from multiprocessing import Process
 
 def run(command):
   print "Command is ", command
-  os.system(command)
+  os.system("/bin/nice -n 19 " + command)
   return
 
 def submit_jobs(command_list, n_par):

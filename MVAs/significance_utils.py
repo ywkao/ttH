@@ -85,6 +85,7 @@ def scan_za(cut_combos, signal_events, background_events, is_data):
   testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
 
   za_dict = []
+  cuts = []
   za = []
   za_unc = []
   n_sig = []
@@ -128,13 +129,90 @@ def scan_za(cut_combos, signal_events, background_events, is_data):
     print "s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)
     print "za: %.3f +/- %.3f" % (z_mc, z_mc_unc)
     za_dict.append({"z_mc": z_mc, "cut_list" : cut_list}) 
+    cuts.append(cut_list)
     za.append(z_mc)
     za_unc.append(z_mc_unc)
     n_sig.append(s)
     n_bkg.append(b)
     sigma_eff_.append(sigma_eff)
 
-  return {"za_dict" : za_dict, "za" : za, "za_unc": za_unc, "n_sig" : n_sig, "n_bkg" : n_bkg, "sigma_eff" : sigma_eff_}
+  return {"cuts" : cuts, "za" : za, "za_unc": za_unc, "n_sig" : n_sig, "n_bkg" : n_bkg, "sigma_eff" : sigma_eff_}
+
+
+def take_first(array):
+  return array[0]
+
+def find_nearest(array,value):
+    val = numpy.ones_like(array)*value
+    idx = (numpy.abs(array-val)).argmin()
+    return array[idx], idx
+
+def extract_1d_curve(full_za_dict):
+  # First sort za_dict by n_sig
+  sort_indices = numpy.argsort(full_za_dict["n_sig"])
+  #print sort_indices
+  for key in full_za_dict.keys():
+    array = numpy.asarray(full_za_dict[key])
+    #print array
+    full_za_dict[key] = array[sort_indices]
+  
+  # Now pick max Z_A for each successive group of points
+  good_indices = []
+  n_points_total = len(full_za_dict["n_sig"])
+  n_groups = 20
+  n_points_per_group = int(n_points_total / n_groups)
+
+  za_group = []
+  for i in range(n_points_total):
+    za_group.append(full_za_dict["za"][i])
+    if (i+1) % n_points_per_group == 0: 
+      #print "Group considering %d points" % n_points_per_group
+      #print "Z_A values were: ", za_group
+      best_index = numpy.argmax(za_group)
+      #print "And chose %.3f as best" % (za_group[best_index])
+      best_index_global = ((i+1) - n_points_per_group) + best_index
+      #print "This should be the same %.3f" % (full_za_dict["za"][best_index_global])
+      good_indices.append(best_index_global)
+      za_group = []
+
+  print good_indices
+
+  za_dict_trimmed = {}
+  for key in full_za_dict.keys():
+    za_dict_trimmed[key] = full_za_dict[key][good_indices]
+
+  return za_dict_trimmed
+
+  # Takes in all points from N-d scan and constructs Z_A vs. signal curve with highest Z_A value for each signal yield
+  #za = full_za_dict["za"]
+  #n_sig = full_za_dict["n_sig"]
+  
+  #za_and_n_sig = [] 
+  #for i in range(len(n_sig)):
+  #  za_and_n_sig.append([n_sig[i], za[i]])
+
+  #za_ordered_by_n_sig = za_and_n_sig.sort(key=take_first)
+  #range = abs(za_ordered_by_n_sig[0] - za_ordered_by_n_sig[-1])
+  #print "Range of n_signal %.3f" % range
+  
+  #sig_points = numpy.linspace(za_ordered_by_n_sig[0], za_ordered_by_n_sig[-1], 20)
+  #print "Sampling points near following signal values: ", sig_points
+
+  #sig_groups = {}
+  #for point in sig_points:
+  #  sig_groups[point] = []
+  
+  #for pair in za_ordered_by_n_sig:
+  #  n_sig_nearest, idx_nearest = find_nearest(sig_points, pair[0])
+  #  sig_groups[n_sig_nearest].append([pair])
+
+  #za_dict_trimmed = {}
+
+  #for group in sig_groups:
+  #  group = numpy.asarray(group)
+  #  idx_max_in_group = numpy.argmax(group[:,1])
+
+  #return n_sig_trimmed, za_trimmed
 
 
 def za_scores(n_quantiles, signal_events, background_events, is_data):
@@ -142,6 +220,8 @@ def za_scores(n_quantiles, signal_events, background_events, is_data):
   mva_cuts = {}
   for mva_name in signal_events["mva_score"].keys():
     quantiles, mva_cut = quantiles_to_mva_score(n_quantiles, signal_events["mva_score"][mva_name])
+    print "Evenly spaced signal efficiency cuts:" 
+    print mva_name, mva_cut
     mva_cut_tuples = []
     for cut in mva_cut:
       mva_cut_tuples.append((mva_name, cut))
@@ -152,25 +232,29 @@ def za_scores(n_quantiles, signal_events, background_events, is_data):
   for mva_name in mva_cuts.keys():
     mva_cut_list.append(mva_cuts[mva_name]["cut_tuples"])
   cut_combos = list(itertools.product(*mva_cut_list)) # all unique combinations of cuts from each of the N MVAs
-  print len(cut_combos)
+  print "Performing %d-D scan with %d points" % (len(signal_events["mva_score"].keys()), len(cut_combos))
 
   # Perform full N-d scan
   full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data) # Full N-d scan
 
   if len(mva_cuts.keys()) > 1:
+    za_dict_1d = extract_1d_curve(full_za_dict)
+
     # Now fix all other MVA scores except BDT at the value for which we get max Z_A, and perform 1-d scan on BDT score
-    max_idx = numpy.argmax(full_za_dict["za"])
-    mva_values_at_max = full_za_dict["za_dict"][max_idx]["cut_list"]
+
+
+    #max_idx = numpy.argmax(full_za_dict["za"])
+    #mva_values_at_max = full_za_dict["za_dict"][max_idx]["cut_list"]
     
-    mva_cut_list_1d = [mva_cuts["bdt_score"]["cut_tuples"]]
-    for mva_name in mva_cuts.keys():
-      if mva_name == "bdt_score":
-        continue
-      else:
-        print "Fixing 1d optimization at %s : %.4f" % (mva_name, mva_values_at_max[mva_name])
-        mva_cut_list_1d.append([(mva_name, mva_values_at_max[mva_name])])
-    cut_combos_1d = list(itertools.product(*mva_cut_list_1d))
-    za_dict_1d = scan_za(cut_combos_1d, signal_events, background_events, is_data)
+    #mva_cut_list_1d = [mva_cuts["bdt_score"]["cut_tuples"]]
+    #for mva_name in mva_cuts.keys():
+    #  if mva_name == "bdt_score":
+    #    continue
+    #  else:
+    #    print "Fixing 1d optimization at %s : %.4f" % (mva_name, mva_values_at_max[mva_name])
+    #    mva_cut_list_1d.append([(mva_name, mva_values_at_max[mva_name])])
+    #cut_combos_1d = list(itertools.product(*mva_cut_list_1d))
+    #za_dict_1d = scan_za(cut_combos_1d, signal_events, background_events, is_data)
   else:
     za_dict_1d = full_za_dict
 

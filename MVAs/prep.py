@@ -8,14 +8,16 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input root file", type=str)
 parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str, default = "Hadronic")
+parser.add_argument("--tag", help = "name to append to filename", type=str, default = "")
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
 parser.add_argument("-i", "--invert", help = "invert the test/train split", action="store_true")
 parser.add_argument("-s", "--sideband", help = "use data sideband for training", action = "store_true")
+parser.add_argument("--handicap", help = "use only 1/3 of training data (to get a feel for how much stats matter)", action = "store_true")
 parser.add_argument("--sideband_name", help = "which data sideband to use", type=str, default="none")
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
-output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features.hdf5"
+output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + ".hdf5"
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
@@ -53,8 +55,11 @@ features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ 
 features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, "&& data_sideband_label_ == 0" if args.sideband else ""))
 
 if args.sideband:
-  features_data_sideband = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 2) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (rand_branch, train_frac)) 
-  features_data_sideband_mc = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 0) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (rand_branch, train_frac))
+  handicap = ""
+  if args.handicap:
+    handicap = " && %s < 0.5" % (rand_branch)
+  features_data_sideband = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 2 %s) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (handicap, rand_branch, train_frac)) 
+  features_data_sideband_mc = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 0 %s) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (handicap, rand_branch, train_frac))
 
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d %s' % (data_label, "&& data_sideband_label_ == 0" if args.sideband else ""))
 

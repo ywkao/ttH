@@ -14,7 +14,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   OptimizationBabyMaker* baby = new OptimizationBabyMaker();
   TString xml_file_noExt = xml_file;
   xml_file_noExt.ReplaceAll(".xml", "");
-  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt;
+  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt + "_" + tag;
   baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
 
   // Create "process" objects
@@ -273,6 +273,37 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+
+      else if (tag == "ttHLeptonic_data_sideband_0b_train") {
+	if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_medium() != 0)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHLeptonic_data_sideband_0b_test") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_medium() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHLeptonic_data_sideband_phoID_train") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (minIDMVA_ >= -0.2)		continue;
+      }
+      else if (tag == "ttHLeptonic_data_sideband_phoID_test") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 2)                continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (minIDMVA_ < -0.2)		continue;
+      }
+
+
       else if (tag == "ttHLeptonic_ttbarCR") {
 	if (mass() < 100)        continue;
 	if (n_jets() < 2)       continue;

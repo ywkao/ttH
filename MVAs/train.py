@@ -27,6 +27,7 @@ parser.add_argument("-s", "--sideband", help = "use data sideband for training",
 parser.add_argument("--optimization_vars", help = "csv list of additional variables to perform N-d Z_A optimization scan in (along with BDT score)", type=str)
 args = parser.parse_args()
 
+
 ### Read features ###
 f = h5py.File(args.input.replace(".hdf5", "") + ".hdf5", "r")
 

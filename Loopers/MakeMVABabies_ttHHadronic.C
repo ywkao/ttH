@@ -96,9 +96,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     tth_ttX_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
     tth_ttX_mva->AddVariable("met_", &met_);
 
-    //tth_ttX_mva->AddVariable("top_tag_score_", &top_tag_score_);
+    tth_ttX_mva->AddVariable("top_tag_score_", &top_tag_score_);
 
-    tth_ttX_mva->BookMVA("BDT", "../MVAs/Hadronic_DataSideband_Data_PhoID_3dOpt_20_1_bdt.xml");
+    tth_ttX_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_data_sideband_phoID_v2__bdt.xml");
   }
 
   bool do_tth_qcdX_mva = true;
@@ -146,12 +146,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     tth_qcdX_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
     tth_qcdX_mva->AddVariable("met_", &met_);
     
-    //tth_qcdX_mva->AddVariable("top_tag_score_", &top_tag_score_);
+    tth_qcdX_mva->AddVariable("top_tag_score_", &top_tag_score_);
     
-    tth_qcdX_mva->BookMVA("BDT", "../MVAs/Hadronic_DataSideband_Data_MediumB_3dOpt_20_1_bdt.xml");
+    tth_qcdX_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_data_sideband_0b__bdt.xml");
   }
 
-  bool do_tth_ttPP_mva = false;
+  bool do_tth_ttPP_mva = true;
   if (do_tth_ttPP_mva) {
     tth_ttPP_mva.reset(new TMVA::Reader( "!Color:Silent" ));
     
@@ -196,9 +196,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     tth_ttPP_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
     tth_ttPP_mva->AddVariable("met_", &met_);
     
-    //tth_ttPP_mva->AddVariable("top_tag_score_", &top_tag_score_);
+    tth_ttPP_mva->AddVariable("top_tag_score_", &top_tag_score_);
     
-    tth_ttPP_mva->BookMVA("BDT", "../MVAs/blahblahblah.xml");
+    tth_ttPP_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_ttPP__bdt.xml");
   }
 
 
@@ -237,7 +237,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     }
 
     if (tag == "ttHHadronic_DNN_presel") {
-      if (!(currentFileTitle.Contains("ttHJet") || currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"))) {
+      if (!(currentFileTitle.Contains("ttHJet") || currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma") || currentFileTitle.Contains("DiPhoton"))) {
 	cout << "Skipping " << currentFileTitle << endl;
         continue;
       }
@@ -317,6 +317,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
+      else if (tag == "ttHHadronic_data_sideband_phoID_v3") {
+        if (mass() < 100)                continue;
+	if (n_jets() < 2)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
       else if (tag == "ttHHadronic_DNN_presel") {
 	if (mass() < 100)                continue;
 	if (n_jets() < 3)               continue;
@@ -390,8 +397,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	  data_sideband_label_ = 0; 
       }
 
-      else if (tag == "ttHHadronic_data_sideband_phoID" || tag == "ttHHadronic_data_sideband_phoID_v2") {
-	if (!(leadIDMVA() > -0.2 && subleadIDMVA() > -0.2))
+      else if (tag == "ttHHadronic_data_sideband_phoID" || tag == "ttHHadronic_data_sideband_phoID_v2" || tag == "ttHHadronic_data_sideband_phoID_v3") {
+	if (minIDMVA_ < -0.2)
 	  data_sideband_label_ = 1;
 	else
 	  data_sideband_label_ = 0;
@@ -446,6 +453,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       dipho_rapidity_ = dipho_rapidity();
       dipho_pt_ = diphoton.Pt();
       met_ = MetPt();
+      met_phi_ = MetPhi();
 
       rand_ = cms3.rand();
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
@@ -479,26 +487,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       // DNN Business
       vector<vector<float>> unordered_objects;
     
-      vector<vector<float>> jet_objects = make_jet_objects(year, diphoton); 
-      for (int i = 0; i < jet_objects.size(); i++)
-        unordered_objects.push_back(jet_objects[i]);
+      vector<vector<float>> jet_objects = make_jet_objects(year, diphoton, false); // don't boost jet p4 to higgs ref. frame
+      vector<vector<float>> jet_objects_boosted = make_jet_objects(year, diphoton, true); // yes boost
 
-
-      //unordered_objects.push_back(make_object(lead_photon_modified,    {-999, -999, -999, -999},    leadIDMVA(), -999));
-      //unordered_objects.push_back(make_object(sublead_photon_modified, {-999, -999, -999, -999}, subleadIDMVA(), -999));
-
-      TLorentzVector Met;
-      Met.SetPtEtaPhiE(MetPt(), 0.0, MetPhi(), MetPt());
-      unordered_objects.push_back(make_object(Met,	      	       {-999, -999, -999, -999},           -999,  1.0, diphoton));
-
-      objects_ = sort_objects(unordered_objects);
-
-      //TLorentzVector lead_photon_modified, sublead_photon_modified;
-      //lead_photon_modified.SetPtEtaPhiE(lead_ptoM(), leadEta(), leadPhi(), -999);
-      //sublead_photon_modified.SetPtEtaPhiE(sublead_ptoM(), subleadEta(), subleadPhi(), -999);
-      
-      //objects_.insert(objects_.begin(), make_object(sublead_photon_modified, {-999, -999, -999, -999}, subleadIDMVA(), -999, diphoton));
-      //objects_.insert(objects_.begin(), make_object(lead_photon_modified,    {-999, -999, -999, -999},    leadIDMVA(), -999, diphoton));
+      objects_ = sort_objects(jet_objects);
+      objects_boosted_ = sort_objects(jet_objects_boosted);
 
       FillBabyNtuple();
 

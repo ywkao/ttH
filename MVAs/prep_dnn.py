@@ -7,24 +7,38 @@ import root_numpy
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input root file", type=str)
+parser.add_argument("--signal", help = "which process to consider as signal", type=str, default="ttH")
+parser.add_argument("--backgrounds", help = "which processes to consider as bkgs", type=str, default="ttGG,dipho")
+parser.add_argument("--tag", help = "name to add to hdf5 file name", type=str, default="")
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
-output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_dnn_features.hdf5"
+output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_dnn_features_" + args.tag + ".hdf5"
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
 
 # load tree to array
-feature_names = ["objects_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_"]
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_"]))
+feature_names = ["objects_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "met_", "met_phi_"]
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_"]))
 
 rand_branch = "rand_"
 data_label = 2
 train_frac = 0.5
 
-features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f' % (data_label, rand_branch, train_frac))
-features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f' % (data_label, rand_branch, train_frac))
+process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2}
+selection = "&& ("
+procs = args.backgrounds.split(",") + args.signal.split(",")
+for i in range(len(procs)):
+  selection += "process_id_ == %d" % (process_dict[procs[i]])
+  if i != len(procs) - 1:
+    selection += " || "
+
+selection += ")"
+print selection
+
+features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, selection))
+features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, selection))
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d' % (data_label))
 
 #features
@@ -32,9 +46,9 @@ object_features = features["objects_"]
 object_features_validation = features_validation["objects_"]
 object_features_data = features_data["objects_"]
 
-global_features = numpy.transpose(numpy.array([features['lead_eta_'], features['sublead_eta_'], features['lead_phi_'], features['sublead_phi_'], features['leadptoM_'], features['subleadptoM_'], features['leadIDMVA_'], features['subleadIDMVA_']]))
-global_features_validation = numpy.transpose(numpy.array([features_validation['lead_eta_'], features_validation['sublead_eta_'], features_validation['lead_phi_'], features_validation['sublead_phi_'], features_validation['leadptoM_'], features_validation['subleadptoM_'], features_validation['leadIDMVA_'], features_validation['subleadIDMVA_']]))
-global_features_data = numpy.transpose(numpy.array([features_data['lead_eta_'], features_data['sublead_eta_'], features_data['lead_phi_'], features_data['sublead_phi_'], features_data['leadptoM_'], features_data['subleadptoM_'], features_data['leadIDMVA_'], features_data['subleadIDMVA_']]))
+global_features = numpy.transpose(numpy.array([features['lead_eta_'], features['sublead_eta_'], features['lead_phi_'], features['sublead_phi_'], features['leadptoM_'], features['subleadptoM_'], features['leadIDMVA_'], features['subleadIDMVA_'], features['met_'], features['met_phi_']]))
+global_features_validation = numpy.transpose(numpy.array([features_validation['lead_eta_'], features_validation['sublead_eta_'], features_validation['lead_phi_'], features_validation['sublead_phi_'], features_validation['leadptoM_'], features_validation['subleadptoM_'], features_validation['leadIDMVA_'], features_validation['subleadIDMVA_'], features_validation['met_'], features_validation['met_phi_']]))
+global_features_data = numpy.transpose(numpy.array([features_data['lead_eta_'], features_data['sublead_eta_'], features_data['lead_phi_'], features_data['sublead_phi_'], features_data['leadptoM_'], features_data['subleadptoM_'], features_data['leadIDMVA_'], features_data['subleadIDMVA_'], features_data['met_'], features_data['met_phi_']]))
 
 def get_mean_and_std(array):
   array_trimmed = array[array != -999]
@@ -52,7 +66,7 @@ def preprocess(array, mean, std):
   return array
 
 def pad_array(array):
-  max_objects = 18
+  max_objects = 6
   nData = len(array)
   nFeatures = len(array[0][0])
   y = numpy.ones((nData, max_objects, nFeatures))
@@ -73,7 +87,7 @@ object_features_data = pad_array(object_features_data)
 object_features_signal = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == 1')["objects_"]
 object_features_signal = pad_array(object_features_signal)
 
-n_objects = 18
+n_objects = 8
 n_features = 10
 
 #for i in range(n_objects):
@@ -95,27 +109,41 @@ n_features = 10
 #      print object_features[k][i][j]
 
 label = features["label_"]
+
+
 multi_label = features["multi_label_"]
 weights = features["evt_weight_"]
 
 mass = features["mass_"]
 lead_sigmaEtoE = features["lead_sigmaEtoE_"]
 sublead_sigmaEtoE = features["sublead_sigmaEtoE_"]
+top_tag_score = features["top_tag_score_"]
 
 label_validation = features_validation["label_"]
 multi_label_validation = features_validation["multi_label_"]
 weights_validation = features_validation["evt_weight_"]
 mass_validation = features_validation["mass_"]
+top_tag_score_validation = features_validation["top_tag_score_"]
 
 label_data = features_data["label_"]
 multi_label_data = features_data["multi_label_"]
 weights_data = features_data["evt_weight_"]
 mass_data = features_data["mass_"]
+top_tag_score_data = features_data["top_tag_score_"]
 
 # reorganize features
 #object_features = numpy.transpose(object_features)
 #object_features_validation = numpy.transpose(object_features_validation)
 #object_features_data = numpy.transpose(object_features_data)
+
+# relabel labels
+for sig in args.signal.split(","):
+  label[features["process_id_"] == process_dict[sig]] = 1
+  label_validation[features_validation["process_id_"] == process_dict[sig]] = 1
+
+for bkg in args.backgrounds.split(","):
+  label[features["process_id_"] == process_dict[bkg]] = 0
+  label_validation[features_validation["process_id_"] == process_dict[bkg]] = 0
 
 f_out = h5py.File(output_file, "w")
 
@@ -127,6 +155,7 @@ dset_label = f_out.create_dataset("label", data=label)
 dset_multi_label = f_out.create_dataset("multi_label", data=multi_label)
 dset_weights = f_out.create_dataset("weights", data=weights)
 dset_mass = f_out.create_dataset("mass", data=mass)
+dset_top_tag_score = f_out.create_dataset("top_tag_score", data=top_tag_score)
 dset_lead_sigmaEtoE = f_out.create_dataset("lead_sigmaEtoE", data=lead_sigmaEtoE)
 dset_sublead_sigmaEtoE = f_out.create_dataset("sublead_sigmaEtoE", data=sublead_sigmaEtoE)
 
@@ -135,6 +164,7 @@ dset_global_validation = f_out.create_dataset("global_validation", data=global_f
 dset_label_validation = f_out.create_dataset("label_validation", data=label_validation)
 dset_multi_label_validation = f_out.create_dataset("multi_label_validation", data=multi_label_validation)
 dset_weights_validation = f_out.create_dataset("weights_validation", data=weights_validation)
+dset_top_tag_score_validation = f_out.create_dataset("top_tag_score_validation", data=top_tag_score_validation)
 dset_mass_validation = f_out.create_dataset("mass_validation", data=mass_validation)
 
 dset_object_data = f_out.create_dataset("object_data", data=object_features_data)
@@ -142,6 +172,7 @@ dset_global_data = f_out.create_dataset("global_data", data=global_features_data
 dset_label_data = f_out.create_dataset("label_data", data=label_data)
 dset_multi_label_data = f_out.create_dataset("multi_label_data", data=multi_label_data)
 dset_weights_data = f_out.create_dataset("weights_data", data=weights_data)
+dset_top_tag_score_data = f_out.create_dataset("top_tag_score_data", data=top_tag_score_data)
 dset_mass_data = f_out.create_dataset("mass_data", data=mass_data)
 
 f_out.close()
