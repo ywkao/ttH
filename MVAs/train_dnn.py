@@ -27,7 +27,8 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input hdf5 file", type=str)
 parser.add_argument("--tag", help = "save name for weights file", type=str)
-parser.add_argument("--global_features", help = "use global features also", action="store_true")
+parser.add_argument("--no_global", help = "don't use global features", action="store_true")
+parser.add_argument("--no_lstm", help = "don't use object features (lstm)", action="store_true")
 args = parser.parse_args()
 
 f = h5py.File(args.input, "r")
@@ -38,6 +39,8 @@ label, label_validation, label_data = f['label'], f['label_validation'], f['labe
 weights, weights_validation, weights_data = f['weights'], f['weights_validation'], f['weights_data']
 mass, mass_validation, mass_data = f['mass'], f['mass_validation'], f['mass_data']
 top_tag_score, top_tag_score_validation, top_tag_score_data = f['top_tag_score'], f['top_tag_score_validation'], f['top_tag_score_data']
+tth_ttPP_mva, tth_ttPP_mva_validation, tth_ttPP_mva_data = f['tth_ttPP_mva'], f['tth_ttPP_mva_validation'], f['tth_ttPP_mva_data']
+
 
 max_objects = len(object_features[0])
 n_features = len(object_features[0][0])
@@ -45,9 +48,9 @@ n_global_features = len(global_features[0])
 
 print(max_objects, n_features, len(object_features), n_global_features)
 
-model = dnn_model.separate_photons(max_objects, n_features, n_global_features, args.global_features)
+model = dnn_model.separate_photons(max_objects, n_features, n_global_features, args.no_global, args.no_lstm)
 
-nEpochs = 3
+nEpochs = 40
 nBatch = 8192
 
 weights_file = "dnn_weights/" + args.tag + "_weights_{epoch:02d}.hdf5"
@@ -69,7 +72,7 @@ object_features = numpy.asarray(object_features)
 label = numpy.asarray(label)
 global_features = numpy.asarray(global_features)
 
-model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights))
+model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list)
 
 pred = model.predict([global_features, object_features], batch_size = nBatch)
 pred_test = model.predict([global_features_validation, object_features_validation], batch_size = nBatch)
@@ -79,12 +82,14 @@ fpr_train, tpr_train, thresh_train = metrics.roc_curve(label, pred, pos_label = 
 fpr_test,  tpr_test,  threst_test  = metrics.roc_curve(label_validation, pred_test, pos_label = 1, sample_weight = weights_validation)
 
 fpr_tts, tpr_tts, thresh_tts = metrics.roc_curve(label, top_tag_score, pos_label = 1, sample_weight = weights_train)
+fpr_ttPP, tpr_ttPP, thresh_ttPP = metrics.roc_curve(label, tth_ttPP_mva, pos_label = 1, sample_weight = weights_train)
 
 print("Training AUC: %.5f" % metrics.auc(fpr_train, tpr_train, reorder = True))
 print("Testing  AUC: %.5f" % metrics.auc(fpr_test , tpr_test, reorder = True))
 print("Top Tag  AUC: %.5f" % metrics.auc(fpr_tts,   tpr_tts, reorder = True))
+print("TTPP BDT AUC: %.5f" % metrics.auc(fpr_ttPP,  tpr_ttPP, reorder = True))
 
-numpy.savez("dnn_rocs_%s.npz" % (args.tag), fpr_train = fpr_train, tpr_train = tpr_train, fpr_test = fpr_test, tpr_test = tpr_test, fpr_tts = fpr_tts, tpr_tts = tpr_tts)
+numpy.savez("dnn_rocs_%s.npz" % (args.tag), fpr_train = fpr_train, tpr_train = tpr_train, fpr_test = fpr_test, tpr_test = tpr_test, fpr_tts = fpr_tts, tpr_tts = tpr_tts, fpr_ttPP = fpr_ttPP, tpr_ttPP = tpr_ttPP)
 
 y_test = label_validation
 
@@ -101,6 +106,7 @@ plt.plot(fpr_train, tpr_train, color='darkred', lw=2, label='Train')
 #plt.plot(fpr_bdt, tpr_bdt, color='blue', lw=2, label='BDT')
 plt.plot(fpr_test, tpr_test, color = 'darkorange', lw=2, label='Test')
 plt.plot(fpr_tts,  tpr_tts,  color = 'blue', lw=2, label='Top tag score')
+plt.plot(fpr_ttPP, tpr_ttPP, color = 'green', lw=2, label='ttPP BDT')
 plt.grid()
 plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate (bkg. eff.)')
@@ -108,6 +114,20 @@ plt.ylabel('True Positive Rate (sig. eff.)')
 plt.legend(loc='lower right')
 plt.savefig('plot_auc_dnn.pdf')
 
+
+bkg_dnn = ks_test.logical_vector(pred_test, y_test, 0)
+bkg_ttPP = ks_test.logical_vector(tth_ttPP_mva_validation, y_test, 0)
+bkg_mass = ks_test.logical_vector(mass_validation, y_test, 0)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.scatter(bkg_mass, bkg_dnn, label = 'ttGG Events (bkg)', edgecolors = 'none', marker=".", c = 'blue')
+plt.ylim([0.0, 1.0])
+plt.xlim([100, 150])
+plt.xlabel('m_gg [GeV]')
+plt.ylabel('DNN Score')
+plt.legend(loc='upper right')
+plt.savefig('dnn_score_vs_mass.pdf')
 
 estimate_za = False
 if estimate_za:

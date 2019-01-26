@@ -10,7 +10,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   bool evaluate_mva = xml_file != "none";
 
-  bool reweight_GJets = tag != "ttHHadronic_GJet_Reweight_Preselection"; 
+  bool combine_gjets_samples = tag != "ttHHadronic_GJet_Reweight_Preselection"; 
+  //bool scale_gjets_normalization = !(tag.Contains("GJet_Reweight_Preselection"));
+  bool scale_gjets_normalization = true;
 
   // Make MVA Optimization Baby
   OptimizationBabyMaker* baby = new OptimizationBabyMaker();
@@ -32,7 +34,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   TFile *currentFile = 0;
 
   // Initialize map of evt_run_lumi -> rand
-  RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
+  //RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
 
   // MVA Business
   unique_ptr<TMVA::Reader> mva;
@@ -157,9 +159,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   gjet_mva->AddVariable("dipho_pt_", &dipho_pt_);
   gjet_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
   gjet_mva->AddVariable("dipho_cosphi_", &dipho_cosphi_); 
+  gjet_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+  gjet_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
 
-
-  gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight_binary_crossEntropy_bdt.xml");
+  gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight_1617_GJetReweight_CombineSamples_bdt.xml");
 
   double dipho_yield = 0;
 
@@ -179,11 +182,17 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
 
+    if (isSignal) {
+      if (!currentFileTitle.Contains("M125"))   continue;
+    }
+
+
     TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
 
     // Set json file
     set_json(mYear);
 
+    bool reweight_gjets;
     if (tag.Contains("GJet_Reweight_Preselection")) {
       if (!(currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT"))) {
         cout << "Skipping " << currentFileTitle << endl;
@@ -325,7 +334,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       double reference_mva = tthMVA();
       bool pass_ref_presel = mYear == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
-      double super_rand = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
+      double super_rand = -999;//rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
 
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
@@ -341,17 +350,29 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" )); 
 
       bool do_binned_probabilities = false;
-      if (processId == 3 && reweight_GJets) {
+      if (combine_gjets_samples) {
+	if (processId == 17) 
+	  processId = 3;
+      }
+      if (processId == 3 && combine_gjets_samples) {
 	if (!do_binned_probabilities) {
 	  double prob = gjet_mva_value;
 	  double prob_ratio = prob / ( 1 - prob);
 	  evt_weight *= prob_ratio;
-	  evt_weight *= gjet_normalization;
+	  if (scale_gjets_normalization)
+	    evt_weight *= gjet_normalization;
+	  //cout << "Reweighting GJets event by: " << prob_ratio * gjet_normalization << endl;
 	}
 	else {
 	  evt_weight *= prob_ratio_from_madgraph(gjet_mva_value);
 	}
       } 
+
+      if (!combine_gjets_samples) { // skip Pythia if we aren't combining Pythia and MadGraph
+	if (processId == 3) {
+	  continue; 
+	}
+      }
 
       if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) {
         continue; //some pu weights are nan/inf and this causes problems for histos 
@@ -376,6 +397,22 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (n_jets() < 3)		continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHHadronicLoose_impute_presel") {
+	if (mass() < 100)               continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (minIDMVA_ < -0.7)		continue;
+      }
+
+      else if (tag == "ttHHadronicLoose_impute_sideband") {
+	if (mass() < 100)               continue;
+	if (n_jets() < 3)               continue;
+	if (nb_loose() < 1)             continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (minIDMVA_ >= -0.7)           continue;
       }
 
       else if (tag == "ttHHadronic_baseline_maxZA") {
@@ -721,13 +758,20 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_fine", maxID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse", maxID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_entries", maxID, 1, vId);
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_fine_entries", maxID, 1, vId);
 
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA_fine", minID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse", minID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA_entries", minID, 1, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA_fine_entries", minID, 1, vId);
+
+      if (nb_medium() == 0) {
+        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse_0b", minID, evt_weight, vId);
+        vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse_0b", maxID, evt_weight, vId);
+      }
 
       vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets", maxID, n_jets(), evt_weight, vId);
       vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets", minID, n_jets(), evt_weight, vId); 
@@ -780,7 +824,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
  
   baby->CloseBabyNtuple();
 
-  delete rand_map;
+  //delete rand_map;
 
   // Example Histograms
   f1->Write();

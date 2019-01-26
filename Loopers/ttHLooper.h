@@ -133,6 +133,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonMinIDMVA_fine_entries", 30, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_coarse", 5, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_coarse", 5, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_coarse_0b", 5, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_coarse_0b", 5, -1, 1);
     v[i]->add_2D_histogram("hPhotonMaxIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5); 
     v[i]->add_2D_histogram("hPhotonMinIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5);
     v[i]->add_2D_histogram("hPhotonMaxIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5);
@@ -216,7 +218,7 @@ vector<TH1D*> generate_1Dhist_vector(TString name, int length, int nBins, float 
 }
 
 int categorize_process(TString currentFileTitle, int genPhotonId) {
-  if (currentFileTitle.Contains("ttHJet"))
+  if (currentFileTitle.Contains("ttHJet")) // && currentFileTitle.Contains("M125"))
     return 0;
   else if (currentFileTitle.Contains("DY"))
     return 1;
@@ -264,6 +266,10 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
     return 16;
   else if (currentFileTitle.Contains("GJets_HT"))
     return 17;
+  //else if (currentFileTitle.Contains("ttHJet") && currentFileTitle.Contains("M126"))
+  //  return 18; // use for MVA testing
+  //else if (currentFileTitle.Contains("ttHJet"))
+  //  return 19; // use for MVA training
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -312,13 +318,23 @@ bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
   return false;
 }
 
-const double gjet_normalization = 2.67547; // scale factor to make Pythia yield match MadGraph yield
-const double qcd_factor = 2.6302765969200204; 
-const double gjets_factor = 1.9817470714424696; 
-const double diphoton_factor = 1.1645911726186993; 
-const vector<double> qcd_factor_Njets = {2.2940045704500824, 1.7784105604582408, 1.7659539814519811}; 
-const vector<double> gjets_factor_Njets = {1.945909958008661, 2.865798441193098, 3.6723528776911034}; 
-const vector<double> diphoton_factor_Njets = {1.195047195435529, 0.9420013195895437, 0.8631697452232668}; 
+const double gjet_normalization = 188341.868812 / 345058.328323; // scale factor to make reweighted (Pythia + MadGraph) yield match MadGraph yield. First number taken from hMass_GammaJets_Madgraph->IntegralAndError(1,80,err) in ttHHadronic_GJet_Reweight_Preselection__histogramsAll.root and second number taken from hMass_GammaJets->IntegralAndError(1,80,err) in ttHHadronic_GJet_Reweight_Preselection_wWeights__histogramsAll.root
+
+// 2017-only results
+const double qcd_factor_2017 = 2.6302765969200204; 
+const double gjets_factor_2017 = 1.9817470714424696; 
+const double diphoton_factor_2017 = 1.1645911726186993; 
+const vector<double> qcd_factor_Njets_2017 = {2.2940045704500824, 1.7784105604582408, 1.7659539814519811}; 
+const vector<double> gjets_factor_Njets_2017 = {1.945909958008661, 2.865798441193098, 3.6723528776911034}; 
+const vector<double> diphoton_factor_Njets_2017 = {1.195047195435529, 0.9420013195895437, 0.8631697452232668}; 
+
+// 2016+2017 results
+const double qcd_factor = 2.399144178915237;
+const double gjets_factor = 1.7532994814392295;
+const double diphoton_factor = 1.1389466592137074;
+const vector<double> qcd_factor_Njets = {2.357160350951758, 2.0445853297833256, 1.3099669292651388};
+const vector<double> gjets_factor_Njets = {1.660622209083969, 2.234460138056228, 3.227084762144053};
+const vector<double> diphoton_factor_Njets = {1.2072907358168674, 1.0503124421392787, 0.7338075364880837};
 
 double qcdX_njets_bin(int n_jets) {
   if (n_jets == 2)
@@ -333,10 +349,8 @@ double qcdX_njets_bin(int n_jets) {
 
 double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   if (qcd_scale == "inclusive_NJets") {
-    if (currentFileTitle.Contains("GJet_Pt")) 
+    if (currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT")) 
       return gjets_factor; 
-    else if (currentFileTitle.Contains("GJets_HT"))
-      return 1.8847607139999762;
     else if (currentFileTitle.Contains("QCD"))
       return qcd_factor; 
     else if (currentFileTitle.Contains("DiPhotonJetsBox"))
@@ -346,10 +360,8 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   }
   else if (qcd_scale == "binned_NJets") {
     int jet_idx = qcdX_njets_bin(n_jets);
-    if (currentFileTitle.Contains("GJet_Pt"))
+    if (currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT"))
       return gjets_factor_Njets[jet_idx];
-    else if (currentFileTitle.Contains("GJets_HT"))
-      return 1.8847607139999762;
     else if (currentFileTitle.Contains("QCD"))
       return qcd_factor_Njets[jet_idx];
     else if (currentFileTitle.Contains("DiPhotonJetsBox"))
@@ -603,6 +615,11 @@ const vector<TString> vSamples_2016 = {
 			"DoubleEG_Run2016H-03Feb2017_ver3-v1_MINIAOD_2016_topTag_overlapRemoval",
 			// ttH
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ttHJetToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ttHJetToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ttHJetToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			// DY
 			"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			// gamma gamma + jets
@@ -714,6 +731,11 @@ const vector<TString> vSamples_2017 = {
 			"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
 			// ttH
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ttHJetToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ttHJetToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ttHJetToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			// other signal modes
 			"THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",

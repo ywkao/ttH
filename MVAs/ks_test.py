@@ -8,9 +8,11 @@ def logical_vector(values, labels, label_target):
   array = []
   if not(len(values) == len(labels)):
     raise RuntimeError("length of target array must be the same as label array")
-  for i in range(len(values)):
-    if labels[i] == label_target:
-      array.append(values[i])
+
+  values = numpy.asarray(values)
+  labels = numpy.asarray(labels)
+
+  array = values[numpy.where(labels == label_target)]
   return array
 
 def plot_hist(distribution, bins, color, label):

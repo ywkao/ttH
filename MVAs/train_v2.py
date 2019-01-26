@@ -146,7 +146,7 @@ def train_bdt(config):
   pred_data = bdt.predict(d_data, output_margin=config["multiclassifier"])
 
   # estimate z_a w/at least 4 signal events
-  n_quantiles = 20
+  n_quantiles = 100
   signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
   bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}
   data_mva_scores = {"bdt_score" : pred_data}

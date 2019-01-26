@@ -113,14 +113,15 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   TString output = output_name;
 
   if (type =="std") {
-    if (year != "All") {
-      vLegendLabels = {year + " Data", "ttH (M125)"};
+    //if (year != "All") {
+    vLegendLabels = {year + " Data", "ttH (M125)"};
       //vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
-    }
-    else if (file_ref != nullptr) 
-      vLegendLabels = {"2018 Data", "2017 Data", "ttH (M125)"};
-    else
-      vLegendLabels = {"2016 + 2017 Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
+    //}
+
+    //else if (file_ref != nullptr) 
+    //  vLegendLabels = {"2018 Data", "2017 Data", "ttH (M125)"};
+    //else
+    //  vLegendLabels = {"2016 + 2017 Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
     for (int i = 0; i < vBkgs.size(); i++) {
       hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + mva_category));
       /*
@@ -175,7 +176,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
 
   else if (type == "GJet_shape") {
-    vLegendLabels = {"#gamma + jets (Pythia)", "#gamma + jets (Madgraph)"};
+    vLegendLabels = {"#gamma + jets (Pythia + MadGraph Reweighted)", "#gamma + jets (Madgraph)"};
     for (int i = 0; i < vBkgs.size(); i++) {
       hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i]));
       vColors.push_back(mColors.find(vBkgs[i])->second);
@@ -338,10 +339,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_y_label("Fraction of Events");
     c->set_no_lumi();
     c->set_scale(-1);
-    c->set_rat_label("#frac{Pythia}{Madgraph}");
+    c->set_rat_label("#frac{Pythia+MadGraph}{MadGraph}");
     c->set_both_data();
     if (output.Contains("wWeights"))
-      c->give_info("Pythia Reweighted");
+      c->give_info("Pythia + MadGraph Reweighted");
     c->set_y_lim_range({0.005, 3.0});
   }
   else if (type == "individual_shape") {

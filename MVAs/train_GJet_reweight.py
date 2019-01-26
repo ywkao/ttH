@@ -88,6 +88,21 @@ pred_train = bdt.predict(d_train, output_margin=False)
 for i in range(5):
   print pred_train[i]
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+pred_sig = ks_test.logical_vector(pred_train, y_train, 1)
+pred_bkg = ks_test.logical_vector(pred_train, y_train, 0)
+
+bins = numpy.linspace(0, 1, 20)
+fig = plt.figure()
+ks_test.plot_hist(pred_sig, bins, 'red', 'training set (signal)')
+ks_test.plot_hist(pred_bkg, bins, 'green', 'training set (background)')
+plt.xlabel('BDT Score')
+plt.legend(loc = 'upper center')
+plt.savefig('discriminant_hist_gjets.pdf')
+
 
 # ks test
 #d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(pred_train, pred_test, y_train, y_test)

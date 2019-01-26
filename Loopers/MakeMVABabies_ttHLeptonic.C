@@ -31,6 +31,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);
 
+    // Skip Pythia GJets
+    if (currentFileTitle.Contains("GJet-Pt")) {
+      cout << "Skipping Pythia GJets sample: " << currentFileTitle << endl;
+    }
+
     // Initialize map of evt_run_lumi -> rand
     RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic_" + ext + ".txt");
 
@@ -38,6 +43,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
     TString year = currentFileTitle.Contains("2016") ? "2016" : "2017";
+
+    if (isSignal) {
+      if (!currentFileTitle.Contains("M125"))   continue;
+    }
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -62,13 +71,15 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       // Decide what type of sample this is
       int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
       process_id_ = categorize_process(currentFileTitle, genPhotonId);
+      if (process_id_ == 17)
+        process_id_ = 3; // use Madgraph GJets instead of Pythia
 
       // Skipping events/samples
       if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
       if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
       if (is_low_stats_process(currentFileTitle))       continue;
       if (is_wrong_tt_jets_sample(currentFileTitle, "Leptonic"))        continue;
-      if (process_id_ == 17)				continue; // skip MadGraph g+jets
+      //if (process_id_ == 17)				continue; // skip MadGraph g+jets
 
       // Selection
       if (tag == "ttHLeptonicLoose") {

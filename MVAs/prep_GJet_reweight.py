@@ -18,7 +18,7 @@ tree = f.Get("t")
 #feature_names = ["mass_", "njets_", "ht_", "jet1_pt_", "jet1_eta_", "max1_btag_", "max2_btag_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "leadptoM_", "subleadptoM_"]
 
 #feature_names = ["jet1_pt_"]
-feature_names = ["njets_", "ht_", "jet1_pt_", "jet2_pt_", "jet1_eta_", "jet2_eta_", "max1_btag_", "max2_btag_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "minIDMVA_", "maxIDMVA_", "lead_pT_", "sublead_pT_", "dipho_pt_", "dipho_rapidity_", "dipho_cosphi_"]
+feature_names = ["njets_", "ht_", "jet1_pt_", "jet2_pt_", "jet1_eta_", "jet2_eta_", "max1_btag_", "max2_btag_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "minIDMVA_", "maxIDMVA_", "lead_pT_", "sublead_pT_", "dipho_pt_", "dipho_rapidity_", "dipho_cosphi_", "leadIDMVA_", "subleadIDMVA_"]
 
 label = root_numpy.tree2array(tree, branches = "process_id_")
 evt_weight = root_numpy.tree2array(tree, branches = "evt_weight_")
@@ -32,6 +32,9 @@ for i in range(len(label)):
     label[i] = 1
   else:
      print "Sample other than GJets, shouldn't be here"
+
+
+
 
 features = numpy.transpose(features)
 evt_weight = numpy.transpose(evt_weight)

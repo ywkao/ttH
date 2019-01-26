@@ -42,7 +42,7 @@ def estimate_max_za(n_round, max_depth, eta, subsample, colsample_bytree, min_ch
 
   else:
     with open(log, "r") as f_in:
-      scan_results = json.load(json_file)
+      scan_results = json.load(f_in)
 
   scan_results[idx] = {
 	"config" : config,
@@ -110,8 +110,8 @@ optimizer = BayesianOptimization(
 optimizer.probe(params = starting_point, lazy = True)
 
 optimizer.maximize(
-	init_points = 3,
-	n_iter = 10,
+	init_points = 10,
+	n_iter = 1000,
 )
 
 for i, res in enumerate(optimizer.res):

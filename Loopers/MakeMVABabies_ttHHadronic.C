@@ -222,11 +222,18 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
     TString year = currentFileTitle.Contains("2016") ? "2016" : "2017";
 
+    if (isSignal && !(tag.Contains("DNN"))) {
+      if (!currentFileTitle.Contains("M125"))   continue;
+    }
+
+
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    if (tag == "GJet_Reweight_Preselection") {
+    bool deriving_gjet_weights = (tag == "GJet_Reweight_Preselection");
+
+    if (deriving_gjet_weights) {
       if (!(currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT"))) { 
 	cout << "Skipping " << currentFileTitle << endl;
 	continue;
@@ -264,11 +271,23 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
       process_id_ = categorize_process(currentFileTitle, genPhotonId);
 
+      // GJets Reweighting
+      double gjet_mva_value = -999;
+      gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" ));
+      if (!deriving_gjet_weights && process_id_ == 3) {
+	if (process_id_ == 3) {
+	  double prob = gjet_mva_value;
+	  double prob_ratio = prob / ( 1 - prob);
+	  evt_weight_ *= prob_ratio;
+	  evt_weight_ *= gjet_normalization;
+	}
+	if (process_id_ == 17) {
+	  process_id_ = 3;
+        }
+      }
+
       // Skipping events/samples
       if (is_low_stats_process(currentFileTitle))       continue;
-      if (tag != "GJet_Reweight_Preselection") {
-        if (process_id_ == 17)				continue; // skip MadGraph G+Jets
-      }
       if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic")) 			continue;
       if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
       if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
@@ -461,16 +480,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       lead_sigmaEtoE_ = lead_sigmaEoE();
       sublead_sigmaEtoE_ = sublead_sigmaEoE();
   
-      // Gamma + jets reweighting
-      double gjet_mva_value = -999;
-      gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" ));
-      if (process_id_ == 3) {
-	double prob = gjet_mva_value;
-	double prob_ratio = prob / ( 1 - prob);
-	evt_weight_ *= prob_ratio;
-	evt_weight_ *= gjet_normalization;
-      } 
-
       if (do_tth_ttX_mva)
         tth_ttX_mva_ = convert_tmva_to_prob(tth_ttX_mva->EvaluateMVA( "BDT" ));
       else
@@ -494,6 +503,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       objects_boosted_ = sort_objects(jet_objects_boosted);
 
       FillBabyNtuple();
+
+      if (deriving_gjet_weights) {
+	if (process_id_ == 17) {
+	  process_id_ == 3;
+	  FillBabyNtuple();
+        }
+      }
 
     }
   
