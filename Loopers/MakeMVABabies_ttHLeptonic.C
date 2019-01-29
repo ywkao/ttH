@@ -44,10 +44,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
     TString year = currentFileTitle.Contains("2016") ? "2016" : "2017";
 
-    if (isSignal) {
-      if (!currentFileTitle.Contains("M125"))   continue;
-    }
-
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
@@ -201,7 +197,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
+      signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 
+      tth_2017_reference_mva_ = year == "2017" ? tthMVA() : -999;
 
       if (tag == "ttHLeptonic_data_sideband_0b") {
 	if (nb_medium() == 0)

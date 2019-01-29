@@ -17,7 +17,7 @@ parser.add_argument("--sideband_name", help = "which data sideband to use", type
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
-output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + ".hdf5"
+output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + "%s.hdf5" % ("_invert" if args.invert else "")
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
@@ -51,8 +51,14 @@ train_frac = 0.5
 rand_branch = "super_rand_" if args.randomize else "rand_"
 
 data_label = 2
-features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")) 
-features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, "&& data_sideband_label_ == 0" if args.sideband else ""))
+selection_train      = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 2)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+selection_validation = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+
+print "Selection for training events: %s" % selection_train
+print "Selection for validation events: %s" % selection_validation
+
+features = root_numpy.tree2array(tree, branches = branches, selection = selection_train) 
+features_validation = root_numpy.tree2array(tree, branches = branches, selection = selection_validation) 
 
 if args.sideband:
   handicap = ""
@@ -62,11 +68,6 @@ if args.sideband:
   features_data_sideband_mc = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 0 %s) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (handicap, rand_branch, train_frac))
 
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d %s' % (data_label, "&& data_sideband_label_ == 0" if args.sideband else ""))
-
-if args.invert: # swap test and train
-  features_temp = features
-  features = features_validation
-  features_validation = features_temp
 
 # organize features
 global_features = []

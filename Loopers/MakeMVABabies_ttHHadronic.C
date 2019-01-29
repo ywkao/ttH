@@ -43,8 +43,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
   gjet_mva->AddVariable("dipho_pt_", &dipho_pt_);
   gjet_mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
   gjet_mva->AddVariable("dipho_cosphi_", &dipho_cosphi_);
+  gjet_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+  gjet_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
 
-  gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight_binary_crossEntropy_bdt.xml");
+  gjet_mva->BookMVA("BDT", gjet_bdt_file);
+
 
   // ttH MVA Business
   unique_ptr<TMVA::Reader> tth_qcdX_mva;
@@ -222,11 +225,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
     TString year = currentFileTitle.Contains("2016") ? "2016" : "2017";
 
-    if (isSignal && !(tag.Contains("DNN"))) {
-      if (!currentFileTitle.Contains("M125"))   continue;
-    }
-
-
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
@@ -271,21 +269,24 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
       process_id_ = categorize_process(currentFileTitle, genPhotonId);
 
+      evt_weight_ = 1.;
+
       // GJets Reweighting
       double gjet_mva_value = -999;
       gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" ));
-      if (!deriving_gjet_weights && process_id_ == 3) {
+
+      if (!deriving_gjet_weights) {
+	if (process_id_ == 17) { // combine pythia and madgraph samples
+	  process_id_ = 3;
+	}
+
 	if (process_id_ == 3) {
 	  double prob = gjet_mva_value;
 	  double prob_ratio = prob / ( 1 - prob);
 	  evt_weight_ *= prob_ratio;
 	  evt_weight_ *= gjet_normalization;
 	}
-	if (process_id_ == 17) {
-	  process_id_ = 3;
-        }
       }
-
       // Skipping events/samples
       if (is_low_stats_process(currentFileTitle))       continue;
       if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic")) 			continue;
@@ -308,6 +309,30 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	if (n_jets() < 3)		continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHHadronicLoose_impute") {
+	if (process_id_ == 3 || process_id_ == 4 || process_id_ == 17) continue; // skip gjets and QCD (QCD is skipped by default anyway)
+	if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (maxIDMVA_ < -0.7)		continue;
+        if (minIDMVA_ < -0.7) {
+	  if (!isData)
+	    continue;  
+	  minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), evt_weight_);
+	  process_id_ == 18;
+	  isData = false;	  
+        }
+        
+      }
+
+      else if (tag == "ttHHadronicVeryLoose") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 2)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
       else if (tag == "ttHHadronic_ttPP") {
@@ -380,8 +405,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       TLorentzVector diphoton = lead_photon + sublead_photon;
 
       // Fill histograms //
-      evt_weight_ = 1.;
-      if (!isData) {
+      if (!isData && process_id_ != 18) {
 	if (year == "2016")
           evt_weight_ = scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
         else if (year == "2017")
@@ -408,6 +432,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
+
+      signal_mass_label_ = categorize_signal_sample(currentFileTitle);
+
+      tth_2017_reference_mva_ = tthMVA();
+
 
       if (tag == "ttHHadronic_data_sideband_0b") {
 	if (nb_medium() == 0)

@@ -18,6 +18,7 @@ std::map<TString, TString> mLatex = {
         {"DiPhoton", "$\\gamma\\gamma$ + Jets"},
         {"GammaJets", "$\\gamma$ + Jets"},
 	{"GammaJets_Madgraph", "$\\gamma$ + Jets (MadGraph)"},
+	{"QCD_GammaJets_imputed", "($\\gamma$) + Jets (Data Sideband)"},
         {"QCD", "QCD"},
         {"TTGG", "$t\\bar{t}+\\gamma\\gamma$"},
         {"TTGJets", "$t\\bar{t}+\\gamma$ + Jets"},
@@ -349,9 +350,9 @@ int main(int argc, char* argv[])
     TFile* f = new TFile(file_path);
     vector<TString> vBkgs;
     if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF", "GammaJets_Madgraph"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF", "GammaJets_Madgraph", "QCD_GammaJets_imputed"};
     else if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "QCD_GammaJets_imputed"};
 
     TString label = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", "");
     make_table_std(f, "hNVtx", vBkgs, label);

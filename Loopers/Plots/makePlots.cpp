@@ -26,6 +26,7 @@ std::map<TString, TString> mLabels = {
 	{"TTJets", "t#bar{t} + Jets"}, 
 	{"THQ", "tHq"},
 	{"TGamma", "t+#gamma+Jets"},
+	{"QCD_GammaJets_imputed", "(#gamma) + Jets (Data Sideband)"},
 };
 
 std::map<TString, int> mColors = {
@@ -40,6 +41,7 @@ std::map<TString, int> mColors = {
         {"WJets", kBlue+2},
         {"TTJets", kSpring+10},
 	{"TGamma", kYellow-9},
+	{"QCD_GammaJets_imputed", kBlack},
 };
 
 std::map<TString, TString> mLatex = {
@@ -54,6 +56,7 @@ std::map<TString, TString> mLatex = {
         {"WJets", "W + Jets"},
         {"TTJets", "$t\\bar{t}$ + Jets"},
         {"TGamma", "$t + \\gamma$"},
+	{"QCD_GammaJets_imputed", "($\\gamma$) + Jets (Data Sideband)"},
 };
 
 
@@ -501,6 +504,7 @@ int main(int argc, char* argv[])
   TString type_s = argv[1];
 
   TString file_path = argv[2];
+  bool impute_gjets = file_path.Contains("impute") && !(file_path.Contains("presel") || file_path.Contains("sideband")); 
   TString year = file_path.Contains("All") ? "All" : file_path.Contains("2018") ? "2018" : ((file_path.Contains("2017") ? "2017" : "2016"));
   TString tag = file_path.Contains("Hadronic") ? "Hadronic" : "Leptonic";
 
@@ -530,8 +534,12 @@ int main(int argc, char* argv[])
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma"};
     if (year == "2017")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
-    if (year == "All")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+    if (year == "All") {
+      if (impute_gjets)
+        vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+      else
+	 vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+    }
     if (year == "2018")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
   }

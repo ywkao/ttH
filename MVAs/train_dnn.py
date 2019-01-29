@@ -7,12 +7,12 @@ session = tf.Session(config=config)
 
 print(session)
 
-
 import keras
 import numpy
 import sys
 from sklearn import metrics
 import h5py
+import glob
 
 import matplotlib
 matplotlib.use('Agg')
@@ -29,9 +29,27 @@ parser.add_argument("--input", help = "input hdf5 file", type=str)
 parser.add_argument("--tag", help = "save name for weights file", type=str)
 parser.add_argument("--no_global", help = "don't use global features", action="store_true")
 parser.add_argument("--no_lstm", help = "don't use object features (lstm)", action="store_true")
+parser.add_argument("--evaluate", help = "give weights files to make learning curve and pick best one", type=str)
 args = parser.parse_args()
 
+def extract_epoch(weights_name):
+  value = weights_name[-7:-5]
+  return int(value)
+
+def compare(item_1, item_2):
+  return extract_epoch(item_1) - extract_epoch(item_2)
+
+def organize(input_list):
+  output_list = sorted(input_list, cmp = compare)
+  return output_list
+
 f = h5py.File(args.input, "r")
+if args.evaluate:
+  weights_list = glob.glob(args.evaluate)
+  weights_list = organize(weights_list)
+  print "Evaluating the following sets of weight files: "
+  for file in weights_list:
+    print file
 
 object_features, object_features_validation, object_features_data = f['object'], f['object_validation'], f['object_data']
 global_features, global_features_validation, global_features_data = f['global'], f['global_validation'], f['global_data']
@@ -41,21 +59,21 @@ mass, mass_validation, mass_data = f['mass'], f['mass_validation'], f['mass_data
 top_tag_score, top_tag_score_validation, top_tag_score_data = f['top_tag_score'], f['top_tag_score_validation'], f['top_tag_score_data']
 tth_ttPP_mva, tth_ttPP_mva_validation, tth_ttPP_mva_data = f['tth_ttPP_mva'], f['tth_ttPP_mva_validation'], f['tth_ttPP_mva_data']
 
-
 max_objects = len(object_features[0])
 n_features = len(object_features[0][0])
 n_global_features = len(global_features[0])
 
 print(max_objects, n_features, len(object_features), n_global_features)
 
-model = dnn_model.separate_photons(max_objects, n_features, n_global_features, args.no_global, args.no_lstm)
+model = dnn_model.baseline_v1(max_objects, n_features, n_global_features, args.no_global, args.no_lstm, 150)
 
 nEpochs = 40
-nBatch = 8192
+nBatch = 16384
 
 weights_file = "dnn_weights/" + args.tag + "_weights_{epoch:02d}.hdf5"
 checkpoint = keras.callbacks.ModelCheckpoint(weights_file) # save after every epoch 
-callbacks_list = [checkpoint]
+#callbacks_list = [checkpoint]
+callbacks_list = []
 
 weights_train = numpy.asarray(weights)
 sum_neg_weights = utils.sum_of_weights_v2(weights_train, label, 0)
@@ -72,7 +90,39 @@ object_features = numpy.asarray(object_features)
 label = numpy.asarray(label)
 global_features = numpy.asarray(global_features)
 
-model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list)
+if not args.evaluate:
+  model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list)
+
+else:
+  auc_train = []
+  auc_test = []
+  epochs = []
+  for i in range(len(weights_list)):
+    model.load_weights(weights_list[i])
+
+    pred = model.predict([global_features, object_features], batch_size = nBatch)
+    pred_test = model.predict([global_features_validation, object_features_validation], batch_size = nBatch)
+    pred_data = model.predict([global_features_data, object_features_data], batch_size = nBatch)
+
+    fpr_train, tpr_train, thresh_train = metrics.roc_curve(label, pred, pos_label = 1, sample_weight = weights_train)
+    fpr_test,  tpr_test,  threst_test  = metrics.roc_curve(label_validation, pred_test, pos_label = 1, sample_weight = weights_validation)
+
+    epochs.append(i+1)
+    auc_train.append(metrics.auc(fpr_train, tpr_train, reorder = True))
+    auc_test.append(metrics.auc(fpr_test, tpr_test, reorder = True))
+
+    print "Epoch %d: train AUC = %.5f, test AUC = %.5f" % (i+1, metrics.auc(fpr_train, tpr_train, reorder = True), metrics.auc(fpr_test, tpr_test, reorder = True))
+
+  fig = plt.figure()
+  ax = fig.add_subplot(111)
+  ax.yaxis.set_ticks_position('both')
+  ax.grid(True)
+  plt.plot(epochs, auc_train, color = 'darkred', label='Training Set')
+  plt.plot(epochs,  auc_test, color = 'darkorange', label = 'Testing Set')
+
+
+  best_weights_idx = numpy.argmax(numpy.asarray(auc_test))
+  model.load_weights(weights_list[best_weights_idx])
 
 pred = model.predict([global_features, object_features], batch_size = nBatch)
 pred_test = model.predict([global_features_validation, object_features_validation], batch_size = nBatch)
@@ -93,22 +143,18 @@ numpy.savez("dnn_rocs_%s.npz" % (args.tag), fpr_train = fpr_train, tpr_train = t
 
 y_test = label_validation
 
-
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.yaxis.set_ticks_position('both')
 ax.grid(True)
-plt.plot(fpr_train, tpr_train, color='darkred', lw=2, label='Train')
+plt.plot(fpr_train, tpr_train, color='darkred', lw=2, label='DNN (Train) [AUC = %.3f]' % (metrics.auc(fpr_train, tpr_train, reorder = True)))
 #plt.plot(fpr_bdt, tpr_bdt, color='blue', lw=2, label='BDT')
-plt.plot(fpr_test, tpr_test, color = 'darkorange', lw=2, label='Test')
-plt.plot(fpr_tts,  tpr_tts,  color = 'blue', lw=2, label='Top tag score')
-plt.plot(fpr_ttPP, tpr_ttPP, color = 'green', lw=2, label='ttPP BDT')
+plt.plot(fpr_test, tpr_test, color = 'darkorange', lw=2, label='DNN (Test) [AUC = %.3f]' % (metrics.auc(fpr_test , tpr_test, reorder = True)))
+plt.plot(fpr_tts,  tpr_tts,  color = 'blue', lw=2, label='Top tag score [AUC = %.3f]' % (metrics.auc(fpr_tts,  tpr_tts, reorder = True)))
+#plt.plot(fpr_ttPP, tpr_ttPP, color = 'green', lw=2, label='ttPP BDT')
 plt.grid()
-plt.ylim([0.0, 1.05])
+plt.ylim([0.0, 1.0])
+plt.xlim([0.0, 1.0])
 plt.xlabel('False Positive Rate (bkg. eff.)')
 plt.ylabel('True Positive Rate (sig. eff.)')
 plt.legend(loc='lower right')

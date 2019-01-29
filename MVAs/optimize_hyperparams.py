@@ -31,11 +31,15 @@ def estimate_max_za(n_round, max_depth, eta, subsample, colsample_bytree, min_ch
   config_1["invert_test_and_train"] = True
   config_2["invert_test_and_train"] = False
 
-  max_za_mc_1, max_za_mc_unc_1, max_za_data_1, max_za_data_unc_1 = train_v2.train_bdt(config_1)
-  max_za_mc_2, max_za_mc_unc_2, max_za_data_2, max_za_data_unc_2 = train_v2.train_bdt(config_2)
+
+  max_za_mc_1, max_za_mc_unc_1, max_za_data_1, max_za_data_unc_1, auc_train_1, auc_test_1 = train_v2.train_bdt(config_1)
+  max_za_mc_2, max_za_mc_unc_2, max_za_data_2, max_za_data_unc_2, auc_train_2, auc_test_2 = train_v2.train_bdt(config_2)
 
   max_za_mc_comb = (max_za_mc_1 + max_za_mc_2) / 2
   max_za_mc_unc_comb = math.sqrt((max_za_mc_unc_1**2) + (max_za_mc_unc_2**2)) / 2
+
+  auc_train = (auc_train_1 + auc_train_2) / 2.
+  auc_test  = (auc_test_1 + auc_test_2) / 2.
 
   if idx == 0:
     scan_results = {}
@@ -56,16 +60,22 @@ def estimate_max_za(n_round, max_depth, eta, subsample, colsample_bytree, min_ch
         "max_za_data_unc_2" : max_za_data_unc_2,
 	"max_za_mc_comb" : max_za_mc_comb,
 	"max_za_mc_unc_comb" : max_za_mc_unc_comb,
+	"auc_train" : auc_train, 
+	"auc_test" : auc_test 
     }
 
   with open(log, "w") as f_out:
     json.dump(scan_results, f_out, indent=4, sort_keys=True)
 
   idx += 1
-  return max_za_mc_comb
+  return auc_test
+  #return max_za_mc_comb
 
 config = {
-        "input_file" : "ttHHadronic_1617_ttHHadronicLoose_features.hdf5",
+        "input_file" : "", 
+
+	"input_file_1" : "ttHLeptonic_1617_ttHLeptonicLoose_features.hdf5",
+	"input_file_2" : "ttHLeptonic_1617_ttHLeptonicLoose_features_invert.hdf5",
         "tag" : "testin",
 
         "sideband" : False,
@@ -79,7 +89,7 @@ log = "bayes_hyperparam_scan.json"
 pbounds = {
 	"n_round" 		: (1, 1000),
 	"max_depth" 		: (2, 15),
-	"eta" 			: (0.0, 1.0),
+	"eta" 			: (0.001, 1.0),
 	"subsample" 		: (0.5, 1.0),
 	"colsample_bytree" 	: (0.1, 1.0),
 	"min_child_weight" 	: (0, 20),
@@ -110,7 +120,7 @@ optimizer = BayesianOptimization(
 optimizer.probe(params = starting_point, lazy = True)
 
 optimizer.maximize(
-	init_points = 10,
+	init_points = 20,
 	n_iter = 1000,
 )
 

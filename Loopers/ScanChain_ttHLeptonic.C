@@ -162,7 +162,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018")); 
 
     if (isSignal) {
-      if (!currentFileTitle.Contains("M125"))	continue;
+      if (categorize_signal_sample(currentFileTitle) != 0)
+        continue;
     }
 
     // Set json file

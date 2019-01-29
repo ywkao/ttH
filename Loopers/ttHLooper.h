@@ -1,3 +1,4 @@
+#include "TRandom.h"
 #include "TLorentzVector.h"
 #include "ttH_process.h"
 #include "GoldenJSON/goodrun.cc"
@@ -22,6 +23,7 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "VBF"));
   v.push_back(new Process(f, "VH"));
   v.push_back(new Process(f, "GammaJets_Madgraph"));
+  v.push_back(new Process(f, "QCD_GammaJets_imputed"));
   //v.push_back(new Process
 
   return v;
@@ -266,10 +268,6 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
     return 16;
   else if (currentFileTitle.Contains("GJets_HT"))
     return 17;
-  //else if (currentFileTitle.Contains("ttHJet") && currentFileTitle.Contains("M126"))
-  //  return 18; // use for MVA testing
-  //else if (currentFileTitle.Contains("ttHJet"))
-  //  return 19; // use for MVA training
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -318,6 +316,7 @@ bool has_simple_qcd_overlap(TString currentFileTitle, int genPhotonId) {
   return false;
 }
 
+const TString gjet_bdt_file = "../MVAs/GJetReweight_1617_GJetReweight_CombineSamples_bdt.xml";
 const double gjet_normalization = 188341.868812 / 345058.328323; // scale factor to make reweighted (Pythia + MadGraph) yield match MadGraph yield. First number taken from hMass_GammaJets_Madgraph->IntegralAndError(1,80,err) in ttHHadronic_GJet_Reweight_Preselection__histogramsAll.root and second number taken from hMass_GammaJets->IntegralAndError(1,80,err) in ttHHadronic_GJet_Reweight_Preselection_wWeights__histogramsAll.root
 
 // 2017-only results
@@ -371,6 +370,16 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   }
 }
 
+const double impute_transfer_factor = 1.451; // N_data passing minIDVMA cut / N_data failing minIDMVA cut (obtained from `python impute_transfer_factor.py --input_fail "ttHHadronicLoose_impute_sideband__histogramsAll.root" --input_pass "ttHHadronicLoose_impute_presel__histogramsAll.root"`)
+double impute_photon_id(double minID_cut, double maxIDMVA, int event, float &evt_weight) {
+  TRandom* rand = new TRandom(event);
+  double minIDMVA = rand->Uniform(minID_cut, maxIDMVA);
+  evt_weight *= impute_transfer_factor;
+  delete rand;
+  return minIDMVA;
+}
+
+
 bool is_wrong_tt_jets_sample(TString currentFileTitle, TString channel) {
   if (!(currentFileTitle.Contains("TTTo") || currentFileTitle.Contains("TTJets")))
     return false;
@@ -393,6 +402,17 @@ bool is_low_stats_process(TString currentFileTitle) {
   if (currentFileTitle.Contains("QCD"))
     return true;
   return false;
+}
+
+int categorize_signal_sample(TString currentFileTitle) {
+  if (currentFileTitle.Contains("M125")) { // save for fgg final fit purposes
+    return 0; 
+  }
+  else if (currentFileTitle.Contains("M126")) {
+    return 1; // save for bdt optimization purposes
+  }
+  else
+    return 2; // don't need to save for anything, do with it what you please
 }
 
 int categorize_photons(int leadGenMatch, int subleadGenMatch) {
@@ -602,6 +622,7 @@ const vector<TString> vSamples_2016 = {"DoubleEG",
 			"TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"				
 }; */
 
+
 const vector<TString> vSamples_2016 = {
 			// Data
 			"DoubleEG_Run2016B-03Feb2017_ver1-v1_MINIAOD_2016_topTag_overlapRemoval",
@@ -671,8 +692,7 @@ const vector<TString> vSamples_2016 = {
 };
 
 const vector<TString> vSamples_2017 = {
-			// Data
-			/*
+			/*	
 			"DoubleEG",
 			"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
 			"DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa",
@@ -692,7 +712,8 @@ const vector<TString> vSamples_2017 = {
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8"
 			*/
 
-			
+
+			// Data
 			"DoubleEG_Run2017B-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017C-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017D-31Mar2018-v1_MINIAOD_forHualin_2017",

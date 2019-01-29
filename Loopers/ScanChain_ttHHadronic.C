@@ -162,7 +162,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   gjet_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
   gjet_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
 
-  gjet_mva->BookMVA("BDT", "../MVAs/GJetReweight_1617_GJetReweight_CombineSamples_bdt.xml");
+  gjet_mva->BookMVA("BDT", gjet_bdt_file); 
 
   double dipho_yield = 0;
 
@@ -183,9 +183,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
 
     if (isSignal) {
-      if (!currentFileTitle.Contains("M125"))   continue;
+      if (categorize_signal_sample(currentFileTitle) != 0)
+        continue;
     }
-
 
     TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
 
@@ -230,7 +230,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
-      double evt_weight = 1.;
+      float evt_weight = 1.;
      
 	/* 
       if (!isData) {
@@ -287,6 +287,18 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Calculate MVA value
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+
+      if (tag == "ttHHadronicLoose_impute") {
+	if (processId == 3 || processId == 4 || processId == 17) continue;
+	if (maxIDMVA_ < -0.7)					 continue;
+	if (minIDMVA_ < -0.7) {
+          if (!isData)
+            continue;
+          minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), evt_weight);
+          processId = 18;
+        }
+      }
+
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
@@ -349,23 +361,17 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" )); 
 
-      bool do_binned_probabilities = false;
       if (combine_gjets_samples) {
 	if (processId == 17) 
 	  processId = 3;
       }
       if (processId == 3 && combine_gjets_samples) {
-	if (!do_binned_probabilities) {
-	  double prob = gjet_mva_value;
-	  double prob_ratio = prob / ( 1 - prob);
-	  evt_weight *= prob_ratio;
-	  if (scale_gjets_normalization)
-	    evt_weight *= gjet_normalization;
-	  //cout << "Reweighting GJets event by: " << prob_ratio * gjet_normalization << endl;
-	}
-	else {
-	  evt_weight *= prob_ratio_from_madgraph(gjet_mva_value);
-	}
+	double prob = gjet_mva_value;
+	double prob_ratio = prob / ( 1 - prob);
+	evt_weight *= prob_ratio;
+	if (scale_gjets_normalization)
+	  evt_weight *= gjet_normalization;
+	//cout << "Reweighting GJets event by: " << prob_ratio * gjet_normalization << endl;
       } 
 
       if (!combine_gjets_samples) { // skip Pythia if we aren't combining Pythia and MadGraph
@@ -399,6 +405,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
+      else if (tag == "ttHHadronicLoose_impute") {
+	if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (minIDMVA_ < -0.7)		continue;	
+      }
+
       else if (tag == "ttHHadronicLoose_impute_presel") {
 	if (mass() < 100)               continue;
         if (n_jets() < 3)               continue;
@@ -412,6 +426,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (n_jets() < 3)               continue;
 	if (nb_loose() < 1)             continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (maxIDMVA_ < -0.7)		continue;
         if (minIDMVA_ >= -0.7)           continue;
       }
 
@@ -753,8 +768,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         vProcess[processId]->fill_histogram("hPhotonDeltaRGen", sublead_closest_gen_dR(), evt_weight, vId);
       }
 
-      double maxID = leadIDMVA() >= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      double minID = leadIDMVA() >= subleadIDMVA() ? subleadIDMVA() : leadIDMVA();
+      double maxID = maxIDMVA_;
+      double minID = minIDMVA_; 
 
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_fine", maxID, evt_weight, vId);

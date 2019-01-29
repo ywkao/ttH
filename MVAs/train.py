@@ -199,14 +199,19 @@ print "Results of ks-test (d-score) for signal: %.10f and background: %.10f" % (
 print "Results of ks-test (p-value) for signal: %.10f and background: %.10f" % (p_value_sig, p_value_bkg)
 
 # roc curves
-fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train)
-fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test)
+fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train, pos_label = 1, sample_weight = weights_train)
+fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test, pos_label = 1, sample_weight = weights_test)
 
-auc_train = metrics.auc(fpr_train, tpr_train)
-auc_test = metrics.auc(fpr_test, tpr_test)
+auc_train = metrics.auc(fpr_train, tpr_train, reorder = True)
+auc_test  = metrics.auc(fpr_test , tpr_test , reorder = True)
 
-print("Training AUC: %.4f" % auc_train)
-print("Testing  AUC: %.4f" % auc_test)
+auc, unc = utils.auc_and_unc(y_test, pred_test, weights_test, 100)
+
+print "Training AUC: %.3f" % auc_train
+print "Testing  AUC: %.3f" % auc_test
+
+print "Testing  AUC: %.3f +/- %.4f" % (auc, unc)
+
 
 ### Make diagnostic plots ###
 import matplotlib
