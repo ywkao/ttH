@@ -36,6 +36,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   // Initialize map of evt_run_lumi -> rand
   //RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
 
+  TF1* gjet_minID_shape = get_photon_ID_shape("min");
+  TF1* gjet_maxID_shape = get_photon_ID_shape("max");
+
   // MVA Business
   unique_ptr<TMVA::Reader> mva;
   unique_ptr<TMVA::Reader> gjet_mva;
@@ -294,7 +297,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (minIDMVA_ < -0.7) {
           if (!isData)
             continue;
-          minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), evt_weight);
+          minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), gjet_minID_shape, gjet_maxID_shape, evt_weight);
+	  if (minIDMVA_ >= maxIDMVA_)
+            swap(minIDMVA_, maxIDMVA_);
           processId = 18;
         }
       }

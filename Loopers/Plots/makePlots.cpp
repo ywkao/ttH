@@ -26,7 +26,7 @@ std::map<TString, TString> mLabels = {
 	{"TTJets", "t#bar{t} + Jets"}, 
 	{"THQ", "tHq"},
 	{"TGamma", "t+#gamma+Jets"},
-	{"QCD_GammaJets_imputed", "(#gamma) + Jets (Data Sideband)"},
+	{"QCD_GammaJets_imputed", "(#gamma) + Jets (Data)"},
 };
 
 std::map<TString, int> mColors = {
@@ -41,7 +41,7 @@ std::map<TString, int> mColors = {
         {"WJets", kBlue+2},
         {"TTJets", kSpring+10},
 	{"TGamma", kYellow-9},
-	{"QCD_GammaJets_imputed", kBlack},
+	{"QCD_GammaJets_imputed", kGray},
 };
 
 std::map<TString, TString> mLatex = {
@@ -714,6 +714,9 @@ int main(int argc, char* argv[])
 
     if (file_path.Contains("GJet_Reweight_Preselection"))
       make_plot(c1, vFiles[i], vNames[i], "hGJet_BDT", "#gamma + jets BDT Score", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_coarse_0b", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA_coarse_0b", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref);
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref);
   }

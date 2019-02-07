@@ -5,7 +5,6 @@ from sklearn import metrics
 def auc_and_unc(label, pred, sample_weight, n_bootstraps):
   fpr, tpr, thresh = metrics.roc_curve(label, pred, pos_label = 1, sample_weight = sample_weight)
   auc = metrics.auc(fpr, tpr, reorder=True)
-  print "Initial AUC: ", auc
 
   label = numpy.asarray(label)
   pred  = numpy.asarray(pred)

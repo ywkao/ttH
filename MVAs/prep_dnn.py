@@ -10,6 +10,8 @@ parser.add_argument("--input", help = "input root file", type=str)
 parser.add_argument("--signal", help = "which process to consider as signal", type=str, default="ttH")
 parser.add_argument("--backgrounds", help = "which processes to consider as bkgs", type=str, default="ttGG,dipho")
 parser.add_argument("--boosted_objects", help = "use objects that are boosted to higgs p4", action="store_true")
+parser.add_argument("--invert", help = "invert test/train split", action="store_true")
+parser.add_argument("--train_frac", help = "what fraction of data to use for training", type = float, default = 0.5)
 parser.add_argument("--tag", help = "name to add to hdf5 file name", type=str, default="")
 args = parser.parse_args()
 
@@ -21,11 +23,11 @@ tree = f.Get("t")
 
 # load tree to array
 feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_"]
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_"]))
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_"]))
 
 rand_branch = "rand_"
 data_label = 2
-train_frac = 0.75
+train_frac = args.train_frac
 
 process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2}
 selection = "&& ("
@@ -38,8 +40,10 @@ for i in range(len(procs)):
 selection += ")"
 print selection
 
-features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, selection))
-features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, selection))
+features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
+#features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, selection))
+#features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, selection))
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d' % (data_label))
 
 #features
@@ -122,6 +126,8 @@ lead_sigmaEtoE = features["lead_sigmaEtoE_"]
 sublead_sigmaEtoE = features["sublead_sigmaEtoE_"]
 top_tag_score = features["top_tag_score_"]
 tth_ttPP_mva = features["tth_ttPP_mva_"]
+tth_dipho_mva = features["tth_dipho_mva_"]
+tth_std_mva = features["tth_std_mva_"]
 
 label_validation = features_validation["label_"]
 multi_label_validation = features_validation["multi_label_"]
@@ -129,6 +135,8 @@ weights_validation = features_validation["evt_weight_"]
 mass_validation = features_validation["mass_"]
 top_tag_score_validation = features_validation["top_tag_score_"]
 tth_ttPP_mva_validation = features_validation["tth_ttPP_mva_"]
+tth_dipho_mva_validation = features_validation["tth_dipho_mva_"]
+tth_std_mva_validation = features_validation["tth_std_mva_"]
 
 label_data = features_data["label_"]
 multi_label_data = features_data["multi_label_"]
@@ -136,6 +144,8 @@ weights_data = features_data["evt_weight_"]
 mass_data = features_data["mass_"]
 top_tag_score_data = features_data["top_tag_score_"]
 tth_ttPP_mva_data = features_data["tth_ttPP_mva_"]
+tth_dipho_mva_data = features_data["tth_dipho_mva_"]
+tth_std_mva_data = features_data["tth_std_mva_"]
 
 # reorganize features
 #object_features = numpy.transpose(object_features)
@@ -162,6 +172,8 @@ dset_multi_label = f_out.create_dataset("multi_label", data=multi_label)
 dset_weights = f_out.create_dataset("weights", data=weights)
 dset_mass = f_out.create_dataset("mass", data=mass)
 dset_tth_ttPP_mva = f_out.create_dataset("tth_ttPP_mva", data=tth_ttPP_mva)
+dset_tth_dipho_mva = f_out.create_dataset("tth_dipho_mva", data=tth_dipho_mva)
+dset_tth_std_mva = f_out.create_dataset("tth_std_mva", data=tth_std_mva)
 dset_top_tag_score = f_out.create_dataset("top_tag_score", data=top_tag_score)
 dset_lead_sigmaEtoE = f_out.create_dataset("lead_sigmaEtoE", data=lead_sigmaEtoE)
 dset_sublead_sigmaEtoE = f_out.create_dataset("sublead_sigmaEtoE", data=sublead_sigmaEtoE)
@@ -174,6 +186,8 @@ dset_weights_validation = f_out.create_dataset("weights_validation", data=weight
 dset_top_tag_score_validation = f_out.create_dataset("top_tag_score_validation", data=top_tag_score_validation)
 dset_mass_validation = f_out.create_dataset("mass_validation", data=mass_validation)
 dset_tth_ttPP_mva_validation = f_out.create_dataset("tth_ttPP_mva_validation", data=tth_ttPP_mva_validation)
+dset_tth_dipho_mva_validation = f_out.create_dataset("tth_dipho_mva_validation", data=tth_dipho_mva_validation)
+dset_tth_std_mva_validation = f_out.create_dataset("tth_std_mva_validation", data=tth_std_mva_validation)
 
 dset_object_data = f_out.create_dataset("object_data", data=object_features_data)
 dset_global_data = f_out.create_dataset("global_data", data=global_features_data)
@@ -183,5 +197,7 @@ dset_weights_data = f_out.create_dataset("weights_data", data=weights_data)
 dset_top_tag_score_data = f_out.create_dataset("top_tag_score_data", data=top_tag_score_data)
 dset_mass_data = f_out.create_dataset("mass_data", data=mass_data)
 dset_tth_ttPP_mva_data = f_out.create_dataset("tth_ttPP_mva_data", data=tth_ttPP_mva_data)
+dset_tth_dipho_mva_data = f_out.create_dataset("tth_dipho_mva_data", data=tth_dipho_mva_data)
+dset_tth_std_mva_data = f_out.create_dataset("tth_std_mva_data", data=tth_std_mva_data)
 
 f_out.close()

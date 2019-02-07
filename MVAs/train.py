@@ -211,7 +211,7 @@ print "Training AUC: %.3f" % auc_train
 print "Testing  AUC: %.3f" % auc_test
 
 print "Testing  AUC: %.3f +/- %.4f" % (auc, unc)
-
+numpy.savez("bdt_roc_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train, y_test = y_test, pred_train = pred_train, pred_test = pred_test, fpr_train = fpr_train, fpr_test = fpr_test, tpr_train = tpr_train, tpr_test = tpr_test)
 
 ### Make diagnostic plots ###
 import matplotlib

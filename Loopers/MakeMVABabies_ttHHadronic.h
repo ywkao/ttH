@@ -55,6 +55,8 @@ class BabyMaker {
     float	tth_qcdX_mva_;
     float	tth_ttX_mva_;
     float	tth_ttPP_mva_;
+    float	tth_dipho_mva_;
+    float	tth_std_mva_;
 
     // DNN Business
     vector<vector<float>>  objects_;
@@ -134,6 +136,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("tth_qcdX_mva_"             , &tth_qcdX_mva_        );
   BabyTree_->Branch("tth_ttX_mva_"             , &tth_ttX_mva_        );
   BabyTree_->Branch("tth_ttPP_mva_"             , &tth_ttPP_mva_        );
+  BabyTree_->Branch("tth_dipho_mva_"             , &tth_dipho_mva_        );
+  BabyTree_->Branch("tth_std_mva_"		, &tth_std_mva_		);
 
   BabyTree_->Branch("lead_sigmaEtoE_"             , &lead_sigmaEtoE_        );
   BabyTree_->Branch("sublead_sigmaEtoE_"             , &sublead_sigmaEtoE_        );

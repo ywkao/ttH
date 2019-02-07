@@ -1,3 +1,4 @@
+#include "TF1.h"
 #include "TRandom.h"
 #include "TLorentzVector.h"
 #include "ttH_process.h"
@@ -370,15 +371,58 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   }
 }
 
-const double impute_transfer_factor = 1.451; // N_data passing minIDVMA cut / N_data failing minIDMVA cut (obtained from `python impute_transfer_factor.py --input_fail "ttHHadronicLoose_impute_sideband__histogramsAll.root" --input_pass "ttHHadronicLoose_impute_presel__histogramsAll.root"`)
-double impute_photon_id(double minID_cut, double maxIDMVA, int event, float &evt_weight) {
-  TRandom* rand = new TRandom(event);
-  double minIDMVA = rand->Uniform(minID_cut, maxIDMVA);
-  evt_weight *= impute_transfer_factor;
-  delete rand;
-  return minIDMVA;
+const double impute_transfer_factor = 1.124; // N_data passing minIDVMA cut / N_data failing minIDMVA cut (obtained from `python impute_transfer_factor.py --input_fail "ttHHadronicLoose_impute_sideband__histogramsAll.root" --input_pass "ttHHadronicLoose_impute_presel__histogramsAll.root"`)
+
+// Function derived from PhotonID_Sideband/derive_shape.py
+// "min" : python derive_shape.py --input "../ttHHadronicLoose_NoQCDScale_histogramsAll.root" --data_driven
+// "max" : python derive_shape.py --input "../ttHHadronicLoose_NoQCDScale_histogramsAll.root" --data_driven --hist_name "hPhotonMaxIDMVA_fine"
+
+TF1* get_photon_ID_shape(TString type) {
+  TF1* f_IDMVA = new TF1("f_IDMVA", "[0] + [1]*x + [2]*x^2 + [3]*x^3 + [4]*x^4 + [5]*x^5 + [6]*x^6 + [7]*x^7", -1.0, 1.0);
+
+  if (type == "min") {
+    f_IDMVA->SetParameter(0, 1546.58);
+    f_IDMVA->SetParameter(1, -2339.5);
+    f_IDMVA->SetParameter(2, 4520.45);
+    f_IDMVA->SetParameter(3, -5953.99);
+    f_IDMVA->SetParameter(4, -3007.99);
+    f_IDMVA->SetParameter(5, 8550.25);
+    f_IDMVA->SetParameter(6, 18200.1);
+    f_IDMVA->SetParameter(7, -21973.2);
+  }
+  else if (type == "max") {
+    f_IDMVA->SetParameter(0, 2074.26);
+    f_IDMVA->SetParameter(1, -1503.06);
+    f_IDMVA->SetParameter(2, 2046.56);
+    f_IDMVA->SetParameter(3, 12631.6);
+    f_IDMVA->SetParameter(4, 3714.54);
+    f_IDMVA->SetParameter(5, -47364.6);
+    f_IDMVA->SetParameter(6, -4399.99);
+    f_IDMVA->SetParameter(7, 59619.5);
+  }
+  return f_IDMVA;
 }
 
+//const TF1* gjet_ID_shape = get_photon_ID_shape();
+
+void swap(double &a, double &b) {
+  double temp_a = a;
+  double temp_b = b;
+  a = temp_b;
+  b = temp_a;
+  return;
+}
+
+double impute_photon_id(double minID_cut, float &maxIDMVA, int event, TF1* photon_minID_shape, TF1* photon_maxID_shape, float &evt_weight) {
+  //TRandom* rand = new TRandom(event);
+  //double minIDMVA = rand->Uniform(minID_cut, maxIDMVA);
+  double minIDMVA = photon_minID_shape->GetRandom(minID_cut, 1.0);
+  maxIDMVA = photon_maxID_shape->GetRandom(minID_cut, 1.0);
+  evt_weight *= impute_transfer_factor;
+  //delete rand;
+
+  return minIDMVA;
+}
 
 bool is_wrong_tt_jets_sample(TString currentFileTitle, TString channel) {
   if (!(currentFileTitle.Contains("TTTo") || currentFileTitle.Contains("TTJets")))
@@ -641,6 +685,10 @@ const vector<TString> vSamples_2016 = {
 			"ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"ttHJetToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"ttHJetToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_v2_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			//"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			//"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			//"ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			// DY
 			"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			// gamma gamma + jets
@@ -757,6 +805,14 @@ const vector<TString> vSamples_2017 = {
 			"ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"ttHJetToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"ttHJetToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			
+			"ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ttHJetToGG_M115_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			/*
+			"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			*/
+			//"ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			// other signal modes
 			"THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",

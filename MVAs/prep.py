@@ -12,6 +12,7 @@ parser.add_argument("--tag", help = "name to append to filename", type=str, defa
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
 parser.add_argument("-i", "--invert", help = "invert the test/train split", action="store_true")
 parser.add_argument("-s", "--sideband", help = "use data sideband for training", action = "store_true")
+parser.add_argument("--train_frac", help = "what fraction of data to use for training", type = float, default = 0.5)
 parser.add_argument("--handicap", help = "use only 1/3 of training data (to get a feel for how much stats matter)", action = "store_true")
 parser.add_argument("--sideband_name", help = "which data sideband to use", type=str, default="none")
 args = parser.parse_args()
@@ -47,11 +48,11 @@ print training_feature_names
 branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_"]))
 
 # grab features
-train_frac = 0.5
+train_frac = args.train_frac
 rand_branch = "super_rand_" if args.randomize else "rand_"
 
 data_label = 2
-selection_train      = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 2)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+selection_train      = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 selection_validation = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
 print "Selection for training events: %s" % selection_train

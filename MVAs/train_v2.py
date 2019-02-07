@@ -152,8 +152,11 @@ def train_bdt(config):
   fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train, pos_label = 1, sample_weight = weights_train)
   fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test, pos_label = 1, sample_weight = weights_test) 
   
-  auc_train = metrics.auc(fpr_train, tpr_train, reorder = True)
-  auc_test  = metrics.auc(fpr_test , tpr_test , reorder = True)
+  auc_train, auc_train_unc = utils.auc_and_unc(y_train, pred_train, weights_train, 100)
+  auc_test, auc_test_unc = utils.auc_and_unc(y_test, pred_test, weights_test, 100)
+  
+  #auc_train = metrics.auc(fpr_train, tpr_train, reorder = True)
+  #auc_test  = metrics.auc(fpr_test , tpr_test , reorder = True)
 
   print "Training AUC: %.3f" % auc_train
   print "Testing  AUC: %.3f" % auc_test 
@@ -200,4 +203,4 @@ def train_bdt(config):
   print "Max Z_A on MC:   %.4f +/- %.4f" % (max_za_mc,   max_za_mc_unc)
   print "Max Z_A on data: %.4f +/- %.4f" % (max_za_data, max_za_data_unc)
 
-  return max_za_mc, max_za_mc_unc, max_za_data, max_za_data_unc, auc_train, auc_test
+  return max_za_mc, max_za_mc_unc, max_za_data, max_za_data_unc, auc_train, auc_train_unc, auc_test, auc_test_unc

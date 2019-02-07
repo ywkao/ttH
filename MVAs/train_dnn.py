@@ -30,6 +30,7 @@ parser.add_argument("--tag", help = "save name for weights file", type=str)
 parser.add_argument("--no_global", help = "don't use global features", action="store_true")
 parser.add_argument("--no_lstm", help = "don't use object features (lstm)", action="store_true")
 parser.add_argument("--evaluate", help = "give weights files to make learning curve and pick best one", type=str)
+parser.add_argument("--load", help = "give weights file to use as starting point", type=str)
 args = parser.parse_args()
 
 def extract_epoch(weights_name):
@@ -58,6 +59,8 @@ weights, weights_validation, weights_data = f['weights'], f['weights_validation'
 mass, mass_validation, mass_data = f['mass'], f['mass_validation'], f['mass_data']
 top_tag_score, top_tag_score_validation, top_tag_score_data = f['top_tag_score'], f['top_tag_score_validation'], f['top_tag_score_data']
 tth_ttPP_mva, tth_ttPP_mva_validation, tth_ttPP_mva_data = f['tth_ttPP_mva'], f['tth_ttPP_mva_validation'], f['tth_ttPP_mva_data']
+tth_dipho_mva, tth_dipho_mva_validation, tth_dipho_mva_data = f['tth_dipho_mva'], f['tth_dipho_mva_validation'], f['tth_dipho_mva_data']
+tth_std_mva, tth_std_mva_validation, tth_std_mva_data = f['tth_std_mva'], f['tth_std_mva_validation'], f['tth_std_mva_data']
 
 max_objects = len(object_features[0])
 n_features = len(object_features[0][0])
@@ -65,15 +68,15 @@ n_global_features = len(global_features[0])
 
 print(max_objects, n_features, len(object_features), n_global_features)
 
-model = dnn_model.baseline_v1(max_objects, n_features, n_global_features, args.no_global, args.no_lstm, 150)
+model = dnn_model.baseline_v1(max_objects, n_features, n_global_features, args.no_global, args.no_lstm, 200)
 
-nEpochs = 40
-nBatch = 16384
+nEpochs = 10
+nBatch = 10000
 
 weights_file = "dnn_weights/" + args.tag + "_weights_{epoch:02d}.hdf5"
 checkpoint = keras.callbacks.ModelCheckpoint(weights_file) # save after every epoch 
-#callbacks_list = [checkpoint]
-callbacks_list = []
+callbacks_list = [checkpoint]
+#callbacks_list = []
 
 weights_train = numpy.asarray(weights)
 sum_neg_weights = utils.sum_of_weights_v2(weights_train, label, 0)
@@ -91,6 +94,9 @@ label = numpy.asarray(label)
 global_features = numpy.asarray(global_features)
 
 if not args.evaluate:
+  if args.load:
+    print "Loading weights: %s" % args.load
+    model.load_weights(args.load)
   model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list)
 
 else:
@@ -132,15 +138,24 @@ fpr_train, tpr_train, thresh_train = metrics.roc_curve(label, pred, pos_label = 
 fpr_test,  tpr_test,  threst_test  = metrics.roc_curve(label_validation, pred_test, pos_label = 1, sample_weight = weights_validation)
 
 fpr_tts, tpr_tts, thresh_tts = metrics.roc_curve(label, top_tag_score, pos_label = 1, sample_weight = weights_train)
-fpr_ttPP, tpr_ttPP, thresh_ttPP = metrics.roc_curve(label, tth_ttPP_mva, pos_label = 1, sample_weight = weights_train)
+fpr_ttPP, tpr_ttPP, thresh_ttPP = metrics.roc_curve(label_validation, tth_ttPP_mva_validation, pos_label = 1, sample_weight = weights_validation)
+fpr_dipho, tpr_dipho, thresh_dipho = metrics.roc_curve(label_validation, tth_dipho_mva_validation, pos_label = 1, sample_weight = weights_validation)
+fpr_std, tpr_std, thresh_std = metrics.roc_curve(label_validation, tth_std_mva_validation, pos_label = 1, sample_weight = weights_validation)
 
-print("Training AUC: %.5f" % metrics.auc(fpr_train, tpr_train, reorder = True))
-print("Testing  AUC: %.5f" % metrics.auc(fpr_test , tpr_test, reorder = True))
-print("Top Tag  AUC: %.5f" % metrics.auc(fpr_tts,   tpr_tts, reorder = True))
-print("TTPP BDT AUC: %.5f" % metrics.auc(fpr_ttPP,  tpr_ttPP, reorder = True))
+auc_train, auc_train_unc = utils.auc_and_unc(label, pred, weights_train, 100)
+auc_test,  auc_test_unc  = utils.auc_and_unc(label_validation, pred_test, weights_validation, 100)
+auc_tts,   auc_tts_unc   = utils.auc_and_unc(label, top_tag_score, weights_train, 100)
+auc_ttPP,  auc_ttPP_unc  = utils.auc_and_unc(label_validation, tth_ttPP_mva_validation, weights_validation, 100)
+auc_dipho,  auc_dipho_unc  = utils.auc_and_unc(label_validation, tth_dipho_mva_validation, weights_validation, 100)
+auc_std_bdt, auc_std_bdt_unc = utils.auc_and_unc(label_validation, tth_std_mva_validation, weights_validation, 100)
 
-numpy.savez("dnn_rocs_%s.npz" % (args.tag), fpr_train = fpr_train, tpr_train = tpr_train, fpr_test = fpr_test, tpr_test = tpr_test, fpr_tts = fpr_tts, tpr_tts = tpr_tts, fpr_ttPP = fpr_ttPP, tpr_ttPP = tpr_ttPP)
+print("Training AUC: %.5f +/- %.5f") % (auc_train, auc_train_unc) 
+print("Testing AUC: %.5f +/- %.5f") % (auc_test, auc_test_unc)
+print("Top Tag AUC: %.5f +/- %.5f") % (auc_tts, auc_tts_unc)
+print("TTPP BDT AUC: %.5f +/- %.5f") % (auc_ttPP, auc_ttPP_unc)
+print("Std. BDT AUC: %.5f +/- %.5f") % (auc_std_bdt, auc_std_bdt_unc)
 
+numpy.savez("dnn_rocs_%s.npz" % (args.tag), fpr_train = fpr_train, tpr_train = tpr_train, fpr_test = fpr_test, tpr_test = tpr_test, fpr_tts = fpr_tts, tpr_tts = tpr_tts, fpr_ttPP = fpr_ttPP, tpr_ttPP = tpr_ttPP, fpr_std = fpr_std, tpr_std = tpr_std, fpr_dipho = fpr_dipho, tpr_dipho = tpr_dipho)
 y_test = label_validation
 
 fig = plt.figure()
@@ -163,11 +178,12 @@ plt.savefig('plot_auc_dnn.pdf')
 
 bkg_dnn = ks_test.logical_vector(pred_test, y_test, 0)
 bkg_ttPP = ks_test.logical_vector(tth_ttPP_mva_validation, y_test, 0)
+bkg_dipho = ks_test.logical_vector(tth_dipho_mva_validation, y_test, 0)
 bkg_mass = ks_test.logical_vector(mass_validation, y_test, 0)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.scatter(bkg_mass, bkg_dnn, label = 'ttGG Events (bkg)', edgecolors = 'none', marker=".", c = 'blue')
+ax.scatter(bkg_mass, bkg_dnn, label = 'Bkg Events', edgecolors = 'none', marker=".", c = 'blue')
 plt.ylim([0.0, 1.0])
 plt.xlim([100, 150])
 plt.xlabel('m_gg [GeV]')

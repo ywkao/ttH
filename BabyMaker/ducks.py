@@ -16,6 +16,7 @@ parser.add_argument("year", help = "which year to run on e.g. '2016'", type=str)
 parser.add_argument("--skip_data", action="store_true")
 parser.add_argument("--data_only", action="store_true")
 parser.add_argument("--central_microAOD", action="store_true")
+parser.add_argument("--updated_microAOD", action="store_true")
 parser.add_argument("--old_data", action="store_true")
 parser.add_argument("--do_all", help = "run on every single skim (not just important ones)", action="store_true")
 parser.add_argument("--soft_rerun", help = "don't remake tarball", action="store_true")
@@ -40,6 +41,8 @@ elif args.year == "2017":
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017" # microAOD with tt+X overlap and top tagger info
   if args.central_microAOD:
     base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/2017_skim_v1"
+  if args.updated_microAOD:
+    base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/2017_updated/"
 elif args.year == "2018":
   cmssw_ver = "CMSSW_10_2_1"
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/"
@@ -69,7 +72,7 @@ subdir_map = { 	"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_
 }
 default_subdir = "RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1"
 
-important_samples = ["TTJets", "TTGJets", "TTGG", "QCD", "GJet_Pt-", "DiPhoton", "DY", "WG", "ZG", "WJets", "ttHJetToGG_M12", "DoubleEG", "EGamma", "TTTo2L2Nu", "TTToSemiLeptonic", "THQ", "THW", "TGJets", "VHToGG_M125", "VBFHToGG_M125", "GluGluHToGG_M125", "GJets_HT"]
+important_samples = ["TTJets", "TTGJets", "TTGG", "QCD", "GJet_Pt-", "DiPhoton", "DY", "WG", "ZG", "WJets", "ttHJetToGG_M1", "DoubleEG", "EGamma", "TTTo2L2Nu", "TTToSemiLeptonic", "THQ", "THW", "TGJets", "VHToGG_M125", "VBFHToGG_M125", "GluGluHToGG_M125", "GJets_HT"]
 def important_sample(name):
   if args.tH_only:
     if "THQ" in name or "THW" in name:
@@ -107,7 +110,7 @@ for sample in samples:
       continue
     nFilesPerOutput = 25
     if not args.old_data:
-      dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])
+      dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput])
     else:
       dslocs.append(["/" + name + "/", old_data_path + "/" + name + "/*", nFilesPerOutput])
   if "ttH" in name or "TTGG" in name:
@@ -141,7 +144,7 @@ while True:
     for ds,loc,fpo in dslocs:
 	print loc
         sample = DirectorySample( dataset=ds, location=loc )
-        #files = [f.name for f in sample.get_files()]
+        files = [f.name for f in sample.get_files()]
         task = CondorTask(
                 sample = sample,
                 open_dataset = False,
