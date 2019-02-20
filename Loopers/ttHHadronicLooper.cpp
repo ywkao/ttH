@@ -19,9 +19,9 @@ int main(int argc, char* argv[]) {
   TString scale_qcd = argc <= 5 ? "none" : argv[5];
   if (scale_qcd == "inclusive_NJets") {
     cout << "Scaling QCD + X by the following: " << endl;
-    cout << "QCD: " << qcd_factor << endl;
-    cout << "Gamma + jets: " << gjets_factor << endl;
-    cout << "DiPhoton + jets: " << diphoton_factor << endl;
+    cout << "QCD: " << qcd_factor_2017 << endl;
+    cout << "Gamma + jets: " << gjets_factor_2017 << endl;
+    cout << "DiPhoton + jets: " << diphoton_factor_2017 << endl;
   }
   else if (scale_qcd == "binned_NJets") {
     cout << "Scaling QCD + X by the following (2, 3, 4+ jet bins): " << endl;

@@ -24,6 +24,7 @@ parser.add_argument("--tag", help = "tag to identify this training", type=str)
 parser.add_argument("-m", "--multi", help = "run a multiclassifier based BDT", action="store_true")
 parser.add_argument("-r", "--res", help = "weight signal events by relative mass resolution", action = "store_true")
 parser.add_argument("-s", "--sideband", help = "use data sideband for training", action = "store_true")
+parser.add_argument("--njets_cut", help = "apply manual cut on njets >= 4", action = "store_true")
 parser.add_argument("--optimization_vars", help = "csv list of additional variables to perform N-d Z_A optimization scan in (along with BDT score)", type=str)
 args = parser.parse_args()
 
@@ -41,6 +42,7 @@ label = utils.load_array(f, 'label')
 multi_label = utils.load_array(f, 'multi_label')
 weights = utils.load_array(f, 'weights')
 mass = utils.load_array(f, 'mass')
+njets = utils.load_array(f, 'njets')
 lead_sigmaEtoE = utils.load_array(f, 'lead_sigmaEtoE')
 sublead_sigmaEtoE = utils.load_array(f, 'sublead_sigmaEtoE')
 
@@ -58,12 +60,14 @@ label_validation = utils.load_array(f, 'label_validation')
 multi_label_validation = utils.load_array(f, 'multi_label_validation')
 weights_validation = utils.load_array(f, 'weights_validation')
 mass_validation = utils.load_array(f, 'mass_validation')
+njets_validation = utils.load_array(f, 'njets_validation')
 
 global_features_data = utils.load_array(f, 'global_data')
 label_data = utils.load_array(f, 'label_data')
 multi_label_data = utils.load_array(f, 'multi_label_data')
 weights_data = utils.load_array(f, 'weights_data')
 mass_data = utils.load_array(f, 'mass_data')
+njets_data = utils.load_array(f, 'njets_data')
 
 
 train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
@@ -253,6 +257,9 @@ if estimate_za:
   signal_mass = ks_test.logical_vector(mass_validation, y_test, 1)
   bkg_mass = ks_test.logical_vector(mass_validation, y_test, 0)
 
+  signal_njets = ks_test.logical_vector(njets_validation, y_test, 1)
+  bkg_njets = ks_test.logical_vector(njets_validation, y_test, 0)
+
   signal_weights = ks_test.logical_vector(weights_validation, y_test, 1)
   bkg_weights = ks_test.logical_vector(weights_validation, y_test, 0)
 
@@ -262,12 +269,12 @@ if estimate_za:
     bkg_mva_scores[var]    = ks_test.logical_vector(utils.load_array(f, var + '_validation'), y_test, 0)
     data_mva_scores[var]   = utils.load_array(f, var + '_data')
 
-  signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores } 
-  bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores } 
-  data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores } 
+  signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores, "njets" : signal_njets } 
+  bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores , "njets" : bkg_njets} 
+  data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores , "njets" : njets_data} 
 
-  za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False)
-  za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True)
+  za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False, args.njets_cut)
+  za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True, args.njets_cut)
   za = numpy.asarray(za)
 
   max_za = numpy.max(za)

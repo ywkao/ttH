@@ -273,7 +273,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       //if (tag != "GJet_Reweight_Preselection") {
       //  if (process_id_ == 17)                          continue; // skip MadGraph G+Jets
       //}
-      if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
+      if (is_wrong_tt_jets_sample(currentFileTitle, "Leptonic"))                        continue;
       if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
       if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
  
@@ -575,6 +575,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (subleadIDMVA() < 0.5)         continue;
       } 
 
+      else if (tag == "ttHLeptonic_2017_SR_like") {
+	if (!isSignal) { if (mass() < 100 || mass() > 180 || (mass() > 115 && mass() < 135))     continue;}
+	if (n_jets() < 1)               continue;
+        if (nb_medium() < 1)            continue;
+        if (leadIDMVA() < -0.2)         continue;
+        if (subleadIDMVA() < -0.2)      continue;
+	if (tthMVA() < mva_thresh_2017[0]) continue;
+      }
+
       else if (tag == "ttHLeptonic_2017_SR1") {
 	if (!(n_ele() + n_muons() == 1)) continue;
 	if (isData && blind && mass() > 115 && mass() < 135)      continue;
@@ -795,6 +804,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse_0b", maxID, evt_weight, vId);
       }
       vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, vId);
+
+      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_MinIDMVA", maxID, minID, evt_weight, vId);
      
       if (lead_photon_type() == 1) {
 	vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", leadIDMVA(), evt_weight, vId);

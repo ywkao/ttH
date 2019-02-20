@@ -22,6 +22,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
   TF1* gjet_minID_shape = get_photon_ID_shape("min");
   TF1* gjet_maxID_shape = get_photon_ID_shape("max");
+  TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
 
   // MVA Businesss
   unique_ptr<TMVA::Reader> gjet_mva;
@@ -206,10 +207,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     
     tth_ttPP_mva->AddVariable("top_tag_score_", &top_tag_score_);
     
-    tth_ttPP_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_ttPP_4Feb2019__bdt.xml");
+    tth_ttPP_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_ttPP_7Feb2019__bdt.xml");
   }
 
-  bool do_tth_dipho_mva = false;
+  bool do_tth_dipho_mva = true;
   if (do_tth_dipho_mva) {
     tth_dipho_mva.reset(new TMVA::Reader( "!Color:Silent" ));
 
@@ -256,7 +257,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
     tth_dipho_mva->AddVariable("top_tag_score_", &top_tag_score_);
 
-    tth_dipho_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_dipho_4Feb2019__bdt.xml");
+    tth_dipho_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_dipho_7Feb2019__bdt.xml");
   }
 
 
@@ -426,6 +427,28 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
+      else if (tag == "ttHHadronicLoose_phoIDCut") {
+	if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (minIDMVA_ < -0.7)		continue;		
+      }
+
+      else if (tag == "ttHHadronicLoose_NJets4") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 4)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
+      else if (tag == "ttHHadronicLoose_NJets5") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 5)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      }
+
       else if (tag == "ttHHadronicLoose_impute") {
 	if (process_id_ == 3 || process_id_ == 4 || process_id_ == 17) continue; // skip gjets and QCD (QCD is skipped by default anyway)
 	if (mass() < 100)                continue;
@@ -433,10 +456,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (nb_loose() < 1)             continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (maxIDMVA_ < -0.7)		continue;
+	if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
         if (minIDMVA_ < -0.7) {
 	  if (!isData)
 	    continue;  
-	  minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), gjet_minID_shape, gjet_maxID_shape, evt_weight_);
+	  //minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), gjet_minID_shape, gjet_maxID_shape, evt_weight_);
+	  minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight_);
 	  process_id_ = 18;
         }
         

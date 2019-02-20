@@ -3,7 +3,7 @@ ROOTLIBS = $(shell root-config --libs) -lMinuit -lMLP -lXMLIO -lTMVA -lGenVector
 CC = g++
 CFLAGS = -g -std=c++1y
 
-TARGET = makePlots templatePlots makeTables fit_plots compare_shapes 
+TARGET = makePlots templatePlots makeTables fit_plots compare_shapes correlation_plots 
 
 all: $(TARGET)
 
@@ -21,3 +21,6 @@ fit_plots: fit_plots.cpp PlotHelper.h
 
 compare_shapes: compare_shapes.cpp PlotHelper.h
 	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o compare_shapes compare_shapes.cpp $(ROOTLIBS)
+
+correlation_plots: correlation_plots.cpp PlotHelper.h
+	$(CC) $(CFLAGS) -I${ROOTSYS}/include -o correlation_plots correlation_plots.cpp $(ROOTLIBS)

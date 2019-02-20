@@ -64,12 +64,13 @@ def baseline_v1(max_objects, n_features, n_global_features, no_global, no_lstm, 
 
   # lstm
   batch_momentum = 0.6
-  dropout_rate = 0.2
+  dropout_rate = 0.1
   lstm = keras.layers.LSTM(n_lstm, implementation=2, name='lstm_1', go_backwards=False, return_sequences=True)(conv)
   lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_1")(lstm)
   lstm = keras.layers.Dropout(dropout_rate, name = 'lstm_dropout_1')(lstm)
-  #lstm = keras.layers.LSTM(225, implementation=2, name='lstm_2', go_backwards=False, return_sequences=True)(lstm)
-  #lstm = keras.layers.Dropout(dropout_rate, name = 'lstm_dropout_2')(lstm)
+  lstm = keras.layers.LSTM(n_lstm, implementation=2, name='lstm_2', go_backwards=False, return_sequences=True)(lstm)
+  lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_2")(lstm)
+  lstm = keras.layers.Dropout(dropout_rate, name = 'lstm_dropout_2')(lstm)
   lstm = keras.layers.LSTM(n_lstm, implementation=2, name='lstm_3', go_backwards=False)(lstm)
   lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_3")(lstm)
   lstm = keras.layers.Dropout(dropout_rate, name = 'lstm_dropout_3')(lstm)
@@ -85,7 +86,7 @@ def baseline_v1(max_objects, n_features, n_global_features, no_global, no_lstm, 
     merged_features = keras.layers.concatenate([input_global, lstm])
 
   # fully-connected layers
-  dropout_rate = 0.2
+  dropout_rate = 0.1
   dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_1')(merged_features)
   dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout_1')(dense)
   dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_2')(dense)

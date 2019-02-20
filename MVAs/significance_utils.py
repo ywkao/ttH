@@ -68,20 +68,23 @@ def calc_sigma_eff(signal_data, weights):
   del h
   return popt[1], abs(popt[2])
 
-def events_passing_cut(events, cut):
+def events_passing_cut(events, cut, njets_cut = False):
   events_pass = {"mass" : [], "weights" : [], "mva_score" : []}
   for i in range(len(events["mass"])):
     pass_cut = True
     for mva_name in events["mva_score"].keys():
       if not events["mva_score"][mva_name][i] > cut[mva_name]:
         pass_cut = False
+    if njets_cut:
+      if not events["njets"][i] >= 5:
+	pass_cut = False
     if pass_cut:
       events_pass["mass"].append(events["mass"][i])
       events_pass["weights"].append(events["weights"][i])
       events_pass["mva_score"].append(events["mva_score"]["bdt_score"][i])
   return events_pass
 
-def scan_za(cut_combos, signal_events, background_events, is_data):
+def scan_za(cut_combos, signal_events, background_events, is_data, njets_cut = False):
   testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
 
   za_dict = []
@@ -96,8 +99,8 @@ def scan_za(cut_combos, signal_events, background_events, is_data):
     cut_list = dict((x,y) for x,y in cut_tuple)
     print cut_list
     # Get events passing cut
-    signal_events_passing_cut = events_passing_cut(signal_events, cut_list)
-    bkg_events_passing_cut = events_passing_cut(background_events, cut_list)
+    signal_events_passing_cut = events_passing_cut(signal_events, cut_list, njets_cut)
+    bkg_events_passing_cut = events_passing_cut(background_events, cut_list, njets_cut)
 
     # Calculate sigma eff
     mean_eff, sigma_eff = calc_sigma_eff(signal_events_passing_cut["mass"], signal_events_passing_cut["weights"])
@@ -215,7 +218,7 @@ def extract_1d_curve(full_za_dict):
   #return n_sig_trimmed, za_trimmed
 
 
-def za_scores(n_quantiles, signal_events, background_events, is_data):
+def za_scores(n_quantiles, signal_events, background_events, is_data, njets_cut = False):
   # Calculate cuts corresponding to each quantile
   mva_cuts = {}
   for mva_name in signal_events["mva_score"].keys():
@@ -235,7 +238,7 @@ def za_scores(n_quantiles, signal_events, background_events, is_data):
   print "Performing %d-D scan with %d points" % (len(signal_events["mva_score"].keys()), len(cut_combos))
 
   # Perform full N-d scan
-  full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data) # Full N-d scan
+  full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data, njets_cut) # Full N-d scan
 
   if len(mva_cuts.keys()) > 1:
     za_dict_1d = extract_1d_curve(full_za_dict)

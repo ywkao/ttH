@@ -27,7 +27,7 @@ tree = f.Get("t")
 #feature_names = (root_numpy.tree2array(tree, branches = ["mva_branches"], start=0, stop=1))[0][0]
 #feature_names = list(feature_names) 
 
-feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "top_tag_score_"] 
+feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "top_tag_score_"] 
 
 
 to_remove = []
@@ -98,6 +98,7 @@ label = features["label_"]
 multi_label = features["multi_label_"]
 weights = features["evt_weight_"]
 mass = features["mass_"]
+njets = features["njets_"]
 lead_sigmaEtoE = features["lead_sigmaEtoE_"]
 sublead_sigmaEtoE = features["sublead_sigmaEtoE_"]
 mvas = {}
@@ -108,6 +109,7 @@ label_validation = features_validation["label_"]
 multi_label_validation = features_validation["multi_label_"]
 weights_validation = features_validation["evt_weight_"]
 mass_validation = features_validation["mass_"]
+njets_validation = features_validation["njets_"]
 mvas_validation = {}
 for name in mva_names:
   mvas_validation[name] = numpy.asarray(features_validation[name])
@@ -116,6 +118,7 @@ label_data = features_data["label_"]
 multi_label_data = features_data["multi_label_"]
 weights_data = features_data["evt_weight_"]
 mass_data = features_data["mass_"]
+njets_data = features_data["njets_"]
 mvas_data = {}
 for name in mva_names:
   mvas_data[name] = numpy.asarray(features_data[name])
@@ -158,6 +161,7 @@ dset_label = f_out.create_dataset("label", data=label)
 dset_multi_label = f_out.create_dataset("multi_label", data=multi_label)
 dset_weights = f_out.create_dataset("weights", data=weights)
 dset_mass = f_out.create_dataset("mass", data=mass)
+dset_njets = f_out.create_dataset("njets", data=njets)
 dset_lead_sigmaEtoE = f_out.create_dataset("lead_sigmaEtoE", data=lead_sigmaEtoE)
 dset_sublead_sigmaEtoE = f_out.create_dataset("sublead_sigmaEtoE", data=sublead_sigmaEtoE)
 for name in mva_names:
@@ -168,6 +172,7 @@ dset_label_validation = f_out.create_dataset("label_validation", data=label_vali
 dset_multi_label_validation = f_out.create_dataset("multi_label_validation", data=multi_label_validation)
 dset_weights_validation = f_out.create_dataset("weights_validation", data=weights_validation)
 dset_mass_validation = f_out.create_dataset("mass_validation", data=mass_validation)
+dset_njets_validation = f_out.create_dataset("njets_validation", data=njets_validation)
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_validation", data=mvas_validation[name])
 
@@ -177,6 +182,7 @@ dset_label_data = f_out.create_dataset("label_data", data=label_data)
 dset_multi_label_data = f_out.create_dataset("multi_label_data", data=multi_label_data)
 dset_weights_data = f_out.create_dataset("weights_data", data=weights_data)
 dset_mass_data = f_out.create_dataset("mass_data", data=mass_data)
+dset_njets_data = f_out.create_dataset("njets_data", data=njets_data)
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_data", data=mvas_data[name])
 

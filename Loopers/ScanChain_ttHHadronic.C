@@ -38,6 +38,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   TF1* gjet_minID_shape = get_photon_ID_shape("min");
   TF1* gjet_maxID_shape = get_photon_ID_shape("max");
+  TF1* gjet_leadID_shape = get_photon_ID_shape("lead");
+  TF1* gjet_subleadID_shape = get_photon_ID_shape("sublead");
+  TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
+
+  TF2* gjet_ID_shape = get_photon_ID_shape();
 
   // MVA Business
   unique_ptr<TMVA::Reader> mva;
@@ -104,8 +109,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("ht_", &ht_);
     mva->AddVariable("leadptoM_", &leadptoM_);
     mva->AddVariable("subleadptoM_", &subleadptoM_);
-    mva->AddVariable("leadIDMVA_", &leadIDMVA_);
-    mva->AddVariable("subleadIDMVA_", &subleadIDMVA_); 
+    //mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    //mva->AddVariable("subleadIDMVA_", &subleadIDMVA_); 
     mva->AddVariable("lead_eta_", &lead_eta_);
     mva->AddVariable("sublead_eta_", &sublead_eta_);
 
@@ -169,6 +174,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   double dipho_yield = 0;
 
+  double reverse_yield = 0; // yield of events in which there is one photon in the sideband and it is not a fake
+  double reverse_yield_denom = 0; // yield of events in which there is one photon in the sideband
+
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -196,7 +204,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     set_json(mYear);
 
     bool reweight_gjets;
-    if (tag.Contains("GJet_Reweight_Preselection")) {
+    if (tag.Contains("GJet_Reweight_Preselection") || (tag == "ttHHadronic_correlation_presel")) {
       if (!(currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT"))) {
         cout << "Skipping " << currentFileTitle << endl;
         continue;
@@ -291,15 +299,26 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
 
-      if (tag == "ttHHadronicLoose_impute") {
+      float leadID_ = leadIDMVA();
+      float subleadID_ = subleadIDMVA();
+
+      if (tag == "ttHHadronicLoose_impute" || tag == "ttHHadronicLoose_impute_tightenPhoID" || tag == "ttHHadronic_impute_SR" || tag == "ttHHadronicLoose_impute_fakesRegion") {
 	if (processId == 3 || processId == 4 || processId == 17) continue;
 	if (maxIDMVA_ < -0.7)					 continue;
 	if (minIDMVA_ < -0.7) {
           if (!isData)
             continue;
-          minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), gjet_minID_shape, gjet_maxID_shape, evt_weight);
-	  if (minIDMVA_ >= maxIDMVA_)
-            swap(minIDMVA_, maxIDMVA_);
+	  
+          //minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), gjet_minID_shape, gjet_maxID_shape, evt_weight, gjet_ID_shape);
+	  //if (minIDMVA_ >= maxIDMVA_)
+          //  swap(minIDMVA_, maxIDMVA_);
+
+	  //impute_lead_sublead_photon_id(-0.7, leadID_, subleadID_, cms3.event(), gjet_leadID_shape, gjet_subleadID_shape, evt_weight);
+          //maxIDMVA_ = leadID_ > subleadID_ ? leadID_ : subleadID_;
+          //minIDMVA_ = leadID_ <= subleadID_ ? leadID_ : subleadID_;
+
+	  minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight);
+
           processId = 18;
         }
       }
@@ -334,8 +353,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       sublead_pT_ = subleadPt();
       leadptoM_ = lead_ptoM();
       subleadptoM_ = sublead_ptoM();
-      leadIDMVA_ = leadIDMVA();
-      subleadIDMVA_ = subleadIDMVA();
+      leadIDMVA_ = leadID_;
+      subleadIDMVA_ = subleadID_;
       lead_eta_ = leadEta();
       sublead_eta_ = subleadEta();
 
@@ -408,6 +427,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (n_jets() < 3)		continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
       }
 
       else if (tag == "ttHHadronicLoose_impute") {
@@ -416,7 +437,54 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (nb_loose() < 1)             continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (minIDMVA_ < -0.7)		continue;	
+	if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
       }
+
+      else if (tag == "ttHHadronic_impute_SR") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (minIDMVA_ < -0.7)           continue;
+        if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
+	if (mva_value < 0.97997838)	continue; // based on "Hadronic_1617_impute_18Feb2019__bdt.xml", should give ~50% signal eff. 
+      }
+
+      else if (tag == "ttHHadronicLoose_impute_tightenPhoID") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (minIDMVA_ < -0.2)           continue;
+        if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
+      }
+
+      else if (tag == "ttHHadronicLoose_impute_fakesRegion") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (minIDMVA_ < -0.2 || minIDMVA_ > 0.5)           continue;
+        if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
+      }
+
+      else if (tag == "ttHHadronic_MC_SR") {
+        if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (minIDMVA_ < -0.7)           continue;
+        if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
+	//if (mva_value < 0.98490679)     continue; // based on "Hadronic_1617_ttHHadronicLoose_phoIDCut_18Feb2019__bdt.xml", should give ~50% signal eff.
+	if (mva_value < 0.983)		continue;
+	cout << "Process id: " << processId << " mva value: " << mva_value << endl;
+      }
+
 
       else if (tag == "ttHHadronicLoose_impute_presel") {
 	if (mass() < 100)               continue;
@@ -424,6 +492,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (nb_loose() < 1)             continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (minIDMVA_ < -0.7)		continue;
+	if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
       }
 
       else if (tag == "ttHHadronicLoose_impute_sideband") {
@@ -433,6 +503,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (maxIDMVA_ < -0.7)		continue;
         if (minIDMVA_ >= -0.7)           continue;
+	if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
       }
 
       else if (tag == "ttHHadronic_baseline_maxZA") {
@@ -552,7 +624,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (subleadIDMVA() < -0.2)              continue;
       }
 
-      else if (tag == "ttHHadronic_GJet_Reweight_Preselection" || tag == "ttHHadronic_GJet_Reweight_Preselection_wWeights") {
+      else if (tag == "ttHHadronic_GJet_Reweight_Preselection" || tag == "ttHHadronic_GJet_Reweight_Preselection_wWeights" || tag == "ttHHadronic_correlation_presel") {
 	if (mass() < 100)	continue;
         if (n_jets() < 2)       continue;
       }
@@ -568,12 +640,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       else if (tag == "ttHHadronic_2017_SR_like") {
 	if (mass() < 100)                       continue;
-        if (isData && blind && mass() > 115 && mass() < 135)      continue;
+	if (!isSignal) { if (mass() < 100 || mass() > 180 || (mass() > 115 && mass() < 135))     continue;}
+        //if (isData && blind && mass() > 115 && mass() < 135)      continue;
         if (leadIDMVA() < -0.2)                 continue;
         if (subleadIDMVA() < -0.2)              continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
         if (n_jets() < 2)                       continue;
         if (tthMVA() < mva_thresh_2017[0])      continue;
+        if (btag_scores_sorted[1].second <= 0)          continue;	
       }
 
       else if (tag == "ttHHadronicLoose_2018studies") {
@@ -669,7 +743,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       // Skip blinded region for MC after filling mass histogram
       if (!(tag.Contains("GJet_Reweight_Preselection"))) {
-        if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)	continue;
+        if (!isSignal && blind && mass() > 120 && mass() < 130)	continue;
       }
 
       // Fill rest of histograms //
@@ -707,6 +781,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hHadronicMVA", mva_value, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hHadronicMVA_coarse", mva_value, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hDiphotonSumPt", dipho_sumpt(), evt_weight, vId);
@@ -743,7 +818,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPhotonLeadSigmaIEtaIEta", lead_sieie(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonLeadHOverE", lead_hoe(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonLeadR9", leadR9(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadIDMVA", leadIDMVA(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadIDMVA", leadID_, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonLeadPToM", lead_ptoM(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonLeadSigmaEOverE", lead_sigmaEoE(), evt_weight, vId);
 
@@ -762,7 +837,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPhotonSubleadSigmaIEtaIEta", sublead_sieie(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonSubleadHOverE", sublead_hoe(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonSubleadR9", subleadR9(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadIDMVA(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadID_, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, vId);
 
@@ -797,6 +872,70 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets", minID, n_jets(), evt_weight, vId); 
       vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets_entries", maxID, n_jets(), 1, vId);
       vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets_entries", minID, n_jets(), 1, vId);
+
+      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_MinIDMVA", maxID, minID, evt_weight, vId);
+
+      if (minID < -0.7 && maxID > -0.7) {
+	reverse_yield_denom += evt_weight;
+	if (lead_photon_type() == 1 && sublead_photon_type() == 3) {
+	  if (leadIDMVA() < subleadIDMVA()) {
+	    reverse_yield += evt_weight;
+	    //cout << "Prompt IDMVA: " << leadIDMVA() << endl;
+	    //cout << "Fake IDMVA:   " << subleadIDMVA() << endl;
+	  }
+	}
+	else if (lead_photon_type() == 3 && sublead_photon_type() == 1) {
+	  if (leadIDMVA() > subleadIDMVA()) {
+	    reverse_yield += evt_weight;
+	    //cout << "Prompt IDMVA: " << subleadIDMVA() << endl;
+            //cout << "Fake IDMVA:   " << leadIDMVA() << endl;
+	  }
+	}
+
+      }
+
+      if (lead_photon_type() == 3) {
+	vProcess[processId]->fill_histogram("hFakePhotonIDMVA", leadIDMVA(), evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", leadIDMVA(), njets_, evt_weight, vId);
+	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_MaxBTag", leadIDMVA(), max1_btag_, evt_weight, vId); 
+	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", leadIDMVA(), max2_btag_, evt_weight, vId);
+	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", leadIDMVA(), diphoton.Pt(), evt_weight, vId);
+	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Pt", leadIDMVA(), leadPt(), evt_weight, vId);
+	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Eta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
+      }
+      else if (lead_photon_type() == 1) {
+	vProcess[processId]->fill_histogram("hPromptPhotonIDMVA", leadIDMVA(), evt_weight, vId);
+	vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_NJets", leadIDMVA(), njets_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_MaxBTag", leadIDMVA(), max1_btag_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_2ndMaxBTag", leadIDMVA(), max2_btag_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_DiPhotonPt", leadIDMVA(), diphoton.Pt(), evt_weight, vId);
+	vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Pt", leadIDMVA(), leadPt(), evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Eta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
+      }
+
+      if (sublead_photon_type() == 3) {
+	vProcess[processId]->fill_histogram("hFakePhotonIDMVA", subleadIDMVA(), evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", subleadIDMVA(), njets_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_MaxBTag", subleadIDMVA(), max1_btag_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", subleadIDMVA(), max2_btag_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", subleadIDMVA(), diphoton.Pt(), evt_weight, vId);
+	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Pt", subleadIDMVA(), subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Eta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId);
+      }
+      else if (sublead_photon_type() == 1) {
+	vProcess[processId]->fill_histogram("hPromptPhotonIDMVA", subleadIDMVA(), evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_NJets", subleadIDMVA(), njets_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_MaxBTag", subleadIDMVA(), max1_btag_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_2ndMaxBTag", subleadIDMVA(), max2_btag_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_DiPhotonPt", subleadIDMVA(), diphoton.Pt(), evt_weight, vId);
+	vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Pt", subleadIDMVA(), subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Eta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId);
+      }
+
+      vProcess[processId]->fill_2D_histogram("hPhotonLeadIDMVA_LeadPt", leadIDMVA(), leadPt(), evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonLeadIDMVA_LeadEta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonSubleadIDMVA_SubleadPt", subleadIDMVA(), subleadPt(), evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonSubleadIDMVA_SubleadEta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId); 
 
       if (n_jets() == 2) {
 	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets2", maxID, evt_weight, vId);
@@ -843,6 +982,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   }
  
   baby->CloseBabyNtuple();
+
+  cout << "Number of events from sideband where minID is prompt: " << reverse_yield << endl;
+  cout << "Number of events from sideband: " << reverse_yield_denom << endl;
+  cout << "Fraction of events: " << reverse_yield / reverse_yield_denom << endl; 
 
   //delete rand_map;
 

@@ -68,10 +68,10 @@ n_global_features = len(global_features[0])
 
 print(max_objects, n_features, len(object_features), n_global_features)
 
-model = dnn_model.baseline_v1(max_objects, n_features, n_global_features, args.no_global, args.no_lstm, 200)
+model = dnn_model.baseline_v1(max_objects, n_features, n_global_features, args.no_global, args.no_lstm, 150)
 
-nEpochs = 10
-nBatch = 10000
+nEpochs = 50
+nBatch = 50000
 
 weights_file = "dnn_weights/" + args.tag + "_weights_{epoch:02d}.hdf5"
 checkpoint = keras.callbacks.ModelCheckpoint(weights_file) # save after every epoch 
@@ -153,6 +153,7 @@ print("Training AUC: %.5f +/- %.5f") % (auc_train, auc_train_unc)
 print("Testing AUC: %.5f +/- %.5f") % (auc_test, auc_test_unc)
 print("Top Tag AUC: %.5f +/- %.5f") % (auc_tts, auc_tts_unc)
 print("TTPP BDT AUC: %.5f +/- %.5f") % (auc_ttPP, auc_ttPP_unc)
+print("TTPP BDT AUC: %.5f +/- %.5f") % (auc_dipho, auc_dipho_unc)
 print("Std. BDT AUC: %.5f +/- %.5f") % (auc_std_bdt, auc_std_bdt_unc)
 
 numpy.savez("dnn_rocs_%s.npz" % (args.tag), fpr_train = fpr_train, tpr_train = tpr_train, fpr_test = fpr_test, tpr_test = tpr_test, fpr_tts = fpr_tts, tpr_tts = tpr_tts, fpr_ttPP = fpr_ttPP, tpr_ttPP = tpr_ttPP, fpr_std = fpr_std, tpr_std = tpr_std, fpr_dipho = fpr_dipho, tpr_dipho = tpr_dipho)

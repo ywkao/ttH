@@ -1,4 +1,5 @@
 #include "TF1.h"
+#include "TF2.h"
 #include "TRandom.h"
 #include "TLorentzVector.h"
 #include "ttH_process.h"
@@ -143,6 +144,31 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_2D_histogram("hPhotonMaxIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5);
     v[i]->add_2D_histogram("hPhotonMinIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5); 
 
+    v[i]->add_2D_histogram("hPhotonMaxIDMVA_MinIDMVA", 20, -1, 1, 20, -1, 1);
+
+    // Correlation with IDMVA
+    v[i]->add_histogram("hFakePhotonIDMVA", 40, -1, 1);
+    v[i]->add_histogram("hPromptPhotonIDMVA", 40, -1, 1);
+
+    v[i]->add_2D_histogram("hFakePhotonIDMVA_NJets", 20, -1, 1, 10, -0.5, 9.5);
+    v[i]->add_2D_histogram("hFakePhotonIDMVA_MaxBTag", 20, -1, 1, 20, 0, 1);
+    v[i]->add_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", 20, -1, 1, 20, 0, 1);
+    v[i]->add_2D_histogram("hPromptPhotonIDMVA_NJets", 20, -1, 1, 10, -0.5, 9.5);
+    v[i]->add_2D_histogram("hPromptPhotonIDMVA_MaxBTag", 20, -1, 1, 20, 0, 1);
+    v[i]->add_2D_histogram("hPromptPhotonIDMVA_2ndMaxBTag", 20, -1, 1, 20, 0, 1);
+
+    v[i]->add_2D_histogram("hFakePhotonIDMVA_Pt", 20, -1, 1, 20, 0, 300);
+    v[i]->add_2D_histogram("hPromptPhotonIDMVA_Pt", 20, -1, 1, 20, 0, 300);
+    v[i]->add_2D_histogram("hFakePhotonIDMVA_Eta", 20, -1, 1, 20, 0, 2.4);
+    v[i]->add_2D_histogram("hPromptPhotonIDMVA_Eta", 20, -1, 1, 20, 0, 2.4);
+
+    v[i]->add_2D_histogram("hPhotonLeadIDMVA_LeadPt", 20, -1, 1, 20, 0, 300);
+    v[i]->add_2D_histogram("hPhotonSubleadIDMVA_SubleadPt", 20, -1, 1, 20, 0, 300);
+    v[i]->add_2D_histogram("hPhotonLeadIDMVA_LeadEta", 20, -1, 1, 20, 0, 2.4);
+    v[i]->add_2D_histogram("hPhotonSubleadIDMVA_SubleadEta", 20, -1, 1, 20, 0, 2.4);
+    v[i]->add_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", 20, -1, 1, 20, 0, 300);
+    v[i]->add_2D_histogram("hPromptPhotonIDMVA_DiPhotonPt", 20, -1, 1, 20, 0, 300);
+
     v[i]->add_histogram("hPhotonMaxIDMVA_NJets2", 30, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_NJets2", 30, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_NJets3", 30, -1, 1);
@@ -167,6 +193,9 @@ void add_variables(vector<Process*> v, TString tag) {
 
     v[i]->add_histogram("hHadronicMVA", 25, -1.0, 1.0);
     v[i]->add_histogram("hLeptonicMVA", 25, -1.0, 1.0);
+
+    v[i]->add_histogram("hHadronicMVA_coarse", 10, 0.0, 1.0);
+    v[i]->add_histogram("hLeptonicMVA_coarse", 10, 0.0, 1.0);
 
     v[i]->add_histogram("hLeptonPt", 25, 0, 200);
     v[i]->add_histogram("hLeptonEta", 25, -3, 3);
@@ -321,9 +350,13 @@ const TString gjet_bdt_file = "../MVAs/GJetReweight_1617_GJetReweight_CombineSam
 const double gjet_normalization = 188341.868812 / 345058.328323; // scale factor to make reweighted (Pythia + MadGraph) yield match MadGraph yield. First number taken from hMass_GammaJets_Madgraph->IntegralAndError(1,80,err) in ttHHadronic_GJet_Reweight_Preselection__histogramsAll.root and second number taken from hMass_GammaJets->IntegralAndError(1,80,err) in ttHHadronic_GJet_Reweight_Preselection_wWeights__histogramsAll.root
 
 // 2017-only results
-const double qcd_factor_2017 = 2.6302765969200204; 
-const double gjets_factor_2017 = 1.9817470714424696; 
-const double diphoton_factor_2017 = 1.1645911726186993; 
+//const double qcd_factor_2017 = 2.6302765969200204; 
+//const double gjets_factor_2017 = 1.9817470714424696; 
+//const double diphoton_factor_2017 = 1.1645911726186993; 
+const double qcd_factor_2017 = 2.34;
+const double gjets_factor_2017 = 1.76;
+const double diphoton_factor_2017 = 1.26;
+
 const vector<double> qcd_factor_Njets_2017 = {2.2940045704500824, 1.7784105604582408, 1.7659539814519811}; 
 const vector<double> gjets_factor_Njets_2017 = {1.945909958008661, 2.865798441193098, 3.6723528776911034}; 
 const vector<double> diphoton_factor_Njets_2017 = {1.195047195435529, 0.9420013195895437, 0.8631697452232668}; 
@@ -350,11 +383,11 @@ double qcdX_njets_bin(int n_jets) {
 double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   if (qcd_scale == "inclusive_NJets") {
     if (currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT")) 
-      return gjets_factor; 
+      return gjets_factor_2017; 
     else if (currentFileTitle.Contains("QCD"))
-      return qcd_factor; 
+      return qcd_factor_2017; 
     else if (currentFileTitle.Contains("DiPhotonJetsBox"))
-      return diphoton_factor; 
+      return diphoton_factor_2017; 
     else
       return 1.0;
   }
@@ -371,7 +404,7 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   }
 }
 
-const double impute_transfer_factor = 1.124; // N_data passing minIDVMA cut / N_data failing minIDMVA cut (obtained from `python impute_transfer_factor.py --input_fail "ttHHadronicLoose_impute_sideband__histogramsAll.root" --input_pass "ttHHadronicLoose_impute_presel__histogramsAll.root"`)
+const double impute_transfer_factor = 1.191; // N_data passing minIDVMA cut / N_data failing minIDMVA cut (obtained from `python impute_transfer_factor.py --input_fail "../ttHHadronicLoose_impute_sideband__histogramsAll.root" --input_pass "../ttHHadronicLoose_impute_presel__histogramsAll.root"`)
 
 // Function derived from PhotonID_Sideband/derive_shape.py
 // "min" : python derive_shape.py --input "../ttHHadronicLoose_NoQCDScale_histogramsAll.root" --data_driven
@@ -400,6 +433,60 @@ TF1* get_photon_ID_shape(TString type) {
     f_IDMVA->SetParameter(6, -4399.99);
     f_IDMVA->SetParameter(7, 59619.5);
   }
+  else if (type == "lead") {
+    f_IDMVA->SetParameter(0, 2456.69); 
+    f_IDMVA->SetParameter(1, -2760.28); 
+    f_IDMVA->SetParameter(2, 1409.34); 
+    f_IDMVA->SetParameter(3, 14775.1); 
+    f_IDMVA->SetParameter(4, 23726.9); 
+    f_IDMVA->SetParameter(5, -73229.7); 
+    f_IDMVA->SetParameter(6, -26851); 
+    f_IDMVA->SetParameter(7, 89832); 
+  }
+  else if (type == "sublead") {
+    f_IDMVA->SetParameter(0, 3014.79); 
+    f_IDMVA->SetParameter(1, -2977.22); 
+    f_IDMVA->SetParameter(2, 6433.38); 
+    f_IDMVA->SetParameter(3, -3873.4); 
+    f_IDMVA->SetParameter(4, -7026.29); 
+    f_IDMVA->SetParameter(5, 2512.59); 
+    f_IDMVA->SetParameter(6, 20228.5); 
+    f_IDMVA->SetParameter(7, -6647.97); 
+  }
+  else if (type == "fake") {
+    f_IDMVA->SetParameter(0, 4142.68); 
+    f_IDMVA->SetParameter(1, -6005.08); 
+    f_IDMVA->SetParameter(2, 12297.7); 
+    f_IDMVA->SetParameter(3, -12373); 
+    f_IDMVA->SetParameter(4, -25571.6); 
+    f_IDMVA->SetParameter(5, 28165.2); 
+    f_IDMVA->SetParameter(6, 58033.1); 
+    f_IDMVA->SetParameter(7, -55772.5); 
+  }
+  return f_IDMVA;
+}
+
+TF2* get_photon_ID_shape() {
+  TF2* f_IDMVA = new TF2("f_IDMVA", "[0] + [1]*x + [2]*y + [3]*(x**2) + [4]*(x*y) + [5]*(y**2) + [6]*(x**3) + [7]*((x**2)*y) + [8]*((x) * (y**2)) + [9]*(y**3) + [10]*(x**4) + [11]*(y**4) + [12]*(x**5) + [13]*(y**5) + [14]*(x**6) + [15]*(y**6) + [16]*(x**7) + [17]*(y**7)",  -0.7, 1.0, -0.7, 1.0); 
+  f_IDMVA->SetParameter(0, 5.50626e+01); 
+  f_IDMVA->SetParameter(2, 6.13402e+02); 
+  f_IDMVA->SetParameter(3, -7.36922e+02); 
+  f_IDMVA->SetParameter(4, -1.58195e+03); 
+  f_IDMVA->SetParameter(5, 2.93274e+03); 
+  f_IDMVA->SetParameter(6, -9.08034e+02); 
+  f_IDMVA->SetParameter(7, 1.19128e+03); 
+  f_IDMVA->SetParameter(8, -2.94121e+03); 
+  f_IDMVA->SetParameter(9, 1.96396e+03); 
+  f_IDMVA->SetParameter(10, -1.00375e+03); 
+  f_IDMVA->SetParameter(11, 2.02756e+03); 
+  f_IDMVA->SetParameter(12, -2.36958e+02); 
+  f_IDMVA->SetParameter(13, -2.54148e+03); 
+  f_IDMVA->SetParameter(14, 1.65733e+03); 
+  f_IDMVA->SetParameter(15, -3.98055e+03); 
+  f_IDMVA->SetParameter(16, 1.40529e+03);
+  f_IDMVA->SetParameter(17, 5.57964e+03); 
+  f_IDMVA->SetParameter(18, -2.16032e+03); 
+  
   return f_IDMVA;
 }
 
@@ -413,16 +500,49 @@ void swap(double &a, double &b) {
   return;
 }
 
-double impute_photon_id(double minID_cut, float &maxIDMVA, int event, TF1* photon_minID_shape, TF1* photon_maxID_shape, float &evt_weight) {
-  //TRandom* rand = new TRandom(event);
-  //double minIDMVA = rand->Uniform(minID_cut, maxIDMVA);
-  double minIDMVA = photon_minID_shape->GetRandom(minID_cut, 1.0);
-  maxIDMVA = photon_maxID_shape->GetRandom(minID_cut, 1.0);
+double impute_from_fakePDF(double minID_cut, float maxIDMVA, int event, TF1* photon_fakeID_shape, float &evt_weight) {
   evt_weight *= impute_transfer_factor;
-  //delete rand;
+  
+  double minIDMVA = photon_fakeID_shape->GetRandom(minID_cut, maxIDMVA);
+  
+  double weight = photon_fakeID_shape->Integral(minID_cut, maxIDMVA) / photon_fakeID_shape->Integral(-0.9, minID_cut);
+  evt_weight *= weight;
+
+  //cout << "Max IDMVA: " << maxIDMVA << " , Min IDMVA: " << minIDMVA << endl;
+  //cout << "Applying additional weight factor of: " << weight << endl;
 
   return minIDMVA;
+  
 }
+
+double impute_photon_id(double minID_cut, float &maxIDMVA, int event, TF1* photon_minID_shape, TF1* photon_maxID_shape, float &evt_weight, TF2* photon_ID_shape = nullptr) {
+  evt_weight *= impute_transfer_factor;
+
+  if (photon_ID_shape == nullptr) {
+    double minIDMVA = photon_minID_shape->GetRandom(minID_cut, 1.0);
+    maxIDMVA = photon_maxID_shape->GetRandom(minID_cut, 1.0);
+    return minIDMVA;
+  }
+
+  else {
+    Double_t minIDMVA_(-999), maxIDMVA_(-999);
+    while (minIDMVA_ >= maxIDMVA_)
+      photon_ID_shape->GetRandom2(maxIDMVA_, minIDMVA_);
+    double minIDMVA = minIDMVA_;
+    maxIDMVA = maxIDMVA_;
+    cout << "Max IDMVA: " << maxIDMVA << " , Min IDMVA: " << minIDMVA << endl;
+    return minIDMVA;
+  }
+  
+}
+
+void impute_lead_sublead_photon_id(double minID_cut, float &leadIDMVA, float &subleadIDMVA, int event, TF1* photon_leadID_shape, TF1* photon_subleadID_shape, float &evt_weight) {
+  evt_weight *= impute_transfer_factor;
+  leadIDMVA = photon_leadID_shape->GetRandom(minID_cut, 1.0);
+  subleadIDMVA = photon_subleadID_shape->GetRandom(minID_cut, 1.0);
+  cout << "Lead IDMVA: " << leadIDMVA << " , Sublead IDMVA: " << subleadIDMVA << endl;
+  return;
+} 
 
 bool is_wrong_tt_jets_sample(TString currentFileTitle, TString channel) {
   if (!(currentFileTitle.Contains("TTTo") || currentFileTitle.Contains("TTJets")))
@@ -678,6 +798,21 @@ const vector<TString> vSamples_2016 = {
 			"DoubleEG_Run2016G-03Feb2017-v1_MINIAOD_2016_topTag_overlapRemoval",
 			"DoubleEG_Run2016H-03Feb2017_ver2-v1_MINIAOD_2016_topTag_overlapRemoval",
 			"DoubleEG_Run2016H-03Feb2017_ver3-v1_MINIAOD_2016_topTag_overlapRemoval",
+			// gamma + jets
+                        "GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        // gamma + jets madgraph sample
+                        "GJets_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-40To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-40To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+                        "GJets_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			// ttH
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
@@ -694,22 +829,6 @@ const vector<TString> vSamples_2016 = {
 			// gamma gamma + jets
 			"DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"DiPhotonJetsBox_M40_80-Sherpa_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			// gamma + jets
-			"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			// gamma + jets madgraph sample
-			"GJets_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-40To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-40To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-			"GJets_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
-
 			// jets
 			"QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
