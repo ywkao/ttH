@@ -174,8 +174,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     tth_ttPP_mva->AddVariable("ht_", &ht_);
     tth_ttPP_mva->AddVariable("leadptoM_", &leadptoM_);
     tth_ttPP_mva->AddVariable("subleadptoM_", &subleadptoM_);
-    tth_ttPP_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
-    tth_ttPP_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
+    //tth_ttPP_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    //tth_ttPP_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
     tth_ttPP_mva->AddVariable("lead_eta_", &lead_eta_);
     tth_ttPP_mva->AddVariable("sublead_eta_", &sublead_eta_);
     
@@ -206,8 +206,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     tth_ttPP_mva->AddVariable("met_", &met_);
     
     tth_ttPP_mva->AddVariable("top_tag_score_", &top_tag_score_);
+    tth_ttPP_mva->AddVariable("dipho_pt_over_mass_", &dipho_pt_over_mass_);
+
+    tth_ttPP_mva->AddVariable("helicity_angle_", &helicity_angle_);
     
-    tth_ttPP_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_ttPP_7Feb2019__bdt.xml");
+    tth_ttPP_mva->BookMVA("BDT", "../MVAs/Hadronic_ttGG_26Feb2019__bdt.xml");
   }
 
   bool do_tth_dipho_mva = true;
@@ -224,8 +227,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     tth_dipho_mva->AddVariable("ht_", &ht_);
     tth_dipho_mva->AddVariable("leadptoM_", &leadptoM_);
     tth_dipho_mva->AddVariable("subleadptoM_", &subleadptoM_);
-    tth_dipho_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
-    tth_dipho_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
+    //tth_dipho_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    //tth_dipho_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
     tth_dipho_mva->AddVariable("lead_eta_", &lead_eta_);
     tth_dipho_mva->AddVariable("sublead_eta_", &sublead_eta_);
 
@@ -257,7 +260,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
     tth_dipho_mva->AddVariable("top_tag_score_", &top_tag_score_);
 
-    tth_dipho_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_dipho_7Feb2019__bdt.xml");
+    tth_dipho_mva->AddVariable("dipho_pt_over_mass_", &dipho_pt_over_mass_);
+    tth_dipho_mva->AddVariable("helicity_angle_", &helicity_angle_);
+
+    tth_dipho_mva->BookMVA("BDT", "../MVAs/Hadronic_ttHHadronicLoose_1617_dipho_26Feb2019__bdt.xml");
   }
 
 
@@ -275,8 +281,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     tth_std_mva->AddVariable("ht_", &ht_);
     tth_std_mva->AddVariable("leadptoM_", &leadptoM_);
     tth_std_mva->AddVariable("subleadptoM_", &subleadptoM_);
-    tth_std_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
-    tth_std_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
+    //tth_std_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    //tth_std_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
     tth_std_mva->AddVariable("lead_eta_", &lead_eta_);
     tth_std_mva->AddVariable("sublead_eta_", &sublead_eta_);
 
@@ -308,7 +314,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
     tth_std_mva->AddVariable("top_tag_score_", &top_tag_score_);
 
-    tth_std_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_ttHHadronicLoose_4Feb2019__bdt.xml");
+    tth_std_mva->AddVariable("dipho_pt_over_mass_", &dipho_pt_over_mass_);
+    tth_std_mva->AddVariable("helicity_angle_", &helicity_angle_);
+
+    //tth_std_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_ttHHadronicLoose_4Feb2019__bdt.xml");
+    tth_std_mva->BookMVA("BDT", "../MVAs/Hadronic_ttHHadronicLoose_impute_21Feb2019__bdt.xml");
   }
 
 
@@ -433,6 +443,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (nb_loose() < 1)             continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (minIDMVA_ < -0.7)		continue;		
+	if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
       }
 
       else if (tag == "ttHHadronicLoose_NJets4") {
@@ -478,9 +490,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       else if (tag == "ttHHadronic_ttPP" || tag == "ttHHadronic_dipho") {
 	if (mass() < 100)                continue;
 	if (n_jets() < 3)		 continue;
+	if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (maxIDMVA_ < -0.7)           continue;
+        if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
+        if (minIDMVA_ < -0.7) 		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
-
 
       else if (tag == "ttHHadronic_data_sideband_0b") {
 	if (mass() < 100)                continue;
@@ -509,10 +526,29 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
-      else if (tag == "ttHHadronic_DNN_presel") {
+      else if (tag == "ttHHadronic_DNN_presel") { 
 	if (mass() < 100)                continue;
 	if (n_jets() < 3)               continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
+      }
+
+      else if (tag == "ttHHadronic_DNN_presel_all_impute") {
+	if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (nb_loose() < 1)             continue;
+	if (maxIDMVA_ < -0.7)           continue;
+        if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
+        if (minIDMVA_ < -0.7) {
+          if (!isData)
+            continue;
+          minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight_);
+          process_id_ = 18;
+        }
+	
       }
 
       else if (tag == "ttHHadronic") {
@@ -559,7 +595,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       }
 
       TString scale_qcd = "binned_NJets";
-      bool do_scale_qcd = !tag.Contains("impute");
+      //bool do_scale_qcd = !tag.Contains("impute");
+      bool do_scale_qcd = false;
       if (do_scale_qcd) {
         evt_weight_ *= qcdX_factor(currentFileTitle, scale_qcd, n_jets());
       }
@@ -641,8 +678,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       dipho_cosphi_ = dipho_cosphi();
       dipho_rapidity_ = dipho_rapidity();
       dipho_pt_ = diphoton.Pt();
+      dipho_pt_over_mass_ = diphoton.Pt() / mass();
       met_ = MetPt();
+      log_met_ = log(MetPt());
       met_phi_ = MetPhi();
+
+      helicity_angle_ = helicity(lead_photon, sublead_photon);
 
       rand_ = cms3.rand();
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());

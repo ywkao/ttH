@@ -70,6 +70,12 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hJet5Eta", 25, -3, 3);
     v[i]->add_histogram("hJet6pT", 25, 0, 500);
     v[i]->add_histogram("hJet6Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet1BTag", 25, 0, 1);   
+    v[i]->add_histogram("hJet2BTag", 25, 0, 1);
+    v[i]->add_histogram("hJet3BTag", 25, 0, 1);  
+    v[i]->add_histogram("hJet4BTag", 25, 0, 1);  
+    v[i]->add_histogram("hJet5BTag", 25, 0, 1);  
+    v[i]->add_histogram("hJet6BTag", 25, 0, 1);  
 
     v[i]->add_histogram("hbJet1pT", 25, 0, 500);
     //v[i]->add_histogram("hbJet1Eta", 25, -3, 3);
@@ -78,6 +84,7 @@ void add_variables(vector<Process*> v, TString tag) {
 
     v[i]->add_histogram("hPtHiggs", 25, 0, 400);
     v[i]->add_histogram("hPhotonDeltaR", 25, 0, 6); 
+    v[i]->add_histogram("hDiphotonPtOverMass", 30, 0, 3);
 
     v[i]->add_histogram("hMinDrDiphoJet", 25, 0, 6);
     v[i]->add_histogram("hDijetClosestWMass", 25, 0, 50);
@@ -106,6 +113,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonLeadPToM", 25, 0, 5);
     v[i]->add_histogram("hPhotonLeadSigmaEOverE", 100, 0, 1);
     v[i]->add_histogram("hPhotonLeadPtGen", 25, 0, 350);
+    v[i]->add_histogram("hPhotonLeadPixelSeed", 2, -0.5, 1.5);
 
     // Subleading photon
     v[i]->add_histogram("hPhotonSubleadPt", 25, 0, 350);
@@ -119,6 +127,14 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonSubleadPToM", 25, 0, 5);
     v[i]->add_histogram("hPhotonSubleadSigmaEOverE", 100, 0, 1);
     v[i]->add_histogram("hPhotonSubleadPtGen", 25, 0, 350);
+    v[i]->add_histogram("hPhotonSubleadPixelSeed", 2, -0.5, 1.5);
+
+
+    // Min/Max ID photon
+    v[i]->add_histogram("hMinIDPhotonPt", 25, 0, 350);
+    v[i]->add_histogram("hMinIDPhotonEta", 25, -3, 3);
+    v[i]->add_histogram("hMaxIDPhotonPt", 25, 0, 350);
+    v[i]->add_histogram("hMaxIDPhotonEta", 25, -3, 3);
 
     v[i]->add_histogram("hPhotonPtRatio", 50, 0.0, 2.0);
     v[i]->add_histogram("hPhotonDeltaRGen", 50, 0, 0.15);
@@ -150,6 +166,11 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hFakePhotonIDMVA", 40, -1, 1);
     v[i]->add_histogram("hPromptPhotonIDMVA", 40, -1, 1);
 
+    v[i]->add_histogram("hFakePhotonIDMVA_Barrel_LowPt", 40, -1, 1);
+    v[i]->add_histogram("hFakePhotonIDMVA_Barrel_HighPt", 40, -1, 1);
+    v[i]->add_histogram("hFakePhotonIDMVA_Endcap_LowPt", 40, -1, 1);
+    v[i]->add_histogram("hFakePhotonIDMVA_Endcap_HighPt", 40, -1, 1);
+
     v[i]->add_2D_histogram("hFakePhotonIDMVA_NJets", 20, -1, 1, 10, -0.5, 9.5);
     v[i]->add_2D_histogram("hFakePhotonIDMVA_MaxBTag", 20, -1, 1, 20, 0, 1);
     v[i]->add_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", 20, -1, 1, 20, 0, 1);
@@ -176,7 +197,6 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonMaxIDMVA_NJets4+", 30, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_NJets4+", 30, -1, 1);
 
-
     v[i]->add_histogram("hDiphoMVA", 25, -1, 1);
 
     v[i]->add_histogram("hPhotonIDMVA_prompt", 5, -1, 1);
@@ -196,6 +216,9 @@ void add_variables(vector<Process*> v, TString tag) {
 
     v[i]->add_histogram("hHadronicMVA_coarse", 10, 0.0, 1.0);
     v[i]->add_histogram("hLeptonicMVA_coarse", 10, 0.0, 1.0);
+
+    v[i]->add_histogram("hHadronicMVA_fine", 50, 0.0, 1.0);
+    v[i]->add_histogram("hLeptonicMVA_fine", 50, 0.0, 1.0);
 
     v[i]->add_histogram("hLeptonPt", 25, 0, 200);
     v[i]->add_histogram("hLeptonEta", 25, -3, 3);
@@ -320,6 +343,20 @@ int multiclassifier_label(TString currentFileTitle, int genPhotonId) {
   }
   else
     return 4;
+}
+
+const double barrel_eta = 1.479;
+int categorize_photon_locations(double eta_lead, double eta_sublead) {
+  if (abs(eta_lead) < barrel_eta && abs(eta_sublead) < barrel_eta)
+    return 0;
+  else if (abs(eta_lead) < barrel_eta || abs(eta_sublead) < barrel_eta)
+    return 1;
+  else if (abs(eta_lead) > barrel_eta && abs(eta_sublead) > barrel_eta)
+    return 2;
+  else {
+    cout << "Shouldn't be here" << endl;
+    return -999;
+  }
 }
 
 bool has_ttX_overlap(TString currentFileTitle, int lead_prompt, int sublead_prompt) {
@@ -463,6 +500,48 @@ TF1* get_photon_ID_shape(TString type) {
     f_IDMVA->SetParameter(6, 58033.1); 
     f_IDMVA->SetParameter(7, -55772.5); 
   }
+  else if (type == "fake_barrel_lowPt") {
+    f_IDMVA->SetParameter(0, 744.04); 
+    f_IDMVA->SetParameter(1, -1118.68); 
+    f_IDMVA->SetParameter(2, 1944.08); 
+    f_IDMVA->SetParameter(3, -1859.54); 
+    f_IDMVA->SetParameter(4, -4195.24); 
+    f_IDMVA->SetParameter(5, 4209.09); 
+    f_IDMVA->SetParameter(6, 8162.02); 
+    f_IDMVA->SetParameter(7, -7385.49); 
+  }
+  else if (type == "fake_barrel_highPt") {
+    f_IDMVA->SetParameter(0, 989.714); 
+    f_IDMVA->SetParameter(1, -1731.67); 
+    f_IDMVA->SetParameter(2, 3120.35); 
+    f_IDMVA->SetParameter(3, -2744.14); 
+    f_IDMVA->SetParameter(4, -4944.81); 
+    f_IDMVA->SetParameter(5, 5135.66); 
+    f_IDMVA->SetParameter(6, 14870.4); 
+    f_IDMVA->SetParameter(7, -13887.5); 
+  }
+  else if (type == "fake_endcap_lowPt") {
+    f_IDMVA->SetParameter(0, 93.664); 
+    f_IDMVA->SetParameter(1, -194.721); 
+    f_IDMVA->SetParameter(2, 10.2034); 
+    f_IDMVA->SetParameter(3, 536.54); 
+    f_IDMVA->SetParameter(4, 407.474); 
+    f_IDMVA->SetParameter(5, -1653.73); 
+    f_IDMVA->SetParameter(6, 638.739); 
+    f_IDMVA->SetParameter(7, 229.782); 
+  }
+  else if (type == "fake_endcap_highPt") {
+    f_IDMVA->SetParameter(0, 177.77); 
+    f_IDMVA->SetParameter(1, -215.428); 
+    f_IDMVA->SetParameter(2, 700.557); 
+    f_IDMVA->SetParameter(3, 338.359); 
+    f_IDMVA->SetParameter(4, -1518.96); 
+    f_IDMVA->SetParameter(5, -1392.57); 
+    f_IDMVA->SetParameter(6, 3457.53); 
+    f_IDMVA->SetParameter(7, -1272.35); 
+  }
+
+
   return f_IDMVA;
 }
 
@@ -498,6 +577,32 @@ void swap(double &a, double &b) {
   a = temp_b;
   b = temp_a;
   return;
+}
+
+double impute_from_fakePDF_withKinematics(double minID_cut, float maxIDMVA, int event, vector<TF1*> photon_fakeID_shapes, float pt, float eta, float &evt_weight) {
+  evt_weight *= impute_transfer_factor;
+
+  int idx = -1;
+  if (pt > 40 && eta < barrel_eta)
+    idx = 0;
+  else if (pt < 40 && eta < barrel_eta)
+    idx = 1;
+  else if (pt > 40 && eta > barrel_eta)
+    idx = 2;
+  else if (pt < 40 && eta > barrel_eta)
+    idx = 3;
+
+  if (photon_fakeID_shapes.size() != 4) {
+    cout << "Incorrect number of fake PDFs (should be 4)" << endl;
+    return -999;
+  } 
+  else {
+    double minIDMVA = photon_fakeID_shapes[idx]->GetRandom(minID_cut, maxIDMVA);
+    double weight = photon_fakeID_shapes[idx]->Integral(minID_cut, maxIDMVA) / photon_fakeID_shapes[idx]->Integral(-0.9, minID_cut);
+    evt_weight *= weight;
+    return minIDMVA;
+  }
+
 }
 
 double impute_from_fakePDF(double minID_cut, float maxIDMVA, int event, TF1* photon_fakeID_shape, float &evt_weight) {
@@ -624,20 +729,6 @@ int categorize_leptons(int nGoodEls, int nGoodMus) {
       return 4;
     if (nGoodMus >= 2)
       return 5;
-  }
-}
-
-const double barrel_eta = 1.479;
-int categorize_photon_locations(double eta_lead, double eta_sublead) {
-  if (abs(eta_lead) < barrel_eta && abs(eta_sublead) < barrel_eta)
-    return 0;
-  else if (abs(eta_lead) < barrel_eta || abs(eta_sublead) < barrel_eta)
-    return 1;
-  else if (abs(eta_lead) > barrel_eta && abs(eta_sublead) > barrel_eta)
-    return 2;
-  else {
-    cout << "Shouldn't be here" << endl;
-    return -999;
   }
 }
 

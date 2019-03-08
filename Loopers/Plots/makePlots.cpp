@@ -541,7 +541,7 @@ int main(int argc, char* argv[])
       if (impute_gjets)
         vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
       else
-	 vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
+	 vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "VG", "DY"};
     }
     if (year == "2018")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
@@ -724,6 +724,25 @@ int main(int argc, char* argv[])
 
     make_plot(c1, vFiles[i], vNames[i], "hTopTagger_score", "Top tagger score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
 
+    //make_plot(c1, vFiles[i], vNames[i], "hMinIDPhotonPt", "Min. ID #gamma p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    //make_plot(c1, vFiles[i], vNames[i], "hMinIDPhotonEta", "Min. ID #gamma #eta", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    //make_plot(c1, vFiles[i], vNames[i], "hMaxIDPhotonPt", "Max. ID #gamma p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    //make_plot(c1, vFiles[i], vNames[i], "hMaxIDPhotonEta", "Max. ID #gamma #eta", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonDeltaR", "#Delta R(#gamma_{1}, #gamma_{2})", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    make_plot(c1, vFiles[i], vNames[i], "hDiphotonPtOverMass", "p_{T}^{#gamma#gamma} / m_{#gamma#gamma}", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonLeadPixelSeed", "Lead #gamma PSV", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonSubleadPixelSeed", "Sublead #gamma PSV", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+
+    make_plot(c1, vFiles[i], vNames[i], "hJet1BTag", "Jet 1 b-tag score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    make_plot(c1, vFiles[i], vNames[i], "hJet2BTag", "Jet 2 b-tag score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    make_plot(c1, vFiles[i], vNames[i], "hJet3BTag", "Jet 3 b-tag score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    make_plot(c1, vFiles[i], vNames[i], "hJet4BTag", "Jet 4 b-tag score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+ 
+    make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA_coarse", "Hadronic MVA Score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+    make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA_fine", "Hadronic MVA Score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo); 
+ 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref, vInfo);
   }
 }

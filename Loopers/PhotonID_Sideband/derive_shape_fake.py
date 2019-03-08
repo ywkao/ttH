@@ -5,7 +5,7 @@ import math
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "file with histograms to derive shape from", type=str)
-parser.add_argument("--hist_name", help = "which histogram to fit", type=str, default = "hPhotonMinIDMVA_fine")
+parser.add_argument("--hist_name", help = "which histogram to fit", type=str, default = "hFakePhotonIDMVA")
 args = parser.parse_args()
 
 f = ROOT.TFile(args.input)

@@ -8,14 +8,14 @@ ff_template = "TTJets"
 
 hist = "hPhotonMinIDMVA_coarse"
 
-f = ROOT.TFile("../ttbar_cr_v2_histograms.root")
+f = ROOT.TFile("../ttHLeptonic_ttbarCR_1Mar2019_histogramsAll.root")
 h_data = f.Get(hist + "_Data")
 h_pp = f.Get(hist + "_" + pp_template + "GenPhoton_2")
 h_fp = f.Get(hist + "_" + fp_template + "GenPhoton_1")
 h_ff = f.Get(hist + "_" + ff_template + "GenPhoton_0")
 
 h_other = 0
-bkgs = ["DiPhoton", "VG"]
+bkgs = ["DiPhoton", "VG", "DY"]
 #bkgs = ["DY", "DiPhoton", "GammaJets", "QCD", "VG", "WJets"]
 for bkg in bkgs:
   hist_name = hist + "_" + bkg

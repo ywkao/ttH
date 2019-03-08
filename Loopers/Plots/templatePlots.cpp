@@ -290,7 +290,8 @@ int main(int argc, char* argv[]) {
   TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
   TFile* f = new TFile("../ttHLeptonic_histograms.root");
   TFile* f0 = new TFile("../ttbar_cr_histograms.root");
-  TFile* f1 = new TFile("../ttbar_cr_v2_histograms.root");
+  //TFile* f1 = new TFile("../ttbar_cr_v2_histograms.root");
+  TFile* f1 = new TFile("../ttHLeptonic_ttbarCR_4Mar2019_histogramsAll.root");
 
   TFile* f_veto_study = new TFile("../ttHLeptonic_veto_study_histograms.root");
 
@@ -321,6 +322,7 @@ int main(int argc, char* argv[]) {
   //compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_minIDbyVeto.pdf", "TTGJets", "Mininum #gamma ID MVA", {"t#bar{t} + #gamma + Jets"}, 0);
   //compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_minIDbyVeto.pdf", "Data", "Mininum #gamma ID MVA", {"Data"}, 2);
 
+  /*
   compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_IDShapes.pdf", "TTGJets", "hPhotonIDMVA", "#gamma ID MVA", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 0);
   compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_IDShapes.pdf", "TTGJets", "hPhotonPt", "p_{T} [GeV]", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 1);
   compare_photon_origins(c1, f_veto_study, "ttHLeptonic_plots_IDShapes.pdf", "TTGJets", "hPhotonEta", "#eta", {"No Vetos Applied", "t#bar{t} + #gamma + Jets"}, 2);
@@ -331,5 +333,5 @@ int main(int argc, char* argv[]) {
   compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "Data", "hPhotonPt", "p_{T} [GeV]", {"Data"}, 1);
   compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "TTGJets", "hPhotonEta", "#eta", {"t#bar{t} + #gamma + Jets"}, 1);
   compare_vetos(c1, f_veto_study, "ttHLeptonic_plots_IDbyVeto.pdf", "Data", "hPhotonEta", "#eta", {"Data"}, 2); 
-
+  */
 }

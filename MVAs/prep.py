@@ -15,10 +15,15 @@ parser.add_argument("-s", "--sideband", help = "use data sideband for training",
 parser.add_argument("--train_frac", help = "what fraction of data to use for training", type = float, default = 0.5)
 parser.add_argument("--handicap", help = "use only 1/3 of training data (to get a feel for how much stats matter)", action = "store_true")
 parser.add_argument("--sideband_name", help = "which data sideband to use", type=str, default="none")
+parser.add_argument("--old_vars", help = "remove top tagger, delta r of photons, and helicity", action="store_true")
+parser.add_argument("--no_psv", help = "remove pixel seed veto", action = "store_true")
+parser.add_argument("--dipho_only", help = "use only diphoton as bkg", action = "store_true")
+parser.add_argument("--ttGG_only", help = "use only ttGG as bkg", action = "store_true")
+
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
-output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + "%s.hdf5" % ("_invert" if args.invert else "")
+output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + "%s%s%s.hdf5" % ("_invert" if args.invert else "", "_remove_new_vars" if args.old_vars else "", "_noPSV" if args.no_psv else "")
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
@@ -27,7 +32,7 @@ tree = f.Get("t")
 #feature_names = (root_numpy.tree2array(tree, branches = ["mva_branches"], start=0, stop=1))[0][0]
 #feature_names = list(feature_names) 
 
-feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "top_tag_score_"] 
+feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "top_tag_score_", "dipho_pt_over_mass_", "helicity_angle_"] 
 
 
 to_remove = []
@@ -41,6 +46,12 @@ if args.sideband: # remove b-tagging features
   elif args.sideband_name == "phoID":
     to_remove += ["leadIDMVA_", "subleadIDMVA_", "maxIDMVA_", "minIDMVA_"]
 
+if args.old_vars:
+  to_remove += ["top_tag_score_", "dipho_delta_R", "helicity_angle_"]
+
+if args.no_psv:
+  to_remove += ["leadPSV_", "subleadPSV_"]
+
 training_feature_names = [feature for feature in feature_names if feature not in to_remove] 
 
 print training_feature_names
@@ -52,8 +63,8 @@ train_frac = args.train_frac
 rand_branch = "super_rand_" if args.randomize else "rand_"
 
 data_label = 2
-selection_train      = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-selection_validation = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
 print "Selection for training events: %s" % selection_train
 print "Selection for validation events: %s" % selection_validation

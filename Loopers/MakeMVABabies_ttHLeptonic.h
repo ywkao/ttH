@@ -106,8 +106,11 @@ class BabyMaker {
     float       dipho_cosphi_;
     float       dipho_rapidity_;
     float       dipho_pt_;
+    float       dipho_pt_over_mass_;
     float       met_;
- 
+    float       met_phi_; 
+
+    float	helicity_angle_;
 
 
 };
@@ -188,8 +191,11 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("dipho_cosphi_"           , &dipho_cosphi_      );
   BabyTree_->Branch("dipho_rapidity_"           , &dipho_rapidity_      );
   BabyTree_->Branch("dipho_pt_"           , &dipho_pt_      );
+  BabyTree_->Branch("dipho_pt_over_mass_"           , &dipho_pt_over_mass_      );
   BabyTree_->Branch("met_"           , &met_      );
+  BabyTree_->Branch("met_phi_"           , &met_phi_      );
 
+  BabyTree_->Branch("helicity_angle_"           , &helicity_angle_      );
  
   
 

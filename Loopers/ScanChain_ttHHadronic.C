@@ -15,11 +15,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   bool scale_gjets_normalization = true;
 
   // Make MVA Optimization Baby
+  /*
   OptimizationBabyMaker* baby = new OptimizationBabyMaker();
   TString xml_file_noExt = xml_file;
   xml_file_noExt.ReplaceAll(".xml", "");
   TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt + "_" + tag;
   baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
+  */
 
   // Create "process" objects
   vector<Process*> vProcess = generate_processes(f1);
@@ -41,6 +43,12 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   TF1* gjet_leadID_shape = get_photon_ID_shape("lead");
   TF1* gjet_subleadID_shape = get_photon_ID_shape("sublead");
   TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
+
+  TF1* photon_fakeID_shape_Barrel_HighPt = get_photon_ID_shape("fake_barrel_highPt");
+  TF1* photon_fakeID_shape_Barrel_LowPt = get_photon_ID_shape("fake_barrel_lowPt");
+  TF1* photon_fakeID_shape_Endcap_HighPt = get_photon_ID_shape("fake_endcap_highPt");
+  TF1* photon_fakeID_shape_Endcap_LowPt = get_photon_ID_shape("fake_endcap_lowPt");
+  vector<TF1*> photon_fakeID_shapes = {photon_fakeID_shape_Barrel_HighPt, photon_fakeID_shape_Barrel_LowPt, photon_fakeID_shape_Endcap_HighPt, photon_fakeID_shape_Endcap_LowPt};
 
   TF2* gjet_ID_shape = get_photon_ID_shape();
 
@@ -94,6 +102,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   float dipho_cosphi_;
   float dipho_rapidity_;
   float dipho_pt_;
+  float dipho_pt_over_mass_;
+
+  float helicity_angle_;
+
   float met_;
 
   if (evaluate_mva) {
@@ -142,6 +154,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("met_", &met_);
 
     mva->AddVariable("top_tag_score_", &top_tag_score_);
+    mva->AddVariable("dipho_pt_over_mass_", &dipho_pt_over_mass_);
+
+    mva->AddVariable("helicity_angle_", &helicity_angle_);
+
+
 
     mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }
@@ -318,6 +335,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
           //minIDMVA_ = leadID_ <= subleadID_ ? leadID_ : subleadID_;
 
 	  minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight);
+	  //minIDMVA_ = impute_from_fakePDF_withKinematics(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shapes, leadID_ > subleadID_ ? leadPt() : subleadPt(), leadID_ > subleadID_ ? abs(leadEta()) : abs(subleadEta()), evt_weight);
 
           processId = 18;
         }
@@ -364,6 +382,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       dipho_cosphi_ = dipho_cosphi();
       dipho_rapidity_ = dipho_rapidity();
       dipho_pt_ = diphoton.Pt();
+      dipho_pt_over_mass_ = diphoton.Pt() / mass();
+
+      helicity_angle_ = helicity(lead_photon, sublead_photon);
+
       met_ = MetPt();
 
       if (evaluate_mva) 
@@ -408,8 +430,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         continue; //some pu weights are nan/inf and this causes problems for histos 
       }
 
-      if (evaluate_mva) 
-        baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
+
+      //if (evaluate_mva) 
+      //  baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
 
       // Selection
 
@@ -777,11 +800,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hLeadMinDr", min_dr(lead_photon, jets), evt_weight, vId);
       vProcess[processId]->fill_histogram("hSubleadMinDr", min_dr(sublead_photon, jets), evt_weight, vId);
 
+      vProcess[processId]->fill_histogram("hPhotonDeltaR", lead_photon.DeltaR(sublead_photon), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hDiphotonPtOverMass", diphoton.Pt() / mass(), evt_weight, vId);
+
       vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hHadronicMVA", mva_value, evt_weight, vId);
       vProcess[processId]->fill_histogram("hHadronicMVA_coarse", mva_value, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hHadronicMVA_fine", mva_value, evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hDiphotonSumPt", dipho_sumpt(), evt_weight, vId);
@@ -807,6 +834,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("hJet3Eta", jet3_eta(), evt_weight, vId);
       if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("hJet4Eta", jet4_eta(), evt_weight, vId);
 
+      if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("hJet1BTag", btag_scores[0], evt_weight, vId);
+      if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("hJet2BTag", btag_scores[1], evt_weight, vId);
+      if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("hJet3BTag", btag_scores[2], evt_weight, vId);
+      if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("hJet4BTag", btag_scores[3], evt_weight, vId);
+
       if (bjet1_pt() != -1)     vProcess[processId]->fill_histogram("hbJet1pT", bjet1_pt(), evt_weight, vId);
       if (bjet2_pt() != -1)     vProcess[processId]->fill_histogram("hbJet2pT", bjet2_pt(), evt_weight, vId);
 
@@ -821,6 +853,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPhotonLeadIDMVA", leadID_, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonLeadPToM", lead_ptoM(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonLeadSigmaEOverE", lead_sigmaEoE(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadPixelSeed", leadPixelSeed(), evt_weight, vId);
 
       if (lead_closest_gen_dR() < 999) {
         vProcess[processId]->fill_histogram("hPhotonLeadPtGen", lead_closest_gen_Pt(), evt_weight, vId);
@@ -840,6 +873,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadID_, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonSubleadPixelSeed", subleadPixelSeed(), evt_weight, vId);
 
       if (sublead_closest_gen_dR() < 999) {
         vProcess[processId]->fill_histogram("hPhotonSubleadPtGen", sublead_closest_gen_Pt(), evt_weight, vId);
@@ -875,6 +909,21 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_MinIDMVA", maxID, minID, evt_weight, vId);
 
+
+      if (leadIDMVA() >= subleadIDMVA()) {
+	vProcess[processId]->fill_histogram("hMaxIDPhotonPt", leadPt(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hMaxIDPhotonEta", leadEta(), evt_weight, vId);
+	vProcess[processId]->fill_histogram("hMinIDPhotonPt", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hMinIDPhotonEta", subleadEta(), evt_weight, vId);
+      }
+      else {
+	vProcess[processId]->fill_histogram("hMaxIDPhotonPt", subleadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hMaxIDPhotonEta", subleadEta(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hMinIDPhotonPt", leadPt(), evt_weight, vId);
+        vProcess[processId]->fill_histogram("hMinIDPhotonEta", leadEta(), evt_weight, vId);
+      }
+
+
       if (minID < -0.7 && maxID > -0.7) {
 	reverse_yield_denom += evt_weight;
 	if (lead_photon_type() == 1 && sublead_photon_type() == 3) {
@@ -896,6 +945,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       if (lead_photon_type() == 3) {
 	vProcess[processId]->fill_histogram("hFakePhotonIDMVA", leadIDMVA(), evt_weight, vId);
+	if (leadPt() > 40 && abs(leadEta()) < barrel_eta)
+	  vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Barrel_HighPt", leadIDMVA(), evt_weight, vId);
+        else if (leadPt() < 40 && abs(leadEta()) < barrel_eta)
+	  vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Barrel_LowPt", leadIDMVA(), evt_weight, vId); 
+	else if (leadPt() > 40 && abs(leadEta()) > barrel_eta)
+          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Endcap_HighPt", leadIDMVA(), evt_weight, vId); 
+        else if (leadPt() < 40 && abs(leadEta()) > barrel_eta)
+          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Endcap_LowPt", leadIDMVA(), evt_weight, vId); 
         vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", leadIDMVA(), njets_, evt_weight, vId);
 	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_MaxBTag", leadIDMVA(), max1_btag_, evt_weight, vId); 
 	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", leadIDMVA(), max2_btag_, evt_weight, vId);
@@ -915,7 +972,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       if (sublead_photon_type() == 3) {
 	vProcess[processId]->fill_histogram("hFakePhotonIDMVA", subleadIDMVA(), evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", subleadIDMVA(), njets_, evt_weight, vId);
+	if (subleadPt() > 40 && abs(subleadEta()) < barrel_eta)
+          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Barrel_HighPt", subleadIDMVA(), evt_weight, vId);
+        else if (subleadPt() < 40 && abs(subleadEta()) < barrel_eta)
+          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Barrel_LowPt", subleadIDMVA(), evt_weight, vId);
+        else if (subleadPt() > 40 && abs(subleadEta()) > barrel_eta)
+          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Endcap_HighPt", subleadIDMVA(), evt_weight, vId); 
+        else if (subleadPt() < 40 && abs(subleadEta()) > barrel_eta)
+          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Endcap_LowPt", subleadIDMVA(), evt_weight, vId); 
+	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", subleadIDMVA(), njets_, evt_weight, vId);
         vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_MaxBTag", subleadIDMVA(), max1_btag_, evt_weight, vId);
         vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", subleadIDMVA(), max2_btag_, evt_weight, vId);
         vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", subleadIDMVA(), diphoton.Pt(), evt_weight, vId);
@@ -981,7 +1046,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     cout << Form( "ERROR: number of events from files (%d) is not equal to total number of events (%d)", nEventsChain, nEventsTotal ) << endl;
   }
  
-  baby->CloseBabyNtuple();
+  //baby->CloseBabyNtuple();
 
   cout << "Number of events from sideband where minID is prompt: " << reverse_yield << endl;
   cout << "Number of events from sideband: " << reverse_yield_denom << endl;

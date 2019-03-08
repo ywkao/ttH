@@ -66,10 +66,10 @@ vector<float> make_object(TLorentzVector p4, vector<float> b_disc, const TLorent
     p4_mod.Boost(boost_to_higgs);
   }  
 
-  object.push_back(p4_mod.Pt());
+  object.push_back(log(p4_mod.Pt()));
   object.push_back(p4_mod.Eta());
   object.push_back(p4_mod.Phi());
-  object.push_back(p4_mod.E());
+  object.push_back(log(p4_mod.E()));
   object.push_back(b_disc[0]);
   object.push_back(b_disc[1]);
   object.push_back(b_disc[2]);

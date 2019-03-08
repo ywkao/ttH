@@ -266,7 +266,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       dipho_cosphi_ = dipho_cosphi();
       dipho_rapidity_ = dipho_rapidity();
       dipho_pt_ = diphoton.Pt();
+      dipho_pt_over_mass_ = diphoton.Pt() / mass();
       met_ = MetPt();
+      met_phi_ = MetPhi();
+
+      helicity_angle_ = helicity(lead_photon, sublead_photon);
 
       rand_ = cms3.rand();
       super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());

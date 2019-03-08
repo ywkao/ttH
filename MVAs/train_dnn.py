@@ -44,6 +44,83 @@ def organize(input_list):
   output_list = sorted(input_list, cmp = compare)
   return output_list
 
+def percentage_difference(x, y):
+  return abs(x-y) / ( (x+y)/2)
+
+def train_model(model, epochs, batch_size):
+  model["model"].fit(model["features_train"], model["label_train"], epochs = epochs, batch_size = batch_size, sample_weight = model["weight_train"], callbacks = model["callbacks"])
+  pred = model["model"].predict(model["features_test"], batch_size = 10000)
+  pred_train = model["model"].predict(model["features_train"], batch_size = 10000)
+  auc, auc_unc = utils.auc_and_unc(model["label_test"], pred, model["weight_test"], 5)
+  auc_train, auc_train_unc = utils.auc_and_unc(model["label_train"], pred_train, model["weight_train"], 5)
+  print "Train AUC: %.4f, Test AUC: %.4f" % (auc_train, auc)
+  return auc_train, auc
+
+
+def train_with_early_stopping(model):
+  best_auc = 0.5
+  keep_training = True
+  increase_batch_size = False
+
+  epochs = 1
+  batch_size = 512
+  while keep_training:
+    auc_train, auc = train_model(model, epochs, batch_size)
+    if auc > best_auc:
+      best_auc = auc
+    else:
+      epochs *= 2
+      batch_size *= 4  
+      if batch_size > 100000:
+        keep_training = False
+  return
+
+#def train_with_early_stopping(model):
+#  best_auc = 0.5
+#  keep_training = True
+#  while keep_training:
+#    model["model"].fit(model["features_train"], model["label_train"], epochs = 1, batch_size = 1024, sample_weight = model["weight_train"], callbacks = model["callbacks"])
+#    pred = model["model"].predict(model["features_test"], batch_size = 10000)
+#    pred_train = model["model"].predict(model["features_train"], batch_size = 10000)
+#    auc, auc_unc = utils.auc_and_unc(model["label_test"], pred, model["weight_test"], 5)
+#    auc_train, auc_train_unc = utils.auc_and_unc(model["label_train"], pred_train, model["weight_train"], 5)
+#    print "Train AUC: %.4f, Test AUC: %.4f" % (auc_train, auc)
+#    keep_training = False
+#    #if auc > best_auc:
+#    #  best_auc = auc
+#    #else:
+#    #  keep_training = False
+#  keep_training = True
+#  while keep_training:
+#    model["model"].fit(model["features_train"], model["label_train"], epochs = 2, batch_size = 5000, sample_weight = model["weight_train"], callbacks = model["callbacks"])
+#    pred = model["model"].predict(model["features_test"], batch_size = 10000)
+#    pred_train = model["model"].predict(model["features_train"], batch_size = 10000)
+#    auc, auc_unc = utils.auc_and_unc(model["label_test"], pred, model["weight_test"], 5)
+#    auc_train, auc_train_unc = utils.auc_and_unc(model["label_train"], pred_train, model["weight_train"], 5)
+#    print "Train AUC: %.4f, Test AUC: %.4f" % (auc_train, auc)
+#    if auc > best_auc:
+#      best_auc = auc
+#    else:
+#      keep_training = False
+#  keep_training = True
+#  bad_epoch = 0
+#  while keep_training:
+#    model["model"].fit(model["features_train"], model["label_train"], epochs = 3, batch_size = 20000, sample_weight = model["weight_train"], callbacks = model["callbacks"])
+#    pred = model["model"].predict(model["features_test"], batch_size = 10000)
+#    pred_train = model["model"].predict(model["features_train"], batch_size = 10000)
+#    auc, auc_unc = utils.auc_and_unc(model["label_test"], pred, model["weight_test"], 5)
+#    auc_train, auc_train_unc = utils.auc_and_unc(model["label_train"], pred_train, model["weight_train"], 5)
+#    print "Train AUC: %.4f, Test AUC: %.4f" % (auc_train, auc)
+#    if auc > best_auc:
+#      best_auc = auc
+#      bad_epoch = 0
+#    else:
+#      bad_epoch += 1
+#      if bad_epoch >= 2:
+#        keep_training = False
+#  return
+
+
 f = h5py.File(args.input, "r")
 if args.evaluate:
   weights_list = glob.glob(args.evaluate)
@@ -69,9 +146,11 @@ n_global_features = len(global_features[0])
 print(max_objects, n_features, len(object_features), n_global_features)
 
 model = dnn_model.baseline_v1(max_objects, n_features, n_global_features, args.no_global, args.no_lstm, 150)
+#model = dnn_model.cnn_v1(max_objects, n_features, n_global_features, args.no_global, args.no_lstm)
+#model = dnn_model.gru_v1(max_objects, n_features, n_global_features, args.no_global, args.no_lstm, 75)
 
-nEpochs = 50
-nBatch = 50000
+nEpochs = 5
+nBatch = 10000
 
 weights_file = "dnn_weights/" + args.tag + "_weights_{epoch:02d}.hdf5"
 checkpoint = keras.callbacks.ModelCheckpoint(weights_file) # save after every epoch 
@@ -97,7 +176,21 @@ if not args.evaluate:
   if args.load:
     print "Loading weights: %s" % args.load
     model.load_weights(args.load)
-  model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list)
+  #model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list)
+  model_dict = {"model" : model, "features_train": [global_features, object_features], "features_test": [global_features_validation, object_features_validation], "weight_train" : numpy.asarray(weights), "weight_test" : numpy.asarray(weights_validation), "label_train" : label, "label_test" : label_validation, "callbacks" : callbacks_list} 
+  if args.no_lstm or args.no_global:
+    model_dict["callbacks"] = []
+  train_with_early_stopping(model_dict)
+
+  #nBatch = 2048
+  #nEpochs = 1
+  #model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list)
+  #nBatch = 10000
+  #nEpochs = 2
+  #model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list)
+  #nBatch = 100000
+  #nEpochs = 5
+  #model.fit([global_features, object_features], label, epochs = nEpochs, batch_size = nBatch, sample_weight = numpy.asarray(weights), callbacks = callbacks_list) 
 
 else:
   auc_train = []
@@ -153,7 +246,7 @@ print("Training AUC: %.5f +/- %.5f") % (auc_train, auc_train_unc)
 print("Testing AUC: %.5f +/- %.5f") % (auc_test, auc_test_unc)
 print("Top Tag AUC: %.5f +/- %.5f") % (auc_tts, auc_tts_unc)
 print("TTPP BDT AUC: %.5f +/- %.5f") % (auc_ttPP, auc_ttPP_unc)
-print("TTPP BDT AUC: %.5f +/- %.5f") % (auc_dipho, auc_dipho_unc)
+print("Dipho BDT AUC: %.5f +/- %.5f") % (auc_dipho, auc_dipho_unc)
 print("Std. BDT AUC: %.5f +/- %.5f") % (auc_std_bdt, auc_std_bdt_unc)
 
 numpy.savez("dnn_rocs_%s.npz" % (args.tag), fpr_train = fpr_train, tpr_train = tpr_train, fpr_test = fpr_test, tpr_test = tpr_test, fpr_tts = fpr_tts, tpr_tts = tpr_tts, fpr_ttPP = fpr_ttPP, tpr_ttPP = tpr_ttPP, fpr_std = fpr_std, tpr_std = tpr_std, fpr_dipho = fpr_dipho, tpr_dipho = tpr_dipho)

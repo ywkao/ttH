@@ -3,16 +3,18 @@ import h5py
 import ROOT
 import numpy
 import root_numpy
+import math
 
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input root file", type=str)
 parser.add_argument("--signal", help = "which process to consider as signal", type=str, default="ttH")
-parser.add_argument("--backgrounds", help = "which processes to consider as bkgs", type=str, default="ttGG,dipho")
+parser.add_argument("--backgrounds", help = "which processes to consider as bkgs", type=str, default="all")
 parser.add_argument("--boosted_objects", help = "use objects that are boosted to higgs p4", action="store_true")
 parser.add_argument("--invert", help = "invert test/train split", action="store_true")
 parser.add_argument("--train_frac", help = "what fraction of data to use for training", type = float, default = 0.5)
 parser.add_argument("--tag", help = "name to add to hdf5 file name", type=str, default="")
+parser.add_argument("--z_score", help = "preprocess features to express them as z-score (subtract mean, divide by std.)", action="store_true")
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
@@ -22,22 +24,28 @@ f = ROOT.TFile(baby_file)
 tree = f.Get("t")
 
 # load tree to array
-feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_"]
+#feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R"]
+feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
 branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_"]))
 
 rand_branch = "rand_"
 data_label = 2
 train_frac = args.train_frac
 
-process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2}
-selection = "&& ("
-procs = args.backgrounds.split(",") + args.signal.split(",")
-for i in range(len(procs)):
-  selection += "process_id_ == %d" % (process_dict[procs[i]])
-  if i != len(procs) - 1:
-    selection += " || "
+if args.backgrounds == "all":
+  selection = ""
+else:
+  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2}
+  selection = "&& ("
+  procs = args.backgrounds.split(",") + args.signal.split(",")
+  for i in range(len(procs)):
+    selection += "process_id_ == %d" % (process_dict[procs[i]])
+    if i != len(procs) - 1:
+      selection += " || "
 
-selection += ")"
+  selection += ")"
+
+
 print selection
 
 features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
@@ -46,7 +54,6 @@ features_validation = root_numpy.tree2array(tree, branches = branches, selection
 #features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, selection))
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d' % (data_label))
 
-#features
 
 if args.boosted_objects:
   object_features = features["objects_boosted_"]
@@ -58,9 +65,31 @@ else:
   object_features_validation = features_validation["objects_"]
   object_features_data = features_data["objects_"]
 
-global_features = numpy.transpose(numpy.array([features['lead_eta_'], features['sublead_eta_'], features['lead_phi_'], features['sublead_phi_'], features['leadptoM_'], features['subleadptoM_'], features['leadIDMVA_'], features['subleadIDMVA_'], features['met_'], features['met_phi_'], features['leadPSV_'], features['subleadPSV_'], features['dipho_rapidity_']]))
-global_features_validation = numpy.transpose(numpy.array([features_validation['lead_eta_'], features_validation['sublead_eta_'], features_validation['lead_phi_'], features_validation['sublead_phi_'], features_validation['leadptoM_'], features_validation['subleadptoM_'], features_validation['leadIDMVA_'], features_validation['subleadIDMVA_'], features_validation['met_'], features_validation['met_phi_'], features_validation['leadPSV_'], features_validation['subleadPSV_'], features_validation['dipho_rapidity_']]))
-global_features_data = numpy.transpose(numpy.array([features_data['lead_eta_'], features_data['sublead_eta_'], features_data['lead_phi_'], features_data['sublead_phi_'], features_data['leadptoM_'], features_data['subleadptoM_'], features_data['leadIDMVA_'], features_data['subleadIDMVA_'], features_data['met_'], features_data['met_phi_'], features_data['leadPSV_'], features_data['subleadPSV_'], features_data['dipho_rapidity_']]))
+def preprocess_sigmoid_v2(array, mean, std):
+  alpha = (array - mean)*(1./std)
+  return (1 - numpy.exp(-alpha))/(1 + numpy.exp(-alpha))
+
+def preprocess_sigmoid(array):
+  array_trimmed = array[array != -999]
+  mean = numpy.mean(array_trimmed)
+  std = numpy.std(array_trimmed)
+  if std == 0:
+    std = 1
+  alpha = (array - mean)*(1./std)
+  return (1 - numpy.exp(-alpha))/(1 + numpy.exp(-alpha))
+
+def create_array(features_list, names):
+  print [feat for feat in names if ("objects_" not in feat)]
+  arr = [features_list[feat] for feat in names if ("objects_" not in feat)]
+  if args.z_score:
+    for feat in arr:
+      feat = preprocess(feat)
+  return numpy.transpose(numpy.array(arr))
+
+feature_names += ["top_tag_score_"]
+global_features = create_array(features, feature_names)
+global_features_validation = create_array(features_validation, feature_names)
+global_features_data = create_array(features_data, feature_names)
 
 def get_mean_and_std(array):
   array_trimmed = array[array != -999]
@@ -97,8 +126,8 @@ object_features_validation = pad_array(object_features_validation)
 object_features_data = pad_array(object_features_data)
 
 # use set of all signal events to get mean and std dev for preprocessing purposes
-object_features_signal = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == 1')["objects_"]
-object_features_signal = pad_array(object_features_signal)
+#object_features_signal = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == 1')["objects_"]
+#object_features_signal = pad_array(object_features_signal)
 
 #for i in range(n_objects):
 #  for j in range(n_features):
@@ -153,13 +182,14 @@ tth_std_mva_data = features_data["tth_std_mva_"]
 #object_features_data = numpy.transpose(object_features_data)
 
 # relabel labels
-for sig in args.signal.split(","):
-  label[features["process_id_"] == process_dict[sig]] = 1
-  label_validation[features_validation["process_id_"] == process_dict[sig]] = 1
+if args.backgrounds != "all":
+  for sig in args.signal.split(","):
+    label[features["process_id_"] == process_dict[sig]] = 1
+    label_validation[features_validation["process_id_"] == process_dict[sig]] = 1
 
-for bkg in args.backgrounds.split(","):
-  label[features["process_id_"] == process_dict[bkg]] = 0
-  label_validation[features_validation["process_id_"] == process_dict[bkg]] = 0
+  for bkg in args.backgrounds.split(","):
+    label[features["process_id_"] == process_dict[bkg]] = 0
+    label_validation[features_validation["process_id_"] == process_dict[bkg]] = 0
 
 f_out = h5py.File(output_file, "w")
 

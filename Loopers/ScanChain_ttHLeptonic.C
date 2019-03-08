@@ -32,6 +32,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   // Initialize map of evt_run_lumi -> rand
   RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic_" + ext + ".txt");
 
+  TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
+
   // MVA Business
   unique_ptr<TMVA::Reader> mva;
 
@@ -85,7 +87,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   float dipho_pt_;
   float met_;
 
-  
+  float dipho_pt_over_mass_;
+  float helicity_angle_;
 
 
   if (evaluate_mva) {
@@ -100,8 +103,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("ht_", &ht_);
     mva->AddVariable("leadptoM_", &leadptoM_);
     mva->AddVariable("subleadptoM_", &subleadptoM_);
-    mva->AddVariable("leadIDMVA_", &leadIDMVA_);
-    mva->AddVariable("subleadIDMVA_", &subleadIDMVA_); 
+    //mva->AddVariable("leadIDMVA_", &leadIDMVA_);
+    //mva->AddVariable("subleadIDMVA_", &subleadIDMVA_); 
     mva->AddVariable("lead_eta_", &lead_eta_);
     mva->AddVariable("sublead_eta_", &sublead_eta_);
 
@@ -133,6 +136,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     mva->AddVariable("top_tag_score_", &top_tag_score_);
     
+    mva->AddVariable("dipho_pt_over_mass_", &dipho_pt_over_mass_);
+    mva->AddVariable("helicity_angle_", &helicity_angle_);
+
     mva->AddVariable("lep_pt_", &lep_pt_);
     mva->AddVariable("lep_eta_", &lep_eta_);
 
@@ -278,59 +284,61 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
  
       double mva_value = -999;
+
+      lep_pt_ = leps[0].Pt();
+      lep_eta_ = leps[0].Eta();
+
+      top_tag_score_ = topTag_score();
+
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      max2_btag_ = btag_scores_sorted[1].second;
+      max1_btag_ = btag_scores_sorted[0].second;
+      dipho_delta_R = lead_photon.DeltaR(sublead_photon);
+      ht_ = get_ht(jets);
+      njets_ = n_jets();
+      nbjets_ = nb_medium();
+
+      jet1_pt_   = njets_ >= 1 ? jets[0].Pt()   : -999;
+      jet1_eta_  = njets_ >= 1 ? jets[0].Eta()  : -999;
+      jet1_btag_ = njets_ >= 1 ? btag_scores[0] : -999;
+      jet2_pt_   = njets_ >= 2 ? jets[1].Pt()   : -999;
+      jet2_eta_  = njets_ >= 2 ? jets[1].Eta()  : -999;
+      jet2_btag_ = njets_ >= 2 ? btag_scores[1] : -999;
+      jet3_pt_   = njets_ >= 3 ? jets[2].Pt()   : -999;
+      jet3_eta_  = njets_ >= 3 ? jets[2].Eta()  : -999;
+      jet3_btag_ = njets_ >= 3 ? btag_scores[2] : -999;
+      jet4_pt_   = njets_ >= 4 ? jets[3].Pt()   : -999;
+      jet4_eta_  = njets_ >= 4 ? jets[3].Eta()  : -999;
+      jet4_btag_ = njets_ >= 4 ? btag_scores[3] : -999;
+      jet5_pt_   = njets_ >= 5 ? jets[4].Pt()   : -999;
+      jet5_eta_  = njets_ >= 5 ? jets[4].Eta()  : -999;
+      jet5_btag_ = njets_ >= 5 ? btag_scores[4] : -999;
+      jet6_pt_   = njets_ >= 6 ? jets[5].Pt()   : -999;
+      jet6_eta_  = njets_ >= 6 ? jets[5].Eta()  : -999;
+      jet6_btag_ = njets_ >= 6 ? btag_scores[5] : -999;
+
+      lead_pT_ = leadPt();
+      sublead_pT_ = subleadPt();
+      leadptoM_ = lead_ptoM();
+      subleadptoM_ = sublead_ptoM();
+      leadIDMVA_ = leadIDMVA();
+      subleadIDMVA_ = subleadIDMVA();
+      lead_eta_ = leadEta();
+      sublead_eta_ = subleadEta();
+
+      leadPSV_ = leadPixelSeed();
+      subleadPSV_ = subleadPixelSeed();
+
+      dipho_cosphi_ = dipho_cosphi();
+      dipho_rapidity_ = dipho_rapidity();
+      dipho_pt_ = diphoton.Pt();
+      met_ = MetPt();
+
+      dipho_pt_over_mass_ = diphoton.Pt() / mass();
+      helicity_angle_ = helicity(lead_photon, sublead_photon);
+
       if (evaluate_mva) {
-
-        // Calculate MVA value
-        lep_pt_ = leps[0].Pt();
-        lep_eta_ = leps[0].Eta();
-
-        top_tag_score_ = topTag_score();
-
-        maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-        max2_btag_ = btag_scores_sorted[1].second;
-        max1_btag_ = btag_scores_sorted[0].second;
-        dipho_delta_R = lead_photon.DeltaR(sublead_photon);
-        ht_ = get_ht(jets);
-        njets_ = n_jets();
-        nbjets_ = nb_medium();
-
-        jet1_pt_   = njets_ >= 1 ? jets[0].Pt()   : -999;
-        jet1_eta_  = njets_ >= 1 ? jets[0].Eta()  : -999;
-        jet1_btag_ = njets_ >= 1 ? btag_scores[0] : -999;
-        jet2_pt_   = njets_ >= 2 ? jets[1].Pt()   : -999;
-        jet2_eta_  = njets_ >= 2 ? jets[1].Eta()  : -999;
-        jet2_btag_ = njets_ >= 2 ? btag_scores[1] : -999;
-        jet3_pt_   = njets_ >= 3 ? jets[2].Pt()   : -999;
-        jet3_eta_  = njets_ >= 3 ? jets[2].Eta()  : -999;
-        jet3_btag_ = njets_ >= 3 ? btag_scores[2] : -999;
-        jet4_pt_   = njets_ >= 4 ? jets[3].Pt()   : -999;
-        jet4_eta_  = njets_ >= 4 ? jets[3].Eta()  : -999;
-        jet4_btag_ = njets_ >= 4 ? btag_scores[3] : -999;
-        jet5_pt_   = njets_ >= 5 ? jets[4].Pt()   : -999;
-        jet5_eta_  = njets_ >= 5 ? jets[4].Eta()  : -999;
-        jet5_btag_ = njets_ >= 5 ? btag_scores[4] : -999;
-        jet6_pt_   = njets_ >= 6 ? jets[5].Pt()   : -999;
-        jet6_eta_  = njets_ >= 6 ? jets[5].Eta()  : -999;
-        jet6_btag_ = njets_ >= 6 ? btag_scores[5] : -999;
-
-        lead_pT_ = leadPt();
-        sublead_pT_ = subleadPt();
-        leadptoM_ = lead_ptoM();
-        subleadptoM_ = sublead_ptoM();
-        leadIDMVA_ = leadIDMVA();
-        subleadIDMVA_ = subleadIDMVA();
-        lead_eta_ = leadEta();
-        sublead_eta_ = subleadEta();
-
-        leadPSV_ = leadPixelSeed();
-        subleadPSV_ = subleadPixelSeed();
-
-        dipho_cosphi_ = dipho_cosphi();
-        dipho_rapidity_ = dipho_rapidity();
-        dipho_pt_ = diphoton.Pt();
-        met_ = MetPt();
-
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       }
 
@@ -340,6 +348,34 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (n_jets() < 2)	continue;
 	if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
+      }
+
+      else if (tag == "ttHLeptonicVeryLoose") {
+	if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
+      }
+
+      else if (tag == "ttHLeptonicLoose_impute_presel") {
+        if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
+	if (minIDMVA_ < -0.7)	continue;
+      }
+      else if (tag == "ttHLeptonicLoose_impute_sideband") {
+        if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
+        if (maxIDMVA_ < -0.7)   continue;
+	if (minIDMVA_ >= -0.7)	continue;
       }
 
       else if (tag == "ttHLeptonic_baseline_maxZA") {
@@ -384,12 +420,25 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (mass() < 100)        continue;
 	if (n_jets() < 2)       continue;
 	if (nb_tight() < 1)             continue;
-	if (leadIDMVA() < -0.2)         continue;
-        if (subleadIDMVA() < -0.2)      continue;
-	if (leps[0].Pt() < 20)		continue;
-	if (MetPt() < 40)		continue;
-	if (leadPixelSeed() || subleadPixelSeed())      continue;
+	if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)      continue;
+	if (leps[0].Pt() < 15)		continue;
+	if (MetPt() < 25)		continue;
+	//if (leadPixelSeed() || subleadPixelSeed())      continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
+
+      else if (tag == "ttHLeptonic_ttbarCR_v2") {
+        if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+	if (nb_medium() < 2)		continue;
+        if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)      continue;
+        if (leps[0].Pt() < 15)          continue;
+        //if (MetPt() < 25)               continue;
+        if (leadPixelSeed() || subleadPixelSeed())      continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+      } 
 
       else if (tag == "ttHLeptonic_2017_SR_like") {
 	if (mass() < 100)		continue;
@@ -678,6 +727,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hSubleadMinDr", min_dr(sublead_photon, objects), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hPhotonDeltaR", lead_photon.DeltaR(sublead_photon), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hDiphotonPtOverMass", diphoton.Pt() / mass(), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
@@ -747,6 +797,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (jet_pt5() != -100)      vProcess[processId]->fill_histogram("hJet5Eta", jet_eta5(), evt_weight, vId);
       if (jet_pt6() != -100)      vProcess[processId]->fill_histogram("hJet6Eta", jet_eta6(), evt_weight, vId);
 
+      if (jet_pt1() != -100)      vProcess[processId]->fill_histogram("hJet1BTag", btag_scores[0], evt_weight, vId);
+      if (jet_pt2() != -100)      vProcess[processId]->fill_histogram("hJet2BTag", btag_scores[1], evt_weight, vId);
+      if (jet_pt3() != -100)      vProcess[processId]->fill_histogram("hJet3BTag", btag_scores[2], evt_weight, vId);
+      if (jet_pt4() != -100)      vProcess[processId]->fill_histogram("hJet4BTag", btag_scores[3], evt_weight, vId);
+
       vProcess[processId]->fill_histogram("hMaxBTag", btag_scores_sorted[0].second, evt_weight, vId);
       vProcess[processId]->fill_histogram("hSecondMaxBTag", btag_scores_sorted[1].second, evt_weight, vId);
 
@@ -767,6 +822,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPhotonLeadIDMVA", leadIDMVA(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonLeadPToM", lead_ptoM(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonLeadSigmaEOverE", lead_sigmaEoE(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonLeadPixelSeed", leadPixelSeed(), evt_weight, vId);
 
       if (lead_closest_gen_dR() < 999) {
         vProcess[processId]->fill_histogram("hPhotonLeadPtGen", lead_closest_gen_Pt(), evt_weight, vId);
@@ -785,6 +841,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadIDMVA(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, vId); 
+      vProcess[processId]->fill_histogram("hPhotonSubleadPixelSeed", subleadPixelSeed(), evt_weight, vId);
 
       if (sublead_closest_gen_dR() < 999) {
         vProcess[processId]->fill_histogram("hPhotonSubleadPtGen", sublead_closest_gen_Pt(), evt_weight, vId);
@@ -797,6 +854,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_entries", maxID, 1, vId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_entries", minID, 1, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse", minID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse", maxID, evt_weight, vId);
       if (nb_medium() == 0) {
