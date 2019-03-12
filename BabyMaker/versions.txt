@@ -140,3 +140,7 @@ Submitting ttH Babies version v80.2 using skims in /hadoop/cms/store/user/bemars
 Date: 2018-12-05 17:34:25.219319 
 Submitting ttH Babies version v94.5 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit c98db2a3d3bbc76f5028938b1a1e4e77bad342f0 of tth_dev_94X branch of flashgg
 
+# Note: in 94.6, loosened lepton ID to loose working points, added loose/medium/tight info to babies
+Date: 2019-03-11 12:53:23.657497 
+Submitting ttH Babies version v94.6 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit e1d86081c732fa5d2eccc0661a694f52bc79d56f of tth_dev_94X branch of flashgg
+

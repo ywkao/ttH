@@ -675,6 +675,10 @@ int main(int argc, char* argv[])
 
       make_plot(c1, vFiles[i], vNames[i], "hJet5pT", "Jet5 p_{T} [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref, vInfo);     
       make_plot(c1, vFiles[i], vNames[i], "hJet5Eta", "Jet5 #eta", vBkgs, 1,type, year, loose_mva_cut, f_ref, vInfo);
+
+      make_plot(c1, vFiles[i], vNames[i], "hNLepLoose", "N_{lep} (loose ID)", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+      make_plot(c1, vFiles[i], vNames[i], "hNLepMedium", "N_{lep} (medium ID)", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+      make_plot(c1, vFiles[i], vNames[i], "hNLepTight", "N_{lep} (tight ID)", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
     }
 
     //if (vNames[i] == "ttHHadronicLoose_plots_" + type_s + ".pdf" || vNames[i] == "ttHHadronicCustom_plots_" + type_s + ".pdf")

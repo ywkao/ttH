@@ -70,6 +70,10 @@ class BabyMaker {
     float       lep_pt_;
     float 	lep_eta_;
 
+    float	n_lep_loose_;
+    float       n_lep_medium_;
+    float       n_lep_tight_;
+
     float      	jet1_pt_;
     float	jet1_eta_;
     float       jet1_btag_;
@@ -151,8 +155,12 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("nbjets_"         , &nbjets_      );
   BabyTree_->Branch("ht_"               , &ht_          );
 
-  BabyTree_->Branch("lep_pt_"               , &ht_          );
+  BabyTree_->Branch("lep_pt_"               , &lep_pt_          );
   BabyTree_->Branch("lep_eta_"               , &lep_eta_          );
+
+  BabyTree_->Branch("n_lep_loose_"               , &n_lep_loose_          );
+  BabyTree_->Branch("n_lep_medium_"               , &n_lep_medium_          );
+  BabyTree_->Branch("n_lep_tight_"               , &n_lep_tight_          );
 
   BabyTree_->Branch("top_tag_score_"               , &top_tag_score_          );
 

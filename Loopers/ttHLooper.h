@@ -260,6 +260,10 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hTopTagger_topMass", 40, 0, 400);
     v[i]->add_histogram("hTopTagger_WMass", 20, 0, 200);
 
+    v[i]->add_histogram("hNLepLoose", 3, -0.5, 2.5);
+    v[i]->add_histogram("hNLepMedium", 3, -0.5, 2.5);
+    v[i]->add_histogram("hNLepTight", 3, -0.5, 2.5);
+
   }
 }
 
@@ -1091,7 +1095,7 @@ bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
 
 void add_samples(TChain* ch, TString year) {
   //TString tag = year == "2018" ? "v102.1" : (year == "2017" ? "v1.2" : "v3.16");
-  TString tag = year == "2016" ? "v80.2" : "v94.4";
+  TString tag = year == "2016" ? "v80.2" : "v94.6";
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 

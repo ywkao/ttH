@@ -81,7 +81,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
         if (n_jets() < 2)       continue;
-        if (nb_loose() < 1)             continue;
+        //if (nb_loose() < 1)             continue;
+	if (nElecMedium() + nMuonMedium() < 1)	continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
@@ -218,6 +219,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       // Variable definitions
       lep_pt_ = leps[0].Pt();
       lep_eta_ = leps[0].Eta();
+
+      n_lep_loose_ = nElecLoose() + nMuonLoose();
+      n_lep_medium_ = nElecMedium() + nMuonMedium();
+      n_lep_tight_ = nElecTight() + nMuonTight();
      
       top_tag_score_ = topTag_score();
 

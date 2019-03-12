@@ -19,11 +19,12 @@ parser.add_argument("--old_vars", help = "remove top tagger, delta r of photons,
 parser.add_argument("--no_psv", help = "remove pixel seed veto", action = "store_true")
 parser.add_argument("--dipho_only", help = "use only diphoton as bkg", action = "store_true")
 parser.add_argument("--ttGG_only", help = "use only ttGG as bkg", action = "store_true")
+parser.add_argument("--no_lepton_id", help = "don't use lepton ID vars", action = "store_true")
 
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
-output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + "%s%s%s.hdf5" % ("_invert" if args.invert else "", "_remove_new_vars" if args.old_vars else "", "_noPSV" if args.no_psv else "")
+output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + "%s%s%s%s.hdf5" % ("_invert" if args.invert else "", "_remove_new_vars" if args.old_vars else "", "_noPSV" if args.no_psv else "", "noLepID" if args.no_lepton_id else "")
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
@@ -37,7 +38,9 @@ feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_de
 
 to_remove = []
 if args.channel == "Leptonic":
-  feature_names += ["lep_pt_", "lep_eta_"]
+  feature_names += ["lep_pt_", "lep_eta_", "n_lep_loose_", "n_lep_medium_", "n_lep_tight_"]
+  if args.no_lepton_id:
+    to_remove += ["n_lep_loose_", "n_lep_medium_", "n_lep_tight_"] 
   to_remove += ["jet4_pt_", "jet4_eta_", "jet4_btag_"]
 
 if args.sideband: # remove b-tagging features

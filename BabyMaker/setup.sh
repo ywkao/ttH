@@ -110,13 +110,13 @@ fi
 if [ "$CMSSW_VER" = "102X" ]; then
   # Set up CMSSW 102X
   export SCRAM_ARCH=slc6_amd64_gcc700 
-  if [ ! -d CMSSW_10_2_1 ]; then
-    cmsrel CMSSW_10_2_1
-    cd CMSSW_10_2_1/src
+  if [ ! -d CMSSW_10_2_9 ]; then
+    cmsrel CMSSW_10_2_9
+    cd CMSSW_10_2_9/src
     cmsenv
     git cms-init
   else
-    cd CMSSW_10_2_1/src
+    cd CMSSW_10_2_9/src
     cmsenv
   fi
 
@@ -137,7 +137,6 @@ if [ "$CMSSW_VER" = "102X" ]; then
     cd ../../
   fi
 fi
-
 
 if [ ! -d logs ]; then
   mkdir logs
