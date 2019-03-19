@@ -25,6 +25,19 @@ def auc_and_unc(label, pred, sample_weight, n_bootstraps):
   print bootstrap_aucs
   return auc, unc
 
+def pad_array(array):
+    max_objects = 8 
+    nData = len(array)
+    nFeatures = len(array[0][0])
+    y = numpy.ones((nData, max_objects, nFeatures))
+    y *= -999
+    for i in range(nData):
+      for j in range(min(max_objects, len(array[i]))):
+        for k in range(nFeatures):
+          y[i][j][k] = array[i][j][k]
+ 
+    return y
+
 def sum_of_weights(weights, label, label_index):
   sum = 0
   for i in range(len(weights)):

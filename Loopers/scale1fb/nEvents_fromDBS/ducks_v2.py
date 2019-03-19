@@ -74,8 +74,8 @@ for input_json in input_jsons:
 for key, dict in mc_samples.iteritems():
   if not dict["sum_of_weights"] <= 0:
     continue
-  if "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1" in key:
-    continue # this sample doesn't work for some reason, but shouldn't matter since we never go below m_gg of ~100
+  #if "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1" in key:
+  #  continue # this sample doesn't work for some reason, but shouldn't matter since we never go below m_gg of ~100
 
   #if dict["n_events_neg"] + dict["n_events_pos"] == dict["n_events_tot"]:
     #print "%s has trustworthy n_events data, skipping\n\n" % key

@@ -124,7 +124,7 @@ if [ "$CMSSW_VER" = "102X" ]; then
     cd $CMSSW_BASE/src
     git clone https://github.com/sam-may/flashgg
     cd flashgg
-    git checkout tth_dev_102X
+    git checkout tth_dev_runII
 
     cd ..
     source flashgg/setup_10_2_X.sh

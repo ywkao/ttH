@@ -4,14 +4,20 @@ import ROOT
 import numpy
 import root_numpy
 
+import dnn_helper
+
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input root file", type=str)
 parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str, default = "Hadronic")
 parser.add_argument("--tag", help = "name to append to filename", type=str, default = "")
+
+parser.add_argument("--dnn_models", help = "csv list of dnn models to add as inputs", type=str, default = "")
+
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
 parser.add_argument("-i", "--invert", help = "invert the test/train split", action="store_true")
 parser.add_argument("-s", "--sideband", help = "use data sideband for training", action = "store_true")
+
 parser.add_argument("--train_frac", help = "what fraction of data to use for training", type = float, default = 0.5)
 parser.add_argument("--handicap", help = "use only 1/3 of training data (to get a feel for how much stats matter)", action = "store_true")
 parser.add_argument("--sideband_name", help = "which data sideband to use", type=str, default="none")
@@ -26,6 +32,8 @@ args = parser.parse_args()
 baby_file = args.input.replace(".root", "") + ".root"
 output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + "%s%s%s%s.hdf5" % ("_invert" if args.invert else "", "_remove_new_vars" if args.old_vars else "", "_noPSV" if args.no_psv else "", "noLepID" if args.no_lepton_id else "")
 
+print output_file
+
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
 
@@ -34,7 +42,6 @@ tree = f.Get("t")
 #feature_names = list(feature_names) 
 
 feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "top_tag_score_", "dipho_pt_over_mass_", "helicity_angle_"] 
-
 
 to_remove = []
 if args.channel == "Leptonic":
@@ -55,11 +62,7 @@ if args.old_vars:
 if args.no_psv:
   to_remove += ["leadPSV_", "subleadPSV_"]
 
-training_feature_names = [feature for feature in feature_names if feature not in to_remove] 
-
-print training_feature_names
-
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_"]))
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_"]))
 
 # grab features
 train_frac = args.train_frac
@@ -84,6 +87,46 @@ if args.sideband:
 
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d %s' % (data_label, "&& data_sideband_label_ == 0" if args.sideband else ""))
 
+
+# Calculate DNN scores
+dnn_models = args.dnn_models.split(",")
+do_dnn = len(dnn_models[0]) > 0
+
+dnn_predictions = []
+
+if do_dnn:
+  dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_", "top_tag_score_"]
+  i = 0
+  for model in dnn_models:
+    dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = [features_data[feat] for feat in dnn_features], objects = features_data["objects_"])
+    dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = [features[feat] for feat in dnn_features], objects = features["objects_"])
+    dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = [features_validation[feat] for feat in dnn_features], objects = features_validation["objects_"])
+    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, weights_file = model)
+    #dnn.predict()
+    #dnn_predictions.append([dnn.predictions["train"], dnn.predictions["validation"], dnn.predictions["data"]])
+    dnn_predictions.append(dnn.predict())
+    feature_names.append("dnn_score_%d" % i)
+    i += 1 
+
+print dnn_predictions
+
+#if do_dnn:
+#  i = 0
+#  dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_", "top_tag_score_"]
+#  for model in dnn_models:
+#    dnn_predictions.append([])
+#    for features_set in [features, features_validation, features_data]:
+#      dnn = dnn_helper.DNN_Helper(objects = features_set["objects_"], global_features = [features_set[feat] for feat in dnn_features], weights_file = model)
+#      prediction = dnn.predict()
+#      dnn_predictions[i].append(prediction)
+#    feature_names.append("dnn_score_%d" % i)
+#    i += 1
+
+
+training_feature_names = [feature for feature in feature_names if feature not in to_remove]
+
+print training_feature_names
+
 # organize features
 global_features = []
 global_features_validation = []
@@ -91,13 +134,22 @@ global_features_data = []
 global_features_data_sideband = []
 global_features_data_sideband_mc = []
 for feature in training_feature_names:
+  if "dnn_score" in feature:
+    continue
   global_features.append(features[feature])
   global_features_validation.append(features_validation[feature])
   global_features_data.append(features_data[feature])
   if args.sideband:
     global_features_data_sideband.append(features_data_sideband[feature])
     global_features_data_sideband_mc.append(features_data_sideband_mc[feature])
-  
+
+if do_dnn:
+  for i in range(len(dnn_predictions)):
+    global_features.append(dnn_predictions[i][0])
+    global_features_validation.append(dnn_predictions[i][1])
+    global_features_data.append(dnn_predictions[i][2])
+
+
 global_features = numpy.asarray(global_features)
 global_features_validation = numpy.asarray(global_features_validation)
 global_features_data = numpy.asarray(global_features_data)

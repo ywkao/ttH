@@ -151,7 +151,7 @@ if args.multi:
 
 print param
 
-n_round = 75
+n_round = 150
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -249,7 +249,7 @@ plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
 estimate_za = True
 if estimate_za:
-  n_quantiles = 50
+  n_quantiles = 200
   signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
   bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}
   data_mva_scores = {"bdt_score" : pred_data}
