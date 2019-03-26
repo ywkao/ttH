@@ -5,8 +5,6 @@ INPUTFILENAMES=$3
 INDEX=$4
 CMSSW_VER=$5
 
-ARGS=$7
-
 echo "[wrapper] OUTPUTDIR	= " ${OUTPUTDIR}
 echo "[wrapper] OUTPUTFILENAME	= " ${OUTPUTFILENAME}
 echo "[wrapper] INPUTFILENAMES	= " ${INPUTFILENAMES}
@@ -44,9 +42,20 @@ cd $CMSSW_BASE/src/flashgg
 export PYTHONPATH=$PYTHONPATH:$CMSSW_BASE/src/flashgg/Taggers/test/
 
 
+# Check python env
+#python check_python.py
+#exit_value=$?
+#zero=0
+#if [ "$exit_value" -eq "$zero" ]; then
+#  continue
+#else
+#  exit 1
+#fi
+  
+
 # Create tag file
-echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} ${ARGS}"
-cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} ${ARGS}
+echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun Taggers/test/ttH_TagAndDump.py"
+cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES}
 
 if [ "$?" != "0" ]; then
     echo "Removing output file because cmsRun crashed with exit code $?"
