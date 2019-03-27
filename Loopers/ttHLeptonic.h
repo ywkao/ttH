@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("merged_ntuple.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
+// makeCMS3ClassFiles("merged_babies/DoubleEG_Run2017E-31Mar2018-v1_MINIAOD_forHualin_2017__ttH_Babies_v94.7_2017/merged_ntuple.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
 
 #ifndef ttHLeptonic_H
 #define ttHLeptonic_H
@@ -313,6 +313,12 @@ class ttHLeptonic {
   float    muon2_energy_;
   TBranch *muon2_energy_branch;
   bool     muon2_energy_isLoaded;
+  float    muonLeadIso_;
+  TBranch *muonLeadIso_branch;
+  bool     muonLeadIso_isLoaded;
+  float    muonSubleadIso_;
+  TBranch *muonSubleadIso_branch;
+  bool     muonSubleadIso_isLoaded;
   float    nMuonLoose_;
   TBranch *nMuonLoose_branch;
   bool     nMuonLoose_isLoaded;
@@ -846,6 +852,8 @@ void LoadAllBranches();
   const float &muon2_phi();
   const float &muon1_energy();
   const float &muon2_energy();
+  const float &muonLeadIso();
+  const float &muonSubleadIso();
   const float &nMuonLoose();
   const float &nMuonMedium();
   const float &nMuonTight();
@@ -1096,6 +1104,8 @@ namespace tas {
   const float &muon2_phi();
   const float &muon1_energy();
   const float &muon2_energy();
+  const float &muonLeadIso();
+  const float &muonSubleadIso();
   const float &nMuonLoose();
   const float &nMuonMedium();
   const float &nMuonTight();

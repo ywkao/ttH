@@ -217,6 +217,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       int processId = categorize_process(currentFileTitle, genPhotonId);
       if (processId == 17)
 	processId = 3; // use Madgraph GJets instead of Pythia
+
       int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
@@ -483,17 +484,20 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (leps[0].Pt() < 15)		continue;
 	if (MetPt() < 25)		continue;
 	//if (leadPixelSeed() || subleadPixelSeed())      continue;
+	if (nElecMedium() + nMuonMedium() < 1)  continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       }
 
       else if (tag == "ttHLeptonic_ttbarCR_v2") {
         if (mass() < 100)        continue;
         if (n_jets() < 2)       continue;
-	if (nb_medium() < 2)		continue;
+	if (nb_tight() < 1)             continue;
+	//if (nb_loose() < 2)		continue;
         if (leadIDMVA() < -0.9)         continue;
         if (subleadIDMVA() < -0.9)      continue;
         if (leps[0].Pt() < 15)          continue;
         //if (MetPt() < 25)               continue;
+	if (nElecTight() + nMuonTight() < 1)  continue;
         if (leadPixelSeed() || subleadPixelSeed())      continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       } 

@@ -26,6 +26,9 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "VH"));
   v.push_back(new Process(f, "GammaJets_Madgraph"));
   v.push_back(new Process(f, "QCD_GammaJets_imputed"));
+  v.push_back(new Process(f, "TTV"));
+  v.push_back(new Process(f, "VV"));
+  v.push_back(new Process(f, "tV"));
   //v.push_back(new Process
 
   return v;
@@ -305,7 +308,7 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
   //  return 6; // split into hadronic/semileptonic/dileptonic 
   else if (currentFileTitle.Contains("WG") || currentFileTitle.Contains("ZG"))
     return 7;
-  else if (currentFileTitle.Contains("WJets"))
+  else if (currentFileTitle.Contains("WJets") && !currentFileTitle.Contains("TTW"))
     return 8;
   //else if (currentFileTitle.Contains("TTJets"))
   //  return 9; // split into hadronic/semileptonic/dileptonic
@@ -325,6 +328,13 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
     return 16;
   else if (currentFileTitle.Contains("GJets_HT"))
     return 17;
+  // 18 is imputed QCD/GJets
+  else if (currentFileTitle.Contains("TTZ") || currentFileTitle.Contains("TTW"))
+    return 19;
+  else if (currentFileTitle.Contains("WW") || currentFileTitle.Contains("WZ") || currentFileTitle.Contains("ZZ"))
+    return 20;
+  else if (currentFileTitle.Contains("ST_tW") || currentFileTitle.Contains("tZq"))
+    return 21;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -944,6 +954,22 @@ const vector<TString> vSamples_2016 = {
 			// t + gamma
 			"TGJets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"TGJets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			// ttV
+			"TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v3_MINIAODSIM_2016_topTag_overlapRemoval",
+			"TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext3-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			// tV
+			"tZq_ll_4f_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			// VV
+			"WW_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"WZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+			"ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_2016_topTag_overlapRemoval",
+
 			// other signal modes
 			"THQ_HToGG_13TeV-madgraph-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
 			"THW_HToGG_13TeV-madgraph-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval",
@@ -1012,6 +1038,22 @@ const vector<TString> vSamples_2017 = {
 			"WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			// t + gamma
 			"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			// ttV
+			"TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			// tV
+			"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"tZq_ll_4f_ckm_NLO_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			// VV
+			"ZZ_TuneCP5_13TeV-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017",
+			"WZ_TuneCP5_13TeV-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			"WW_TuneCP5_13TeV-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+
 			// ttH
 			"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
@@ -1095,7 +1137,7 @@ bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
 
 void add_samples(TChain* ch, TString year) {
   //TString tag = year == "2018" ? "v102.1" : (year == "2017" ? "v1.2" : "v3.16");
-  TString tag = year == "2016" ? "v80.2" : "v94.6";
+  TString tag = year == "2016" ? "v80.2" : "v94.7";
 
   TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
 

@@ -151,7 +151,7 @@ if args.multi:
 
 print param
 
-n_round = 150
+n_round = 75
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 

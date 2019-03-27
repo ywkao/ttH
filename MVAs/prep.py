@@ -90,11 +90,12 @@ features_data = root_numpy.tree2array(tree, branches = branches, selection = 'la
 
 # Calculate DNN scores
 dnn_models = args.dnn_models.split(",")
-do_dnn = len(dnn_models[0]) > 0
+do_dnn = len(args.dnn_models) > 0
 
 dnn_predictions = []
 
 if do_dnn:
+  print "Calculating dnn scores"
   dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_", "top_tag_score_"]
   i = 0
   for model in dnn_models:

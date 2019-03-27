@@ -28,7 +28,7 @@ if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "*")
   os.system("rm package.tar.gz")
 
-  os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' -f package.tar.gz %s" % cmssw_ver) 
+  os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' -f package.tar.gz %s" % cmssw_ver) 
 
   with open("versions.txt", "a") as fout:
     os.chdir("%s/src/flashgg/" % cmssw_ver)
@@ -53,7 +53,7 @@ for sample in samples:
   datasets[name] = { "input_loc" : sample }
   datasets[name]["isData"] = True if ("EGamma" in name or "DoubleEG" in name) else False
   if datasets[name]["isData"]:
-    datasets[name]["fpo"] = 25
+    datasets[name]["fpo"] = 50
   elif "ttH" in name:
     datasets[name]["fpo"] = 1
   elif "DiPhoton" in name:
@@ -90,6 +90,8 @@ while True:
     for dataset, info in datasets.iteritems():
       if args.data_only and not info["isData"]:
         continue
+      if "Run2016E" not in dataset:
+        continue
       print "Submitting jobs for: ", dataset
       #time.sleep(15)
       sample = DirectorySample( dataset = dataset, location = info["input_loc"])
@@ -113,7 +115,6 @@ while True:
         allcomplete = False
       # save some information for the dashboard
       total_summary[dataset] = task.get_task_summary()
-      break
     # parse the total summary and write out the dashboard
     #StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
     os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker")

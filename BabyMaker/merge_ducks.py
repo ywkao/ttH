@@ -8,15 +8,18 @@ sys.path.append("~/Utilities")
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("tag", help = "job tag e.g. 'v7'", type=str)
-parser.add_argument("year", help = "2016 or 2017", type=str)
+parser.add_argument("--tag", help = "job tag e.g. 'v7'", type=str)
+parser.add_argument("--year", help = "2016,2017,RunII", type=str)
 parser.add_argument("--data_only", action="store_true")
 parser.add_argument("--no_signal", action="store_true")
 args = parser.parse_args()
 
 hadoop_name = "smay" if os.environ.get("USER") == "sjmay" else os.environ.get("USER")
 
-dirs = glob.glob(("/hadoop/cms/store/user/%s/ttH/*ttH_Babies_" % hadoop_name) + args.tag + "_" + args.year)
+if args.year == "RunII":
+  dirs = glob.glob(("/hadoop/cms/store/user/%s/ttH/*ttH_Babies_" % hadoop_name) + args.year + args.tag)
+else:
+  dirs = glob.glob(("/hadoop/cms/store/user/%s/ttH/*ttH_Babies_" % hadoop_name) + args.tag + "_" + args.year)
 print "Adding ntuples from the following directories:"
 for dir in dirs:
   print dir

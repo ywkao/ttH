@@ -145,6 +145,8 @@ while True:
 	print loc
         sample = DirectorySample( dataset=ds, location=loc )
         files = [f.name for f in sample.get_files()]
+        sample.set_files([f.name for f in sample.get_files() if "/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017/test_skim_630.root" not in f.name])
+        #print [f.name for f in sample.get_files()]
         task = CondorTask(
                 sample = sample,
                 open_dataset = False,

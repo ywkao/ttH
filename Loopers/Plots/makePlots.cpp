@@ -27,6 +27,9 @@ std::map<TString, TString> mLabels = {
 	{"THQ", "tHq"},
 	{"TGamma", "t+#gamma+Jets"},
 	{"QCD_GammaJets_imputed", "(#gamma) + Jets (Data)"},
+	{"TTV", "t#bar{t}V"},
+        {"VV", "VV"},
+        {"tV", "t + V"}
 };
 
 std::map<TString, int> mColors = {
@@ -42,6 +45,9 @@ std::map<TString, int> mColors = {
         {"TTJets", kSpring+10},
 	{"TGamma", kYellow-9},
 	{"QCD_GammaJets_imputed", kGray},
+	{"TTV", kPink},
+	{"tV", kPink-6},
+	{"VV", kBlue+2}
 };
 
 std::map<TString, TString> mLatex = {
@@ -57,6 +63,9 @@ std::map<TString, TString> mLatex = {
         {"TTJets", "$t\\bar{t}$ + Jets"},
         {"TGamma", "$t + \\gamma$"},
 	{"QCD_GammaJets_imputed", "($\\gamma$) + Jets (Data Sideband)"},
+	{"TTV", "$t\\bar{t}+V$"},
+        {"VV", "$VV$"},
+        {"tV", "$tV$"},
 };
 
 
@@ -536,7 +545,7 @@ int main(int argc, char* argv[])
     if (year == "2016")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma"};
     if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
     if (year == "All") {
       if (impute_gjets)
         vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "VG", "DY"};

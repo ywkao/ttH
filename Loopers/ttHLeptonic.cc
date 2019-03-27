@@ -199,6 +199,10 @@ void ttHLeptonic::Init(TTree *tree) {
   if (muon1_energy_branch) muon1_energy_branch->SetAddress(&muon1_energy_);
   muon2_energy_branch = tree->GetBranch("muon2_energy");
   if (muon2_energy_branch) muon2_energy_branch->SetAddress(&muon2_energy_);
+  muonLeadIso_branch = tree->GetBranch("muonLeadIso");
+  if (muonLeadIso_branch) muonLeadIso_branch->SetAddress(&muonLeadIso_);
+  muonSubleadIso_branch = tree->GetBranch("muonSubleadIso");
+  if (muonSubleadIso_branch) muonSubleadIso_branch->SetAddress(&muonSubleadIso_);
   nMuonLoose_branch = tree->GetBranch("nMuonLoose");
   if (nMuonLoose_branch) nMuonLoose_branch->SetAddress(&nMuonLoose_);
   nMuonMedium_branch = tree->GetBranch("nMuonMedium");
@@ -591,6 +595,8 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   muon2_phi_isLoaded = false;
   muon1_energy_isLoaded = false;
   muon2_energy_isLoaded = false;
+  muonLeadIso_isLoaded = false;
+  muonSubleadIso_isLoaded = false;
   nMuonLoose_isLoaded = false;
   nMuonMedium_isLoaded = false;
   nMuonTight_isLoaded = false;
@@ -836,6 +842,8 @@ void ttHLeptonic::LoadAllBranches() {
   if (muon2_phi_branch != 0) muon2_phi();
   if (muon1_energy_branch != 0) muon1_energy();
   if (muon2_energy_branch != 0) muon2_energy();
+  if (muonLeadIso_branch != 0) muonLeadIso();
+  if (muonSubleadIso_branch != 0) muonSubleadIso();
   if (nMuonLoose_branch != 0) nMuonLoose();
   if (nMuonMedium_branch != 0) nMuonMedium();
   if (nMuonTight_branch != 0) nMuonTight();
@@ -2241,6 +2249,32 @@ const float &ttHLeptonic::muon2_energy() {
     muon2_energy_isLoaded = true;
   }
   return muon2_energy_;
+}
+
+const float &ttHLeptonic::muonLeadIso() {
+  if (not muonLeadIso_isLoaded) {
+    if (muonLeadIso_branch != 0) {
+      muonLeadIso_branch->GetEntry(index);
+    } else {
+      printf("branch muonLeadIso_branch does not exist!\n");
+      exit(1);
+    }
+    muonLeadIso_isLoaded = true;
+  }
+  return muonLeadIso_;
+}
+
+const float &ttHLeptonic::muonSubleadIso() {
+  if (not muonSubleadIso_isLoaded) {
+    if (muonSubleadIso_branch != 0) {
+      muonSubleadIso_branch->GetEntry(index);
+    } else {
+      printf("branch muonSubleadIso_branch does not exist!\n");
+      exit(1);
+    }
+    muonSubleadIso_isLoaded = true;
+  }
+  return muonSubleadIso_;
 }
 
 const float &ttHLeptonic::nMuonLoose() {
@@ -4235,6 +4269,8 @@ const float &muon1_phi() { return cms3.muon1_phi(); }
 const float &muon2_phi() { return cms3.muon2_phi(); }
 const float &muon1_energy() { return cms3.muon1_energy(); }
 const float &muon2_energy() { return cms3.muon2_energy(); }
+const float &muonLeadIso() { return cms3.muonLeadIso(); }
+const float &muonSubleadIso() { return cms3.muonSubleadIso(); }
 const float &nMuonLoose() { return cms3.nMuonLoose(); }
 const float &nMuonMedium() { return cms3.nMuonMedium(); }
 const float &nMuonTight() { return cms3.nMuonTight(); }
