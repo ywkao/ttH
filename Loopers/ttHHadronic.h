@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_2016_topTag_overlapRemoval__ttH_Babies_v80.1_2016/merged_ntuple_1.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
+// makeCMS3ClassFiles("/home/users/sjmay/ttH/BabyMaker/CMSSW_8_0_28/src/flashgg/merged_ntuple.root", "tthHadronicTagDumper/trees/tth_13TeV_all", "ttHHadronic", "tas", "cms3")
 
 #ifndef ttHHadronic_H
 #define ttHHadronic_H
@@ -268,6 +268,24 @@ class ttHHadronic {
   float    MetPhi_;
   TBranch *MetPhi_branch;
   bool     MetPhi_isLoaded;
+  float    topTag_topPt_;
+  TBranch *topTag_topPt_branch;
+  bool     topTag_topPt_isLoaded;
+  float    topTag_WPt_;
+  TBranch *topTag_WPt_branch;
+  bool     topTag_WPt_isLoaded;
+  float    topTag_topEta_;
+  TBranch *topTag_topEta_branch;
+  bool     topTag_topEta_isLoaded;
+  float    topTag_WEta_;
+  TBranch *topTag_WEta_branch;
+  bool     topTag_WEta_isLoaded;
+  float    topTag_topPhi_;
+  TBranch *topTag_topPhi_branch;
+  bool     topTag_topPhi_isLoaded;
+  float    topTag_WPhi_;
+  TBranch *topTag_WPhi_branch;
+  bool     topTag_WPhi_isLoaded;
   float    jet1_pt_;
   TBranch *jet1_pt_branch;
   bool     jet1_pt_isLoaded;
@@ -792,6 +810,12 @@ void LoadAllBranches();
   const float &bjet2_pt();
   const float &MetPt();
   const float &MetPhi();
+  const float &topTag_topPt();
+  const float &topTag_WPt();
+  const float &topTag_topEta();
+  const float &topTag_WEta();
+  const float &topTag_topPhi();
+  const float &topTag_WPhi();
   const float &jet1_pt();
   const float &jet2_pt();
   const float &jet3_pt();
@@ -1029,6 +1053,12 @@ namespace tas {
   const float &bjet2_pt();
   const float &MetPt();
   const float &MetPhi();
+  const float &topTag_topPt();
+  const float &topTag_WPt();
+  const float &topTag_topEta();
+  const float &topTag_WEta();
+  const float &topTag_topPhi();
+  const float &topTag_WPhi();
   const float &jet1_pt();
   const float &jet2_pt();
   const float &jet3_pt();

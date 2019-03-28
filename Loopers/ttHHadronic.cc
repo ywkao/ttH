@@ -169,6 +169,18 @@ void ttHHadronic::Init(TTree *tree) {
   if (MetPt_branch) MetPt_branch->SetAddress(&MetPt_);
   MetPhi_branch = tree->GetBranch("MetPhi");
   if (MetPhi_branch) MetPhi_branch->SetAddress(&MetPhi_);
+  topTag_topPt_branch = tree->GetBranch("topTag_topPt");
+  if (topTag_topPt_branch) topTag_topPt_branch->SetAddress(&topTag_topPt_);
+  topTag_WPt_branch = tree->GetBranch("topTag_WPt");
+  if (topTag_WPt_branch) topTag_WPt_branch->SetAddress(&topTag_WPt_);
+  topTag_topEta_branch = tree->GetBranch("topTag_topEta");
+  if (topTag_topEta_branch) topTag_topEta_branch->SetAddress(&topTag_topEta_);
+  topTag_WEta_branch = tree->GetBranch("topTag_WEta");
+  if (topTag_WEta_branch) topTag_WEta_branch->SetAddress(&topTag_WEta_);
+  topTag_topPhi_branch = tree->GetBranch("topTag_topPhi");
+  if (topTag_topPhi_branch) topTag_topPhi_branch->SetAddress(&topTag_topPhi_);
+  topTag_WPhi_branch = tree->GetBranch("topTag_WPhi");
+  if (topTag_WPhi_branch) topTag_WPhi_branch->SetAddress(&topTag_WPhi_);
   jet1_pt_branch = tree->GetBranch("jet1_pt");
   if (jet1_pt_branch) jet1_pt_branch->SetAddress(&jet1_pt_);
   jet2_pt_branch = tree->GetBranch("jet2_pt");
@@ -550,6 +562,12 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   bjet2_pt_isLoaded = false;
   MetPt_isLoaded = false;
   MetPhi_isLoaded = false;
+  topTag_topPt_isLoaded = false;
+  topTag_WPt_isLoaded = false;
+  topTag_topEta_isLoaded = false;
+  topTag_WEta_isLoaded = false;
+  topTag_topPhi_isLoaded = false;
+  topTag_WPhi_isLoaded = false;
   jet1_pt_isLoaded = false;
   jet2_pt_isLoaded = false;
   jet3_pt_isLoaded = false;
@@ -782,6 +800,12 @@ void ttHHadronic::LoadAllBranches() {
   if (bjet2_pt_branch != 0) bjet2_pt();
   if (MetPt_branch != 0) MetPt();
   if (MetPhi_branch != 0) MetPhi();
+  if (topTag_topPt_branch != 0) topTag_topPt();
+  if (topTag_WPt_branch != 0) topTag_WPt();
+  if (topTag_topEta_branch != 0) topTag_topEta();
+  if (topTag_WEta_branch != 0) topTag_WEta();
+  if (topTag_topPhi_branch != 0) topTag_topPhi();
+  if (topTag_WPhi_branch != 0) topTag_WPhi();
   if (jet1_pt_branch != 0) jet1_pt();
   if (jet2_pt_branch != 0) jet2_pt();
   if (jet3_pt_branch != 0) jet3_pt();
@@ -1994,6 +2018,84 @@ const float &ttHHadronic::MetPhi() {
     MetPhi_isLoaded = true;
   }
   return MetPhi_;
+}
+
+const float &ttHHadronic::topTag_topPt() {
+  if (not topTag_topPt_isLoaded) {
+    if (topTag_topPt_branch != 0) {
+      topTag_topPt_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_topPt_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_topPt_isLoaded = true;
+  }
+  return topTag_topPt_;
+}
+
+const float &ttHHadronic::topTag_WPt() {
+  if (not topTag_WPt_isLoaded) {
+    if (topTag_WPt_branch != 0) {
+      topTag_WPt_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_WPt_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_WPt_isLoaded = true;
+  }
+  return topTag_WPt_;
+}
+
+const float &ttHHadronic::topTag_topEta() {
+  if (not topTag_topEta_isLoaded) {
+    if (topTag_topEta_branch != 0) {
+      topTag_topEta_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_topEta_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_topEta_isLoaded = true;
+  }
+  return topTag_topEta_;
+}
+
+const float &ttHHadronic::topTag_WEta() {
+  if (not topTag_WEta_isLoaded) {
+    if (topTag_WEta_branch != 0) {
+      topTag_WEta_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_WEta_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_WEta_isLoaded = true;
+  }
+  return topTag_WEta_;
+}
+
+const float &ttHHadronic::topTag_topPhi() {
+  if (not topTag_topPhi_isLoaded) {
+    if (topTag_topPhi_branch != 0) {
+      topTag_topPhi_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_topPhi_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_topPhi_isLoaded = true;
+  }
+  return topTag_topPhi_;
+}
+
+const float &ttHHadronic::topTag_WPhi() {
+  if (not topTag_WPhi_isLoaded) {
+    if (topTag_WPhi_branch != 0) {
+      topTag_WPhi_branch->GetEntry(index);
+    } else {
+      printf("branch topTag_WPhi_branch does not exist!\n");
+      exit(1);
+    }
+    topTag_WPhi_isLoaded = true;
+  }
+  return topTag_WPhi_;
 }
 
 const float &ttHHadronic::jet1_pt() {
@@ -3999,6 +4101,12 @@ const float &bjet1_pt() { return cms3.bjet1_pt(); }
 const float &bjet2_pt() { return cms3.bjet2_pt(); }
 const float &MetPt() { return cms3.MetPt(); }
 const float &MetPhi() { return cms3.MetPhi(); }
+const float &topTag_topPt() { return cms3.topTag_topPt(); }
+const float &topTag_WPt() { return cms3.topTag_WPt(); }
+const float &topTag_topEta() { return cms3.topTag_topEta(); }
+const float &topTag_WEta() { return cms3.topTag_WEta(); }
+const float &topTag_topPhi() { return cms3.topTag_topPhi(); }
+const float &topTag_WPhi() { return cms3.topTag_WPhi(); }
 const float &jet1_pt() { return cms3.jet1_pt(); }
 const float &jet2_pt() { return cms3.jet2_pt(); }
 const float &jet3_pt() { return cms3.jet3_pt(); }
