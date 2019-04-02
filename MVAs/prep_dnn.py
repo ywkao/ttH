@@ -11,6 +11,7 @@ parser.add_argument("--input", help = "input root file", type=str)
 parser.add_argument("--signal", help = "which process to consider as signal", type=str, default="ttH")
 parser.add_argument("--backgrounds", help = "which processes to consider as bkgs", type=str, default="all")
 parser.add_argument("--boosted_objects", help = "use objects that are boosted to higgs p4", action="store_true")
+parser.add_argument("--do_top_tag", help = "use top tagger BDT in training", action="store_true")
 parser.add_argument("--invert", help = "invert test/train split", action="store_true")
 parser.add_argument("--train_frac", help = "what fraction of data to use for training", type = float, default = 0.5)
 parser.add_argument("--tag", help = "name to add to hdf5 file name", type=str, default="")
@@ -86,7 +87,8 @@ def create_array(features_list, names):
       feat = preprocess(feat)
   return numpy.transpose(numpy.array(arr))
 
-feature_names += ["top_tag_score_"]
+if args.do_top_tag:
+  feature_names += ["top_tag_score_"]
 global_features = create_array(features, feature_names)
 global_features_validation = create_array(features_validation, feature_names)
 global_features_data = create_array(features_data, feature_names)
