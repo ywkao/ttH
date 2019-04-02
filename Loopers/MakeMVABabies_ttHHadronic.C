@@ -60,7 +60,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
   unique_ptr<TMVA::Reader> tth_dipho_mva;
   unique_ptr<TMVA::Reader> tth_std_mva;
 
-  bool do_tth_ttX_mva = true;
+  bool do_tth_ttX_mva = false;
   if (do_tth_ttX_mva) {
     tth_ttX_mva.reset(new TMVA::Reader( "!Color:Silent" ));
 
@@ -110,7 +110,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     tth_ttX_mva->BookMVA("BDT", "../MVAs/Hadronic_1617_data_sideband_phoID_v2__bdt.xml");
   }
 
-  bool do_tth_qcdX_mva = true;
+  bool do_tth_qcdX_mva = false;
   if (do_tth_qcdX_mva) {
     tth_qcdX_mva.reset(new TMVA::Reader( "!Color:Silent" ));
     
@@ -473,7 +473,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         if (minIDMVA_ < -0.7) {
 	  if (!isData)
 	    continue;  
-	  //minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), gjet_minID_shape, gjet_maxID_shape, evt_weight_);
 	  minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight_);
 	  process_id_ = 18;
         }
@@ -595,7 +594,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       }
 
       TString scale_qcd = "binned_NJets";
-      //bool do_scale_qcd = !tag.Contains("impute");
       bool do_scale_qcd = false;
       if (do_scale_qcd) {
         evt_weight_ *= qcdX_factor(currentFileTitle, scale_qcd, n_jets());
