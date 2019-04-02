@@ -226,6 +226,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hLeptonPt", 25, 0, 200);
     v[i]->add_histogram("hLeptonEta", 25, -3, 3);
 
+    v[i]->add_histogram("hMuonMiniIsolation", 10, 0, 0.25);
+
     v[i]->add_histogram("hPixelSeed", 2, -0.5, 1.5);
     v[i]->add_histogram("hPixelSeedEB", 2, -0.5, 1.5);
     v[i]->add_histogram("hPixelSeedEE", 2, -0.5, 1.5);
@@ -746,6 +748,29 @@ int categorize_leptons(int nGoodEls, int nGoodMus) {
   }
 }
 
+int categorize_reco_leptons(int nGoodEls, int nGoodMus) {
+  int nLeps = nGoodEls + nGoodMus;
+  if (nLeps == 0)
+    return 0;
+  if (nLeps == 1) {
+    if (nGoodEls == 1)
+      return 1;
+    if (nGoodMus == 1)
+      return 2;
+  }
+  if (nLeps == 2) {
+    if (nGoodEls == 1 || nGoodMus == 1)
+      return 3;
+    if (nGoodEls >= 2)
+      return 4;
+    if (nGoodMus >= 2)
+      return 5;
+  }
+  if (nLeps >= 3) {
+    return 6;
+  }
+}
+
 double sgn(double x) {
   if (x < 0)
     return -1;
@@ -1007,6 +1032,7 @@ const vector<TString> vSamples_2017 = {
 			"DoubleEG_Run2017D-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017E-31Mar2018-v1_MINIAOD_forHualin_2017",
 			"DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_forHualin_2017",
+			/* delete me
 			// DY
 			"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10_ext1-v1_MINIAODSIM_forHualin_2017",
 			"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_forHualin_2017",
@@ -1064,17 +1090,20 @@ const vector<TString> vSamples_2017 = {
 			
 			"ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"ttHJetToGG_M115_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			*/ // delete me 
 			/*
 			"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			*/
 			//"ttHJetToGG_M100_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			// other signal modes
+			/* delete me
 			"THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
 			"VBFHToGG_M125_13TeV_amcatnlo_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_forHualin_2017",
+			*/ // delete me
 };
 
 /*
@@ -1113,6 +1142,32 @@ const vector<TString> vSamples_2018 = {"EGamma",
 };
 
 
+const vector<TString> vSamples_2016_RunII = {
+		"DoubleEG_Run2016B-17Jul2018_ver1-v1_MINIAOD_RunII",
+		"DoubleEG_Run2016B-17Jul2018_ver2-v1_MINIAOD_RunII",
+		"DoubleEG_Run2016C-17Jul2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2016D-17Jul2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2016E-17Jul2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2016F-17Jul2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2016G-17Jul2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2016H-17Jul2018-v1_MINIAOD_RunII"
+};
+
+const vector<TString> vSamples_2017_RunII = {
+		"DoubleEG_Run2017B-31Mar2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2017C-31Mar2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2017D-31Mar2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2017E-31Mar2018-v1_MINIAOD_RunII",
+		"DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_RunII"
+};
+
+const vector<TString> vSamples_2018_RunII = {
+		"EGamma_Run2018A-17Sep2018-v2_MINIAOD_RunII",
+		"EGamma_Run2018B-17Sep2018-v1_MINIAOD_RunII",
+		"EGamma_Run2018C-17Sep2018-v1_MINIAOD_RunII",
+		"EGamma_Run2018D-22Jan2019-v2_MINIAOD_RunII"
+};
+
 const char* json_2018 = "GoldenJSON/Cert_314472-322633_13TeV_PromptReco_Collisions18_JSON_snt.txt";
 const char* json_2017 = "GoldenJSON/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_snt.txt";
 const char* json_2016 = "GoldenJSON/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
@@ -1136,17 +1191,41 @@ bool pass_json(TString year, unsigned int run, unsigned int lumi_block) {
 };*/
 
 void add_samples(TChain* ch, TString year) {
-  //TString tag = year == "2018" ? "v102.1" : (year == "2017" ? "v1.2" : "v3.16");
-  TString tag = year == "2016" ? "v80.2" : "v94.7";
+  bool runII = year.Contains("RunII");
 
-  TString location = "/home/users/sjmay/ttH/Loopers/merged_babies";
+  TString tag;
+  TString location;
+  vector<TString> vSamples;
 
-  vector<TString> vSamples = year == "2018" ? vSamples_2018 : (year == "2017" ? vSamples_2017 : vSamples_2016);
+  if (runII) {
+    tag = "v1.0";
+    location = "/home/users/sjmay/ttH/Loopers/merged_babies";
+    if (year.Contains("2016"))
+      vSamples = vSamples_2016_RunII;
+    else if (year.Contains("2017"))
+      vSamples = vSamples_2017_RunII;
+    else if (year.Contains("2018"))
+      vSamples = vSamples_2018_RunII; 
 
-  for (int i = 0; i < vSamples.size(); i++) {
-    TString tag_temp = vSamples[i].Contains("EGamma") ? "v102.1" : tag;
-    TString year_temp = year == "2018" ? (vSamples[i].Contains("EGamma") ? "2018" : "2017") : year;
-    ch->Add(location + "/" + vSamples[i] + "__ttH_Babies_" + tag_temp + "_" + year_temp + "/merged_ntuple.root");
+    for (int i = 0; i < vSamples.size(); i++) {
+      ch->Add(location + "/" + vSamples[i] + "_ttH_Babies_RunII" + tag + "/merged_ntuple.root");
+    }
+
+
   }
 
+  else {
+
+    tag = year == "2016" ? "v80.2" : "v94.7";
+
+    location = "/home/users/sjmay/ttH/Loopers/merged_babies";
+
+    vSamples = year == "2018" ? vSamples_2018 : (year == "2017" ? vSamples_2017 : vSamples_2016);
+
+    for (int i = 0; i < vSamples.size(); i++) {
+      TString tag_temp = vSamples[i].Contains("EGamma") ? "v102.1" : tag;
+      TString year_temp = year == "2018" ? (vSamples[i].Contains("EGamma") ? "2018" : "2017") : year;
+      ch->Add(location + "/" + vSamples[i] + "__ttH_Babies_" + tag_temp + "_" + year_temp + "/merged_ntuple.root");
+    }
+  }
 }

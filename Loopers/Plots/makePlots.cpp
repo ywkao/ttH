@@ -47,7 +47,7 @@ std::map<TString, int> mColors = {
 	{"QCD_GammaJets_imputed", kGray},
 	{"TTV", kPink},
 	{"tV", kPink-6},
-	{"VV", kBlue+2}
+	{"VV", kPink+6}
 };
 
 std::map<TString, TString> mLatex = {
@@ -514,6 +514,9 @@ int main(int argc, char* argv[])
   TString file_path = argv[2];
   bool impute_gjets = file_path.Contains("impute") && !(file_path.Contains("presel") || file_path.Contains("sideband")); 
   TString year = file_path.Contains("All") ? "All" : file_path.Contains("2018") ? "2018" : ((file_path.Contains("2017") ? "2017" : "2016"));
+  if (file_path.Contains("RunII"))
+    year = "2017";
+
   TString tag = file_path.Contains("Hadronic") ? "Hadronic" : "Leptonic";
 
   TString info = argv[3]; 
@@ -663,6 +666,7 @@ int main(int argc, char* argv[])
     if (tag == "Leptonic") {
       make_plot(c1, vFiles[i], vNames[i], "hLeptonPt", "Lepton p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
       make_plot(c1, vFiles[i], vNames[i], "hLeptonEta", "Lepton #eta", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
+      make_plot(c1, vFiles[i], vNames[i], "hMuonMiniIsolation", "Muon Mini-Iso", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);
     }
 
     make_plot(c1, vFiles[i], vNames[i], "hPtHiggs", "DiPhoton p_{T} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo);

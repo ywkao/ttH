@@ -45,9 +45,9 @@ feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_de
 
 to_remove = []
 if args.channel == "Leptonic":
-  feature_names += ["lep_pt_", "lep_eta_", "n_lep_loose_", "n_lep_medium_", "n_lep_tight_"]
+  feature_names += ["lep_pt_", "lep_eta_", "n_lep_loose_", "n_lep_medium_", "n_lep_tight_", "muon1_mini_iso_", "muon2_mini_iso_"]
   if args.no_lepton_id:
-    to_remove += ["n_lep_loose_", "n_lep_medium_", "n_lep_tight_"] 
+    to_remove += ["n_lep_loose_", "n_lep_medium_", "n_lep_tight_", "muon1_mini_iso_", "muon2_mini_iso_"] 
   to_remove += ["jet4_pt_", "jet4_eta_", "jet4_btag_"]
 
 if args.sideband: # remove b-tagging features
@@ -62,7 +62,10 @@ if args.old_vars:
 if args.no_psv:
   to_remove += ["leadPSV_", "subleadPSV_"]
 
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_"]))
+if args.channel == "Hadronic":
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_"]))
+elif args.channel == "Leptonic":
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_"]))
 
 # grab features
 train_frac = args.train_frac
@@ -159,7 +162,10 @@ if args.sideband:
   global_features_data_sideband = numpy.asarray(global_features_data_sideband)
   global_features_data_sideband_mc = numpy.asarray(global_features_data_sideband_mc)
 
-mva_names = ["max1_btag_", "max2_btag_", "maxIDMVA_", "minIDMVA_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_"]
+if args.channel == "Hadronic":
+  mva_names = ["max1_btag_", "max2_btag_", "maxIDMVA_", "minIDMVA_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_"]
+elif args.channel == "Leptonic":
+  mva_names = ["max1_btag_", "max2_btag_", "maxIDMVA_", "minIDMVA_"]
 
 label = features["label_"]
 multi_label = features["multi_label_"]

@@ -18,7 +18,12 @@ int main(int argc, char* argv[]) {
 
   TChain *ch = new TChain("tthLeptonicTagDumper/trees/tth_13TeV_all"); 
 
-  if (year == "All") {
+  if (year == "RunII") {
+    //add_samples(ch, "2016_RunII");
+    add_samples(ch, "2017_RunII");
+    //add_samples(ch, "2018_RunII"); 
+  }
+  else if (year == "All") {
     add_samples(ch, "2016");
     add_samples(ch, "2017");
   }

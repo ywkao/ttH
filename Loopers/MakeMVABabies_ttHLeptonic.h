@@ -74,6 +74,9 @@ class BabyMaker {
     float       n_lep_medium_;
     float       n_lep_tight_;
 
+    float	muon1_mini_iso_;
+    float	muon2_mini_iso_;
+
     float      	jet1_pt_;
     float	jet1_eta_;
     float       jet1_btag_;
@@ -161,6 +164,9 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("n_lep_loose_"               , &n_lep_loose_          );
   BabyTree_->Branch("n_lep_medium_"               , &n_lep_medium_          );
   BabyTree_->Branch("n_lep_tight_"               , &n_lep_tight_          );
+
+  BabyTree_->Branch("muon1_mini_iso_"               , &muon1_mini_iso_          );
+  BabyTree_->Branch("muon2_mini_iso_"               , &muon2_mini_iso_          );
 
   BabyTree_->Branch("top_tag_score_"               , &top_tag_score_          );
 

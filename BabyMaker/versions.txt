@@ -162,3 +162,12 @@ Submitting ttH Babies version v1.0 using skims in /hadoop/cms/store/user/smay/tt
 Date: 2019-03-27 10:19:08.013305 
 Submitting ttH Babies version v1.0 using skims in /hadoop/cms/store/user/smay/ttH/MicroAOD/RunII and commit 4f47ed8a3c362c5507c19a63086907c4d4de8db0 of tth_dev_runII branch of flashgg
 
+Date: 2019-03-28 16:29:54.571501 
+Submitting ttH Babies version v94.8 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017 and commit ebaad87694ab694c25bd519e897d5520aae29989 of tth_dev_94X branch of flashgg
+
+Date: 2019-03-28 16:44:27.262209 
+Submitting ttH Babies version v80.3 using skims in /hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/2016_topTag_overlapRemoval and commit b849a16e83ff625b7445b5913d7006b2f9cc223a of tth_dev_80X branch of flashgg
+
+Date: 2019-04-01 13:31:29.215036 
+Submitting ttH Babies version v1.0 using skims in /hadoop/cms/store/user/smay/ttH/MicroAOD/RunII and commit 5bd5e7259003b0d454b6343dccb4eb33416214fd of tth_dev_runII branch of flashgg
+

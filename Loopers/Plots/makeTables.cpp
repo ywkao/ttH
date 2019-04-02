@@ -47,6 +47,16 @@ std::map<int, TString> mLeptons = {
         {5, "$\\mu\\mu$"}
 };
 
+std::map<int, TString> mRecoLeptons = {
+        {0, "Hadronic"},
+        {1, "$e$"},
+        {2, "$\\mu$"},
+        {3, "$e\\mu$"},
+        {4, "$ee$"},
+        {5, "$\\mu\\mu$"},
+        {6, "Multi Lepton"}
+};
+
 std::map<int, TString> mPhotons = {
         {0, "(Fake/Fake)"},
         {1, "(Fake/Prompt)"},
@@ -360,9 +370,12 @@ int main(int argc, char* argv[])
     if (file_path.Contains("impute"))
       vBkgs.push_back("QCD_GammaJets_imputed");
 
+    //vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF", "GammaJets_Madgraph", "QCD_GammaJets_imputed"};
+
     TString label = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", "");
     make_table_std(f, "hNVtx", vBkgs, label);
     make_table_components(f, "hNVtx", vBkgs, label, mLeptons, "GenLepton");
+    make_table_components(f, "hNVtx", vBkgs, label, mRecoLeptons, "RecoLepton");
     make_table_components(f, "hNVtx", vBkgs, label, mPhotons, "GenPhoton"); 
     make_table_components(f, "hNVtx", vBkgs, label, mPhotonsDetail, "GenPhotonDetail");
     make_table_components(f, "hNVtx", vBkgs, label, mPhotonLocations, "PhotonLocations", true);
@@ -386,7 +399,7 @@ int main(int argc, char* argv[])
     if (year == "2016")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW"};
     else if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "VG", "TGamma", "THW"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "TGamma", "THW", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
 
     make_table_multiple(vF, "hNVtx", vBkgs, vLabels); 
 

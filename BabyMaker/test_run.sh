@@ -71,7 +71,8 @@ if [ "$CMSSW_VER" = "102X" ]; then
   cd CMSSW_10_2_9/src/flashgg
   cmsenv
 
-  INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/EGamma/RunIIFall18-4_0_0-RunIIFall18-4_0_0-3-g040ebcb0-v0-Run2018B-PromptReco-v1/microAOD_1.root'
+  #INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/EGamma/RunIIFall18-4_0_0-RunIIFall18-4_0_0-3-g040ebcb0-v0-Run2018B-PromptReco-v1/microAOD_1.root'
+  INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_forHualin_2017/test_skim_1.root'
 fi
 
 

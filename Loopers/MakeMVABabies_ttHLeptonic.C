@@ -223,6 +223,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       n_lep_loose_ = nElecLoose() + nMuonLoose();
       n_lep_medium_ = nElecMedium() + nMuonMedium();
       n_lep_tight_ = nElecTight() + nMuonTight();
+
+      muon1_mini_iso_ = muon1_pt() > 0 ? muonLeadIso() / muon1_pt() : -999;
+      muon2_mini_iso_ = muon2_pt() > 0 ? muonSubleadIso() / muon2_pt() : -999;
      
       top_tag_score_ = topTag_score();
 

@@ -452,6 +452,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (leadIDMVA() < -0.9)                 continue;
         if (subleadIDMVA() < -0.9)              continue;
+	if (lead_ptoM() < 0.5)		continue;
+	if (sublead_ptoM() < 0.25)	continue;
       }
 
       else if (tag == "ttHHadronicLoose_impute") {
@@ -462,6 +464,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (minIDMVA_ < -0.7)		continue;	
 	if (leadIDMVA() < -0.9)                 continue;
         if (subleadIDMVA() < -0.9)              continue;
+	if (lead_ptoM() < 0.5)          continue;
+        if (sublead_ptoM() < 0.25)      continue;
       }
 
       else if (tag == "ttHHadronic_impute_SR") {

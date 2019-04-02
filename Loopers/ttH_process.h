@@ -8,6 +8,7 @@
 using namespace std;
 
 const int nGenLeptonCats = 6;
+const int nRecoLeptonCats = 7;
 const int nGenPhotonCats = 3;
 const int nGenPhotonDetailCats = 6;
 const int nPhotonLocations = 3;
@@ -36,6 +37,9 @@ class Process
     bool mGenLepton;
     vector<vector<TH1D*>> mHGenLeptonComp;
 
+    bool mRecoLepton;
+    vector<vector<TH1D*>> mHRecoLeptonComp;
+
     bool mGenPhoton;
     vector<vector<TH1D*>> mHGenPhotonComp;
 
@@ -49,6 +53,7 @@ class Process
     vector<vector<TH1D*>> mHMVACategories;
 
     vector<vector<TH2D*>> mHGenLeptonComp_2D;
+    vector<vector<TH2D*>> mHRecoLeptonComp_2D;
     vector<vector<TH2D*>> mHGenPhotonComp_2D;
     vector<vector<TH2D*>> mHGenPhotonDetailComp_2D;
     vector<vector<TH2D*>> mHPhotonLocations_2D;
@@ -65,6 +70,10 @@ inline Process::~Process()
   for (int i = 0; i < mHGenLeptonComp.size(); i ++ ) {
     for (int j = 0; j < mHGenLeptonComp[i].size(); j++)
       delete mHGenLeptonComp[i][j];
+  }
+  for (int i = 0; i < mHRecoLeptonComp.size(); i ++ ) {
+    for (int j = 0; j < mHRecoLeptonComp[i].size(); j++)
+      delete mHRecoLeptonComp[i][j];
   }
   for (int i = 0; i < mHGenPhotonComp.size(); i ++ ) {
     for (int j = 0; j < mHGenPhotonComp[i].size(); j++)
@@ -85,6 +94,10 @@ inline Process::~Process()
   for (int i = 0; i < mHGenLeptonComp_2D.size(); i ++ ) {
     for (int j = 0; j < mHGenLeptonComp_2D.size(); j++)
       delete mHGenLeptonComp_2D[i][j];
+  }
+  for (int i = 0; i < mHRecoLeptonComp_2D.size(); i ++ ) {
+    for (int j = 0; j < mHRecoLeptonComp_2D.size(); j++)
+      delete mHRecoLeptonComp_2D[i][j];
   }
   for (int i = 0; i < mHGenPhotonComp_2D.size(); i ++ ) {
     for (int j = 0; j < mHGenPhotonComp_2D.size(); j++)
@@ -113,6 +126,7 @@ inline Process::Process(TFile* f, TString name)
   f->cd();
   mName = name;
   mGenLepton = true;
+  mRecoLepton = true;
   mGenPhoton = true;
   mGenPhotonDetail = true;
   mPhotonLocations = true; 
@@ -131,6 +145,15 @@ inline void Process::add_histogram(TString name, int nBins, double xLow, double 
       vTemp[i]->Sumw2();
     }       
     mHGenLeptonComp.push_back(vTemp);
+  }
+
+  if (mRecoLepton) {
+    vector<TH1D*> vTemp;
+    for (int i = 0; i < nRecoLeptonCats; i++) {
+      vTemp.push_back(new TH1D(name + "_" + mName + "RecoLepton_" + to_string(i), "", nBins, xLow, xHigh));
+      vTemp[i]->Sumw2();
+    }
+    mHRecoLeptonComp.push_back(vTemp);
   }
 
   if (mGenPhoton) {
@@ -184,6 +207,15 @@ inline void Process::add_2D_histogram(TString name, int nBinsX, double xLow, dou
       vTemp[i]->Sumw2();
     }
     mHGenLeptonComp_2D.push_back(vTemp);
+  }
+
+  if (mRecoLepton) {
+    vector<TH2D*> vTemp;
+    for (int i = 0; i < nRecoLeptonCats; i++) {
+      vTemp.push_back(new TH2D(name + "_" + mName + "RecoLepton_" + to_string(i), "", nBinsX, xLow, xHigh, nBinsY, yLow, yHigh));
+      vTemp[i]->Sumw2();
+    }
+    mHRecoLeptonComp_2D.push_back(vTemp);
   }
 
   if (mGenPhoton) {
@@ -253,9 +285,12 @@ inline void Process::fill_histogram(TString name, double value, double weight, v
   int genPhotonDetailId = vId.size() > 2 ? vId[2] : -1;
   int photonLocationId = vId.size() > 3 ? vId[3]: -1;
   int mvaCategoryId = vId.size() > 4 ? vId[4]: -1;
+  int recoLeptonId = vId.size() > 5 ? vId[5]: -1;
 
   if (genLeptonId >= 0)
     mHGenLeptonComp[idx][genLeptonId]->Fill(value, weight);
+  if (recoLeptonId >= 0)
+    mHRecoLeptonComp[idx][recoLeptonId]->Fill(value, weight);
   if (genPhotonId >= 0)
     mHGenPhotonComp[idx][genPhotonId]->Fill(value, weight);
   if (genPhotonDetailId >= 0)
@@ -276,9 +311,12 @@ inline void Process::fill_2D_histogram(TString name, double valueX, double value
   int genPhotonDetailId = vId.size() > 2 ? vId[2] : -1;
   int photonLocationId = vId.size() > 3 ? vId[3]: -1;
   int mvaCategoryId = vId.size() > 4 ? vId[4]: -1;
+  int recoLeptonId = vId.size() > 5 ? vId[5]: -1;
 
   if (genLeptonId >= 0)
     mHGenLeptonComp_2D[idx][genLeptonId]->Fill(valueX, valueY, weight);
+  if (recoLeptonId >= 0)
+    mHRecoLeptonComp_2D[idx][recoLeptonId]->Fill(valueX, valueY, weight);
   if (genPhotonId >= 0)
     mHGenPhotonComp_2D[idx][genPhotonId]->Fill(valueX, valueY, weight);
   if (genPhotonDetailId >= 0)

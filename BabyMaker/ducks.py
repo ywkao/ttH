@@ -13,6 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--tag", help = "tag to identify this set of babies", type=str)
 parser.add_argument("--data_only", help = "run on data only", action="store_true")
+parser.add_argument("--old_2017", action="store_true")
 parser.add_argument("--soft_rerun", help = "don't remake tarball", action="store_true")
 args = parser.parse_args()
 
@@ -23,6 +24,8 @@ hadoop_path = "ttH"
 
 cmssw_ver = "CMSSW_10_2_9"
 base_path = "/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII"
+if args.old_2017:
+  base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017"
 
 if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "*")
@@ -58,6 +61,8 @@ for sample in samples:
     datasets[name]["fpo"] = 1
   elif "DiPhoton" in name:
     datasets[name]["fpo"] = 5
+  elif "EGamma" in name and dataset[name]["isData"]:
+    datasets[name]["fpo"] = 250
   else:
     datasets[name]["fpo"] = 100
 
@@ -90,12 +95,13 @@ while True:
     for dataset, info in datasets.iteritems():
       if args.data_only and not info["isData"]:
         continue
-      if "Run2016E" not in dataset:
+      if not ("Run2016" in dataset or "Run2017" in dataset or "Run2018" in dataset): 
         continue
       print "Submitting jobs for: ", dataset
       #time.sleep(15)
       sample = DirectorySample( dataset = dataset, location = info["input_loc"])
       files = [f.name for f in sample.get_files()]
+      print len(files)
       task = CondorTask(
 	sample = sample,
 	open_dataset = False,

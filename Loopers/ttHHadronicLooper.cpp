@@ -33,7 +33,12 @@ int main(int argc, char* argv[]) {
     cout << "Not scaling normalization of QCD samples" << endl;
 
   TChain *ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 
-  if (year == "All") {
+  if (year == "RunII") {
+    //add_samples(ch, "2016_RunII");
+    add_samples(ch, "2017_RunII");
+    //add_samples(ch, "2018_RunII"); 
+  }
+  else if (year == "All") {
     add_samples(ch, "2016");
     add_samples(ch, "2017");
   }
