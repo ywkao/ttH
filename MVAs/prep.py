@@ -99,7 +99,7 @@ dnn_predictions = []
 
 if do_dnn:
   print "Calculating dnn scores"
-  dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_", "top_tag_score_"]
+  dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
   i = 0
   for model in dnn_models:
     dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = [features_data[feat] for feat in dnn_features], objects = features_data["objects_"])
