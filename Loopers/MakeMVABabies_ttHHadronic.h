@@ -73,6 +73,10 @@ class BabyMaker {
     float	ht_;
 
     float       top_tag_score_;
+    float       top_tag_mass_;
+    float       top_tag_pt_;
+    float       top_tag_eta_;
+    float       top_tag_phi_;
 
     float	jet1_pt_;
     float       jet1_eta_;
@@ -160,6 +164,10 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("ht_"    		, &ht_       	);
 
   BabyTree_->Branch("top_tag_score_"               , &top_tag_score_          );
+  BabyTree_->Branch("top_tag_mass_"               , &top_tag_mass_          );
+  BabyTree_->Branch("top_tag_pt_"               , &top_tag_pt_          );
+  BabyTree_->Branch("top_tag_eta_"               , &top_tag_eta_          );
+  BabyTree_->Branch("top_tag_phi_"               , &top_tag_phi_          );
 
   BabyTree_->Branch("jet1_pt_"            , &jet1_pt_   );
   BabyTree_->Branch("jet1_eta_"            , &jet1_eta_ );

@@ -409,6 +409,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
       if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
 
+
+      if (currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW"))		continue; // FIXME: just skipping temporarily since there was an issue with the THQ/THW babies and these should not matter for BDT training
+
       if (tag == "ttHHadronic_ttPP") {
         if (!isSignal && !isData) {
 	  if (!(currentFileTitle.Contains("TTGG")))
@@ -632,6 +635,18 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       // Variable definitions
       top_tag_score_ = topTag_score();
+      if (top_tag_score_ > -1) {
+	top_tag_mass_ = log(topTag_topMass());
+	top_tag_pt_ = log(topTag_topPt());
+	top_tag_eta_ = topTag_topEta();
+	top_tag_phi_ = topTag_topPhi();
+      }
+      else {
+	top_tag_mass_ = -1;
+        top_tag_pt_ = -1;
+        top_tag_eta_ = -1;
+        top_tag_phi_ = -1;
+      }
 
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;

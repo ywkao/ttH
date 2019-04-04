@@ -27,7 +27,7 @@ tree = f.Get("t")
 # load tree to array
 #feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R"]
 feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_"]))
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "top_tag_mass_", "top_tag_pt_", "top_tag_eta_", "top_tag_phi_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_"]))
 
 rand_branch = "rand_"
 data_label = 2
@@ -88,7 +88,7 @@ def create_array(features_list, names):
   return numpy.transpose(numpy.array(arr))
 
 if args.do_top_tag:
-  feature_names += ["top_tag_score_"]
+  feature_names += ["top_tag_score_", "top_tag_mass_", "top_tag_pt_", "top_tag_eta_", "top_tag_phi_"]
 global_features = create_array(features, feature_names)
 global_features_validation = create_array(features_validation, feature_names)
 global_features_data = create_array(features_data, feature_names)
