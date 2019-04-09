@@ -3,12 +3,17 @@ import numpy
 import glob
 import json
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--runII", help = "Use Run II legacy samples", action = "store_true")
+parser.add_argument("--old_weights", action = "store_true")
+args = parser.parse_args()
 
 scale1fb = {}
 
-old_weights = False
-
-if old_weights:
+if args.runII:
+  samples_file = "nEvents_fromDBS/sum_of_weights_runII.json"
+elif args.old_weights:
   samples_file = "nEvents_fromDBS/n_events.json"
 else:
   samples_file = "nEvents_fromDBS/sum_of_weights.json"
@@ -53,7 +58,7 @@ for sample, info in samples.iteritems():
 years = {	
 		"2016" : "RunIISummer16MiniAOD",
 		"2017" : "RunIIFall17MiniAOD",
-		"2018" : "blahblahblah",
+		"2018" : "RunIIAutumn18MiniAOD",
 	}
 for year, year_info in years.iteritems():
   for sample, sample_info in scale1fb.iteritems():
@@ -66,14 +71,14 @@ for year, year_info in years.iteritems():
       if "BSandPUSummer16" in production: #skip this one, not sure what it is
 	production_info["comment"] = "unused in scale1fb calc"
 	continue
-      if old_weights:
+      if args.old_weights:
         n_events_pos += production_info["n_events_pos"]
 	n_events_neg += production_info["n_events_neg"]
       else: 
         sum_of_weights += production_info["sum_of_weights"]
       #n_events_pos += production_info["n_events_pos"]
       #n_events_neg += production_info["n_events_neg"]
-    if old_weights:
+    if args.old_weights:
       if n_events_pos > 0:
         sample_info["scale1fb_" + year] = float(sample_info["xs"] * sample_info["br"] * sample_info["filter_eff"] * 1000) / float(n_events_pos - n_events_neg)
     else:
@@ -85,8 +90,8 @@ for year, year_info in years.iteritems():
 with open("scale1fb.json", "w") as f_out:
   json.dump(scale1fb, f_out, indent=4, sort_keys=True)
 
-for year in ["2016", "2017"]:
-  with open("scale1fb_%s.h" % year, "w") as fout:
+for year in ["2016", "2017", "2018"]:
+  with open("scale1fb_%s%s.h" % (year, "_RunII" if args.runII else ""), "w") as fout:
     fout.write("double scale1fb_%s(TString currentFileTitle) {\n" % year)
     fout.write("  std::map<TString, double> m = {\n")
     for key, info in scale1fb.iteritems():
