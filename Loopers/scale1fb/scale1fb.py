@@ -56,8 +56,8 @@ for sample, info in samples.iteritems():
   scale1fb[process]["productions"][production] = info
 
 years = {	
-		"2016" : "RunIISummer16MiniAOD",
-		"2017" : "RunIIFall17MiniAOD",
+		"2016" : "RunIISummer16MiniAODv3",
+		"2017" : "RunIIFall17MiniAODv2",
 		"2018" : "RunIIAutumn18MiniAOD",
 	}
 for year, year_info in years.iteritems():
@@ -68,7 +68,7 @@ for year, year_info in years.iteritems():
     for production, production_info in sample_info["productions"].iteritems():
       if year_info not in production:
         continue
-      if "BSandPUSummer16" in production: #skip this one, not sure what it is
+      if "BSandPUSummer16" in production and "ttHJetToGG" in sample: #skip this one, not sure what it is
 	production_info["comment"] = "unused in scale1fb calc"
 	continue
       if args.old_weights:
@@ -92,7 +92,7 @@ with open("scale1fb.json", "w") as f_out:
 
 for year in ["2016", "2017", "2018"]:
   with open("scale1fb_%s%s.h" % (year, "_RunII" if args.runII else ""), "w") as fout:
-    fout.write("double scale1fb_%s(TString currentFileTitle) {\n" % year)
+    fout.write("double scale1fb_%s%s(TString currentFileTitle) {\n" % (year, "_RunII" if args.runII else ""))
     fout.write("  std::map<TString, double> m = {\n")
     for key, info in scale1fb.iteritems():
       #for process in info["productions"].keys():

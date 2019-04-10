@@ -10,9 +10,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   bool evaluate_mva = xml_file != "none";
 
-  bool combine_gjets_samples = tag != "ttHHadronic_GJet_Reweight_Preselection"; 
+  bool combine_gjets_samples = false; //tag != "ttHHadronic_GJet_Reweight_Preselection"; 
   //bool scale_gjets_normalization = !(tag.Contains("GJet_Reweight_Preselection"));
-  bool scale_gjets_normalization = true;
+  bool scale_gjets_normalization = false; //true;
 
   // Make MVA Optimization Baby
   /*
@@ -214,8 +214,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (categorize_signal_sample(currentFileTitle) != 0)
         continue;
     }
-
     TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
+
+    if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
 
     // Set json file
     set_json(mYear);
@@ -253,6 +254,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Fill mva baby before any selections
       int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
       int processId = categorize_process(currentFileTitle, genPhotonId);
+      if (processId == 17)
+        processId = 3; // use Madgraph GJets instead of Pythia
 
       int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
@@ -287,8 +290,18 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vector<std::pair<int, double>> btag_scores_sorted;
       jets = make_jets(btag_scores, year);
       btag_scores_sorted = sortVector(btag_scores);
-      
-      if (!isData) {
+
+      if (year == "RunII" && !isData) {
+        double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
+        if (mYear == "2016")
+          evt_weight *= scale1fb * lumi_2016 * weight();
+        else if (mYear == "2017")
+          evt_weight *= scale1fb * lumi_2017 * weight();
+        else if (mYear == "2018")
+          evt_weight *= scale1fb * lumi_2018 * weight();
+      }     
+ 
+      else if (!isData) {
         if (year == "2018") // temporary hack to use 2017 mc with 2018 data
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
         else if (mYear == "2016")
@@ -401,12 +414,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Gamma + jets reweighting
       double gjet_mva_value = -999;	
 
-      njets_ = n_jets();
-      jet1_pt_  = jet1_pt() > 0 ? jet1_pt() : -999;	
-      ht_ = get_ht(jets);
-
       gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" )); 
 
+      /* turn this off for now
       if (combine_gjets_samples) {
 	if (processId == 17) 
 	  processId = 3;
@@ -425,25 +435,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	  continue; 
 	}
       }
+      */
 
       if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) {
         continue; //some pu weights are nan/inf and this causes problems for histos 
       }
 
 
-      //if (evaluate_mva) 
-      //  baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
-
-      // Selection
-
-      // Skipping events/samples
-      //if (is_low_stats_process(currentFileTitle))       continue;
-      //if (tag != "GJet_Reweight_Preselection") {
-      //  if (process_id_ == 17)                          continue; // skip MadGraph G+Jets
-      //}
-      if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
-      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
-      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
+      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
@@ -452,8 +451,19 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (leadIDMVA() < -0.9)                 continue;
         if (subleadIDMVA() < -0.9)              continue;
+	if (minIDMVA_ < -0.7)		continue;
 	if (lead_ptoM() < 0.5)		continue;
 	if (sublead_ptoM() < 0.25)	continue;
+      }
+
+      else if (tag == "ttHHadronicVeryLoose") {
+	if (mass() < 100)                continue;
+        if (n_jets() < 3)               continue;
+        if (nb_loose() < 1)             continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < -0.9)                 continue;
+        if (subleadIDMVA() < -0.9)              continue;
+        if (minIDMVA_ < -0.7)           continue;
       }
 
       else if (tag == "ttHHadronicLoose_impute") {

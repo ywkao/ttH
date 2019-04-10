@@ -95,10 +95,9 @@ while True:
     for dataset, info in datasets.iteritems():
       if args.data_only and not info["isData"]:
         continue
-      if not ("Run2016" in dataset or "Run2017" in dataset or "Run2018" in dataset): 
-        continue
+      #if not ("Run2016" in dataset or "Run2017" in dataset or "Run2018" in dataset): 
+      #  continue
       print "Submitting jobs for: ", dataset
-      #time.sleep(15)
       sample = DirectorySample( dataset = dataset, location = info["input_loc"])
       files = [f.name for f in sample.get_files()]
       print len(files)

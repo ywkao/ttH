@@ -1,4 +1,4 @@
-double scale1fb_2016(TString currentFileTitle) {
+double scale1fb_2016_RunII(TString currentFileTitle) {
   std::map<TString, double> m = {
         {"TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8", 0.0006896736},
         {"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8", 0.0000000000},
@@ -16,7 +16,7 @@ double scale1fb_2016(TString currentFileTitle) {
         {"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8", 0.0000000000},
         {"WZ_TuneCUETP8M1_13TeV-pythia8", 0.0057084665},
         {"ttHJetToGG_M70_13TeV_amcatnloFXFX_madspin_pythia8", 0.0000000000},
-        {"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8", 0.0000000000},
+        {"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8", 0.0000028461},
         {"ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4", 0.0010080401},
         {"THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2", 0.0005049842},
         {"DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa", 0.0030298354},
@@ -54,7 +54,7 @@ double scale1fb_2016(TString currentFileTitle) {
         {"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_DownPS", 0.0000023061},
         {"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8", 0.0000344562},
         {"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_UpPS", 0.0000016394},
-        {"GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8", 0.0000000000},
+        {"GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8", 0.0000023151},
         {"GJets_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8", 0.0000000000},
         {"ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1", 0.0051708516},
         {"GJets_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8", 0.0000000000},

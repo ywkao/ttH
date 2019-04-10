@@ -149,12 +149,12 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("lep_pt_", &lep_pt_);
     mva->AddVariable("lep_eta_", &lep_eta_);
 
-    mva->AddVariable("n_lep_loose_", &n_lep_loose_);
-    mva->AddVariable("n_lep_medium_", &n_lep_medium_);
+    //mva->AddVariable("n_lep_loose_", &n_lep_loose_);
+    //mva->AddVariable("n_lep_medium_", &n_lep_medium_);
     mva->AddVariable("n_lep_tight_", &n_lep_tight_);
 
-    mva->AddVariable("muon1_mini_iso_", &muon1_mini_iso_);
-    mva->AddVariable("muon2_mini_iso_", &muon2_mini_iso_);
+    //mva->AddVariable("muon1_mini_iso_", &muon1_mini_iso_);
+    //mva->AddVariable("muon2_mini_iso_", &muon2_mini_iso_);
 
     mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }
@@ -186,6 +186,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (categorize_signal_sample(currentFileTitle) != 0)
         continue;
     }
+
+    if (is_wrong_tt_jets_sample(currentFileTitle, "Leptonic"))                        continue;
 
     // Set json file
     set_json(mYear);
@@ -229,7 +231,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
       int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
 
-      double evt_weight = 1.;
+      float evt_weight = 1.;
      
 	/* 
       if (!no_weights && !isData) {
@@ -243,8 +245,17 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
       } 
 	*/
-	
-      if (!isData) {
+      if (year == "RunII" && !isData) {
+	double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
+	if (mYear == "2016")
+	  evt_weight *= scale1fb * lumi_2016 * weight();
+	else if (mYear == "2017")
+	  evt_weight *= scale1fb * lumi_2017 * weight();
+	else if (mYear == "2018")
+          evt_weight *= scale1fb * lumi_2018 * weight();
+      }	
+
+      else if (!isData) {
         if (year == "2018") // temporary hack to use 2017 mc with 2018 data
           evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
         else if (mYear == "2016")
@@ -290,17 +301,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       int recoLeptonId = categorize_reco_leptons(electrons.size(), muons.size());
 
-      // Selection
-     
-      // Skipping events/samples
-      //if (is_low_stats_process(currentFileTitle))       continue;
-      //if (tag != "GJet_Reweight_Preselection") {
-      //  if (process_id_ == 17)                          continue; // skip MadGraph G+Jets
-      //}
-      if (is_wrong_tt_jets_sample(currentFileTitle, "Leptonic"))                        continue;
-      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
-      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
- 
+      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))	continue;
+
       double mva_value = -999;
 
       lep_pt_ = leps[0].Pt();
@@ -317,6 +319,72 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+
+      // Scale MC by N_leps (tight)
+      bool scale_nleps = false;
+      std::map<int, double> lep_scale = {
+	{0, 2.3525},
+	{1, 1.25451},
+	{2, 0.791874}
+      };
+      if (scale_nleps && !isData && !isSignal) 
+	evt_weight *= lep_scale[n_lep_tight_]; 
+
+      // Scale ttX MC by results of templated fit
+      bool scale_ttX = false;
+      std::map<int, double> ttX_scale = {
+	{5, 0.7107},
+	{6, 1.7715},
+	{9, 2.0501}
+      };
+
+      if (scale_ttX && (processId == 5 || processId == 6 || processId == 9))
+	evt_weight *= ttX_scale[processId];
+
+      if (tag == "ttHLeptonicLoose_impute" || tag == "ttHLeptonicLoose_impute2") {
+	
+	if (processId == 3 || processId == 4 || processId == 17) continue;
+	bool scale = true;
+	if (tag == "ttHLeptonicLoose_impute") { // skip V+gamma, DY, tt+jets, tt+gamma+jets
+	  if (processId == 2 && scale) {
+	    if (nElecTight() + nMuonTight() == 0)
+	      evt_weight *= 1.74339;
+	    if (nElecTight() + nMuonTight() >= 1)
+	      evt_weight *= 3.517525;
+	  }
+	  if (processId == 1 || processId == 6 || processId == 7 || processId == 9 || processId == 8)
+	    continue;
+	}
+	else if (tag == "ttHLeptonicLoose_impute2") {
+	  if (processId == 2 && scale) {
+	    evt_weight *= 1.223;
+	  }
+	}
+        if (maxIDMVA_ < -0.7)                                    continue;
+        if (minIDMVA_ < -0.7) {
+          if (!isData)
+            continue;
+	  if (tag == "ttHLeptonicLoose_impute2") {
+	    if (n_lep_medium_ >= 1)		continue;
+	  }
+	  //n_lep_medium_ = impute_leps_from_fakePDF(lep_mediumID_shape, evt_weight);
+	  n_lep_tight_  = impute_leps_from_fakePDF();
+	  minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight);
+	  processId = 18;
+	  if (processId == 18 && scale) {
+	    if (tag == "ttHLeptonicLoose_impute") {
+	      if (nElecTight() + nMuonTight() == 0)
+		evt_weight *= 1.314106; 
+	      if (nElecTight() + nMuonTight() >= 1)
+		evt_weight *= 1.2313558; 
+	    }
+	    else if (tag == "ttHLeptonicLoose_impute2") {
+	      evt_weight *= 1.8657;
+	    }
+	  }
+        }
+      }
+
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
@@ -371,10 +439,25 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
 	if (n_jets() < 2)	continue;
-	if (nb_loose() < 1)		continue;
+	//if (nb_loose() < 1)		continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (leadIDMVA() < -0.9)         continue;
         if (subleadIDMVA() < -0.9)         continue;
+	if (minIDMVA_ < -0.7)   continue;
+	if (nElecMedium() + nMuonMedium() < 1)	continue;
+	if (lead_ptoM() < 0.33)	continue;
+	if (sublead_ptoM() < 0.25)	continue;
+      }
+
+      else if (tag == "ttHLeptonicLoose_LoosePhotons") {
+	if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        //if (nb_loose() < 1)           continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
+        if (minIDMVA_ < -0.7)   continue;
+        if (nElecMedium() + nMuonMedium() < 1)  continue;
       }
 
       else if (tag == "ttHLeptonic_noFakes") {
@@ -394,15 +477,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       else if (tag == "ttHLeptonicVeryLoose") {
 	if (mass() < 100)        continue;
-        if (n_jets() < 2)       continue;
+        if (n_jets() < 1)       continue;
 	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (leadIDMVA() < -0.9)         continue;
         if (subleadIDMVA() < -0.9)         continue;
-	if (nElecLoose() + nMuonLoose() < 1)	continue;
+	if (minIDMVA_ < -0.7)   continue;
+	if (nElecMedium() + nMuonMedium() < 1)  continue;
       }
 
       else if (tag == "ttHLeptonicVeryLoose_MediumLepID") {
-        if (mass() < 200)        continue;
+        if (mass() < 100)        continue;
         if (n_jets() < 2)       continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
         if (leadIDMVA() < -0.9)         continue;
@@ -419,6 +503,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (leadIDMVA() < -0.9)         continue;
         if (subleadIDMVA() < -0.9)         continue;
         if (nElecTight() + nMuonTight() < 1)    continue;
+      }
+
+      else if (tag == "ttHLeptonicLoose_impute") {
+	if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
+        if (minIDMVA_ < -0.7)   continue;
+        if (nMuonMedium() + nElecMedium() < 1)  continue;
       }
 
       else if (tag == "ttHLeptonicLoose_impute_presel") {
@@ -439,6 +533,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (maxIDMVA_ < -0.7)   continue;
 	if (minIDMVA_ >= -0.7)	continue;
 	if (nMuonMedium() + nElecMedium() < 1)	continue;
+      }
+
+      else if (tag == "ttHLeptonicLoose_impute2") {
+        if (mass() < 100)        continue;
+        if (n_jets() < 2)       continue;
+        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+        if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
+        if (minIDMVA_ < -0.7)   continue;
+        if (processId != 18 && (nMuonMedium() + nElecMedium() < 1))  continue;
       }
 
       else if (tag == "ttHLeptonicLoose_impute2_presel") {
@@ -467,6 +571,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	if (mass() < 100)        continue;
         if (n_jets() < 2)       continue;
         //if (nb_loose() < 1)             continue;
+	if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)         continue;
 	if (nElecMedium() + nMuonMedium() < 1)	continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
 	if (mva_value < 0.86978543)     continue; // about 5 ttH events in mass window 
@@ -528,6 +634,19 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (leadPixelSeed() || subleadPixelSeed())      continue;
         if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
       } 
+
+      else if (tag == "ttHLeptonic_ttbarCR_v3") {
+	if (mass() < 100)        continue;
+	if (nElecTight() + nMuonTight() < 1)  continue;
+	if (leadIDMVA() < -0.9)         continue;
+        if (subleadIDMVA() < -0.9)      continue;
+	//if (n_jets() < 2)		continue;
+	if (nb_medium() < 1)		continue;
+	//if (nb_loose()  < 2)		continue;
+	if (leps[0].Pt() < 15)		continue;
+	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
+	if (leadPixelSeed() || subleadPixelSeed())      continue;
+      }
 
       else if (tag == "ttHLeptonic_2017_SR_like") {
 	if (mass() < 100)		continue;
@@ -906,9 +1025,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (muon2_pt() > 0)
         vProcess[processId]->fill_histogram("hMuonMiniIsolation", muonSubleadIso() / muon2_pt(), evt_weight, vId); 
 
-      vProcess[processId]->fill_histogram("hNLepLoose", nMuonLoose() + nElecLoose(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hNLepMedium", nMuonMedium() + nElecMedium(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hNLepTight", nMuonTight() + nElecTight(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNLepLoose", n_lep_loose_, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNLepMedium", n_lep_medium_, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hNLepTight", n_lep_tight_, evt_weight, vId);
 
       // Leading Photon
       vProcess[processId]->fill_histogram("hPhotonLeadPt", leadPt(), evt_weight, vId);
@@ -948,8 +1067,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         vProcess[processId]->fill_histogram("hPhotonDeltaRGen", sublead_closest_gen_dR(), evt_weight, vId);
       }
 
-      double maxID = leadIDMVA() >= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      double minID = leadIDMVA() >= subleadIDMVA() ? subleadIDMVA() : leadIDMVA();
+      double maxID = maxIDMVA_;
+      double minID = minIDMVA_;
+      //double maxID = leadIDMVA() >= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      //double minID = leadIDMVA() >= subleadIDMVA() ? subleadIDMVA() : leadIDMVA();
 
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, vId);
@@ -957,11 +1078,23 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA_entries", minID, 1, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse", minID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse", maxID, evt_weight, vId);
+      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse_entries", minID, 1, vId);
+      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse_entries", maxID, 1, vId);
       if (nb_medium() == 0) {
 	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse_0b", minID, evt_weight, vId);
         vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse_0b", maxID, evt_weight, vId);
       }
       vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, vId);
+
+      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets", maxID, n_jets(), evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets", minID, n_jets(), evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets_entries", maxID, n_jets(), 1, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets_entries", minID, n_jets(), 1, vId);
+
+      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NTightLeps", maxID, nMuonTight() + nElecTight(), evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NTightLeps", minID, nMuonTight() + nElecTight(), evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NTightLeps_entries", maxID, nMuonTight() + nElecTight(), 1, vId);
+      vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NTightLeps_entries", minID, nMuonTight() + nElecTight(), 1, vId);
 
       vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_MinIDMVA", maxID, minID, evt_weight, vId);
      

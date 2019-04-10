@@ -1,4 +1,4 @@
-double scale1fb_2017(TString currentFileTitle) {
+double scale1fb_2017_RunII(TString currentFileTitle) {
   std::map<TString, double> m = {
         {"TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8", 0.0000000000},
         {"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8", 0.0005012288},

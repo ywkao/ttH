@@ -45,9 +45,11 @@ feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_de
 
 to_remove = []
 if args.channel == "Leptonic":
-  feature_names += ["lep_pt_", "lep_eta_", "n_lep_loose_", "n_lep_medium_", "n_lep_tight_", "muon1_mini_iso_", "muon2_mini_iso_"]
+  feature_names += ["lep_pt_", "lep_eta_", "n_lep_tight_"]
+  #feature_names += ["lep_pt_", "lep_eta_", "n_lep_loose_", "n_lep_medium_", "n_lep_tight_", "muon1_mini_iso_", "muon2_mini_iso_"]
   if args.no_lepton_id:
-    to_remove += ["n_lep_loose_", "n_lep_medium_", "n_lep_tight_", "muon1_mini_iso_", "muon2_mini_iso_"] 
+    to_remove += ["n_lep_tight_"]
+    #to_remove += ["n_lep_loose_", "n_lep_medium_", "n_lep_tight_", "muon1_mini_iso_", "muon2_mini_iso_"] 
   to_remove += ["jet4_pt_", "jet4_eta_", "jet4_btag_"]
 
 if args.sideband: # remove b-tagging features
@@ -65,7 +67,7 @@ if args.no_psv:
 if args.channel == "Hadronic":
   branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_"]))
 elif args.channel == "Leptonic":
-  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_"]))
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_"]))
 
 # grab features
 train_frac = args.train_frac
@@ -100,6 +102,8 @@ dnn_predictions = []
 if do_dnn:
   print "Calculating dnn scores"
   dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
+  if args.channel == "Leptonic":
+    dnn_features += ["n_lep_tight_"]
   i = 0
   for model in dnn_models:
     dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = [features_data[feat] for feat in dnn_features], objects = features_data["objects_"])

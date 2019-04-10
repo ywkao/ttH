@@ -54,6 +54,13 @@ class BabyMaker {
     float       tth_qcdX_mva_;
     float       tth_ttX_mva_;
     float       tth_ttPP_mva_;
+    float       tth_std_mva_;
+    float       tth_dipho_mva_;
+
+    // DNN Business
+    vector<vector<float>>  jets_;
+    vector<vector<float>>  objects_;
+    vector<vector<float>>  leptons_;
 
     // Variable declarations
     float       maxIDMVA_;
@@ -115,6 +122,7 @@ class BabyMaker {
     float       dipho_pt_;
     float       dipho_pt_over_mass_;
     float       met_;
+    float	log_met_;
     float       met_phi_; 
 
     float	helicity_angle_;
@@ -144,9 +152,15 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("tth_qcdX_mva_"             , &tth_qcdX_mva_        );
   BabyTree_->Branch("tth_ttX_mva_"             , &tth_ttX_mva_        );
   BabyTree_->Branch("tth_ttPP_mva_"             , &tth_ttPP_mva_        );
+  BabyTree_->Branch("tth_dipho_mva_"             , &tth_dipho_mva_        );
+  BabyTree_->Branch("tth_std_mva_"             , &tth_std_mva_        );
 
   BabyTree_->Branch("lead_sigmaEtoE_"             , &lead_sigmaEtoE_        );
   BabyTree_->Branch("sublead_sigmaEtoE_"             , &sublead_sigmaEtoE_        );
+
+  BabyTree_->Branch("objects_"             , &objects_        );
+  BabyTree_->Branch("jets_"             , &jets_        );
+  BabyTree_->Branch("leptons_"             , &leptons_        );
 
   // Variable branches
   BabyTree_->Branch("maxIDMVA_" ,&maxIDMVA_);
@@ -207,6 +221,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("dipho_pt_"           , &dipho_pt_      );
   BabyTree_->Branch("dipho_pt_over_mass_"           , &dipho_pt_over_mass_      );
   BabyTree_->Branch("met_"           , &met_      );
+  BabyTree_->Branch("log_met_"           , &log_met_      );
   BabyTree_->Branch("met_phi_"           , &met_phi_      );
 
   BabyTree_->Branch("helicity_angle_"           , &helicity_angle_      );

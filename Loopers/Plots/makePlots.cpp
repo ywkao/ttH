@@ -107,7 +107,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   TH1D* hData_ref;
   if (file_ref != nullptr) {
     hData_ref = (TH1D*)file_ref->Get(hist_name + "_Data" + mva_category);
-    hData_ref->Scale(45.966/41.5); 
+    //hData_ref->Scale(45.966/41.5); 
   }
 
   TH1D* hSig_TTH = (TH1D*)file->Get(hist_name + "_ttH" + mva_category);
@@ -126,7 +126,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   if (type == "std" || type == "std_linear") {
     //if (year != "All") {
-    vLegendLabels = {year + " Data", "ttH (M125)"};
+    if (file_ref != nullptr)
+      vLegendLabels = {"2017 Data (New)", "ttH (M125)", "2017 Data (Old)"};
+    else 
+      vLegendLabels = {year + " Data", "ttH (M125)"};
+    
       //vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
     //}
 
@@ -319,12 +323,24 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
 
   //TString output = output_name;
-  double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9))); 
+  std::map<TString, double> lumi_map = {
+	{"2016", 35.9},
+	{"2017", 41.5},
+	{"2018", 59.76},
+	{"RunII", 137.16}
+  };
+
+  double lumi = lumi_map[year];
+
+  //double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9))); 
+
   if (type == "std" || type == "std_linear") {
     if (file_ref == nullptr)
       c = new Comparison(c1, {hData}, hSig, hBkg);
-    else
-      c = new Comparison(c1, {hData, hData_ref}, hSig, hBkg);
+    else {
+      c = new Comparison(c1, {hData}, hSig, {hData_ref});
+      //c = new Comparison(c1, {hData, hData_ref}, hSig, hBkg);
+    }
     c->set_data_drawOpt("E");
     c->set_rat_label("#frac{Data}{MC}");
     c->set_y_label("Events");
@@ -515,17 +531,19 @@ int main(int argc, char* argv[])
   bool impute_gjets = file_path.Contains("impute") && !(file_path.Contains("presel") || file_path.Contains("sideband")); 
   TString year = file_path.Contains("All") ? "All" : file_path.Contains("2018") ? "2018" : ((file_path.Contains("2017") ? "2017" : "2016"));
   if (file_path.Contains("RunII"))
-    year = "2017";
+    year = "RunII";
+
+  cout << "Year: " << year << endl;
 
   TString tag = file_path.Contains("Hadronic") ? "Hadronic" : "Leptonic";
 
   TString info = argv[3]; 
   vector<TString> vInfo = {info};
 
-  //TString file_path_ref = argv[3];
-  //TString year_ref = file_path_ref.Contains("All") ? "All" : file_path_ref.Contains("2018") ? "2018" : ((file_path_ref.Contains("2017") ? "2017" : "2016"));
+  TString file_path_ref = argv[4];
+  TString year_ref = file_path_ref.Contains("RunII") ? "2017" : file_path_ref.Contains("2018") ? "2018" : ((file_path_ref.Contains("2017") ? "2017" : "2016"));
 
-  bool loose_mva_cut = argc > 4;
+  bool loose_mva_cut = false; //argc > 4;
   TString mva_ext = loose_mva_cut ? "_looseMVACut" : "";
 
   TFile* f = new TFile(file_path);
@@ -534,8 +552,8 @@ int main(int argc, char* argv[])
 
   TFile* f_ref; 
   f_ref = nullptr;
-  //if (argc > 3) f_ref = new TFile(file_path_ref);
-  //else f_ref = nullptr;
+  if (argc > 4) f_ref = new TFile(file_path_ref);
+  else f_ref = nullptr;
   
   vector<string> vNames = {output};
 
@@ -545,10 +563,17 @@ int main(int argc, char* argv[])
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "WJets"}; 
+    if (year == "RunII")
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};   
     if (year == "2016")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma"};
-    if (year == "2017")
+    if (year == "2017") {
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
+      if (file_path.Contains("impute2"))
+	vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
+      else if (file_path.Contains("impute"))
+	vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TGamma", "TTV", "VV", "tV"};
+    }
     if (year == "All") {
       if (impute_gjets)
         vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "VG", "DY"};

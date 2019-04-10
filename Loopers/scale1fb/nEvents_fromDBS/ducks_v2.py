@@ -10,8 +10,19 @@ import os, sys
 
 import ROOT as r
 
-input_jsons = ["datasets_RunIISummer16.json", "datasets_RunIIFall17.json"] 
-output_json = "sum_of_weights.json"
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--runII", help = "Use Run II legacy samples", action = "store_true")
+args = parser.parse_args()
+
+
+if args.runII:
+  base_path = "/home/users/sjmay/ttH/BabyMaker/CMSSW_10_2_9/src/flashgg/MicroAOD/BatchSubmit/"
+  input_jsons = [base_path + "datasets_RunIISummer16.json", base_path + "datasets_RunIIFall17.json", base_path + "datasets_RunIIAutumn18.json"]
+  output_json = "sum_of_weights_runII.json"
+else:
+  input_jsons = ["datasets_RunIISummer16.json", "datasets_RunIIFall17.json"] 
+  output_json = "sum_of_weights.json"
 
 with open(output_json, "r") as f_in:
   mc_samples = json.load(f_in)
@@ -74,8 +85,8 @@ for input_json in input_jsons:
 for key, dict in mc_samples.iteritems():
   if not dict["sum_of_weights"] <= 0:
     continue
-  if "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1" in key:
-    continue # this sample doesn't work for some reason, but shouldn't matter since we never go below m_gg of ~100
+  #if "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1" in key:
+  #  continue # this sample doesn't work for some reason, but shouldn't matter since we never go below m_gg of ~100
 
   #if dict["n_events_neg"] + dict["n_events_pos"] == dict["n_events_tot"]:
     #print "%s has trustworthy n_events data, skipping\n\n" % key

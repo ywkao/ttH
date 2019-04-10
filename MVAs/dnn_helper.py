@@ -23,7 +23,10 @@ class DNN_Features:
       self.objects = numpy.array(kwargs.get('objects'))
 
     if 'leptons' in kwargs:
-      self.leptons = utils.pad_array(kwargs.get('leptons', []))
+      if not kwargs.get('no_prep'):
+        self.leptons = utils.pad_array(kwargs.get('leptons', []))
+      else:
+	self.leptons = numpy.array(kwargs.get('leptons'))
       self.features = [self.global_features, self.objects, self.leptons]
       self.channel = "Leptonic"
     else:
@@ -64,12 +67,12 @@ class DNN_Helper:
     self.n_global_features = len(self.features_validation.global_features[0])
 
     if self.channel == "Hadronic":
-      self.model = dnn_model.baseline_v1(self.n_objects, self.n_object_features, self.n_global_features, False, False, 150)
+      self.model = dnn_model.baseline_v1(self.n_objects, self.n_object_features, self.n_global_features, False, False, 100)
 
     elif self.channel == "Leptonic":
       self.n_leptons = len(self.features_validation.leptons[0])
       self.n_lepton_features = len(self.features_validation.leptons[0][0])
-      self.model = []
+      self.model = dnn_model.baseline_leptonic_v1(self.n_objects, self.n_object_features, self.n_leptons, self.n_lepton_features, self.n_global_features, False, False, 100)
 
     if self.weights_file:
       self.model.load_weights(self.weights_file)
@@ -126,22 +129,27 @@ class DNN_Helper:
       self.auc["train"].append(auc_train)
       self.auc_unc["train"].append(auc_unc_train)
 
-      return auc_train, auc
+    return auc_train, auc
     
   def train_with_early_stopping(self):
     best_auc = 0.5
     keep_training = True
 
     epochs = 1
+    bad_epochs = 0
     while keep_training:
       auc_train, auc = self.train(epochs, self.batch_size_train)
       if auc > best_auc:
 	best_auc = auc
+	bad_epochs = 0
       else:
-	epochs *= 2
-	self.batch_size_train *= 4
-	if self.batch_size_train > 100000:
-	  keep_training = False
+	if self.batch_size_train * 4 < 100000:
+	  self.batch_size_train *= 4
+	  bad_epochs = 0
+	else:
+	  bad_epochs += 1
+	if bad_epochs >= 3:
+          keep_training = False
     return
 
   def initialize_plot(self):
@@ -157,6 +165,8 @@ class DNN_Helper:
     self.initialize_plot()
     plt.errorbar(x, self.auc["validation"], yerr = self.auc_unc["validation"], label = 'Validation Set', color = 'green')
     plt.errorbar(x, self.auc["train"], yerr = self.auc_unc["train"], label = "Training Set", color = 'red')
+    plt.xlabel("Epoch #")
+    plt.ylabel("AUC")
     plt.legend(loc = 'lower right')
     plt.savefig('learning_curve_%s.pdf' % self.tag)
     plt.clf()
@@ -164,13 +174,15 @@ class DNN_Helper:
   def make_comparison(self, reference):
     fpr_ref, tpr_ref, thresh_ref = metrics.roc_curve(self.features_validation.label, self.features_validation.references[reference], pos_label = 1, sample_weight = self.features_validation.weights)
 
-    numpy.savez("dnn_rocs_%s_%s.npz" % (reference, self.tag), fpr_validation = self.fpr["validation"][-1], tpr_validation = self.tpr["validation"][-1], fpr_train = self.fpr["train"][-1], tpr_train = self.tpr["train"][-1], fpr_ref = fpr_ref, tpr_ref = tpr_ref) 
+    numpy.savez("dnn_rocs_%s_%s.npz" % (reference.replace(" ", "_"), self.tag), fpr_validation = self.fpr["validation"][-1], tpr_validation = self.tpr["validation"][-1], fpr_train = self.fpr["train"][-1], tpr_train = self.tpr["train"][-1], fpr_ref = fpr_ref, tpr_ref = tpr_ref) 
 
     self.initialize_plot()
     plt.plot(self.fpr["validation"][-1], self.tpr["validation"][-1], color = 'darkred', lw = 2, label = 'DNN [AUC = %.3f]' % self.auc["validation"][-1])
     plt.plot(fpr_ref, tpr_ref, color = 'blue', lw = 2, label = '%s [AUC = %.3f]' % (reference, metrics.auc(fpr_ref, tpr_ref, reorder = True)))
+    plt.xlabel("False Positive Rate (bkg. eff.)")
+    plt.ylabel("True Positive Rate (sig. eff.)")
     plt.legend(loc = 'lower right')
-    plt.savefig('dnn_roc_%s_%s.pdf' % (reference, self.tag))
+    plt.savefig('dnn_roc_%s_%s.pdf' % (reference.replace(" ", "_"), self.tag))
 
   def do_diagnostics(self):
     self.make_learning_curve()

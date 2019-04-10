@@ -22,7 +22,7 @@ def auc_and_unc(label, pred, sample_weight, n_bootstraps):
     bootstrap_aucs[i] = bootstrap_auc
 
   unc = numpy.std(bootstrap_aucs)
-  print bootstrap_aucs
+  #print bootstrap_aucs
   return auc, unc
 
 def pad_array(array):
@@ -30,7 +30,7 @@ def pad_array(array):
     nData = len(array)
     nFeatures = len(array[0][0])
     y = numpy.ones((nData, max_objects, nFeatures))
-    y *= -999
+    y *= -9
     for i in range(nData):
       for j in range(min(max_objects, len(array[i]))):
         for k in range(nFeatures):

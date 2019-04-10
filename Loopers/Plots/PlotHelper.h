@@ -1037,6 +1037,8 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
   mVHRat[0]->SetFillColor(dataColors[0]);
 
   mVHRat[0]->Draw("e1x0");
+  //for (int i = 0; i < mVHRat[0]->GetNbinsX(); i++)
+  //  cout << "Bin " << i + 1 << ": " << mVHRat[0]->GetBinContent(i+1) << endl; 
   mVHRat[0]->GetXaxis()->SetLabelOffset();
   mVHRat[0]->GetXaxis()->SetLabelSize(0.07);
 

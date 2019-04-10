@@ -18,6 +18,9 @@
 #include "ttHLooper.h"
 #include "scale1fb/scale1fb_2016.h"
 #include "scale1fb/scale1fb_2017.h"
+#include "scale1fb/scale1fb_2016_RunII.h"
+#include "scale1fb/scale1fb_2017_RunII.h"
+#include "scale1fb/scale1fb_2018_RunII.h"
 #include "MakeMVAOptimizationBabies.h"
 #include "Utils/RandomMap.h"
 #include "GJetReweight/ProbMap.h"
@@ -30,8 +33,8 @@ using namespace tas;
 
 const double lumi_2016 = 35.9;
 const double lumi_2017 = 41.5;
-const double lumi_2018 = 45.966;
-const double lumi_all = lumi_2016 + lumi_2017;
+const double lumi_2018 = 59.76;
+const double lumi_all = lumi_2016 + lumi_2017 + lumi_2018;
 
 
 const vector<double> mva_thresh_2017 = { 0.38, 0.48, 0.56 };

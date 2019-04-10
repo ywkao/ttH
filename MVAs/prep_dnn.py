@@ -8,6 +8,7 @@ import math
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input root file", type=str)
+parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str, default="Hadronic")
 parser.add_argument("--signal", help = "which process to consider as signal", type=str, default="ttH")
 parser.add_argument("--backgrounds", help = "which processes to consider as bkgs", type=str, default="all")
 parser.add_argument("--boosted_objects", help = "use objects that are boosted to higgs p4", action="store_true")
@@ -24,10 +25,26 @@ output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
 
+pad_value = -9
+
 # load tree to array
 #feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R"]
-feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "top_tag_mass_", "top_tag_pt_", "top_tag_eta_", "top_tag_phi_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_"]))
+feature_names = ["objects_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
+if args.channel == "Hadronic":
+  feature_names += ["objects_boosted_"]
+elif args.channel == "Leptonic":
+  feature_names += ["n_lep_tight_", "leptons_", "jets_"]
+
+if args.do_top_tag:
+  top_tag_features = ["top_tag_score_", "top_tag_mass_", "top_tag_pt_", "top_tag_eta_", "top_tag_phi_"]
+else:
+  top_tag_features = []
+
+feature_names = numpy.concatenate((feature_names, top_tag_features))
+
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_"]))
+branches = numpy.unique(branches)
+
 
 rand_branch = "rand_"
 data_label = 2
@@ -66,12 +83,22 @@ else:
   object_features_validation = features_validation["objects_"]
   object_features_data = features_data["objects_"]
 
+if args.channel == "Leptonic": # also add sequences of leptons and jets separately
+  jet_features = features["jets_"]
+  jet_features_validation = features_validation["jets_"]
+  jet_features_data = features_data["jets_"]
+
+  lepton_features = features["leptons_"]
+  lepton_features_validation = features_validation["leptons_"]
+  lepton_features_data = features_data["leptons_"]
+
+
 def preprocess_sigmoid_v2(array, mean, std):
   alpha = (array - mean)*(1./std)
   return (1 - numpy.exp(-alpha))/(1 + numpy.exp(-alpha))
 
 def preprocess_sigmoid(array):
-  array_trimmed = array[array != -999]
+  array_trimmed = array[array != pad_value]
   mean = numpy.mean(array_trimmed)
   std = numpy.std(array_trimmed)
   if std == 0:
@@ -80,21 +107,19 @@ def preprocess_sigmoid(array):
   return (1 - numpy.exp(-alpha))/(1 + numpy.exp(-alpha))
 
 def create_array(features_list, names):
-  print [feat for feat in names if ("objects_" not in feat)]
-  arr = [features_list[feat] for feat in names if ("objects_" not in feat)]
+  print [feat for feat in names if ("objects_" not in feat and "leptons_" != feat and "jets_" != feat)]
+  arr = [features_list[feat] for feat in names if ("objects_" not in feat and "leptons_" != feat and "jets_" != feat)]
   if args.z_score:
     for feat in arr:
       feat = preprocess(feat)
   return numpy.transpose(numpy.array(arr))
 
-if args.do_top_tag:
-  feature_names += ["top_tag_score_", "top_tag_mass_", "top_tag_pt_", "top_tag_eta_", "top_tag_phi_"]
 global_features = create_array(features, feature_names)
 global_features_validation = create_array(features_validation, feature_names)
 global_features_data = create_array(features_data, feature_names)
 
 def get_mean_and_std(array):
-  array_trimmed = array[array != -999]
+  array_trimmed = array[array != pad_value]
   if (len(array_trimmed) <= 1):
     return 0, 1
   mean = numpy.mean(array_trimmed)
@@ -104,17 +129,16 @@ def get_mean_and_std(array):
   return mean, std
 
 def preprocess(array, mean, std):
-  array[array != -999] += -mean
-  array[array != -999] *= 1./std
+  array[array != pad_value] += -mean
+  array[array != pad_value] *= 1./std
   return array
 
-n_objects = 8
-def pad_array(array):
+def pad_array(array, n_objects):
   max_objects = n_objects
   nData = len(array)
   nFeatures = len(array[0][0])
   y = numpy.ones((nData, max_objects, nFeatures))
-  y *= -999
+  y *= pad_value
   for i in range(nData):
     for j in range(min(max_objects, len(array[i]))):
       for k in range(nFeatures):
@@ -123,9 +147,22 @@ def pad_array(array):
   return y
 
 
-object_features = pad_array(object_features)
-object_features_validation = pad_array(object_features_validation)
-object_features_data = pad_array(object_features_data)
+n_max_objects = 8
+object_features = pad_array(object_features, n_max_objects)
+object_features_validation = pad_array(object_features_validation, n_max_objects)
+object_features_data = pad_array(object_features_data, n_max_objects)
+
+if args.channel == "Leptonic":
+  n_max_jets = 6
+  jet_features = pad_array(jet_features, n_max_jets)
+  jet_features_validation = pad_array(jet_features_validation, n_max_jets)
+  jet_features_data = pad_array(jet_features_data, n_max_jets)
+
+  n_max_leptons = 2
+  lepton_features = pad_array(lepton_features, n_max_leptons)
+  lepton_features_validation = pad_array(lepton_features_validation, n_max_leptons)
+  lepton_features_data = pad_array(lepton_features_data, n_max_leptons)
+
 
 # use set of all signal events to get mean and std dev for preprocessing purposes
 #object_features_signal = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == 1')["objects_"]
@@ -231,5 +268,14 @@ dset_mass_data = f_out.create_dataset("mass_data", data=mass_data)
 dset_tth_ttPP_mva_data = f_out.create_dataset("tth_ttPP_mva_data", data=tth_ttPP_mva_data)
 dset_tth_dipho_mva_data = f_out.create_dataset("tth_dipho_mva_data", data=tth_dipho_mva_data)
 dset_tth_std_mva_data = f_out.create_dataset("tth_std_mva_data", data=tth_std_mva_data)
+
+if args.channel == "Leptonic":
+  dset_jet = f_out.create_dataset("jet", data=jet_features)
+  dset_jet_validation = f_out.create_dataset("jet_validation", data=jet_features_validation)
+  dset_jet_data = f_out.create_dataset("jet_data", data=jet_features_data)
+
+  dset_lepton = f_out.create_dataset("lepton", data=lepton_features)
+  dset_lepton_validation = f_out.create_dataset("lepton_validation", data=lepton_features_validation)
+  dset_lepton_data = f_out.create_dataset("lepton_data", data=lepton_features_data)
 
 f_out.close()
