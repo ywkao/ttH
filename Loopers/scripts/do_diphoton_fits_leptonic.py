@@ -11,7 +11,7 @@ args = parser.parse_args()
 bdt = "none"
 
 os.chdir("../")
-#parallel_utils.run('./ttHLeptonicLooper "ttHLeptonic_RunII_DiPhotonFits_Presel" "RunII" "%s" "%s" "none"' % (args.tag + "prefit", bdt))
+parallel_utils.run('./ttHLeptonicLooper "ttHLeptonic_RunII_MVA_Presel" "RunII" "%s" "%s" "none"' % (args.tag + "prefit", bdt))
 os.chdir("tt_template_fit")
 #parallel_utils.run('python do_fits_qcd.py --input_file "../ttHLeptonic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.root" --jet_bin "2+"' % (args.tag + "prefit"))
 os.chdir("../")

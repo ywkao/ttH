@@ -265,5 +265,13 @@
 	"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8" : { "xs" : 35.85, "br" : 1.0, "comment" : "added by Sam from SummaryTable1G25ns"},
 	"ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1" : { "xs" : 35.85, "br" : 1.0, "comment" : "added by Sam from SummaryTable1G25ns"},
 	"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8" : { "xs" : 35.85, "br" : 1.0, "comment" : "added by Sam from SummaryTable1G25ns"},
-	"ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1" : { "xs" : 35.85, "br" : 1.0, "comment" : "added by Sam from SummaryTable1G25ns"}
+	"ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1" : { "xs" : 35.85, "br" : 1.0, "comment" : "added by Sam from SummaryTable1G25ns"},
+	"ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4" : { "xs" : 35.85, "br" : 1.0, "comment" : "copied by Sam from ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1"},
+	"ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4" : { "xs" : 35.85, "br" : 1.0, "comment" : "copied by Sam from ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1"},
+	"THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2" : { "xs" : 0.01517, "br" : 1.0, "comment" : "copied by Sam from THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5" },
+	"THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2" : { "xs" : 0.07425, "br" : 1.0, "comment" : "copied by Sam from THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5" },
+	"VBFHToGG_M125_13TeV_amcatnlo_pythia8_v2" : { "xs" : 3.782, "br" : 0.00227, "comment" : "copied by Sam from VBFHToGG_M125_13TeV_amcatnlo_pythia8" },
+	"WGToLNuG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 489.0, "br" : 1.0, "comment" : "copied by Sam from WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" },
+	"ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 117.864, "br" : 1.0, "comment" : "copied by Sam from ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" },
+	"tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-madgraph-pythia8" : { "xs" : 0.0758, "br" : 1.0, "comment" : "copied by Sam from tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-madgraph-pythia8" }
 }
