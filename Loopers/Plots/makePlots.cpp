@@ -450,6 +450,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_verbose();
   }
 
+  /*
   if (output.Contains("LeptonicLoose")) {
     c->give_info("ttH Leptonic");
     c->give_info("Loose Preselection");
@@ -494,11 +495,12 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   }
   if (output.Contains("Custom"))
     c->give_info("Loose MVA cut applied");
-
+  */
   if (hist_name.Contains("SigmaIEtaIEta"))      c->set_x_bin_range({1,50});
 
   for (int i = 0; i < vExtraInfo.size(); i++)
     c->give_info(vExtraInfo[i]);
+
 
   if (type == "individual_shape")
     c->plot(idx, false);
@@ -538,7 +540,10 @@ int main(int argc, char* argv[])
   TString tag = file_path.Contains("Hadronic") ? "Hadronic" : "Leptonic";
 
   TString info = argv[3]; 
-  vector<TString> vInfo = {info};
+  TObjArray *tx = info.Tokenize("|");
+  vector<TString> vInfo = {};
+  for (int i = 0; i < tx->GetEntries(); i++)
+    vInfo.push_back(((TObjString *)(tx->At(i)))->String());
 
   TString file_path_ref = argv[4];
   TString year_ref = file_path_ref.Contains("RunII") ? "2017" : file_path_ref.Contains("2018") ? "2018" : ((file_path_ref.Contains("2017") ? "2017" : "2016"));
@@ -559,6 +564,12 @@ int main(int argc, char* argv[])
 
   // Decide which backgrounds you want to plot
   vector<TString> vBkgs;
+  if (type == "std" || type == "shape" || type == "std_linear") { 
+    vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
+    if (file_path.Contains("impute"))
+      vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
+  }
+  /*
   if (type == "std" || type == "shape" || type == "std_linear") { 
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "TTGG", "TTGJets", "VG", "WJets"}; 
     //vBkgs = {"DY", "DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "VG", "WJets"}; 
@@ -583,7 +594,7 @@ int main(int argc, char* argv[])
     if (year == "2018")
       vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY"};
   }
-
+  */
   else if (type == "individual_shape") {
     vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets"};
   }

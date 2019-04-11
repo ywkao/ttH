@@ -1,6 +1,6 @@
 #include "ScanChain_ttHHadronic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString scale_qcd, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
@@ -14,15 +14,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   //bool scale_gjets_normalization = !(tag.Contains("GJet_Reweight_Preselection"));
   bool scale_gjets_normalization = false; //true;
 
-  // Make MVA Optimization Baby
-  /*
-  OptimizationBabyMaker* baby = new OptimizationBabyMaker();
-  TString xml_file_noExt = xml_file;
-  xml_file_noExt.ReplaceAll(".xml", "");
-  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt + "_" + tag;
-  baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
-  */
-
   // Create "process" objects
   vector<Process*> vProcess = generate_processes(f1);
   add_variables(vProcess, tag); // defined in ttHLooper
@@ -35,14 +26,12 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
-  // Initialize map of evt_run_lumi -> rand
-  //RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
-
   TF1* gjet_minID_shape = get_photon_ID_shape("min");
   TF1* gjet_maxID_shape = get_photon_ID_shape("max");
   TF1* gjet_leadID_shape = get_photon_ID_shape("lead");
   TF1* gjet_subleadID_shape = get_photon_ID_shape("sublead");
   TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
+  TF1* photon_fakeID_shape_runII = get_photon_ID_shape("fake_runII");
 
   TF1* photon_fakeID_shape_Barrel_HighPt = get_photon_ID_shape("fake_barrel_highPt");
   TF1* photon_fakeID_shape_Barrel_LowPt = get_photon_ID_shape("fake_barrel_lowPt");
@@ -189,10 +178,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   gjet_mva->BookMVA("BDT", gjet_bdt_file); 
 
-  double dipho_yield = 0;
-
-  double reverse_yield = 0; // yield of events in which there is one photon in the sideband and it is not a fake
-  double reverse_yield_denom = 0; // yield of events in which there is one photon in the sideband
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
@@ -217,6 +202,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
 
     if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
+    if (bkg_options.Contains("impute") && (currentFileTitle.Contains("GJets_HT") || currentFileTitle.Contains("QCD"))) {
+      cout << "Skipping this sample: " << currentFileTitle << ", since we are imputing." << endl;
+      continue;
+    }
+
 
     // Set json file
     set_json(mYear);
@@ -263,20 +253,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       float evt_weight = 1.;
      
-	/* 
-      if (!isData) {
-	if (year == "2018") // temporary hack to use 2017 mc with 2018 data
-	  evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
-        else if (mYear == "2016")
-          evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
-        else if (mYear == "2017")
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
-	else if (mYear == "2018")
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
-      } 
-	*/
-
-
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
       vector<TLorentzVector> jets;
@@ -291,6 +267,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       jets = make_jets(btag_scores, year);
       btag_scores_sorted = sortVector(btag_scores);
 
+      double mva_value = -999;
+
       if (year == "RunII" && !isData) {
         double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
         if (mYear == "2016")
@@ -303,13 +281,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
  
       else if (!isData) {
         if (year == "2018") // temporary hack to use 2017 mc with 2018 data
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
         else if (mYear == "2016")
-          evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
+          evt_weight *= scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
         else if (mYear == "2017")
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
+          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
         else if (mYear == "2018")
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
       }
 
       bool pu_weight = true;
@@ -317,42 +295,19 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         evt_weight *= puweight();
       }
 
-      bool do_scale_qcd = scale_qcd != "none";
-      if (do_scale_qcd) {
-	evt_weight *= qcdX_factor(currentFileTitle, scale_qcd, n_jets());
-      }
-
-      // Evaluate MVA, if we choose
-      double mva_value = -999;
-
-      // Calculate MVA value
+      // Impute, if applicable
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-
-      float leadID_ = leadIDMVA();
-      float subleadID_ = subleadIDMVA();
-
-      if (tag == "ttHHadronicLoose_impute" || tag == "ttHHadronicLoose_impute_tightenPhoID" || tag == "ttHHadronic_impute_SR" || tag == "ttHHadronicLoose_impute_fakesRegion") {
-	if (processId == 3 || processId == 4 || processId == 17) continue;
-	if (maxIDMVA_ < -0.7)					 continue;
-	if (minIDMVA_ < -0.7) {
-          if (!isData)
-            continue;
-	  
-          //minIDMVA_ = impute_photon_id(-0.7, maxIDMVA_, cms3.event(), gjet_minID_shape, gjet_maxID_shape, evt_weight, gjet_ID_shape);
-	  //if (minIDMVA_ >= maxIDMVA_)
-          //  swap(minIDMVA_, maxIDMVA_);
-
-	  //impute_lead_sublead_photon_id(-0.7, leadID_, subleadID_, cms3.event(), gjet_leadID_shape, gjet_subleadID_shape, evt_weight);
-          //maxIDMVA_ = leadID_ > subleadID_ ? leadID_ : subleadID_;
-          //minIDMVA_ = leadID_ <= subleadID_ ? leadID_ : subleadID_;
-
-	  minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight);
-	  //minIDMVA_ = impute_from_fakePDF_withKinematics(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shapes, leadID_ > subleadID_ ? leadPt() : subleadPt(), leadID_ > subleadID_ ? abs(leadEta()) : abs(subleadEta()), evt_weight);
-
-          processId = 18;
-        }
+      if (bkg_options.Contains("impute")) {
+        if (isData)
+          impute_photon_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, evt_weight, processId);
       }
+
+      // Scale bkg weight
+      evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Hadronic");
+
+      double leadID_ = leadIDMVA() == maxIDMVA_ ? maxIDMVA_ : minIDMVA_;
+      double subleadID_ = leadIDMVA() == maxIDMVA_ ? minIDMVA_ : maxIDMVA_; 
 
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;
@@ -404,8 +359,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (evaluate_mva) 
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       double reference_mva = tthMVA();
-      bool pass_ref_presel = mYear == "2017" ? pass_2017_mva_presel() : pass_2016_mva_presel();
-      double super_rand = -999;//rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
+      double super_rand = -999;
 
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
@@ -444,6 +398,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_))	continue;
+
+      /*
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
 	if (n_jets() < 3)		continue;
@@ -768,7 +725,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       else {
         cout << "Did not recognize tag name" << endl;
       }
- 
+      */
  
 
       // Fill histograms //
@@ -937,26 +894,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         vProcess[processId]->fill_histogram("hMinIDPhotonEta", leadEta(), evt_weight, vId);
       }
 
-
-      if (minID < -0.7 && maxID > -0.7) {
-	reverse_yield_denom += evt_weight;
-	if (lead_photon_type() == 1 && sublead_photon_type() == 3) {
-	  if (leadIDMVA() < subleadIDMVA()) {
-	    reverse_yield += evt_weight;
-	    //cout << "Prompt IDMVA: " << leadIDMVA() << endl;
-	    //cout << "Fake IDMVA:   " << subleadIDMVA() << endl;
-	  }
-	}
-	else if (lead_photon_type() == 3 && sublead_photon_type() == 1) {
-	  if (leadIDMVA() > subleadIDMVA()) {
-	    reverse_yield += evt_weight;
-	    //cout << "Prompt IDMVA: " << subleadIDMVA() << endl;
-            //cout << "Fake IDMVA:   " << leadIDMVA() << endl;
-	  }
-	}
-
-      }
-
       if (lead_photon_type() == 3) {
 	vProcess[processId]->fill_histogram("hFakePhotonIDMVA", leadIDMVA(), evt_weight, vId);
 	if (leadPt() > 40 && abs(leadEta()) < barrel_eta)
@@ -1060,14 +997,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     cout << Form( "ERROR: number of events from files (%d) is not equal to total number of events (%d)", nEventsChain, nEventsTotal ) << endl;
   }
  
-  //baby->CloseBabyNtuple();
-
-  cout << "Number of events from sideband where minID is prompt: " << reverse_yield << endl;
-  cout << "Number of events from sideband: " << reverse_yield_denom << endl;
-  cout << "Fraction of events: " << reverse_yield / reverse_yield_denom << endl; 
-
-  //delete rand_map;
-
   // Example Histograms
   f1->Write();
   f1->Close(); 

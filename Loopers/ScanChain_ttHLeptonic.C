@@ -1,6 +1,6 @@
 #include "ScanChain_ttHLeptonic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + ".root", "RECREATE");
   f1->cd();
 
@@ -33,6 +33,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic_" + ext + ".txt");
 
   TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
+  TF1* photon_fakeID_shape_runII = get_photon_ID_shape("fake_runII");
 
   // MVA Business
   unique_ptr<TMVA::Reader> mva;
@@ -257,13 +258,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       else if (!isData) {
         if (year == "2018") // temporary hack to use 2017 mc with 2018 data
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
         else if (mYear == "2016")
-          evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
+          evt_weight *= scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
         else if (mYear == "2017") 
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
+          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
         else if (mYear == "2018")
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
       }
 
       bool pu_weight = true;
@@ -320,6 +321,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
 
+      // Impute, if applicable
+      if (bkg_options.Contains("impute")) {
+        if (isData)
+          impute_photon_and_lepton_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, n_lep_medium_, n_lep_tight_, evt_weight, processId);
+      }
+
+      // Scale bkg weight
+      evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Leptonic");
+
+      /*
       // Scale MC by N_leps (tight)
       bool scale_nleps = false;
       std::map<int, double> lep_scale = {
@@ -384,6 +395,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	  }
         }
       }
+      */
+
 
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;
@@ -435,7 +448,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       }
 
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_)) continue;
 
+      /*
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
 	if (n_jets() < 2)	continue;
@@ -875,8 +890,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         cout << "Did not recognize tag name" << endl;
       } 
 
+      */
+
       //if (is_low_stats_process(currentFileTitle))       continue;
 
+      /*
       // Evaluate MVA, if we choose
       if (evaluate_mva) {
 
@@ -887,12 +905,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (!is_low_stats_process(currentFileTitle)) 	
           baby->FillBabyNtuple(label, evt_weight, processId, cms3.rand(), mass(), mva_value, reference_mva, pass_ref_presel, super_rand);
       }
-
+      */
 
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
 
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId, recoLeptonId}; 
 
+      /*
       bool make_text_file = false;
       bool make_2prompts = true;
       if (make_text_file && mYear == "2016") {
@@ -910,6 +929,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	}
         continue;
       }
+
+      */
 
       //////////////////////////////
       // Start filling histograms //

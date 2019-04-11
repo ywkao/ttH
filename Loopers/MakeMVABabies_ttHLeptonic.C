@@ -1,7 +1,7 @@
 #include "MakeMVABabies_ttHLeptonic.h"
 #include "ScanChain_ttHLeptonic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -21,6 +21,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
   int nLowID = 0;
 
   TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
+  TF1* photon_fakeID_shape_runII = get_photon_ID_shape("fake_runII");
 
   // ttH MVA Business
   unique_ptr<TMVA::Reader> tth_qcdX_mva;
@@ -117,7 +118,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
-    TString year = currentFileTitle.Contains("2016") ? "2016" : "2017";
+
+    TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
 
     if (tag == "ttHLeptonic_ttPP") {
       if (!isSignal && !isData) {
@@ -136,6 +138,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       }
     }
 
+    if (is_wrong_tt_jets_sample(currentFileTitle, "Leptonic"))                        continue;
+
+    // Set json file
+    set_json(mYear);
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -151,6 +157,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       ttHLeptonic::progress( nEventsTotal, nEventsChain );
 
       InitBabyNtuple();
+
+      // Check golden json
+      if (isData) {
+        if (!pass_json(mYear, cms3.run(), cms3.lumi()))         continue;
+      }
 
       // Blinded region
       if (!isSignal && blind && mass() > 120 && mass() < 130)	continue;
@@ -170,13 +181,22 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       if (process_id_ == 17)
         process_id_ = 3; // use Madgraph GJets instead of Pythia
 
-      // Skipping events/samples
-      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
-      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
-      if (is_low_stats_process(currentFileTitle))       continue;
-      if (is_wrong_tt_jets_sample(currentFileTitle, "Leptonic"))        continue;
-      //if (process_id_ == 17)				continue; // skip MadGraph g+jets
+      // Impute, if applicable
+      if (bkg_options.Contains("impute")) {
+        if (isData)
+          impute_photon_and_lepton_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, n_lep_medium_, n_lep_tight_, evt_weight_, process_id_);
+      } 
 
+      // Scale bkg weight
+      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Leptonic");
+
+      // Skipping events/samples
+      if (is_low_stats_process(currentFileTitle))       continue;
+      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
+
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_)) continue;
+
+      /*
       // Selection
       if (tag == "ttHLeptonicLoose") {
         if (mass() < 100)        continue;
@@ -318,7 +338,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       else {
         cout << "Did not recognize tag name" << endl;
       }
- 
+      */ 
+
+
+
       // Make p4 for physics objects
       vector<TLorentzVector> jets;
       vector<double> btag_scores;
@@ -361,12 +384,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       }
 
 
-      bool isSignal = process_id_ == 0;
-
-
-      label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
-      if (process_id_ == 18)
-	label_ = 0;
+      label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 0 ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data sidebands
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 

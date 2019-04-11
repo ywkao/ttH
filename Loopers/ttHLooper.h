@@ -480,6 +480,81 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   }
 }
 
+const double diphoton_factor_hadronic_runII = 1.04;
+const double gjets_factor_hadronic_runII    = 1.41;
+const double qcd_factor_hadronic_runII      = 1.78;
+
+const double qcd_gjets_impute_factor_hadronic_runII = 1.1375;
+const double diphoton_impute_factor_hadronic_runII  = 1.1300;
+
+const double diphoton_factor_leptonic_runII = 1.00;
+const double gjets_factor_leptonic_runII    = 1.00;
+const double qcd_factor_leptonic_runII      = 1.00;
+
+const double qcd_gjets_impute_factor_leptonic_runII = 1.0;
+const double diphoton_impute_factor_leptonic_runII  = 1.0;
+
+double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel) {
+  if (bkg_options == "none")
+    return 1.0;
+
+  if (channel == "Hadronic") {
+    if (bkg_options == "scale_diphoton") {
+      if (currentFileTitle.Contains("GJets_HT"))
+	return gjets_factor_hadronic_runII;
+      else if (currentFileTitle.Contains("QCD"))
+	return qcd_factor_hadronic_runII;
+      else if (currentFileTitle.Contains("DiPhotonJetsBox"))
+	return diphoton_factor_hadronic_runII;
+      else
+	return 1.0;
+    }
+
+    else if (bkg_options == "impute") {
+      if ((currentFileTitle.Contains("EGamma") || currentFileTitle.Contains("DoubleEG")) && processId == 18)
+	return qcd_gjets_impute_factor_hadronic_runII;
+      else if (currentFileTitle.Contains("DiPhotonJetsBox"))
+	return diphoton_impute_factor_hadronic_runII;
+      else
+	return 1.0;
+    }
+
+    else if (bkg_options == "impute_no_scale") 
+      return 1.0;
+  }
+
+  else
+    cout << "Did not recognize background scaling option" << endl;
+  return 0.0;
+
+}
+
+void impute_photon_id(double minID_cut, float maxIDMVA, TF1* photon_fakeID_shape, float &minIDMVA, float &evt_weight, int &process_id) {
+  if (!(maxIDMVA > minID_cut && minIDMVA < minID_cut))
+    return;
+  else {
+    minIDMVA = photon_fakeID_shape->GetRandom(minID_cut, maxIDMVA);
+    evt_weight *= photon_fakeID_shape->Integral(minID_cut, maxIDMVA) / photon_fakeID_shape->Integral(-0.9, minID_cut);
+    process_id = 18;
+    return;
+  }
+}
+
+TRandom* myRand = new TRandom(0);
+void impute_photon_and_lepton_id(double minID_cut, float maxIDMVA, TF1* photon_fakeID_shape, float &minIDMVA, float &n_lep_medium, float &n_lep_tight, float &evt_weight, int &process_id) {
+  if (!(maxIDMVA > minID_cut && minIDMVA < minID_cut && n_lep_medium == 0))
+    return;
+  else {
+    minIDMVA = photon_fakeID_shape->GetRandom(minID_cut, maxIDMVA);
+    double rand = myRand->Rndm();
+    n_lep_tight = rand <= 0.4841 ? 0 : (rand <= 0.9669 ? 1 : 2);
+    n_lep_medium = n_lep_tight == 2 ? 2 : 1;
+    evt_weight *= photon_fakeID_shape->Integral(minID_cut, maxIDMVA) / photon_fakeID_shape->Integral(-0.9, minID_cut);
+    process_id = 18;
+    return;
+  }
+}
+
 const double impute_transfer_factor = 1.191; // N_data passing minIDVMA cut / N_data failing minIDMVA cut (obtained from `python impute_transfer_factor.py --input_fail "../ttHHadronicLoose_impute_sideband__histogramsAll.root" --input_pass "../ttHHadronicLoose_impute_presel__histogramsAll.root"`)
 
 // Function derived from PhotonID_Sideband/derive_shape.py
@@ -539,6 +614,17 @@ TF1* get_photon_ID_shape(TString type) {
     f_IDMVA->SetParameter(6, 58033.1); 
     f_IDMVA->SetParameter(7, -55772.5); 
   }
+  else if (type == "fake_runII") {
+    f_IDMVA->SetParameter(0, 6443.84);
+    f_IDMVA->SetParameter(1, -13129.1);
+    f_IDMVA->SetParameter(2, 25726.9);
+    f_IDMVA->SetParameter(3, -9090.69);
+    f_IDMVA->SetParameter(4, -45407.3);
+    f_IDMVA->SetParameter(5, 33939);
+    f_IDMVA->SetParameter(6, 83914.5);
+    f_IDMVA->SetParameter(7, -81361.9);
+  }
+
   else if (type == "fake_barrel_lowPt") {
     f_IDMVA->SetParameter(0, 744.04); 
     f_IDMVA->SetParameter(1, -1118.68); 
@@ -624,7 +710,7 @@ const std::map<double, int> lepton_probs = {
 	{1.0, 2}
 };
 
-TRandom* myRand = new TRandom(0);
+//TRandom* myRand = new TRandom(0);
 float impute_leps_from_fakePDF() { // values from `python derive_shape_fake_lepton.py --input "../ttHLeptonicLoose_impute2_8Apr2019_scaled_histograms2017.root"`
   double rand = myRand->Rndm();
   if ( rand <= 0.4841 )

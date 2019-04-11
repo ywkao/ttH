@@ -38,6 +38,8 @@ const double lumi_2017 = 41.5;
 const double lumi_2018 = 59.76;
 const double lumi_all = lumi_2016 + lumi_2017 + lumi_2018;
 
+const double min_photon_ID_presel_cut = -0.7;
+
 const vector<double> mva_thresh_2017 = { 0.3, 0.7 };
 
 bool pass_2017_mva_presel() {
@@ -47,6 +49,43 @@ bool pass_2017_mva_presel() {
   if (leadIDMVA() < -0.2)         return false;
   if (subleadIDMVA() < -0.2)      return false;
   return true;
+}
+
+bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_medium, int n_lep_tight) {
+  // common to all selections
+  if (!(leadPassEVeto() && subleadPassEVeto()))       return false; // always require e veto
+  if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)    return false; // don't use photon ID below -0.9
+
+  if (tag == "ttHLeptonic_RunII_MVA_Presel") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 1)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)				return false;
+    return true;
+  }
+
+  else if (tag == "ttHLeptonic_RunII_MVA_Presel_lowGammaAndLeptonIDSideband") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 3)                                   return false;
+    if (nb_loose() < 1)                                 return false;
+    if (maxIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (minIDMVA_ > min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium >= 1)				return false;
+    return true;
+  }
+
+  else if (tag == "ttHLeptonic_RunII_ttbar_region") {
+    if (mass() < 100)                                   return false;
+    if (n_lep_tight < 1)				return false;
+    if (nb_medium() < 1)				return false;
+    if (leadPixelSeed() || subleadPixelSeed())      	return false;
+    return true;
+  }
+
+  else
+    cout << "Did not recognize tag name" << endl;
+  return false;
+
 }
 
 double get_lep_pt(double &lep_eta) {

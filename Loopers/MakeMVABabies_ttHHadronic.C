@@ -1,7 +1,7 @@
 #include "MakeMVABabies_ttHHadronic.h"
 #include "ScanChain_ttHHadronic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -23,6 +23,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
   TF1* gjet_minID_shape = get_photon_ID_shape("min");
   TF1* gjet_maxID_shape = get_photon_ID_shape("max");
   TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
+  TF1* photon_fakeID_shape_runII = get_photon_ID_shape("fake_runII");
 
   // MVA Businesss
   unique_ptr<TMVA::Reader> gjet_mva;
@@ -339,34 +340,24 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG"); 
-    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG");
-    TString year = currentFileTitle.Contains("2016") ? "2016" : "2017";
+    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
+
+    TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
+
+    if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
+    if (bkg_options.Contains("impute") && (currentFileTitle.Contains("GJets_HT") || currentFileTitle.Contains("QCD"))) {
+      cout << "Skipping this sample: " << currentFileTitle << ", since we are imputing." << endl;
+      continue;
+    }
+
+    // Set json file
+    set_json(mYear);
 
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    bool deriving_gjet_weights = (tag == "GJet_Reweight_Preselection");
-
-    if (deriving_gjet_weights) {
-      if (!(currentFileTitle.Contains("GJet_Pt") || currentFileTitle.Contains("GJets_HT"))) { 
-	cout << "Skipping " << currentFileTitle << endl;
-	continue;
-      }
-      else {
-	cout << "Looping over " << currentFileTitle << endl;
-      }
-    }
-
-    if (tag == "ttHHadronic_DNN_presel") {
-      if (!(currentFileTitle.Contains("ttHJet") || currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma") || currentFileTitle.Contains("DiPhoton"))) {
-	cout << "Skipping " << currentFileTitle << endl;
-        continue;
-      }
-      else {
-        cout << "Looping over " << currentFileTitle << endl;
-      }
-    }
+  
 
     for (unsigned int event = 0; event < nEventsTree; ++event) {
 
@@ -378,6 +369,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       // Progress
       ttHHadronic::progress( nEventsTotal, nEventsChain );
+
+      // Check golden json
+      if (isData) {
+        if (!pass_json(mYear, cms3.run(), cms3.lumi()))            continue;
+      }
 
       InitBabyNtuple();
 
@@ -391,6 +387,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       double gjet_mva_value = -999;
       gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" ));
 
+      /*
       if (!deriving_gjet_weights) {
 	if (process_id_ == 17) { // combine pythia and madgraph samples
 	  process_id_ = 3;
@@ -403,15 +400,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 	  evt_weight_ *= gjet_normalization;
 	}
       }
+      */
       // Skipping events/samples
       if (is_low_stats_process(currentFileTitle))       continue;
-      if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic")) 			continue;
-      if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))           continue;
-      if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))                        continue;
 
+      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
-      if (currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW"))		continue; // FIXME: just skipping temporarily since there was an issue with the THQ/THW babies and these should not matter for BDT training
-
+      /*
       if (tag == "ttHHadronic_ttPP") {
         if (!isSignal && !isData) {
 	  if (!(currentFileTitle.Contains("TTGG")))
@@ -424,7 +419,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
           if (!(currentFileTitle.Contains("DiPhotonJetsBox")))
             continue;
         }
-      }
+      } */
 
       // Blinded region
       if (isData && blind && mass() > 120 && mass() < 130)	continue;
@@ -432,6 +427,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
 
+      if (bkg_options.Contains("impute")) {
+        if (isData)
+          impute_photon_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, evt_weight_, process_id_);
+      }
+
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_)) continue;
+
+      /*
       // Selection
       if (tag == "ttHHadronicLoose") {
         if (mass() < 100)                continue;
@@ -571,7 +574,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
       else {
         cout << "Did not recognize tag name" << endl;
       }
- 
+      */ 
+
       vector<TLorentzVector> jets;
       vector<double> btag_scores;
       vector<std::pair<int, double>> btag_scores_sorted;
@@ -596,24 +600,16 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
         evt_weight_ *= puweight();
       }
 
-      TString scale_qcd = "binned_NJets";
-      bool do_scale_qcd = false;
-      if (do_scale_qcd) {
-        evt_weight_ *= qcdX_factor(currentFileTitle, scale_qcd, n_jets());
-      }
+      // Scale bkg weight
+      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Hadronic");
 
       if (isnan(evt_weight_) || isinf(evt_weight_) || evt_weight_ == 0) {
         continue; //some pu weights are nan/inf and this causes problems for histos 
       }
 
       // Skip blinded region for MC after filling mass histogram
-      bool isSignal = process_id_ == 0;
-
-      label_ = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
-      if (process_id_ == 18)
-        label_ = 0;
+      label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 0 ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data sidebands
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
-
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 
       tth_2017_reference_mva_ = tthMVA();
@@ -737,12 +733,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString ext, bool blind = 
 
       FillBabyNtuple();
 
+      /*
       if (deriving_gjet_weights) {
 	if (process_id_ == 17) {
 	  process_id_ == 3;
 	  FillBabyNtuple();
         }
       }
+      */
 
     }
   

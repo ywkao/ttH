@@ -36,6 +36,7 @@ const double lumi_2017 = 41.5;
 const double lumi_2018 = 59.76;
 const double lumi_all = lumi_2016 + lumi_2017 + lumi_2018;
 
+const double min_photon_ID_presel_cut = -0.7;
 
 const vector<double> mva_thresh_2017 = { 0.38, 0.48, 0.56 };
 
@@ -57,7 +58,39 @@ bool pass_2017_mva_presel() {
   return true;
 }
 
+bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_) {
+  // common to all selections
+  if (!(leadPassEVeto() && subleadPassEVeto()))       return false; // always require e veto
+  if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)    return false; // don't use photon ID below -0.9
 
+  if (tag == "ttHHadronic_RunII_MVA_Presel") {
+    if (mass() < 100) 					return false;
+    if (n_jets() < 3)					return false;
+    if (nb_loose() < 1)					return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)		return false;
+    return true;
+  }
+
+  else if (tag == "ttHHadronic_RunII_MVA_Presel_lowGammaIDSideband") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 3)                                   return false;
+    if (nb_loose() < 1)                                 return false;
+    if (maxIDMVA_ < min_photon_ID_presel_cut)		return false;
+    if (minIDMVA_ > min_photon_ID_presel_cut)		return false;
+    return true; 
+  }
+
+  else if (tag == "ttHHadronic_RunII_DiPhotonFits_Presel") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 2)                                   return false;
+    return true;
+  }
+
+  else 
+    cout << "Did not recognize tag name" << endl;
+  return false;
+
+}
 
 vector<float> make_object(TLorentzVector p4, vector<float> b_disc, const TLorentzVector diphoton, bool boost) { 
 // 0: pT, 1: eta, 2: phi, 3: E, 4: b disc, 5: bb disc, 6: c disc, 7: udsg disc,

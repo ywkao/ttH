@@ -16,21 +16,17 @@ int main(int argc, char* argv[]) {
   else
     cout << "Not evaluating BDT" << endl;
 
-  TString scale_qcd = argc <= 5 ? "none" : argv[5];
-  if (scale_qcd == "inclusive_NJets") {
-    cout << "Scaling QCD + X by the following: " << endl;
-    cout << "QCD: " << qcd_factor_2017 << endl;
-    cout << "Gamma + jets: " << gjets_factor_2017 << endl;
-    cout << "DiPhoton + jets: " << diphoton_factor_2017 << endl;
-  }
-  else if (scale_qcd == "binned_NJets") {
-    cout << "Scaling QCD + X by the following (2, 3, 4+ jet bins): " << endl;
-    cout << "QCD: " << qcd_factor_Njets[0] << " , " << qcd_factor_Njets[1] << " , " << qcd_factor_Njets[2] << endl;
-    cout << "Gamma + jets: " << gjets_factor_Njets[0] << " , " << gjets_factor_Njets[1] << " , " << gjets_factor_Njets[2] << endl;
-    cout << "DiPhoton + jets: " << diphoton_factor_Njets[0] << " , " << diphoton_factor_Njets[1] << " , " << diphoton_factor_Njets[2] << endl;
-  }
+  TString bkg_options = argc <= 5 ? "none" : argv[5];
+  if (bkg_options == "none")
+    cout << "No MC scaling/bkg imputing applied to bkg" << endl;
+  else if (bkg_options == "scale_diphoton")
+    cout << "Scaling QCD/GammaJets/DiPhoton MC" << endl;
+  else if (bkg_options == "impute")
+    cout << "Using data-driven QCD/GammaJets description. Scaling normalization along with DiPhoton MC" << endl;
+  else if (bkg_options == "impute_no_scale")
+    cout << "Using data-driven QCD/GammaJets description. NOT scaling normalization" << endl;
   else
-    cout << "Not scaling normalization of QCD samples" << endl;
+    cout << "Did not recognize background treatment option" << endl;
 
   TChain *ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 
   if (year == "RunII") {
@@ -45,5 +41,5 @@ int main(int argc, char* argv[]) {
   else
     add_samples(ch, year);
 
-  ScanChain(ch, tag, year, ext, xml_file, scale_qcd); 
+  ScanChain(ch, tag, year, ext, xml_file, bkg_options); 
 }
