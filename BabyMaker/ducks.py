@@ -22,7 +22,7 @@ exec_path = "condor_exe.sh"
 tar_path = "package.tar.gz"
 hadoop_path = "ttH"
 
-cmssw_ver = "CMSSW_10_2_9"
+cmssw_ver = "CMSSW_10_5_0"
 base_path = "/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII"
 if args.old_2017:
   base_path = "/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017"
@@ -130,7 +130,3 @@ while True:
         break
     print "Sleeping 300 seconds ..."
     time.sleep(300)
-
-
-    break
-
