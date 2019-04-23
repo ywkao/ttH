@@ -2,10 +2,12 @@ How to merge individual commits from another branch into your branch ("mybranch"
 
 `git stash`
 `git checkout other-user-name/other-branch-name`
+`git pull other-user-name other-branch-name`
 `git log --oneline` (this gives you all the recent commits)
 `git checkout mybranch`
 `git cherry-pick commit_1 ... commit_n`
 Troubleshooting:
+  * Safest to cherry-pick commits 1 at a time
   * If it is a pull request, you can do `git cherry-pick -m 1 commit#`
   * If there are conflicts, resolve by hand and then commit
   * If you need to bail, `git cherry-pick --abort`
