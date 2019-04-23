@@ -139,6 +139,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     }
 
     if (is_wrong_tt_jets_sample(currentFileTitle, "Leptonic"))                        continue;
+    if (bkg_options.Contains("impute") && (currentFileTitle.Contains("GJets_HT") || currentFileTitle.Contains("QCD"))) {
+      cout << "Skipping this sample: " << currentFileTitle << ", since we are imputing." << endl;
+      continue;
+    }
 
     // Set json file
     set_json(mYear);

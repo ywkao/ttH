@@ -26,6 +26,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
+  // Dumb hacky stuff to use 2017 MC samples as placeholders for 2018
+  bool already_looped_dipho = false;
+  bool already_looped_qcd = false;
+  bool already_looped_dy = false;
+
   TF1* gjet_minID_shape = get_photon_ID_shape("min");
   TF1* gjet_maxID_shape = get_photon_ID_shape("max");
   TF1* gjet_leadID_shape = get_photon_ID_shape("lead");
@@ -199,7 +204,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (categorize_signal_sample(currentFileTitle) != 0)
         continue;
     }
-    TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
+    TString mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year"));
 
     if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
     if (bkg_options.Contains("impute") && (currentFileTitle.Contains("GJets_HT") || currentFileTitle.Contains("QCD"))) {
@@ -207,6 +212,24 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       continue;
     }
 
+
+    // Dumb hacky stuff to use 2017 MC as placeholders for 2018
+    if (already_looped_dipho && currentFileTitle.Contains("DiPhotonJetsBox"))
+      mYear = "2018";
+    if (already_looped_qcd && currentFileTitle.Contains("QCD"))
+      mYear = "2018";
+    if (already_looped_dy && currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX"))
+      mYear = "2018";
+
+    if (currentFileTitle.Contains("DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIIFall17MiniAODv2"))
+      already_looped_dipho = true;
+    if (currentFileTitle.Contains("QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM"))
+      already_looped_qcd = true;
+    if (currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM"))
+      already_looped_dy = true;
+
+    cout << "mYear: " << mYear << endl;
+    int yearId = mYear == "2016" ? 0 : (mYear == "2017" ? 1 : (mYear == "2018" ? 2 : -1));
 
     // Set json file
     set_json(mYear);
@@ -362,7 +385,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       double super_rand = -999;
 
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
-      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId};
+      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId, -1, yearId};
 
 
       // Gamma + jets reweighting

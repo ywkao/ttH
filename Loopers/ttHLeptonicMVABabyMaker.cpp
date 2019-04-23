@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
   TString bkg_options = argc <= 5 ? "none" : argv[5];
   if (bkg_options == "none")
     cout << "No MC scaling/bkg imputing applied to bkg" << endl;
-  else if (bkg_options == "scale_diphoton")
+  else if (bkg_options == "scale_mc")
     cout << "Scaling QCD/GammaJets/DiPhoton MC" << endl;
   else if (bkg_options == "impute")
     cout << "Using data-driven QCD/GammaJets description. Scaling normalization along with DiPhoton MC" << endl;

@@ -615,14 +615,14 @@ TF1* get_photon_ID_shape(TString type) {
     f_IDMVA->SetParameter(7, -55772.5); 
   }
   else if (type == "fake_runII") {
-    f_IDMVA->SetParameter(0, 6443.84);
-    f_IDMVA->SetParameter(1, -13129.1);
-    f_IDMVA->SetParameter(2, 25726.9);
-    f_IDMVA->SetParameter(3, -9090.69);
-    f_IDMVA->SetParameter(4, -45407.3);
-    f_IDMVA->SetParameter(5, 33939);
-    f_IDMVA->SetParameter(6, 83914.5);
-    f_IDMVA->SetParameter(7, -81361.9);
+    f_IDMVA->SetParameter(0, 6244.78);
+    f_IDMVA->SetParameter(1, -8740.43);
+    f_IDMVA->SetParameter(2, 10637.2);
+    f_IDMVA->SetParameter(3, -4925.31);
+    f_IDMVA->SetParameter(4, -6361.07);
+    f_IDMVA->SetParameter(5, 969.525);
+    f_IDMVA->SetParameter(6, 26352);
+    f_IDMVA->SetParameter(7, -18116.8);
   }
 
   else if (type == "fake_barrel_lowPt") {
@@ -1410,7 +1410,7 @@ const vector<TString> vSamples_2017_RunII = {
 
 		// V + (gamma)
 		"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
-"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM_RunII",
+		"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM_RunII",
 		"WGToLNuG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
 		"ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
 
@@ -1476,7 +1476,9 @@ const vector<TString> vSamples_2018_RunII = {
 		"TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
 
                 // V + (gamma)
-		"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
+		//"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
+		"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+                "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM_RunII", // copy these from 2017 because 2018 sample has SUCH bad stats
 		"WGToLNuG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v1_MINIAODSIM_RunII",
 		"ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2_MINIAODSIM_RunII",
 		
@@ -1529,7 +1531,7 @@ void add_samples(TChain* ch, TString year) {
   vector<TString> vSamples;
 
   if (runII) {
-    tag = "v1.1";
+    tag = "v1.2";
     location = "/home/users/sjmay/ttH/Loopers/merged_babies";
     if (year.Contains("2016"))
       vSamples = vSamples_2016_RunII;

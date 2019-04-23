@@ -29,8 +29,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
+
+  // Dumb hacky stuff to use 2017 MC samples as placeholders for 2018
+  bool already_looped_dipho = false;
+  bool already_looped_qcd = false;
+  bool already_looped_dy = false;
+
+
   // Initialize map of evt_run_lumi -> rand
-  RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic_" + ext + ".txt");
+  //RandomMap* rand_map = new RandomMap("Utils/random_map_Leptonic_" + ext + ".txt");
 
   TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
   TF1* photon_fakeID_shape_runII = get_photon_ID_shape("fake_runII");
@@ -181,7 +188,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma");
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG");
-    TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018")); 
+    TString mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year")); 
 
     if (isSignal) {
       if (categorize_signal_sample(currentFileTitle) != 0)
@@ -189,6 +196,29 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     }
 
     if (is_wrong_tt_jets_sample(currentFileTitle, "Leptonic"))                        continue;
+    if (bkg_options.Contains("impute") && (currentFileTitle.Contains("GJets_HT") || currentFileTitle.Contains("QCD"))) {
+      cout << "Skipping this sample: " << currentFileTitle << ", since we are imputing." << endl;
+      continue;
+    }
+
+
+    // Dumb hacky stuff to use 2017 MC as placeholders for 2018
+    if (already_looped_dipho && currentFileTitle.Contains("DiPhotonJetsBox"))
+      mYear = "2018";
+    if (already_looped_qcd && currentFileTitle.Contains("QCD"))
+      mYear = "2018";
+    if (already_looped_dy && currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX"))
+      mYear = "2018";
+
+    if (currentFileTitle.Contains("DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIIFall17MiniAODv2"))
+      already_looped_dipho = true;
+    if (currentFileTitle.Contains("QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM"))
+      already_looped_qcd = true;
+    if (currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM"))
+      already_looped_dy = true;
+   
+    cout << "mYear: " << mYear << endl;
+    int yearId = mYear == "2016" ? 0 : (mYear == "2017" ? 1 : (mYear == "2018" ? 2 : -1)); 
 
     // Set json file
     set_json(mYear);
@@ -234,18 +264,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       float evt_weight = 1.;
      
-	/* 
-      if (!no_weights && !isData) {
-	if (year == "2018") // temporary hack to use 2017 mc with 2018 data
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
-        else if (mYear == "2016")
-          evt_weight = scale1fb_2016(currentFileTitle) * lumi_2016 * sgn(weight());
-        else if (mYear == "2017") 
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2017 * sgn(weight());
-	else if (mYear == "2018")
-          evt_weight = scale1fb_2017(currentFileTitle) * lumi_2018 * sgn(weight());
-      } 
-	*/
       if (year == "RunII" && !isData) {
 	double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
 	if (mYear == "2016")
@@ -302,8 +320,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       int recoLeptonId = categorize_reco_leptons(electrons.size(), muons.size());
 
-      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))	continue;
-
       double mva_value = -999;
 
       lep_pt_ = leps[0].Pt();
@@ -330,72 +346,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Scale bkg weight
       evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Leptonic");
 
-      /*
-      // Scale MC by N_leps (tight)
-      bool scale_nleps = false;
-      std::map<int, double> lep_scale = {
-	{0, 2.3525},
-	{1, 1.25451},
-	{2, 0.791874}
-      };
-      if (scale_nleps && !isData && !isSignal) 
-	evt_weight *= lep_scale[n_lep_tight_]; 
+      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
-      // Scale ttX MC by results of templated fit
-      bool scale_ttX = false;
-      std::map<int, double> ttX_scale = {
-	{5, 0.7107},
-	{6, 1.7715},
-	{9, 2.0501}
-      };
-
-      if (scale_ttX && (processId == 5 || processId == 6 || processId == 9))
-	evt_weight *= ttX_scale[processId];
-
-      if (tag == "ttHLeptonicLoose_impute" || tag == "ttHLeptonicLoose_impute2") {
-	
-	if (processId == 3 || processId == 4 || processId == 17) continue;
-	bool scale = true;
-	if (tag == "ttHLeptonicLoose_impute") { // skip V+gamma, DY, tt+jets, tt+gamma+jets
-	  if (processId == 2 && scale) {
-	    if (nElecTight() + nMuonTight() == 0)
-	      evt_weight *= 1.74339;
-	    if (nElecTight() + nMuonTight() >= 1)
-	      evt_weight *= 3.517525;
-	  }
-	  if (processId == 1 || processId == 6 || processId == 7 || processId == 9 || processId == 8)
-	    continue;
-	}
-	else if (tag == "ttHLeptonicLoose_impute2") {
-	  if (processId == 2 && scale) {
-	    evt_weight *= 1.223;
-	  }
-	}
-        if (maxIDMVA_ < -0.7)                                    continue;
-        if (minIDMVA_ < -0.7) {
-          if (!isData)
-            continue;
-	  if (tag == "ttHLeptonicLoose_impute2") {
-	    if (n_lep_medium_ >= 1)		continue;
-	  }
-	  //n_lep_medium_ = impute_leps_from_fakePDF(lep_mediumID_shape, evt_weight);
-	  n_lep_tight_  = impute_leps_from_fakePDF();
-	  minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight);
-	  processId = 18;
-	  if (processId == 18 && scale) {
-	    if (tag == "ttHLeptonicLoose_impute") {
-	      if (nElecTight() + nMuonTight() == 0)
-		evt_weight *= 1.314106; 
-	      if (nElecTight() + nMuonTight() >= 1)
-		evt_weight *= 1.2313558; 
-	    }
-	    else if (tag == "ttHLeptonicLoose_impute2") {
-	      evt_weight *= 1.8657;
-	    }
-	  }
-        }
-      }
-      */
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_)) continue;
 
 
       max2_btag_ = btag_scores_sorted[1].second;
@@ -909,7 +862,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
 
-      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId, recoLeptonId}; 
+      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId, recoLeptonId, yearId}; 
 
       /*
       bool make_text_file = false;
@@ -1225,7 +1178,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
  
   baby->CloseBabyNtuple();
  
-  delete rand_map;
+  //delete rand_map;
 
   // Example Histograms
   f1->Write();

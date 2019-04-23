@@ -57,6 +57,12 @@ std::map<int, TString> mRecoLeptons = {
         {6, "Multi Lepton"}
 };
 
+std::map<int, TString> mYears = {
+	{0, "2016"},
+	{1, "2017"},
+	{2, "2018"}
+};
+
 std::map<int, TString> mPhotons = {
         {0, "(Fake/Fake)"},
         {1, "(Fake/Prompt)"},
@@ -78,18 +84,18 @@ std::map<int, TString> mPhotonLocations = {
 	{2, "(Endcap/Endcap)"}
 };
 
-void make_table_std(TFile* file, TString hist_name, vector<TString> vBkgs, TString label) {
-  TH1D* hData = (TH1D*)file->Get(hist_name + "_Data");
-  TH1D* hSig = (TH1D*)file->Get(hist_name + "_ttH");
+void make_table_std(TFile* file, TString hist_name, vector<TString> vBkgs, TString label, TString ext = "") {
+  TH1D* hData = (TH1D*)file->Get(hist_name + "_Data" + ext);
+  TH1D* hSig = (TH1D*)file->Get(hist_name + "_ttH" + ext);
   TH1D* hBkg;
   vector<TH1D*> vHBkg;
 
   for (int i = 0; i < vBkgs.size(); i++) {
-    vHBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i]));
+    vHBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + ext));
     if (i == 0)
-      hBkg = (TH1D*)file->Get(hist_name + "_" + vBkgs[i])->Clone("hBkg");
+      hBkg = (TH1D*)file->Get(hist_name + "_" + vBkgs[i] + ext)->Clone("hBkg");
     else
-      hBkg->Add((TH1D*)file->Get(hist_name + "_" + vBkgs[i]));
+      hBkg->Add((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + ext));
   }
 
   int n_bins = hData->GetSize()-2;
@@ -374,6 +380,10 @@ int main(int argc, char* argv[])
 
     TString label = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", "");
     make_table_std(f, "hNVtx", vBkgs, label);
+    make_table_std(f, "hNVtx", vBkgs, label, "Year_0");
+    make_table_std(f, "hNVtx", vBkgs, label, "Year_1");
+    make_table_std(f, "hNVtx", vBkgs, label, "Year_2");
+    make_table_components(f, "hNVtx", vBkgs, label, mYears, "Year");
     make_table_components(f, "hNVtx", vBkgs, label, mLeptons, "GenLepton");
     make_table_components(f, "hNVtx", vBkgs, label, mRecoLeptons, "RecoLepton");
     make_table_components(f, "hNVtx", vBkgs, label, mPhotons, "GenPhoton"); 

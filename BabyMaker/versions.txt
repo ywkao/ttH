@@ -178,3 +178,7 @@ Submitting ttH Babies version v1.1 using skims in /hadoop/cms/store/user/smay/tt
 Date: 2019-04-19 12:20:38.489216 
 Submitting ttH Babies version v1.2 using skims in /hadoop/cms/store/user/smay/ttH/MicroAOD/RunII and commit c1e18519fff06bb8d0e618a1722233e6c991a0fe of tth_dev_runII branch of flashgg
 
+# Note: in 1.3, added more SFs, updated EGM ID version, etc. Not clear that all systematics/SFs/etc are in place for the run II branch yet...
+Date: 2019-04-23 14:50:29.178315 
+Submitting ttH Babies version v1.3 using skims in /hadoop/cms/store/user/smay/ttH/MicroAOD/RunII and commit 4a0e586a8671840302e47a367245c1f07c8501a5 of tth_dev_runII branch of flashgg
+
