@@ -18,7 +18,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
-  int nLowID = 0;
+  // Dumb hacky stuff to use 2017 MC samples as placeholders for 2018
+  bool already_looped_dipho = false;
+  bool already_looped_qcd = false;
+  bool already_looped_dy = false;
 
   TF1* gjet_minID_shape = get_photon_ID_shape("min");
   TF1* gjet_maxID_shape = get_photon_ID_shape("max");
@@ -336,19 +339,37 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     cms3.Init(tree);
 
     // Initialize map of evt_run_lumi -> rand
-    RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
+    //RandomMap* rand_map = new RandomMap("Utils/random_map_Hadronic_" + ext + ".txt");
 
     // Decide what type of sample this is
-    bool isData = currentFileTitle.Contains("DoubleEG"); 
+    bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
 
-    TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
+    TString mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year"));
 
     if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
     if (bkg_options.Contains("impute") && (currentFileTitle.Contains("GJets_HT") || currentFileTitle.Contains("QCD"))) {
       cout << "Skipping this sample: " << currentFileTitle << ", since we are imputing." << endl;
       continue;
     }
+
+    // Dumb hacky stuff to use 2017 MC as placeholders for 2018
+    if (already_looped_dipho && currentFileTitle.Contains("DiPhotonJetsBox"))
+      mYear = "2018";
+    if (already_looped_qcd && currentFileTitle.Contains("QCD"))
+      mYear = "2018";
+    if (already_looped_dy && currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX"))
+      mYear = "2018";
+
+    if (currentFileTitle.Contains("DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIIFall17MiniAODv2"))
+      already_looped_dipho = true;
+    if (currentFileTitle.Contains("QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM"))
+      already_looped_qcd = true;
+    if (currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM"))
+      already_looped_dy = true;
+
+    cout << "mYear: " << mYear << endl;
+    int yearId = mYear == "2016" ? 0 : (mYear == "2017" ? 1 : (mYear == "2018" ? 2 : -1));
 
     // Set json file
     set_json(mYear);
@@ -369,13 +390,16 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       // Progress
       ttHHadronic::progress( nEventsTotal, nEventsChain );
+      InitBabyNtuple();
 
       // Check golden json
       if (isData) {
         if (!pass_json(mYear, cms3.run(), cms3.lumi()))            continue;
       }
 
-      InitBabyNtuple();
+      // Blinded region
+      if (isData && blind && mass() > 120 && mass() < 130)      continue;
+
 
       // Decide what type of sample this is
       int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
@@ -387,212 +411,28 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       double gjet_mva_value = -999;
       gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" ));
 
-      /*
-      if (!deriving_gjet_weights) {
-	if (process_id_ == 17) { // combine pythia and madgraph samples
-	  process_id_ = 3;
-	}
-
-	if (process_id_ == 3) {
-	  double prob = gjet_mva_value;
-	  double prob_ratio = prob / ( 1 - prob);
-	  evt_weight_ *= prob_ratio;
-	  evt_weight_ *= gjet_normalization;
-	}
-      }
-      */
       // Skipping events/samples
       if (is_low_stats_process(currentFileTitle))       continue;
 
-      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
-
-      /*
-      if (tag == "ttHHadronic_ttPP") {
-        if (!isSignal && !isData) {
-	  if (!(currentFileTitle.Contains("TTGG")))
-	    continue;	
-        }
+      if (year == "RunII" && !isData) {
+        double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
+        if (mYear == "2016")
+          evt_weight_ *= scale1fb * lumi_2016 * weight();
+        else if (mYear == "2017")
+          evt_weight_ *= scale1fb * lumi_2017 * weight();
+        else if (mYear == "2018")
+          evt_weight_ *= scale1fb * lumi_2018 * weight();
       }
 
-      if (tag == "ttHHadronic_dipho") {
-        if (!isSignal && !isData) {
-          if (!(currentFileTitle.Contains("DiPhotonJetsBox")))
-            continue;
-        }
-      } */
-
-      // Blinded region
-      if (isData && blind && mass() > 120 && mass() < 130)	continue;
-
-      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-
-      if (bkg_options.Contains("impute")) {
-        if (isData)
-          impute_photon_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, evt_weight_, process_id_);
-      }
-
-      if (!passes_selection(tag, minIDMVA_, maxIDMVA_)) continue;
-
-      /*
-      // Selection
-      if (tag == "ttHHadronicLoose") {
-        if (mass() < 100)                continue;
-	if (n_jets() < 3)		continue;
-	if (nb_loose() < 1)		continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHHadronicLoose_phoIDCut") {
-	if (mass() < 100)                continue;
-        if (n_jets() < 3)               continue;
-        if (nb_loose() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (minIDMVA_ < -0.7)		continue;		
-	if (leadIDMVA() < -0.9)                 continue;
-        if (subleadIDMVA() < -0.9)              continue;
-      }
-
-      else if (tag == "ttHHadronicLoose_NJets4") {
-        if (mass() < 100)                continue;
-        if (n_jets() < 4)               continue;
-        if (nb_loose() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHHadronicLoose_NJets5") {
-        if (mass() < 100)                continue;
-        if (n_jets() < 5)               continue;
-        if (nb_loose() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHHadronicLoose_impute") {
-	if (process_id_ == 3 || process_id_ == 4 || process_id_ == 17) continue; // skip gjets and QCD (QCD is skipped by default anyway)
-	if (mass() < 100)                continue;
-        if (n_jets() < 3)               continue;
-        if (nb_loose() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (maxIDMVA_ < -0.7)		continue;
-	if (leadIDMVA() < -0.9)                 continue;
-        if (subleadIDMVA() < -0.9)              continue;
-        if (minIDMVA_ < -0.7) {
-	  if (!isData)
-	    continue;  
-	  minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight_);
-	  process_id_ = 18;
-        }
-        
-      }
-
-      else if (tag == "ttHHadronicVeryLoose") {
-        if (mass() < 100)                continue;
-        if (n_jets() < 2)               continue;
-        if (nb_loose() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHHadronic_ttPP" || tag == "ttHHadronic_dipho") {
-	if (mass() < 100)                continue;
-	if (n_jets() < 3)		 continue;
-	if (nb_loose() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-        if (maxIDMVA_ < -0.7)           continue;
-        if (leadIDMVA() < -0.9)                 continue;
-        if (subleadIDMVA() < -0.9)              continue;
-        if (minIDMVA_ < -0.7) 		continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHHadronic_data_sideband_0b") {
-	if (mass() < 100)                continue;
-	if (n_jets() < 2)               continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHHadronic_data_sideband_phoID") {
-	if (mass() < 100)                continue;
-	if (n_jets() < 3)		 continue;
-	if (nb_medium() < 1)		 continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue; 
-      }
-
-      else if (tag == "ttHHadronic_data_sideband_phoID_v2") {
-        if (mass() < 100)                continue;
-        if (n_jets() < 2)                continue;
-        if (nb_tight() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHHadronic_data_sideband_phoID_v3") {
-        if (mass() < 100)                continue;
-	if (n_jets() < 2)               continue;
-        if (nb_loose() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHHadronic_DNN_presel") { 
-	if (mass() < 100)                continue;
-	if (n_jets() < 3)               continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (leadIDMVA() < -0.9)         continue;
-        if (subleadIDMVA() < -0.9)         continue;
-      }
-
-      else if (tag == "ttHHadronic_DNN_presel_all_impute") {
-	if (mass() < 100)                continue;
-        if (n_jets() < 3)               continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-        if (nb_loose() < 1)             continue;
-	if (maxIDMVA_ < -0.7)           continue;
-        if (leadIDMVA() < -0.9)                 continue;
-        if (subleadIDMVA() < -0.9)              continue;
-        if (minIDMVA_ < -0.7) {
-          if (!isData)
-            continue;
-          minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight_);
-          process_id_ = 18;
-        }
-	
-      }
-
-      else if (tag == "ttHHadronic") {
-	if (mass() < 100)                continue;
-        if (n_jets() < 3)       continue;
-        if (tthMVA() < 0.75)    continue;
-        if (diphoMVARes() < 0.4)        continue;
-        if (leadIDMVA() < -0.9)         continue;
-        if (subleadIDMVA() < -0.9)         continue;
-	if (nb_loose() < 1)	continue;
-      }
-
-      else if (tag == "GJet_Reweight_Preselection") {
-	if (mass() < 100)	continue;
-	if (n_jets() < 2)	continue;
-      }
-
-      else {
-        cout << "Did not recognize tag name" << endl;
-      }
-      */ 
-
-      vector<TLorentzVector> jets;
-      vector<double> btag_scores;
-      vector<std::pair<int, double>> btag_scores_sorted;
-      TLorentzVector lead_photon;
-      TLorentzVector sublead_photon;
-      jets = make_jets(btag_scores, year);
-      btag_scores_sorted = sortVector(btag_scores);
-      lead_photon = make_lead_photon();
-      sublead_photon = make_sublead_photon();
-      TLorentzVector diphoton = lead_photon + sublead_photon;
-
-      // Fill histograms //
-      if (!isData && process_id_ != 18) {
-	if (year == "2016")
+      else if (!isData) {
+        if (year == "2018") // temporary hack to use 2017 mc with 2018 data
+          evt_weight_ *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+        else if (mYear == "2016")
           evt_weight_ *= scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
-        else if (year == "2017")
+        else if (mYear == "2017")
           evt_weight_ *= scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
+        else if (mYear == "2018")
+          evt_weight_ *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
       }
 
       bool pu_weight = true;
@@ -600,14 +440,27 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         evt_weight_ *= puweight();
       }
 
+      // Impute, if applicable
+      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+      if (bkg_options.Contains("impute")) {
+        if (isData)
+          impute_photon_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, evt_weight_, process_id_);
+      }
+
+      double leadID_ = leadIDMVA() == maxIDMVA_ ? maxIDMVA_ : minIDMVA_;
+      double subleadID_ = leadIDMVA() == maxIDMVA_ ? minIDMVA_ : maxIDMVA_;
+
       // Scale bkg weight
       evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Hadronic");
+
+      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_)) continue;
 
       if (isnan(evt_weight_) || isinf(evt_weight_) || evt_weight_ == 0) {
         continue; //some pu weights are nan/inf and this causes problems for histos 
       }
 
-      // Skip blinded region for MC after filling mass histogram
       label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 0 ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data sidebands
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
@@ -630,7 +483,19 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       }
 
       // Variable definitions
+      vector<TLorentzVector> jets;
+      vector<double> btag_scores;
+      vector<std::pair<int, double>> btag_scores_sorted;
+      TLorentzVector lead_photon;
+      TLorentzVector sublead_photon;
+      jets = make_jets(btag_scores, year);
+      btag_scores_sorted = sortVector(btag_scores);
+      lead_photon = make_lead_photon();
+      sublead_photon = make_sublead_photon();
+      TLorentzVector diphoton = lead_photon + sublead_photon;
+
       top_tag_score_ = topTag_score();
+      /*
       if (top_tag_score_ > -1) {
 	top_tag_mass_ = log(topTag_topMass());
 	top_tag_pt_ = log(topTag_topPt());
@@ -638,11 +503,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 	top_tag_phi_ = topTag_topPhi();
       }
       else {
+      */
 	top_tag_mass_ = -1;
         top_tag_pt_ = -1;
         top_tag_eta_ = -1;
         top_tag_phi_ = -1;
-      }
+      //}
 
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;
@@ -674,8 +540,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       sublead_pT_ = subleadPt();
       leadptoM_ = lead_ptoM();
       subleadptoM_ = sublead_ptoM();
-      leadIDMVA_ = leadIDMVA(); 
-      subleadIDMVA_ = subleadIDMVA();
+      leadIDMVA_ = leadID_;
+      subleadIDMVA_ = subleadID_; 
       lead_eta_ = leadEta();
       sublead_eta_ = subleadEta();
       lead_phi_ = leadPhi();
@@ -695,7 +561,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       helicity_angle_ = helicity(lead_photon, sublead_photon);
 
       rand_ = cms3.rand();
-      super_rand_ = rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
+      super_rand_ = -1; //rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
       mass_ = mass();
       lead_sigmaEtoE_ = lead_sigmaEoE();
       sublead_sigmaEtoE_ = sublead_sigmaEoE();

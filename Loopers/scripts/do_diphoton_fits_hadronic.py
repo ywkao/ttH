@@ -2,6 +2,7 @@ import sys, os
 sys.path.append("../")
 
 import parallel_utils
+import workflow_utils
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -29,21 +30,16 @@ parallel_utils.submit_jobs(command_list, 2)
 
 # Tables and Plots
 os.chdir("Plots")
-parallel_utils.run('./makeTables "../ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.root" > ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.txt' % (args.tag + "prefit", args.tag + "prefit"))
-parallel_utils.run('./makeTables "../ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.root" > ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.txt' % (args.tag, args.tag))
-parallel_utils.run('./makeTables "../ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" > ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.txt' % (args.tag + "prefit", args.tag + "prefit"))
-parallel_utils.run('./makeTables "../ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" > ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.txt' % (args.tag, args.tag))
 
-plot_label = "ttH Hadronic"
-for plot_type in ["std", "std_linear"]:
-  parallel_utils.run('./makePlots "%s" "../ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.root" "%s"' % (plot_type, args.tag + "prefit", plot_label + "|DiPho Fit Presel."))
-  parallel_utils.run('./makePlots "%s" "../ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.root" "%s"' % (plot_type, args.tag, plot_label + "|DiPho Fit Presel.|Post-fit"))
-  parallel_utils.run('./makePlots "%s" "../ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.root" "%s"' % (plot_type, args.tag + "prefit", plot_label + "|Loose Preselection"))
-  parallel_utils.run('./makePlots "%s" "../ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" "%s"' % (plot_type, args.tag, plot_label + "|Loose Preselection|Post-fit"))
+workflow_utils.make_tables_and_plots("../ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.root" % (args.tag + "prefit"), "ttH Hadronic|DiPhoton Fit Presel.|Pre-Fit")
+workflow_utils.make_tables_and_plots("../ttHHadronic_RunII_DiPhotonFits_Presel_%s_histogramsRunII.root" % (args.tag), "ttH Hadronic|DiPhoton Fit Presel.|Post-Fit")
+workflow_utils.make_tables_and_plots("../ttHHadronic_RunII_MVA_Presel_Presel_%s_histogramsRunII.root" % (args.tag + "prefit"), "ttH Hadronic|Loose MVA Fit Presel.|Pre-Fit")
+workflow_utils.make_tables_and_plots("../ttHHadronic_RunII_MVA_Presel_Presel_%s_histogramsRunII.root" % (args.tag), "ttH Hadronic|Loose MVA Fit Presel.|Post-Fit")
 
-# Make MVA Baby
-parallel_utils.run('./ttHHadronicMVABabyMaker "ttHHadronic_RunII_MVA_Presel" "RunII" "%s_RunII_MVA_Presel_scale_diphoton" "scale_diphoton"' % (args.tag))
+do_mva = False
+if do_mva:
+  parallel_utils.run('./ttHHadronicMVABabyMaker "ttHHadronic_RunII_MVA_Presel" "RunII" "%s_RunII_MVA_Presel_scale_diphoton" "scale_diphoton"' % (args.tag))
 
-os.chdir("../MVAs/")
-parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_scale_diphoton" --channel "Hadronic"' % (args.tag))
-parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_scale_diphoton_features.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_scale_diphoton" --ext ""' % (args.tag, args.tag))
+  os.chdir("../MVAs/")
+  parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_scale_diphoton" --channel "Hadronic"' % (args.tag))
+  parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_scale_diphoton_features.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_scale_diphoton" --ext ""' % (args.tag, args.tag))

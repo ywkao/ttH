@@ -51,17 +51,19 @@ conds_dict = {
 samples = glob.glob(base_path + "/*")
 datasets = {}
 
+signal_strings = ["ttHJetToGG", "ttHToGG", "THQ", "THW", "VBF", "GluGluHToGG", "VHToGG", "FCNC"]
+
 for sample in samples:
   name = sample.split("/")[-1]
   datasets[name] = { "input_loc" : sample }
   datasets[name]["isData"] = True if ("EGamma" in name or "DoubleEG" in name) else False
   if datasets[name]["isData"]:
     datasets[name]["fpo"] = 50
-  elif "ttH" in name:
+  if any([x in name for x in signal_strings]):
     datasets[name]["fpo"] = 1
   elif "DiPhoton" in name:
     datasets[name]["fpo"] = 5
-  elif "EGamma" in name and dataset[name]["isData"]:
+  elif "EGamma" in name and datasets[name]["isData"]:
     datasets[name]["fpo"] = 250
   else:
     datasets[name]["fpo"] = 100

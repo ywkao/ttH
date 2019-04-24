@@ -484,8 +484,8 @@ const double diphoton_factor_hadronic_runII = 1.04;
 const double gjets_factor_hadronic_runII    = 1.41;
 const double qcd_factor_hadronic_runII      = 1.78;
 
-const double qcd_gjets_impute_factor_hadronic_runII = 1.1375;
-const double diphoton_impute_factor_hadronic_runII  = 1.1300;
+const double qcd_gjets_impute_factor_hadronic_runII = 0.9383634106686037;
+const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
 
 const double diphoton_factor_leptonic_runII = 1.00;
 const double gjets_factor_leptonic_runII    = 1.00;

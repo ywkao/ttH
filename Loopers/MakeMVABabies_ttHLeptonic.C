@@ -18,7 +18,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
 
-  int nLowID = 0;
+  // Dumb hacky stuff to use 2017 MC samples as placeholders for 2018
+  bool already_looped_dipho = false;
+  bool already_looped_qcd = false;
+  bool already_looped_dy = false;
 
   TF1* photon_fakeID_shape = get_photon_ID_shape("fake");
   TF1* photon_fakeID_shape_runII = get_photon_ID_shape("fake_runII");
@@ -118,8 +121,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
-
-    TString mYear = currentFileTitle.Contains("2016") ? "2016" : (currentFileTitle.Contains("2017") ? "2017" : (currentFileTitle.Contains("2018") ? "2018" : "2018"));
+    TString mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year"));
 
     if (tag == "ttHLeptonic_ttPP") {
       if (!isSignal && !isData) {
@@ -143,6 +145,24 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       cout << "Skipping this sample: " << currentFileTitle << ", since we are imputing." << endl;
       continue;
     }
+
+    // Dumb hacky stuff to use 2017 MC as placeholders for 2018
+    if (already_looped_dipho && currentFileTitle.Contains("DiPhotonJetsBox"))
+      mYear = "2018";
+    if (already_looped_qcd && currentFileTitle.Contains("QCD"))
+      mYear = "2018";
+    if (already_looped_dy && currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX"))
+      mYear = "2018";
+
+    if (currentFileTitle.Contains("DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIIFall17MiniAODv2"))
+      already_looped_dipho = true;
+    if (currentFileTitle.Contains("QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM"))
+      already_looped_qcd = true;
+    if (currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM"))
+      already_looped_dy = true;
+
+    cout << "mYear: " << mYear << endl;
+    int yearId = mYear == "2016" ? 0 : (mYear == "2017" ? 1 : (mYear == "2018" ? 2 : -1));
 
     // Set json file
     set_json(mYear);
@@ -168,9 +188,30 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       }
 
       // Blinded region
-      if (!isSignal && blind && mass() > 120 && mass() < 130)	continue;
+      if (isData && blind && mass() > 120 && mass() < 130)      continue;
 
       evt_weight_ = 1.;
+
+      if (year == "RunII" && !isData) {
+        double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
+        if (mYear == "2016")
+          evt_weight_ *= scale1fb * lumi_2016 * weight();
+        else if (mYear == "2017")
+          evt_weight_ *= scale1fb * lumi_2017 * weight();
+        else if (mYear == "2018")
+          evt_weight_ *= scale1fb * lumi_2018 * weight();
+      }
+
+      else if (!isData) {
+        if (year == "2018") // temporary hack to use 2017 mc with 2018 data
+          evt_weight_ *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+        else if (mYear == "2016")
+          evt_weight_ *= scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
+        else if (mYear == "2017")
+          evt_weight_ *= scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
+        else if (mYear == "2018")
+          evt_weight_ *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+      }
 
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
@@ -199,151 +240,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
       if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_)) continue;
-
-      /*
-      // Selection
-      if (tag == "ttHLeptonicLoose") {
-        if (mass() < 100)        continue;
-        if (n_jets() < 2)       continue;
-        //if (nb_loose() < 1)             continue;
-	if (nElecMedium() + nMuonMedium() < 1)	continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9) continue;
-	if (n_lep_medium_ < 1)	continue;
-	if (minIDMVA_ < -0.7)	continue;
-      }
-
-      else if (tag == "ttHLeptonicLoose_impute2") {
-	if (process_id_ == 3 || process_id_ == 4 || process_id_ == 17) continue; // skip gjets and QCD (QCD is skipped by default anyway)
-	if (mass() < 100)        continue;
-        if (n_jets() < 2)       continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-        if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9) continue;
-	if (maxIDMVA_ < -0.7)	continue;
-	if (isData) {
-	  if (minIDMVA_ < -0.7 && n_lep_medium_ < 1) {
-	    minIDMVA_ = impute_from_fakePDF(-0.7, maxIDMVA_, cms3.event(), photon_fakeID_shape, evt_weight_);
-	    n_lep_tight_  = impute_leps_from_fakePDF();
-	    process_id_ = 18;
-	    evt_weight_ *= 1.8657; // from fits of gg+jets, imputed QCD/gjets sample AFTER fits of ttX in tt region
-	  }
-	  else {
-	    if (minIDMVA_ < -0.7)         continue;
-            if (n_lep_medium_ < 1)        continue;
-	  }
-	}
-	else {
-	  if (minIDMVA_ < -0.7)		continue;
-	  if (n_lep_medium_ < 1)	continue;
-	
-	  if (process_id_ == 2) {
-	    evt_weight_ *= 1.223; // from fits of gg+jets, imputed QCD/gjets sample AFTER fits of ttX in tt region
-	  }
-
-	  // Scale ttX samples
-	  bool scale_ttX = true;
-	  std::map<int, double> ttX_scale = {
-	    {5, 0.7107},
-	    {6, 1.7715},
-	    {9, 2.0501}
-	  };
-
-	  if (scale_ttX && (process_id_ == 5 || process_id_ == 6 || process_id_ == 9)) { 
-	    evt_weight_ *= ttX_scale[process_id_];
-	  }
-	}
-      }
-
-      else if (tag == "ttHLeptonicLoose_scaleMC") {
-	if (mass() < 100)        continue;
-        if (n_jets() < 2)       continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-        if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9) continue;
-	if (minIDMVA_ < -0.7)	continue;
-	if (n_lep_medium_ < 1)	continue;
-	bool scale_nleps = true;
-	std::map<int, double> lep_scale = {
-	  {0, 2.3525},
-	  {1, 1.25451},
-	  {2, 0.791874}
-	};
-	if (scale_nleps && !isData && !isSignal)
-	  evt_weight_ *= lep_scale[n_lep_tight_];
-      } 
-
-      else if (tag == "ttHLeptonic_ttPP" || tag == "ttHLeptonic_dipho") {
-	if (mass() < 100)        continue;
-        if (n_jets() < 2)       continue;
-        if (nElecMedium() + nMuonMedium() < 1)  continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-	if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9) continue;
-      }
-
-      else if (tag == "ttHLeptonic_data_sideband_0b") {
-	if (mass() < 100)                continue;
-	if (n_jets() < 2)               continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHLeptonic_data_sideband_phoID") {
-	if (mass() < 100)                continue;
-	if (n_jets() < 2)                continue;
-	if (nb_loose() < 1)             continue;
-	if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-      }
-
-      else if (tag == "ttHLeptonic_2017_MVA_presel") {
-        if (mass() < 100)               continue;
-        if (n_jets() < 1)               continue;
-        if (nb_medium() < 1)            continue;
-        if (leadIDMVA() < -0.2)         continue;
-        if (subleadIDMVA() < -0.2)      continue;
-      }
-
-      else if (tag == "ttHLeptonicMedium") {
-        if (mass() < 100)                               continue;
-        if (n_jets() < 2)                               continue;
-        if (nb_medium() < 1)                            continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-        if (leadPixelSeed() || subleadPixelSeed())      continue;
-        double lep_pt, lep_eta;
-        if (get_lep_pt(lep_eta) < 15)                   continue;
-      }
-      else if (tag == "ttHLeptonicTight") {
-        if (mass() < 100)                               continue;
-        if (n_jets() < 2)                               continue;
-        if (nb_tight() < 1)                             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-        if (leadPixelSeed() || subleadPixelSeed())      continue;
-        double lep_pt, lep_eta;
-        if (get_lep_pt(lep_eta) < 25)                   continue;
-        if (MetPt() < 50)                             continue;
-      }
-      else if (tag == "ttHLeptonicLoose_tightPhoIDMVA") {
-        if (mass() < 100)        continue;
-        if (n_jets() < 2)       continue;
-        if (nb_loose() < 1)             continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-        if (leadIDMVA() < -0.2)         continue;
-        if (subleadIDMVA() < -0.2)         continue;
-      }
-
-      else if (tag == "ttHLeptonicPresel_v2") {
-        if (mass() < 100)                               continue;
-        if (n_jets() < 2)                               continue;
-        if (nb_medium() < 1)                            continue;
-        if (!(leadPassEVeto() && subleadPassEVeto()))   continue;
-        if (leadPixelSeed() || subleadPixelSeed())      continue;
-        double lep_pt, lep_eta;
-        if (get_lep_pt(lep_eta) < 20)                   continue;
-        //if (MetPt() < 50)                             continue;
-      }
-
-      else {
-        cout << "Did not recognize tag name" << endl;
-      }
-      */ 
-
 
 
       // Make p4 for physics objects
