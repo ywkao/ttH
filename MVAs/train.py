@@ -10,6 +10,9 @@ from sklearn.cross_validation import train_test_split
 from sklearn.utils import shuffle
 from sklearn import metrics
 
+import ROOT
+import root_numpy
+
 import utils
 import tmva_utils
 import ks_test
@@ -216,6 +219,17 @@ print "Testing  AUC: %.3f" % auc_test
 
 print "Testing  AUC: %.3f +/- %.4f" % (auc, unc)
 numpy.savez("bdt_roc_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train, y_test = y_test, pred_train = pred_train, pred_test = pred_test, fpr_train = fpr_train, fpr_test = fpr_test, tpr_train = tpr_train, tpr_test = tpr_test)
+
+# Write output to TTree
+tree_train_id = numpy.concatenate((numpy.zeros(len(pred_train)), numpy.ones(len(pred_test)), numpy.ones(len(pred_data))))
+tree_sample_id = numpy.concatenate((label, label_validation, label_data))
+tree_mass = numpy.concatenate((mass, mass_validation, mass_data))
+tree_weight = numpy.concatenate((weights, weights_validation, weights_data))
+tree_bdt_score = numpy.concatenate((pred_train, pred_test, pred_data))
+
+out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score], names = 'train_id,sample_id,mass,weight,mva_score')
+root_numpy.array2root(out_array, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag), treename = 't')
+
 
 ### Make diagnostic plots ###
 import matplotlib

@@ -148,7 +148,7 @@ class DNN_Helper:
 	  bad_epochs = 0
 	else:
 	  bad_epochs += 1
-	if bad_epochs >= 3:
+	if bad_epochs >= 2:
           keep_training = False
     return
 
