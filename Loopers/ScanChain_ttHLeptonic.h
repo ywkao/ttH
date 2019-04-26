@@ -64,6 +64,24 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_m
     return true;
   }
 
+  else if (tag == "ttHLeptonic_RunII_MVA_Presel_CutPtoM") {
+    if (mass() < 100)                                   return false;
+    if (lead_ptoM() < 0.33 || sublead_ptoM() < 0.25)	return false;
+    if (n_jets() < 1)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)                               return false;
+    return true;
+  }
+
+  else if (tag == "ttHLeptonic_RunII_MVA_Presel_CutPtoM_NJets") {
+    if (mass() < 100)                                   return false;
+    if (lead_ptoM() < 0.33 || sublead_ptoM() < 0.25)    return false;
+    if (n_jets() < 2)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)                               return false;
+    return true;
+  }
+
   else if (tag == "ttHLeptonic_RunII_MVA_Presel_lowGammaAndLeptonIDSideband") {
     if (mass() < 100)                                   return false;
     if (n_jets() < 1)                                   return false;

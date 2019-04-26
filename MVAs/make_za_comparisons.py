@@ -30,7 +30,7 @@ for i in range(len(files)):
   ax1.fill_between(files[i]["signal"], files[i]["za"] - files[i]["za_unc"], files[i]["za"] + files[i]["za_unc"], color = colors[i], alpha = 0.25)
   plt.xlabel('# Signal Events')
   ax1.set_ylabel('Significance (Z_A)')
-  ax1.legend(loc='upper right')
+  ax1.legend(loc='lower left')
 
 plt.savefig('za_comparison_mc.pdf')
 
@@ -45,7 +45,7 @@ for i in range(len(files)):
   ax1.fill_between(files[i]["signal_data"], files[i]["za_data"] - files[i]["za_unc_data"], files[i]["za_data"] + files[i]["za_unc_data"], color = colors[i], alpha = 0.25)
   plt.xlabel('# Signal Events')
   ax1.set_ylabel('Significance (Z_A)')
-  ax1.legend(loc='upper right')
+  ax1.legend(loc='lower left')
 
 plt.savefig('za_comparison_data.pdf') 
 

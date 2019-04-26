@@ -418,6 +418,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   if (hist_name == "hDiphotonMassResolution")
     c->set_x_bin_range({1, 100});
 
+  if (hist_name.Contains("LeadPToM") || hist_name.Contains("SubleadPToM"))
+    c->set_x_bin_range({1,10});
+
   if (hist_name == "hMassAN") {
     c->set_no_flow();
     c->set_no_log();
@@ -585,7 +588,7 @@ int main(int argc, char* argv[])
 
   vector<TString> vBkgs;
   if (type == "std" || type == "shape" || type == "std_linear") { 
-    vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
+    vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
     if (file_path.Contains("impute"))
       vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
   }

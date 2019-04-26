@@ -166,6 +166,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }
 
+  double w_gamma_yield = 0;
+
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -338,10 +340,21 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Scale bkg weight
       evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Leptonic");
 
-      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
+
+      if (bkg_options == "old_vgamma") {
+	if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))	continue;
+	if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))		continue;
+	if (currentFileTitle.Contains("ZGTo2LG") || currentFileTitle.Contains("ZGToLLG"))	continue;
+	if (currentFileTitle.Contains("DYJetsToLL") && genPhotonId >= 1)
+	  processId = 7; 
+      }	
+      else
+        if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
       if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_)) continue;
 
+      if (currentFileTitle.Contains("WGToLNuG"))
+        w_gamma_yield += evt_weight;
 
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;
@@ -697,7 +710,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   // Example Histograms
   f1->Write();
   f1->Close(); 
- 
+
+  cout << "W+gamma yield: " << w_gamma_yield << endl; 
 
   // return
   bmark->Stop("benchmark");

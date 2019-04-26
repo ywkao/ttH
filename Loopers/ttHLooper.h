@@ -113,7 +113,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonLeadHOverE", 25, 0, 0.1);
     v[i]->add_histogram("hPhotonLeadR9", 25, 0, 1);
     v[i]->add_histogram("hPhotonLeadIDMVA", 20, -1, 1);
-    v[i]->add_histogram("hPhotonLeadPToM", 25, 0, 5);
+    v[i]->add_histogram("hPhotonLeadPToM", 50, 0, 5);
     v[i]->add_histogram("hPhotonLeadSigmaEOverE", 100, 0, 1);
     v[i]->add_histogram("hPhotonLeadPtGen", 25, 0, 350);
     v[i]->add_histogram("hPhotonLeadPixelSeed", 2, -0.5, 1.5);
@@ -127,7 +127,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonSubleadHOverE", 25, 0, 0.1);
     v[i]->add_histogram("hPhotonSubleadR9", 25, 0, 1);
     v[i]->add_histogram("hPhotonSubleadIDMVA", 20, -1, 1);
-    v[i]->add_histogram("hPhotonSubleadPToM", 25, 0, 5);
+    v[i]->add_histogram("hPhotonSubleadPToM", 50, 0, 5);
     v[i]->add_histogram("hPhotonSubleadSigmaEOverE", 100, 0, 1);
     v[i]->add_histogram("hPhotonSubleadPtGen", 25, 0, 350);
     v[i]->add_histogram("hPhotonSubleadPixelSeed", 2, -0.5, 1.5);
@@ -480,9 +480,9 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   }
 }
 
-const double diphoton_factor_hadronic_runII = 1.04;
-const double gjets_factor_hadronic_runII    = 1.41;
-const double qcd_factor_hadronic_runII      = 1.78;
+const double diphoton_factor_hadronic_runII = 1.147982488785183;
+const double gjets_factor_hadronic_runII    = 1.7587831077271554;
+const double qcd_factor_hadronic_runII      = 2.290911314017982;
 
 const double qcd_gjets_impute_factor_hadronic_runII = 0.9383634106686037;
 const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
@@ -520,6 +520,11 @@ double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, T
     }
 
     else if (bkg_options == "impute_no_scale") 
+      return 1.0;
+  }
+
+  else if (channel == "Leptonic") {
+    if (bkg_options == "old_vgamma")
       return 1.0;
   }
 
@@ -827,7 +832,7 @@ int categorize_signal_sample(TString currentFileTitle) {
   if (currentFileTitle.Contains("M125")) { // save for fgg final fit purposes
     return 0; 
   }
-  else if (currentFileTitle.Contains("M126")) {
+  else if (currentFileTitle.Contains("M127")) {
     return 1; // save for bdt optimization purposes
   }
   else
@@ -1285,16 +1290,13 @@ const vector<TString> vSamples_2016_RunII = {
 		"DoubleEG_Run2016H-17Jul2018-v1_MINIAOD_RunII",
 
 		// ttH signal
-		"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
+		//"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_v2_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
-		"ttHJetToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
-		"ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
 		"ttHJetToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
-		"ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
 		"ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_v2_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
 
 		// other signal modes
@@ -1373,9 +1375,9 @@ const vector<TString> vSamples_2017_RunII = {
 		"DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_RunII",
 
 		// ttH Signal
-		"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
-		"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
-		"ttHJetToGG_M115_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+		//"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+		//"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+		//"ttHJetToGG_M115_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
@@ -1443,7 +1445,7 @@ const vector<TString> vSamples_2018_RunII = {
 		"EGamma_Run2018D-22Jan2019-v2_MINIAOD_RunII",
 
 		// ttH Signal
-		"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
+		//"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
 		"ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",

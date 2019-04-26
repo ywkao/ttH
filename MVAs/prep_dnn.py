@@ -36,7 +36,8 @@ elif args.channel == "Leptonic":
   feature_names += ["n_lep_tight_", "leptons_", "jets_"]
 
 if args.do_top_tag:
-  top_tag_features = ["top_tag_score_", "top_tag_mass_", "top_tag_pt_", "top_tag_eta_", "top_tag_phi_"]
+  top_tag_features = ["top_tag_score_"]
+  #top_tag_features = ["top_tag_score_", "top_tag_mass_", "top_tag_pt_", "top_tag_eta_", "top_tag_phi_"]
 else:
   top_tag_features = []
 
@@ -57,12 +58,15 @@ else:
   selection = "&& ("
   procs = args.backgrounds.split(",") + args.signal.split(",")
   for i in range(len(procs)):
-    selection += "process_id_ == %d" % (process_dict[procs[i]])
+    selection += "((process_id_ == %d" % (process_dict[procs[i]])
+    if procs[i] == "ttGG":
+      selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
+    else:
+      selection += "))"
     if i != len(procs) - 1:
       selection += " || "
 
   selection += ")"
-
 
 print selection
 

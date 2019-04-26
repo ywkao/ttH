@@ -13,6 +13,7 @@ parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str, defaul
 parser.add_argument("--tag", help = "name to append to filename", type=str, default = "")
 
 parser.add_argument("--dnn_models", help = "csv list of dnn models to add as inputs", type=str, default = "")
+parser.add_argument("--do_top_tag", help = "add top tag score", action = "store_true")
 
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
 parser.add_argument("-i", "--invert", help = "invert the test/train split", action="store_true")
@@ -26,6 +27,7 @@ parser.add_argument("--no_psv", help = "remove pixel seed veto", action = "store
 parser.add_argument("--dipho_only", help = "use only diphoton as bkg", action = "store_true")
 parser.add_argument("--ttGG_only", help = "use only ttGG as bkg", action = "store_true")
 parser.add_argument("--no_lepton_id", help = "don't use lepton ID vars", action = "store_true")
+parser.add_argument("--one_mass_point", help = "only use one signal mass point in training", action = "store_true")
 
 args = parser.parse_args()
 
@@ -42,6 +44,9 @@ tree = f.Get("t")
 #feature_names = list(feature_names) 
 
 feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_", "dipho_pt_over_mass_", "helicity_angle_"] 
+
+if args.do_top_tag:
+  feature_names += ["top_tag_score_"]
 
 to_remove = []
 if args.channel == "Leptonic":
@@ -75,6 +80,9 @@ rand_branch = "super_rand_" if args.randomize else "rand_"
 
 data_label = 2
 selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+
+if args.one_mass_point:
+  selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
 print "Selection for training events: %s" % selection_train
@@ -102,6 +110,7 @@ dnn_predictions = []
 if do_dnn:
   print "Calculating dnn scores"
   dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
+  print len(dnn_features)
   if args.channel == "Leptonic":
     dnn_features += ["n_lep_tight_"]
   i = 0
