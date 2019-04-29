@@ -28,6 +28,7 @@ parser.add_argument("--dipho_only", help = "use only diphoton as bkg", action = 
 parser.add_argument("--ttGG_only", help = "use only ttGG as bkg", action = "store_true")
 parser.add_argument("--no_lepton_id", help = "don't use lepton ID vars", action = "store_true")
 parser.add_argument("--one_mass_point", help = "only use one signal mass point in training", action = "store_true")
+parser.add_argument("--cut_ptoM", help = "apply cuts on photon pT/mgg", action = "store_true")
 
 args = parser.parse_args()
 
@@ -85,6 +86,15 @@ if args.one_mass_point:
   selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
+ptoM_cut = ""
+if args.cut_ptoM:
+  if args.channel == "Hadronic":
+    ptoM_cut = "&& (leadptoM_ > 0.5 && subleadptoM_ > 0.25)"
+  elif args.channel == "Leptonic":
+    ptoM_cut = "&& (leadptoM_ > 0.33 && subleadptoM_ > 0.25)"
+  selection_train += ptoM_cut
+  selection_validation += ptoM_cut
+
 print "Selection for training events: %s" % selection_train
 print "Selection for validation events: %s" % selection_validation
 
@@ -98,7 +108,7 @@ if args.sideband:
   features_data_sideband = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 2 %s) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (handicap, rand_branch, train_frac)) 
   features_data_sideband_mc = root_numpy.tree2array(tree, branches = branches, selection = '(data_sideband_label_ == 1 && label_ == 0 %s) || (label_ == 1 && %s < %.6f && data_sideband_label_ == 0)' % (handicap, rand_branch, train_frac))
 
-features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d %s' % (data_label, "&& data_sideband_label_ == 0" if args.sideband else ""))
+features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d %s %s' % (data_label, "&& data_sideband_label_ == 0" if args.sideband else "", ptoM_cut))
 
 
 # Calculate DNN scores

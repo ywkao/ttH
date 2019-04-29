@@ -9,7 +9,7 @@ args = parser.parse_args()
 inputs = (args.inputs.replace(" ","")).split(",")
 labels = args.labels.split(",")
 
-colors = ["black", "red", "blue", "green"]
+colors = ["black", "red", "blue", "green", "orange"]
 
 files = []
 for input in inputs:

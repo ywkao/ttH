@@ -32,6 +32,7 @@ if not args.soft_rerun:
   os.system("rm package.tar.gz")
 
   os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' -f package.tar.gz %s" % cmssw_ver) 
+  os.system("for task in `ls -1 -d tasks/*%s*/`; do echo cp package.tar.gz $task/package.tar.gz; cp package.tar.gz $task/package.tar.gz; done" % args.tag) # make sure we overwrite any previously existing tar files
 
   with open("versions.txt", "a") as fout:
     os.chdir("%s/src/flashgg/" % cmssw_ver)

@@ -407,7 +407,7 @@ int main(int argc, char* argv[])
   
     vector<TString> vBkgs;
     if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW"};
+      vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH"};
     else if (year == "2017")
       vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "TGamma", "THW", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
 
