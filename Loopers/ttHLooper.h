@@ -29,6 +29,7 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "TTV"));
   v.push_back(new Process(f, "VV"));
   v.push_back(new Process(f, "tV"));
+  v.push_back(new Process(f, "FCNC"));
   //v.push_back(new Process
 
   return v;
@@ -343,6 +344,8 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
     return 20;
   else if (currentFileTitle.Contains("ST_tW") || currentFileTitle.Contains("tZq"))
     return 21;
+  else if (currentFileTitle.Contains("FCNC"))
+    return 22;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -480,9 +483,15 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
   }
 }
 
+/* These are for p_T/m_gg > 0.2 
 const double diphoton_factor_hadronic_runII = 1.147982488785183;
 const double gjets_factor_hadronic_runII    = 1.7587831077271554;
 const double qcd_factor_hadronic_runII      = 2.290911314017982;
+*/
+// No cut on p_T/m_gg
+const double diphoton_factor_hadronic_runII = 1.1876246790390081;
+const double gjets_factor_hadronic_runII    = 1.8279831173728753;
+const double qcd_factor_hadronic_runII      = 2.3186537475651194;
 
 const double qcd_gjets_impute_factor_hadronic_runII = 0.9383634106686037;
 const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
@@ -619,7 +628,7 @@ TF1* get_photon_ID_shape(TString type) {
     f_IDMVA->SetParameter(6, 58033.1); 
     f_IDMVA->SetParameter(7, -55772.5); 
   }
-  else if (type == "fake_runII") {
+  else if (type == "fake_runII_pTMggCutAtPoint2") {
     f_IDMVA->SetParameter(0, 6244.78);
     f_IDMVA->SetParameter(1, -8740.43);
     f_IDMVA->SetParameter(2, 10637.2);
@@ -628,6 +637,17 @@ TF1* get_photon_ID_shape(TString type) {
     f_IDMVA->SetParameter(5, 969.525);
     f_IDMVA->SetParameter(6, 26352);
     f_IDMVA->SetParameter(7, -18116.8);
+  }
+
+  else if (type == "fake_runII") {
+    f_IDMVA->SetParameter(0, 7513.99);
+    f_IDMVA->SetParameter(1, -10002.3);
+    f_IDMVA->SetParameter(2, 11186.2);
+    f_IDMVA->SetParameter(3, -6361.53);
+    f_IDMVA->SetParameter(4, -5173.1);
+    f_IDMVA->SetParameter(5, 2221.39);
+    f_IDMVA->SetParameter(6, 29594.1);
+    f_IDMVA->SetParameter(7, -22148.4);
   }
 
   else if (type == "fake_barrel_lowPt") {
@@ -1363,7 +1383,13 @@ const vector<TString> vSamples_2016_RunII = {
 		"TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext3-v1_MINIAODSIM_RunII",
 			
 		// t + gamma
-		"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII"
+		"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+		
+		// FCNC
+		"ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
+		"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
+		"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
+		"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII"
 
 };
 
@@ -1373,6 +1399,15 @@ const vector<TString> vSamples_2017_RunII = {
 		"DoubleEG_Run2017D-31Mar2018-v1_MINIAOD_RunII",
 		"DoubleEG_Run2017E-31Mar2018-v1_MINIAOD_RunII",
 		"DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_RunII",
+
+		// FCNC
+                "ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+                "ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+                "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
+                "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+                "TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+                "TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+
 
 		// ttH Signal
 		//"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
@@ -1499,7 +1534,8 @@ const vector<TString> vSamples_2018_RunII = {
 		"TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2_MINIAODSIM_RunII",
 
                 // t + gamma
-		"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v2_MINIAODSIM_RunII",
+		"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v2_MINIAODSIM_RunII"
+
 };
 
 //const char* json_2018 = "GoldenJSON/Cert_314472-322633_13TeV_PromptReco_Collisions18_JSON_snt.txt";
@@ -1533,7 +1569,7 @@ void add_samples(TChain* ch, TString year) {
   vector<TString> vSamples;
 
   if (runII) {
-    tag = "v1.2";
+    tag = "v1.4";
     location = "/home/users/sjmay/ttH/Loopers/merged_babies";
     if (year.Contains("2016"))
       vSamples = vSamples_2016_RunII;

@@ -30,11 +30,22 @@ int main(int argc, char* argv[]) {
 
   TChain *ch = new TChain("tthLeptonicTagDumper/trees/tth_13TeV_all"); 
 
-  if (year == "RunII") {
-    add_samples(ch, "2016_RunII");
-    add_samples(ch, "2017_RunII");
-    add_samples(ch, "2018_RunII");
+  if (year.Contains("RunII")) {
+    if (year == "RunII") {
+      add_samples(ch, "2016_RunII");
+      add_samples(ch, "2017_RunII");
+      add_samples(ch, "2018_RunII");
+    }
+    else {
+      if (year.Contains("2016"))
+	add_samples(ch, "2016_RunII");
+      if (year.Contains("2017"))
+	add_samples(ch, "2017_RunII");
+      if (year.Contains("2018"))
+	add_samples(ch, "2018_RunII");
+    }
   }
+
   else if (year == "All") {
     add_samples(ch, "2016");
     add_samples(ch, "2017");

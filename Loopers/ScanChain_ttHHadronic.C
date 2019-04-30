@@ -278,7 +278,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
      
       int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
 
-      if (year == "RunII" && !isData) {
+      if (year.Contains("RunII") && !isData) {
         double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
         if (mYear == "2016")
           evt_weight *= scale1fb * lumi_2016 * weight();

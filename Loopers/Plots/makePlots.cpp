@@ -33,14 +33,14 @@ std::map<TString, TString> mLabels = {
 };
 
 std::map<TString, int> mColors = {
-        {"DY", kViolet-9},
+        {"DY", kViolet+3},
         {"DiPhoton", kBlue - 4},
         {"GammaJets", kAzure + 1},
 	{"GammaJets_Madgraph", kRed},
         {"QCD", kCyan-7},
         {"TTGG", kGreen-2},
         {"TTGJets", kGreen-7},
-        {"VG", kViolet+3},
+        {"VG", kViolet-9},
         {"WJets", kBlue+2},
         {"TTJets", kSpring+10},
 	{"TGamma", kYellow-9},

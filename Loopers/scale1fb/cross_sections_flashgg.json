@@ -273,5 +273,11 @@
 	"VBFHToGG_M125_13TeV_amcatnlo_pythia8_v2" : { "xs" : 3.782, "br" : 0.00227, "comment" : "copied by Sam from VBFHToGG_M125_13TeV_amcatnlo_pythia8" },
 	"WGToLNuG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 157.5, "br" : 1.0, "comment" : "originally copied by Sam from WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8, however, after discussion with Nick and Philip, saw that this sample has different generator level cuts than the 2016 sample and has a different cross section because of this" },
 	"ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 117.864, "br" : 1.0, "comment" : "copied by Sam from ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" },
-	"tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-madgraph-pythia8" : { "xs" : 0.0758, "br" : 1.0, "comment" : "copied by Sam from tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-madgraph-pythia8" }
+	"tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-madgraph-pythia8" : { "xs" : 0.0758, "br" : 1.0, "comment" : "copied by Sam from tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-madgraph-pythia8" },
+	"TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 15.3837, "br" : 0.00393414, "comment" : "xs taken from H->bb FCNC AN. br is BR(gg)/BR(bb). xs is also scaled by 0.832 (tt->all hadronic/tt->semi/di leptonic)"},
+	"TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8" : {"xs" : 15.3837, "br" : 0.00393414, "comment" : "xs taken from H->bb FCNC AN. br is BR(gg)/BR(bb). xs is also scaled by 0.832 (tt->all hadronic/tt->semi/di leptonic)"},
+	"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 18.49, "br" : 0.00393414, "comment" : "xs taken from H->bb FCNC AN. br is BR(gg)/BR(bb)"},
+	"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 18.49, "br" : 0.00393414, "comment" : "xs taken from H->bb FCNC AN. br is BR(gg)/BR(bb)"},
+	"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 1.90, "br" : 0.00393414, "comment" : "xs taken from H->bb FCNC AN. br is BR(gg)/BR(bb)"},
+	"ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 13.84, "br" : 0.00393414, "comment" : "xs taken from H->bb FCNC AN. br is BR(gg)/BR(bb)"}	
 }

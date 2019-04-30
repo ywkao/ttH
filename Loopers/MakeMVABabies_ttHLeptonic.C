@@ -192,7 +192,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       evt_weight_ = 1.;
 
-      if (year == "RunII" && !isData) {
+      if (year.Contains("RunII") && !isData) {
         double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
         if (mYear == "2016")
           evt_weight_ *= scale1fb * lumi_2016 * weight();

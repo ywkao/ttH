@@ -71,7 +71,16 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_) {
     return true;
   }
 
-  if (tag == "ttHHadronic_RunII_MVA_Presel_CutPtoM") {
+  else if (tag == "ttHHadronic_RunII_MVA_Presel_CutPtoM_light") {
+    if (mass() < 100)                                   return false;
+    if (lead_ptoM() < 0.2 || sublead_ptoM() < 0.2)      return false;
+    if (n_jets() < 3)                                   return false;
+    if (nb_loose() < 1)                                 return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    return true;
+  }
+
+  else if (tag == "ttHHadronic_RunII_MVA_Presel_CutPtoM") {
     if (mass() < 100)                                   return false;
     if (lead_ptoM() < 0.5 || sublead_ptoM() < 0.25)	return false;
     if (n_jets() < 3)                                   return false;
