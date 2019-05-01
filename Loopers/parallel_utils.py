@@ -26,5 +26,8 @@ def submit_jobs(command_list, n_par, nice=True):
         os.system("sleep 5s")
   while len(running_procs) > 0:
     for i in range(len(running_procs)):
-      if not running_procs[i].is_alive():
-        running_procs.pop(i)
+      try:
+        if not running_procs[i].is_alive():
+          running_procs.pop(i)
+      except:
+	continue

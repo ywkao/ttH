@@ -487,21 +487,28 @@ double qcdX_factor(TString currentFileTitle, TString qcd_scale, int n_jets) {
 const double diphoton_factor_hadronic_runII = 1.147982488785183;
 const double gjets_factor_hadronic_runII    = 1.7587831077271554;
 const double qcd_factor_hadronic_runII      = 2.290911314017982;
+
+const double qcd_gjets_impute_factor_hadronic_runII = 0.9383634106686037;
+const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
 */
 // No cut on p_T/m_gg
 const double diphoton_factor_hadronic_runII = 1.1876246790390081;
 const double gjets_factor_hadronic_runII    = 1.8279831173728753;
 const double qcd_factor_hadronic_runII      = 2.3186537475651194;
 
-const double qcd_gjets_impute_factor_hadronic_runII = 0.9383634106686037;
-const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
+const double qcd_gjets_impute_factor_hadronic_runII = 0.9433630221924071; 
+const double diphoton_impute_factor_hadronic_runII  = 1.24575175003913; 
 
-const double diphoton_factor_leptonic_runII = 1.00;
-const double gjets_factor_leptonic_runII    = 1.00;
+const double diphoton_factor_leptonic_runII = 1.919798;
+const double gjets_factor_leptonic_runII    = 1.919798;
 const double qcd_factor_leptonic_runII      = 1.00;
 
-const double qcd_gjets_impute_factor_leptonic_runII = 1.0;
+const double qcd_gjets_impute_factor_leptonic_runII = 0.02350297991807451;
 const double diphoton_impute_factor_leptonic_runII  = 1.0;
+
+const double diphoton_nTightLep0_prob = 0.4865;
+const double diphoton_nTightLep1_prob = 0.4791;
+const double diphoton_nTightLep2_prob = 0.0344;
 
 double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel) {
   if (bkg_options == "none")
@@ -535,6 +542,27 @@ double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, T
   else if (channel == "Leptonic") {
     if (bkg_options == "old_vgamma")
       return 1.0;
+    else if (bkg_options == "scale_mc") {
+      if (currentFileTitle.Contains("GJets_HT"))
+        return gjets_factor_leptonic_runII;
+      else if (currentFileTitle.Contains("QCD"))
+        return qcd_factor_leptonic_runII;
+      else if (currentFileTitle.Contains("DiPhotonJetsBox"))
+        return diphoton_factor_leptonic_runII;
+      else
+	return 1.0;
+    }
+    else if (bkg_options == "impute_no_scale")
+      return 1.0;
+    else if (bkg_options == "impute") {
+      if ((currentFileTitle.Contains("EGamma") || currentFileTitle.Contains("DoubleEG")) && processId == 18)
+        return qcd_gjets_impute_factor_leptonic_runII;
+      else if (currentFileTitle.Contains("DiPhotonJetsBox"))
+        return diphoton_impute_factor_leptonic_runII;
+      else
+        return 1.0;
+    }
+
   }
 
   else
@@ -559,12 +587,14 @@ void impute_photon_and_lepton_id(double minID_cut, float maxIDMVA, TF1* photon_f
   if (!(maxIDMVA > minID_cut && minIDMVA < minID_cut && n_lep_medium == 0))
     return;
   else {
+    //cout << "Imputing this event: maxIDMVA = " << maxIDMVA << ", minIDMVA = " << minIDMVA << ", n_lep_medium = " << n_lep_medium <<endl;
     minIDMVA = photon_fakeID_shape->GetRandom(minID_cut, maxIDMVA);
     double rand = myRand->Rndm();
-    n_lep_tight = rand <= 0.4841 ? 0 : (rand <= 0.9669 ? 1 : 2);
+    n_lep_tight = rand <= diphoton_nTightLep0_prob ? 0 : (rand <= diphoton_nTightLep0_prob + diphoton_nTightLep1_prob ? 1 : 2);
     n_lep_medium = n_lep_tight == 2 ? 2 : 1;
     evt_weight *= photon_fakeID_shape->Integral(minID_cut, maxIDMVA) / photon_fakeID_shape->Integral(-0.9, minID_cut);
     process_id = 18;
+    //cout << "Same event, after imputing: maxIDMVA = " << maxIDMVA << ", minIDMVA = " << minIDMVA << ", n_lep_medium = " << n_lep_medium << ", evt_weight = " << evt_weight << endl;
     return;
   }
 }
@@ -1385,11 +1415,12 @@ const vector<TString> vSamples_2016_RunII = {
 		// t + gamma
 		"TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
 		
-		// FCNC
+		// FCNC 
+		/*
 		"ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
 		"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
 		"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
-		"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII"
+		"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII" */
 
 };
 
@@ -1401,13 +1432,14 @@ const vector<TString> vSamples_2017_RunII = {
 		"DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_RunII",
 
 		// FCNC
+		/*
                 "ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
                 "ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
                 "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
                 "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
                 "TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
                 "TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
-
+		*/
 
 		// ttH Signal
 		//"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
@@ -1569,7 +1601,7 @@ void add_samples(TChain* ch, TString year) {
   vector<TString> vSamples;
 
   if (runII) {
-    tag = "v1.4";
+    tag = "v1.5";
     location = "/home/users/sjmay/ttH/Loopers/merged_babies";
     if (year.Contains("2016"))
       vSamples = vSamples_2016_RunII;

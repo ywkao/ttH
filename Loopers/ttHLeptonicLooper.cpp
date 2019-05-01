@@ -23,6 +23,8 @@ int main(int argc, char* argv[]) {
     cout << "Scaling QCD/GammaJets/DiPhoton MC" << endl;
   else if (bkg_options == "impute")
     cout << "Using data-driven QCD/GammaJets description. Scaling normalization along with DiPhoton MC" << endl;
+  else if (bkg_options == "impute_no_scale")
+    cout << "Using data-driven QCD/GammaJets description. NOT scaling normalization" << endl;
   else if (bkg_options == "old_vgamma")
     cout << "Using DY sample for PF/PP events (instead of V+gamma sample)" << endl;
   else

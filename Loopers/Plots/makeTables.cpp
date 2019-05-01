@@ -369,7 +369,7 @@ int main(int argc, char* argv[])
     TFile* f = new TFile(file_path);
     vector<TString> vBkgs;
     if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
+      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
     else if (year == "2017")
       vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
 

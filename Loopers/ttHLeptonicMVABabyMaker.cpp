@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
   TString ext = argc <= 3 ? "" : argv[3];
   cout << "Saving output files with tag: " << ext << endl;
 
-  TString bkg_options = argc <= 5 ? "none" : argv[5];
+  TString bkg_options = argc <= 4 ? "none" : argv[4];
   if (bkg_options == "none")
     cout << "No MC scaling/bkg imputing applied to bkg" << endl;
   else if (bkg_options == "scale_mc")

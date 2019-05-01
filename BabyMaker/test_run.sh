@@ -73,7 +73,8 @@ if [ "$CMSSW_VER" = "102X" ]; then
 
   #INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/EGamma/RunIIFall18-4_0_0-RunIIFall18-4_0_0-3-g040ebcb0-v0-Run2018B-PromptReco-v1/microAOD_1.root'
   #INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_forHualin_2017/test_skim_1.root'
-  INPUTFILENAMES='file:/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII/test_skim_1.root'
+  #INPUTFILENAMES='file:/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII/test_skim_1.root'
+  INPUTFILENAMES='file:/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII/DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_RunII/test_skim_1.root'
   cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} "MetaData/data/MetaConditions/Era2018_RR-17Sep2018_v1.json"
 fi
 
@@ -89,7 +90,8 @@ if [ "$CMSSW_VER" = "105X" ]; then
 
   #INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD_skim/RunIIFall18-4_0_0/EGamma/RunIIFall18-4_0_0-RunIIFall18-4_0_0-3-g040ebcb0-v0-Run2018B-PromptReco-v1/microAOD_1.root'
   #INPUTFILENAMES='file:/hadoop/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_forHualin_2017/test_skim_1.root'
-  INPUTFILENAMES='file:/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII/test_skim_1.root'
+  #INPUTFILENAMES='file:/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII/test_skim_1.root'
+  INPUTFILENAMES='file:/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII/DoubleEG_Run2017F-31Mar2018-v1_MINIAOD_RunII/test_skim_1.root'
   cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} "MetaData/data/MetaConditions/Era2018_RR-17Sep2018_v1.json"
 fi
 

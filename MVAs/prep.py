@@ -89,7 +89,7 @@ selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_
 ptoM_cut = ""
 if args.cut_ptoM:
   if args.channel == "Hadronic":
-    ptoM_cut = "&& (leadptoM_ > 0.5 && subleadptoM_ > 0.25)"
+    ptoM_cut = "&& (leadptoM_ > 0.333 && subleadptoM_ > 0.25)"
   elif args.channel == "Leptonic":
     ptoM_cut = "&& (leadptoM_ > 0.33 && subleadptoM_ > 0.25)"
   selection_train += ptoM_cut
