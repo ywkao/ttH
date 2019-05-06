@@ -792,7 +792,15 @@ int main(int argc, char* argv[])
  
     make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA_coarse", "Hadronic MVA Score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA_fine", "Hadronic MVA Score", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx); 
- 
+
+    vInfo.push_back("N_{jets} >= 5");
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA_NJets5+", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_NJets5+", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx); 
+    vInfo[vInfo.size()-1] = "N_{jets} >= 7"; 
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA_NJets7+", "Max #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_NJets7+", "Min #gamma ID", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx); 
+
+    vInfo[vInfo.size()-1] = "";
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
   }
 }

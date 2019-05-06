@@ -143,7 +143,7 @@ param = {
 	'scale_pos_weight': sum_neg_weights / sum_pos_weights,
 	'subsample': 1.0,
 	'colsample_bytree': 1.0,
-	'nthread' : 8,
+	'nthread' : 12,
 	'min_child_weight' : 1,
 	}
 

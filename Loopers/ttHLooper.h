@@ -159,6 +159,12 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonMaxIDMVA_coarse", 5, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_coarse_entries", 5, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_coarse_entries", 5, -1, 1);
+
+    v[i]->add_histogram("hPhotonMaxIDMVA_NJets5+", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_NJets5+", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMaxIDMVA_NJets7+", 10, -1, 1);
+    v[i]->add_histogram("hPhotonMinIDMVA_NJets7+", 10, -1, 1);
+
     v[i]->add_histogram("hPhotonMinIDMVA_coarse_0b", 5, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_coarse_0b", 5, -1, 1);
     v[i]->add_2D_histogram("hPhotonMaxIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5); 
@@ -492,9 +498,9 @@ const double qcd_gjets_impute_factor_hadronic_runII = 0.9383634106686037;
 const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
 */
 // No cut on p_T/m_gg
-const double diphoton_factor_hadronic_runII = 1.1876246790390081;
-const double gjets_factor_hadronic_runII    = 1.8279831173728753;
-const double qcd_factor_hadronic_runII      = 2.3186537475651194;
+const double diphoton_factor_hadronic_runII = 1.2247879210012904;
+const double gjets_factor_hadronic_runII    = 1.8330524459247017;
+const double qcd_factor_hadronic_runII      = 2.0797761555731786;
 
 const double qcd_gjets_impute_factor_hadronic_runII = 0.9433630221924071; 
 const double diphoton_impute_factor_hadronic_runII  = 1.24575175003913; 

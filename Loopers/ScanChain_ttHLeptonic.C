@@ -581,6 +581,18 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse", maxID, evt_weight, vId);
       vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse_entries", minID, 1, vId);
       vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse_entries", maxID, 1, vId);
+
+      if (njets_ >= 5)
+        vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets5+", maxID, evt_weight, vId);
+      if (njets_ >= 7)
+        vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets7+", maxID, evt_weight, vId);
+
+      if (njets_ >= 5)
+        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets5+", minID, evt_weight, vId);
+      if (njets_ >= 7)
+        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets7+", minID, evt_weight, vId);
+
+
       if (nb_medium() == 0) {
 	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse_0b", minID, evt_weight, vId);
         vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse_0b", maxID, evt_weight, vId);

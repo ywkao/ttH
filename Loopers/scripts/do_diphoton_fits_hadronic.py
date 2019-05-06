@@ -13,8 +13,8 @@ bdt = "none"
 
 os.chdir("../")
 command_list = []
-#command_list.append('./ttHHadronicLooper "ttHHadronic_RunII_DiPhotonFits_Presel" "RunII" "%s" "%s" "none"' % (args.tag + "prefit", bdt))
-#command_list.append('./ttHHadronicLooper "ttHHadronic_RunII_MVA_Presel" "RunII" "%s" "%s" "none"' % (args.tag + "prefit", bdt))
+command_list.append('./ttHHadronicLooper "ttHHadronic_RunII_DiPhotonFits_Presel" "RunII" "%s" "%s" "none"' % (args.tag + "prefit", bdt))
+command_list.append('./ttHHadronicLooper "ttHHadronic_RunII_MVA_Presel" "RunII" "%s" "%s" "none"' % (args.tag + "prefit", bdt))
 parallel_utils.submit_jobs(command_list, 2)
 
 os.chdir("tt_template_fit")

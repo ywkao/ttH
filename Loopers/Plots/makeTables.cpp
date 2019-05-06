@@ -369,7 +369,7 @@ int main(int argc, char* argv[])
     TFile* f = new TFile(file_path);
     vector<TString> vBkgs;
     if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "QCD", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
+      vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
     else if (year == "2017")
       vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
 
@@ -385,10 +385,11 @@ int main(int argc, char* argv[])
     make_table_std(f, "hNVtx", vBkgs, label, "Year_2");
     make_table_components(f, "hNVtx", vBkgs, label, mYears, "Year");
     make_table_components(f, "hNVtx", vBkgs, label, mLeptons, "GenLepton");
-    make_table_components(f, "hNVtx", vBkgs, label, mRecoLeptons, "RecoLepton");
     make_table_components(f, "hNVtx", vBkgs, label, mPhotons, "GenPhoton"); 
     make_table_components(f, "hNVtx", vBkgs, label, mPhotonsDetail, "GenPhotonDetail");
     make_table_components(f, "hNVtx", vBkgs, label, mPhotonLocations, "PhotonLocations", true);
+    vBkgs.push_back("Data"); 
+    make_table_components(f, "hNVtx", vBkgs, label, mRecoLeptons, "RecoLepton");
   }
 
   else if (argc >= 3) {
@@ -411,8 +412,7 @@ int main(int argc, char* argv[])
     else if (year == "2017")
       vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "TGamma", "THW", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
 
-    if (file_paths[0].Contains("impute"))
-      vBkgs.push_back("QCD_GammaJets_imputed");
+    vBkgs.push_back("QCD_GammaJets_imputed");
 
     make_table_multiple(vF, "hNVtx", vBkgs, vLabels); 
 
