@@ -48,6 +48,7 @@ mass = utils.load_array(f, 'mass')
 njets = utils.load_array(f, 'njets')
 lead_sigmaEtoE = utils.load_array(f, 'lead_sigmaEtoE')
 sublead_sigmaEtoE = utils.load_array(f, 'sublead_sigmaEtoE')
+signal_mass_label = utils.load_array(f, 'signal_mass_label')
 
 if args.sideband:
   global_features = utils.load_array(f, 'global_data_sideband')
@@ -64,6 +65,7 @@ multi_label_validation = utils.load_array(f, 'multi_label_validation')
 weights_validation = utils.load_array(f, 'weights_validation')
 mass_validation = utils.load_array(f, 'mass_validation')
 njets_validation = utils.load_array(f, 'njets_validation')
+signal_mass_label_validation = utils.load_array(f, 'signal_mass_label_validation')
 
 global_features_data = utils.load_array(f, 'global_data')
 label_data = utils.load_array(f, 'label_data')
@@ -71,7 +73,7 @@ multi_label_data = utils.load_array(f, 'multi_label_data')
 weights_data = utils.load_array(f, 'weights_data')
 mass_data = utils.load_array(f, 'mass_data')
 njets_data = utils.load_array(f, 'njets_data')
-
+signal_mass_label_data = utils.load_array(f, 'signal_mass_label_data')
 
 train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
 nTrain = int(len(label)*train_frac)
@@ -154,7 +156,7 @@ if args.multi:
 
 print param
 
-n_round = 300 if args.channel == "Hadronic" else 100
+n_round = 300 if args.channel == "Hadronic" else 150
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 
@@ -226,8 +228,17 @@ tree_sample_id = numpy.concatenate((label, label_validation, label_data))
 tree_mass = numpy.concatenate((mass, mass_validation, mass_data))
 tree_weight = numpy.concatenate((weights, weights_validation, weights_data))
 tree_bdt_score = numpy.concatenate((pred_train, pred_test, pred_data))
+tree_signal_mass_label = numpy.concatenate((signal_mass_label, signal_mass_label_validation, signal_mass_label_data))
 
-out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score], names = 'train_id,sample_id,mass,weight,mva_score')
+tree_train_id = tree_train_id.astype(numpy.int64)
+tree_sample_id = tree_sample_id.astype(numpy.int64)
+tree_mass = tree_mass.astype(numpy.float64)
+tree_weight = tree_weight.astype(numpy.float64)
+tree_bdt_score = tree_bdt_score.astype(numpy.float64)
+tree_signal_mass_label = tree_signal_mass_label.astype(numpy.int64)
+
+out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label')
+#out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label], dtype = [('train_id','<u8'), ('sample_id','<u8'), ('mass','<f8'),('weight','<f8'), ('mva_score','<f8'),('signal_mass_label','<u8')])
 root_numpy.array2root(out_array, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag), treename = 't')
 
 
