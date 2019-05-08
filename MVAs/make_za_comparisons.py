@@ -29,6 +29,7 @@ for i in range(len(files)):
   ax1.plot(files[i]["signal"], files[i]["za"], label = labels[i], color = colors[i])
   ax1.fill_between(files[i]["signal"], files[i]["za"] - files[i]["za_unc"], files[i]["za"] + files[i]["za_unc"], color = colors[i], alpha = 0.25)
   plt.xlabel('# Signal Events')
+  plt.gca().set_xlim(left=2)
   ax1.set_ylabel('Significance (Z_A)')
   ax1.legend(loc='lower left')
 
@@ -44,6 +45,7 @@ for i in range(len(files)):
   ax1.plot(files[i]["signal_data"], files[i]["za_data"], label = labels[i], color = colors[i])
   ax1.fill_between(files[i]["signal_data"], files[i]["za_data"] - files[i]["za_unc_data"], files[i]["za_data"] + files[i]["za_unc_data"], color = colors[i], alpha = 0.25)
   plt.xlabel('# Signal Events')
+  plt.gca().set_xlim(left=2)
   ax1.set_ylabel('Significance (Z_A)')
   ax1.legend(loc='lower left')
 

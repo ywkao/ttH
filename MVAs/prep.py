@@ -71,9 +71,9 @@ if args.no_psv:
   to_remove += ["leadPSV_", "subleadPSV_"]
 
 if args.channel == "Hadronic":
-  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_"]))
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_"]))
 elif args.channel == "Leptonic":
-  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_"]))
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_"]))
 
 # grab features
 train_frac = args.train_frac
@@ -121,11 +121,13 @@ if do_dnn:
   print "Calculating dnn scores"
   dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
   print len(dnn_features)
+  print [feat for feat in dnn_features]
   if args.channel == "Leptonic":
     dnn_features += ["n_lep_tight_"]
     if args.do_top_tag:
       dnn_features += ["top_tag_score_"]
   i = 0
+  print dnn_features
   for model in dnn_models:
     dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = [features_data[feat] for feat in dnn_features], objects = features_data["objects_"])
     dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = [features[feat] for feat in dnn_features], objects = features["objects_"])
@@ -200,6 +202,7 @@ njets = features["njets_"]
 lead_sigmaEtoE = features["lead_sigmaEtoE_"]
 sublead_sigmaEtoE = features["sublead_sigmaEtoE_"]
 signal_mass_label = features["signal_mass_label_"]
+tth_2017_reference_mva = features["tth_2017_reference_mva_"]
 
 mvas = {}
 for name in mva_names:
@@ -211,6 +214,7 @@ weights_validation = features_validation["evt_weight_"]
 mass_validation = features_validation["mass_"]
 njets_validation = features_validation["njets_"]
 signal_mass_label_validation = features_validation["signal_mass_label_"]
+tth_2017_reference_mva_validation = features_validation["tth_2017_reference_mva_"]
 
 mvas_validation = {}
 for name in mva_names:
@@ -222,6 +226,7 @@ weights_data = features_data["evt_weight_"]
 mass_data = features_data["mass_"]
 njets_data = features_data["njets_"]
 signal_mass_label_data = features_data["signal_mass_label_"]
+tth_2017_reference_mva_data = features_data["tth_2017_reference_mva_"]
 
 mvas_data = {}
 for name in mva_names:
@@ -269,6 +274,7 @@ dset_njets = f_out.create_dataset("njets", data=njets)
 dset_lead_sigmaEtoE = f_out.create_dataset("lead_sigmaEtoE", data=lead_sigmaEtoE)
 dset_sublead_sigmaEtoE = f_out.create_dataset("sublead_sigmaEtoE", data=sublead_sigmaEtoE)
 dset_signal_mass_label  = f_out.create_dataset("signal_mass_label", data=signal_mass_label)
+dset_tth_2017_reference_mva  = f_out.create_dataset("tth_2017_reference_mva", data=tth_2017_reference_mva)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name, data=mvas[name])
@@ -280,6 +286,7 @@ dset_weights_validation = f_out.create_dataset("weights_validation", data=weight
 dset_mass_validation = f_out.create_dataset("mass_validation", data=mass_validation)
 dset_njets_validation = f_out.create_dataset("njets_validation", data=njets_validation)
 dset_signal_mass_label_validation  = f_out.create_dataset("signal_mass_label_validation", data=signal_mass_label_validation)
+dset_tth_2017_reference_mva_validation  = f_out.create_dataset("tth_2017_reference_mva_validation", data=tth_2017_reference_mva_validation)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_validation", data=mvas_validation[name])
@@ -292,6 +299,7 @@ dset_weights_data = f_out.create_dataset("weights_data", data=weights_data)
 dset_mass_data = f_out.create_dataset("mass_data", data=mass_data)
 dset_njets_data = f_out.create_dataset("njets_data", data=njets_data)
 dset_signal_mass_label_data  = f_out.create_dataset("signal_mass_label_data", data=signal_mass_label_data)
+dset_tth_2017_reference_mva_data  = f_out.create_dataset("tth_2017_reference_mva_data", data=tth_2017_reference_mva_data)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_data", data=mvas_data[name])

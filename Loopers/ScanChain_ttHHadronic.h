@@ -59,6 +59,7 @@ bool pass_2017_mva_presel() {
 }
 
 bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_) {
+
   // common to all selections
   if (!(leadPassEVeto() && subleadPassEVeto()))       return false; // always require e veto
   if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)    return false; // don't use photon ID below -0.9
@@ -101,6 +102,14 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_) {
   else if (tag == "ttHHadronic_RunII_DiPhotonFits_Presel") {
     if (mass() < 100)                                   return false;
     if (n_jets() < 2)                                   return false;
+    return true;
+  }
+
+  else if (tag == "ttHHadronic_2017_Presel") {
+    if (mass() < 100 || mass() > 180)             	return false;
+    if (lead_ptoM() < 0.333 || sublead_ptoM() < 0.25)   return false;
+    if (n_jets() < 2)                                   return false;
+    if (minIDMVA_ < -0.2)				return false;
     return true;
   }
 

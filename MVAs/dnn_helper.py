@@ -129,6 +129,10 @@ class DNN_Helper:
       self.auc["train"].append(auc_train)
       self.auc_unc["train"].append(auc_unc_train)
 
+      self.model.save_weights("dnn_weights/" + self.tag + "_weights_%d.hdf5" % i)
+      with open("dnn_weights/" + self.tag + "_model_architecture_%d.json" % i, "w") as f_out:
+	f_out.write(self.model.to_json())
+
     return auc_train, auc
     
   def train_with_early_stopping(self):
@@ -150,6 +154,11 @@ class DNN_Helper:
 	  bad_epochs += 1
 	if bad_epochs >= 2:
           keep_training = False
+
+    self.model.save_weights("dnn_weights/" + self.tag + "_weights.hdf5")
+    with open("dnn_weights/" + self.tag + "_model_architecture.json", "w") as f_out:
+      f_out.write(self.model.to_json())
+
     return
 
   def initialize_plot(self):
@@ -185,6 +194,7 @@ class DNN_Helper:
     plt.savefig('dnn_roc_%s_%s.pdf' % (reference.replace(" ", "_"), self.tag))
 
   def do_diagnostics(self):
+    numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"])
     self.make_learning_curve()
     for ref in self.features_validation.references.iterkeys():
       self.make_comparison(ref)

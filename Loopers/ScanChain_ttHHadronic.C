@@ -147,7 +147,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
     mva->AddVariable("met_", &met_);
 
-    mva->AddVariable("top_tag_score_", &top_tag_score_);
+    //mva->AddVariable("top_tag_score_", &top_tag_score_);
     mva->AddVariable("dipho_pt_over_mass_", &dipho_pt_over_mass_);
 
     mva->AddVariable("helicity_angle_", &helicity_angle_);
@@ -656,6 +656,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_2D_histogram("hPhotonLeadIDMVA_LeadEta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
       vProcess[processId]->fill_2D_histogram("hPhotonSubleadIDMVA_SubleadPt", subleadIDMVA(), subleadPt(), evt_weight, vId);
       vProcess[processId]->fill_2D_histogram("hPhotonSubleadIDMVA_SubleadEta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId); 
+
+      // Checks for p_T/mGG cuts
+      vProcess[processId]->fill_2D_histogram("hBDT_LeadPtoM", mva_value, leadptoM_, evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hBDT_SubleadPtoM", mva_value, subleadptoM_, evt_weight, vId); 
+      vProcess[processId]->fill_2D_histogram("hMass_LeadPtoM", mass(), leadptoM_, evt_weight, vId);
+      vProcess[processId]->fill_2D_histogram("hMass_SubleadPtoM", mass(), subleadptoM_, evt_weight, vId);
+      if (mva_value > 0.9) {
+	vProcess[processId]->fill_2D_histogram("hMass_LeadPtoM_afterBDTCut", mass(), leadptoM_, evt_weight, vId);
+        vProcess[processId]->fill_2D_histogram("hMass_SubleadPtoM_afterBDTCut", mass(), subleadptoM_, evt_weight, vId);
+      }
 
       if (n_jets() == 2) {
 	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets2", maxID, evt_weight, vId);

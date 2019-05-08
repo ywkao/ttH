@@ -206,6 +206,13 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", 20, -1, 1, 20, 0, 300);
     v[i]->add_2D_histogram("hPromptPhotonIDMVA_DiPhotonPt", 20, -1, 1, 20, 0, 300);
 
+    v[i]->add_2D_histogram("hBDT_LeadPtoM", 20, 0, 1, 20, 0, 2);
+    v[i]->add_2D_histogram("hBDT_SubleadPtoM", 20, 0, 1, 20, 0, 2);
+    v[i]->add_2D_histogram("hMass_LeadPtoM", 20, 100, 180, 20, 0, 2);
+    v[i]->add_2D_histogram("hMass_SubleadPtoM", 20, 100, 180, 20, 0, 2);
+    v[i]->add_2D_histogram("hMass_LeadPtoM_afterBDTCut", 20, 100, 180, 20, 0, 2);
+    v[i]->add_2D_histogram("hMass_SubleadPtoM_afterBDTCut", 20, 100, 180, 20, 0, 2);
+
     v[i]->add_histogram("hPhotonMaxIDMVA_NJets2", 30, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_NJets2", 30, -1, 1);
     v[i]->add_histogram("hPhotonMaxIDMVA_NJets3", 30, -1, 1);
