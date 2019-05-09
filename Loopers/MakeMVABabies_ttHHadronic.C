@@ -510,6 +510,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         top_tag_phi_ = -1;
       //}
 
+      evt_run_lumi_ = to_string(cms3.event()) + "_" + to_string(cms3.run()) + "_" + to_string(cms3.lumi()); 
+
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);

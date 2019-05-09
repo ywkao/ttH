@@ -1,7 +1,7 @@
 #include "ScanChain_ttHHadronic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-  TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + ".root", "RECREATE");
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+  TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + idx + ".root", "RECREATE");
   f1->cd();
 
   // Benchmark
@@ -204,7 +204,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       if (categorize_signal_sample(currentFileTitle) != 0)
         continue;
     }
-    TString mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year"));
+    
+    if (mYear == "")
+      mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year"));
 
     if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
     if (bkg_options.Contains("impute") && (currentFileTitle.Contains("GJets_HT") || currentFileTitle.Contains("QCD"))) {
@@ -426,6 +428,12 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hGJet_BDT", gjet_mva_value, evt_weight, vId);
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   
       vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
+      
+      if (leadptoM_ > 0.33 && subleadptoM_ > 0.25)
+	vProcess[processId]->fill_histogram("hMass_PassPtToM", mass(), evt_weight, vId);
+      else
+	vProcess[processId]->fill_histogram("hMass_FailPtToM", mass(), evt_weight, vId);
+
       cout.setf(ios::fixed);
       cout << std::setprecision(6);
 

@@ -46,6 +46,7 @@ class DNN_Helper:
     self.features_train = kwargs.get('features_train', [])
     self.features_data = kwargs.get('features_data', [])
     self.features_final_fit = kwargs.get('features_final_fit', [])   
+    self.evt_run_lumi_data = kwargs.get('evt_run_lumi_data', [])
  
     self.tag = kwargs.get('tag', '')
 
@@ -196,7 +197,7 @@ class DNN_Helper:
     plt.savefig('dnn_roc_%s_%s.pdf' % (reference.replace(" ", "_"), self.tag))
 
   def do_diagnostics(self):
-    numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"], scores_final_fit = self.predictions["final_fit"])
+    numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"], scores_final_fit = self.predictions["final_fit"], evt_run_lumi_data = self.evt_run_lumi_data)
     self.make_learning_curve()
     for ref in self.features_validation.references.iterkeys():
       self.make_comparison(ref)

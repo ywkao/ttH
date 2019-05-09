@@ -43,7 +43,7 @@ else:
 
 feature_names = numpy.concatenate((feature_names, top_tag_features))
 
-branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_"]))
+branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_", "evt_run_lumi_"]))
 branches = numpy.unique(branches)
 
 
@@ -72,7 +72,7 @@ print selection
 
 features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
 features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
-features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))'
+features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))')
 
 #features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, selection))
 #features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, selection))
@@ -210,6 +210,7 @@ top_tag_score = features["top_tag_score_"]
 tth_ttPP_mva = features["tth_ttPP_mva_"]
 tth_dipho_mva = features["tth_dipho_mva_"]
 tth_std_mva = features["tth_std_mva_"]
+evt_run_lumi = features["evt_run_lumi_"]
 
 label_validation = features_validation["label_"]
 multi_label_validation = features_validation["multi_label_"]
@@ -219,6 +220,7 @@ top_tag_score_validation = features_validation["top_tag_score_"]
 tth_ttPP_mva_validation = features_validation["tth_ttPP_mva_"]
 tth_dipho_mva_validation = features_validation["tth_dipho_mva_"]
 tth_std_mva_validation = features_validation["tth_std_mva_"]
+evt_run_lumi_validation = features_validation["evt_run_lumi_"]
 
 label_data = features_data["label_"]
 multi_label_data = features_data["multi_label_"]
@@ -228,6 +230,7 @@ top_tag_score_data = features_data["top_tag_score_"]
 tth_ttPP_mva_data = features_data["tth_ttPP_mva_"]
 tth_dipho_mva_data = features_data["tth_dipho_mva_"]
 tth_std_mva_data = features_data["tth_std_mva_"]
+evt_run_lumi_data = features_data["evt_run_lumi_"]
 
 label_final_fit = features_final_fit["label_"]
 multi_label_final_fit = features_final_fit["multi_label_"]
@@ -237,7 +240,7 @@ top_tag_score_final_fit = features_final_fit["top_tag_score_"]
 tth_ttPP_mva_final_fit = features_final_fit["tth_ttPP_mva_"]
 tth_dipho_mva_final_fit = features_final_fit["tth_dipho_mva_"]
 tth_std_mva_final_fit = features_final_fit["tth_std_mva_"]
-
+evt_run_lumi_final_fit = features_final_fit["evt_run_lumi_"]
 
 # reorganize features
 #object_features = numpy.transpose(object_features)
@@ -267,6 +270,7 @@ dset_mass = f_out.create_dataset("mass", data=mass)
 dset_tth_ttPP_mva = f_out.create_dataset("tth_ttPP_mva", data=tth_ttPP_mva)
 dset_tth_dipho_mva = f_out.create_dataset("tth_dipho_mva", data=tth_dipho_mva)
 dset_tth_std_mva = f_out.create_dataset("tth_std_mva", data=tth_std_mva)
+dset_evt_run_lumi = f_out.create_dataset("evt_run_lumi", data=evt_run_lumi)
 dset_top_tag_score = f_out.create_dataset("top_tag_score", data=top_tag_score)
 dset_lead_sigmaEtoE = f_out.create_dataset("lead_sigmaEtoE", data=lead_sigmaEtoE)
 dset_sublead_sigmaEtoE = f_out.create_dataset("sublead_sigmaEtoE", data=sublead_sigmaEtoE)
@@ -281,6 +285,7 @@ dset_mass_validation = f_out.create_dataset("mass_validation", data=mass_validat
 dset_tth_ttPP_mva_validation = f_out.create_dataset("tth_ttPP_mva_validation", data=tth_ttPP_mva_validation)
 dset_tth_dipho_mva_validation = f_out.create_dataset("tth_dipho_mva_validation", data=tth_dipho_mva_validation)
 dset_tth_std_mva_validation = f_out.create_dataset("tth_std_mva_validation", data=tth_std_mva_validation)
+dset_evt_run_lumi_validation = f_out.create_dataset("evt_run_lumi_validation", data=evt_run_lumi_validation)
 
 dset_object_data = f_out.create_dataset("object_data", data=object_features_data)
 dset_global_data = f_out.create_dataset("global_data", data=global_features_data)
@@ -292,6 +297,7 @@ dset_mass_data = f_out.create_dataset("mass_data", data=mass_data)
 dset_tth_ttPP_mva_data = f_out.create_dataset("tth_ttPP_mva_data", data=tth_ttPP_mva_data)
 dset_tth_dipho_mva_data = f_out.create_dataset("tth_dipho_mva_data", data=tth_dipho_mva_data)
 dset_tth_std_mva_data = f_out.create_dataset("tth_std_mva_data", data=tth_std_mva_data)
+dset_evt_run_lumi_data = f_out.create_dataset("evt_run_lumi_data", data=evt_run_lumi_data)
 
 dset_object_final_fit = f_out.create_dataset("object_final_fit", data=object_features_final_fit)
 dset_global_final_fit = f_out.create_dataset("global_final_fit", data=global_features_final_fit)
@@ -303,7 +309,7 @@ dset_mass_final_fit = f_out.create_dataset("mass_final_fit", data=mass_final_fit
 dset_tth_ttPP_mva_final_fit = f_out.create_dataset("tth_ttPP_mva_final_fit", data=tth_ttPP_mva_final_fit)
 dset_tth_dipho_mva_final_fit = f_out.create_dataset("tth_dipho_mva_final_fit", data=tth_dipho_mva_final_fit)
 dset_tth_std_mva_final_fit = f_out.create_dataset("tth_std_mva_final_fit", data=tth_std_mva_final_fit)
-
+dset_evt_run_lumi_final_fit = f_out.create_dataset("evt_run_lumi_final_fit", data=evt_run_lumi_final_fit)
 
 if args.channel == "Leptonic":
   dset_jet = f_out.create_dataset("jet", data=jet_features)

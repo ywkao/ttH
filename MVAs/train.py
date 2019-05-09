@@ -50,6 +50,7 @@ lead_sigmaEtoE = utils.load_array(f, 'lead_sigmaEtoE')
 sublead_sigmaEtoE = utils.load_array(f, 'sublead_sigmaEtoE')
 signal_mass_label = utils.load_array(f, 'signal_mass_label')
 tth_2017_reference_mva = utils.load_array(f, 'tth_2017_reference_mva')
+evt_run_lumi = utils.load_array(f, 'evt_run_lumi')
 
 if args.sideband:
   global_features = utils.load_array(f, 'global_data_sideband')
@@ -68,6 +69,7 @@ mass_validation = utils.load_array(f, 'mass_validation')
 njets_validation = utils.load_array(f, 'njets_validation')
 signal_mass_label_validation = utils.load_array(f, 'signal_mass_label_validation')
 tth_2017_reference_mva_validation = utils.load_array(f, 'tth_2017_reference_mva_validation')
+evt_run_lumi_validation = utils.load_array(f, 'evt_run_lumi_validation')
 
 global_features_data = utils.load_array(f, 'global_data')
 label_data = utils.load_array(f, 'label_data')
@@ -77,6 +79,7 @@ mass_data = utils.load_array(f, 'mass_data')
 njets_data = utils.load_array(f, 'njets_data')
 signal_mass_label_data = utils.load_array(f, 'signal_mass_label_data')
 tth_2017_reference_mva_data = utils.load_array(f, 'tth_2017_reference_mva_data')
+evt_run_lumi_data = utils.load_array(f, 'evt_run_lumi_data')
 
 global_features_final_fit = utils.load_array(f, 'global_final_fit')
 label_final_fit = utils.load_array(f, 'label_final_fit')
@@ -86,6 +89,7 @@ mass_final_fit = utils.load_array(f, 'mass_final_fit')
 njets_final_fit = utils.load_array(f, 'njets_final_fit')
 signal_mass_label_final_fit = utils.load_array(f, 'signal_mass_label_final_fit')
 tth_2017_reference_mva_final_fit = utils.load_array(f, 'tth_2017_reference_mva_final_fit')
+evt_run_lumi_final_fit = utils.load_array(f, 'evt_run_lumi_final_fit')
 
 train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
 nTrain = int(len(label)*train_frac)
@@ -245,6 +249,8 @@ tree_weight = numpy.concatenate((weights, weights_validation, weights_data, weig
 tree_bdt_score = numpy.concatenate((pred_train, pred_test, pred_data, pred_final_fit))
 tree_signal_mass_label = numpy.concatenate((signal_mass_label, signal_mass_label_validation, signal_mass_label_data, numpy.zeros(len(pred_final_fit))))
 tree_tth_2017_reference_mva = numpy.concatenate((tth_2017_reference_mva, tth_2017_reference_mva_validation, tth_2017_reference_mva_data, tth_2017_reference_mva_final_fit))
+tree_evt_run_lumi = numpy.concatenate((evt_run_lumi, evt_run_lumi_validation, evt_run_lumi_data, evt_run_lumi_final_fit))
+
 
 tree_train_id = tree_train_id.astype(numpy.int64)
 tree_sample_id = tree_sample_id.astype(numpy.int64)
@@ -253,6 +259,7 @@ tree_weight = tree_weight.astype(numpy.float64)
 tree_bdt_score = tree_bdt_score.astype(numpy.float64)
 tree_signal_mass_label = tree_signal_mass_label.astype(numpy.int64)
 tree_tth_2017_reference_mva = tree_tth_2017_reference_mva.astype(numpy.float64)
+tree_evt_run_lumi = tree_evt_run_lumi.astype(numpy.str)
 
 dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva}
 utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))

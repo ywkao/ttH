@@ -166,7 +166,7 @@ def baseline_v1(max_objects, n_features, n_global_features, no_global, no_lstm, 
 
   # fully-connected layers
   maxnorm = 3
-  dropout_rate = 0.1
+  dropout_rate = 0.25
   dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_1')(merged_features)
   dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout_1')(dense)
   dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_2')(dense)

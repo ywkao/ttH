@@ -64,7 +64,7 @@ else:
 
 
 # DNN Helper
-dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag)
+dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_run_lumi_data = evt_run_lumi_data)
 
 # Train
 dnn.train_with_early_stopping()
