@@ -72,6 +72,8 @@ print selection
 
 features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
 features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
+features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))'
+
 #features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, selection))
 #features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, selection))
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d' % (data_label))
@@ -81,20 +83,24 @@ if args.boosted_objects:
   object_features = features["objects_boosted_"]
   object_features_validation = features_validation["objects_boosted_"]
   object_features_data = features_data["objects_boosted_"]
+  object_features_final_fit = features_final_fit["objects_boosted_"]
 
 else:
   object_features = features["objects_"]
   object_features_validation = features_validation["objects_"]
   object_features_data = features_data["objects_"]
+  object_features_final_fit = features_final_fit["objects_"]
 
 if args.channel == "Leptonic": # also add sequences of leptons and jets separately
   jet_features = features["jets_"]
   jet_features_validation = features_validation["jets_"]
   jet_features_data = features_data["jets_"]
+  jet_features_final_fit = features_final_fit["jets_"]
 
   lepton_features = features["leptons_"]
   lepton_features_validation = features_validation["leptons_"]
   lepton_features_data = features_data["leptons_"]
+  lepton_features_final_fit = features_final_fit["leptons_"]
 
 
 def preprocess_sigmoid_v2(array, mean, std):
@@ -121,6 +127,7 @@ def create_array(features_list, names):
 global_features = create_array(features, feature_names)
 global_features_validation = create_array(features_validation, feature_names)
 global_features_data = create_array(features_data, feature_names)
+global_features_final_fit = create_array(features_final_fit, feature_names)
 
 def get_mean_and_std(array):
   array_trimmed = array[array != pad_value]
@@ -155,17 +162,20 @@ n_max_objects = 8
 object_features = pad_array(object_features, n_max_objects)
 object_features_validation = pad_array(object_features_validation, n_max_objects)
 object_features_data = pad_array(object_features_data, n_max_objects)
+object_features_final_fit = pad_array(object_features_final_fit, n_max_objects)
 
 if args.channel == "Leptonic":
   n_max_jets = 6
   jet_features = pad_array(jet_features, n_max_jets)
   jet_features_validation = pad_array(jet_features_validation, n_max_jets)
   jet_features_data = pad_array(jet_features_data, n_max_jets)
+  jet_features_final_fit = pad_array(jet_features_final_fit, n_max_jets)
 
   n_max_leptons = 2
   lepton_features = pad_array(lepton_features, n_max_leptons)
   lepton_features_validation = pad_array(lepton_features_validation, n_max_leptons)
   lepton_features_data = pad_array(lepton_features_data, n_max_leptons)
+  lepton_features_final_fit = pad_array(lepton_features_final_fit, n_max_leptons)
 
 
 # use set of all signal events to get mean and std dev for preprocessing purposes
@@ -218,6 +228,16 @@ top_tag_score_data = features_data["top_tag_score_"]
 tth_ttPP_mva_data = features_data["tth_ttPP_mva_"]
 tth_dipho_mva_data = features_data["tth_dipho_mva_"]
 tth_std_mva_data = features_data["tth_std_mva_"]
+
+label_final_fit = features_final_fit["label_"]
+multi_label_final_fit = features_final_fit["multi_label_"]
+weights_final_fit = features_final_fit["evt_weight_"]
+mass_final_fit = features_final_fit["mass_"]
+top_tag_score_final_fit = features_final_fit["top_tag_score_"]
+tth_ttPP_mva_final_fit = features_final_fit["tth_ttPP_mva_"]
+tth_dipho_mva_final_fit = features_final_fit["tth_dipho_mva_"]
+tth_std_mva_final_fit = features_final_fit["tth_std_mva_"]
+
 
 # reorganize features
 #object_features = numpy.transpose(object_features)
@@ -273,13 +293,27 @@ dset_tth_ttPP_mva_data = f_out.create_dataset("tth_ttPP_mva_data", data=tth_ttPP
 dset_tth_dipho_mva_data = f_out.create_dataset("tth_dipho_mva_data", data=tth_dipho_mva_data)
 dset_tth_std_mva_data = f_out.create_dataset("tth_std_mva_data", data=tth_std_mva_data)
 
+dset_object_final_fit = f_out.create_dataset("object_final_fit", data=object_features_final_fit)
+dset_global_final_fit = f_out.create_dataset("global_final_fit", data=global_features_final_fit)
+dset_label_final_fit = f_out.create_dataset("label_final_fit", data=label_final_fit)
+dset_multi_label_final_fit = f_out.create_dataset("multi_label_final_fit", data=multi_label_final_fit)
+dset_weights_final_fit = f_out.create_dataset("weights_final_fit", data=weights_final_fit)
+dset_top_tag_score_final_fit = f_out.create_dataset("top_tag_score_final_fit", data=top_tag_score_final_fit)
+dset_mass_final_fit = f_out.create_dataset("mass_final_fit", data=mass_final_fit)
+dset_tth_ttPP_mva_final_fit = f_out.create_dataset("tth_ttPP_mva_final_fit", data=tth_ttPP_mva_final_fit)
+dset_tth_dipho_mva_final_fit = f_out.create_dataset("tth_dipho_mva_final_fit", data=tth_dipho_mva_final_fit)
+dset_tth_std_mva_final_fit = f_out.create_dataset("tth_std_mva_final_fit", data=tth_std_mva_final_fit)
+
+
 if args.channel == "Leptonic":
   dset_jet = f_out.create_dataset("jet", data=jet_features)
   dset_jet_validation = f_out.create_dataset("jet_validation", data=jet_features_validation)
   dset_jet_data = f_out.create_dataset("jet_data", data=jet_features_data)
+  dset_jet_final_fit = f_out.create_dataset("jet_final_fit", data=jet_features_final_fit)
 
   dset_lepton = f_out.create_dataset("lepton", data=lepton_features)
   dset_lepton_validation = f_out.create_dataset("lepton_validation", data=lepton_features_validation)
   dset_lepton_data = f_out.create_dataset("lepton_data", data=lepton_features_data)
+  dset_lepton_final_fit = f_out.create_dataset("lepton_final_fit", data=lepton_features_final_fit)
 
 f_out.close()

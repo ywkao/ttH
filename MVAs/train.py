@@ -78,6 +78,14 @@ njets_data = utils.load_array(f, 'njets_data')
 signal_mass_label_data = utils.load_array(f, 'signal_mass_label_data')
 tth_2017_reference_mva_data = utils.load_array(f, 'tth_2017_reference_mva_data')
 
+global_features_final_fit = utils.load_array(f, 'global_final_fit')
+label_final_fit = utils.load_array(f, 'label_final_fit')
+multi_label_final_fit = utils.load_array(f, 'multi_label_final_fit')
+weights_final_fit = utils.load_array(f, 'weights_final_fit')
+mass_final_fit = utils.load_array(f, 'mass_final_fit')
+njets_final_fit = utils.load_array(f, 'njets_final_fit')
+signal_mass_label_final_fit = utils.load_array(f, 'signal_mass_label_final_fit')
+tth_2017_reference_mva_final_fit = utils.load_array(f, 'tth_2017_reference_mva_final_fit')
 
 train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
 nTrain = int(len(label)*train_frac)
@@ -100,6 +108,7 @@ x_test, y_test, y_test_multi, weights_test  = global_features_validation, label_
 X_train = pandas.DataFrame(data=x_train, columns = training_feature_names)
 X_test = pandas.DataFrame(data=x_test, columns = training_feature_names)
 X_data = pandas.DataFrame(data=global_features_data, columns = training_feature_names)
+X_final_fit = pandas.DataFrame(data=global_features_final_fit, columns = training_feature_names)
 
 if args.multi:
   Y_train = y_train_multi 
@@ -140,6 +149,7 @@ print sum_pos_weights, sum_neg_weights
 d_train = xgboost.DMatrix(X_train, label = Y_train, weight = weights_train)
 d_test = xgboost.DMatrix(X_test, label = Y_test)
 d_data = xgboost.DMatrix(X_data)
+d_final_fit = xgboost.DMatrix(X_final_fit)
 
 # Define BDT parameters
 param = { 
@@ -194,7 +204,7 @@ tmva_utils.convert_model(model, input_variables = input_variables, output_xml = 
 pred_train = bdt.predict(d_train, output_margin=args.multi)
 pred_test = bdt.predict(d_test, output_margin=args.multi)
 pred_data = bdt.predict(d_data, output_margin=args.multi)
-
+pred_final_fit = bdt.predict(d_final_fit, output_margin=args.multi)
 
 print pred_test.shape
 
@@ -202,6 +212,7 @@ if args.multi:
   pred_train = pred_train[:,0] 
   pred_test = pred_test[:,0] 
   pred_data = pred_data[:,0]
+  pred_final_fit = pred_final_fit[:,0]
 
 print pred_test.shape
 
@@ -227,13 +238,13 @@ print "Testing  AUC: %.3f +/- %.4f" % (auc, unc)
 numpy.savez("bdt_roc_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train, y_test = y_test, pred_train = pred_train, pred_test = pred_test, fpr_train = fpr_train, fpr_test = fpr_test, tpr_train = tpr_train, tpr_test = tpr_test)
 
 # Write output to TTree
-tree_train_id = numpy.concatenate((numpy.zeros(len(pred_train)), numpy.ones(len(pred_test)), numpy.ones(len(pred_data))))
-tree_sample_id = numpy.concatenate((label, label_validation, label_data))
-tree_mass = numpy.concatenate((mass, mass_validation, mass_data))
-tree_weight = numpy.concatenate((weights, weights_validation, weights_data))
-tree_bdt_score = numpy.concatenate((pred_train, pred_test, pred_data))
-tree_signal_mass_label = numpy.concatenate((signal_mass_label, signal_mass_label_validation, signal_mass_label_data))
-tree_tth_2017_reference_mva = numpy.concatenate((tth_2017_reference_mva, tth_2017_reference_mva_validation, tth_2017_reference_mva_data))
+tree_train_id = numpy.concatenate((numpy.zeros(len(pred_train)), numpy.ones(len(pred_test)), numpy.ones(len(pred_data)), numpy.ones(len(pred_final_fit))))
+tree_sample_id = numpy.concatenate((label, label_validation, label_data, numpy.ones(len(pred_final_fit))))
+tree_mass = numpy.concatenate((mass, mass_validation, mass_data, mass_final_fit))
+tree_weight = numpy.concatenate((weights, weights_validation, weights_data, weights_final_fit))
+tree_bdt_score = numpy.concatenate((pred_train, pred_test, pred_data, pred_final_fit))
+tree_signal_mass_label = numpy.concatenate((signal_mass_label, signal_mass_label_validation, signal_mass_label_data, numpy.zeros(len(pred_final_fit))))
+tree_tth_2017_reference_mva = numpy.concatenate((tth_2017_reference_mva, tth_2017_reference_mva_validation, tth_2017_reference_mva_data, tth_2017_reference_mva_final_fit))
 
 tree_train_id = tree_train_id.astype(numpy.int64)
 tree_sample_id = tree_sample_id.astype(numpy.int64)
@@ -243,9 +254,12 @@ tree_bdt_score = tree_bdt_score.astype(numpy.float64)
 tree_signal_mass_label = tree_signal_mass_label.astype(numpy.int64)
 tree_tth_2017_reference_mva = tree_tth_2017_reference_mva.astype(numpy.float64)
 
-out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label, tree_tth_2017_reference_mva], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label,tth_2017_reference_mva')
+dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva}
+utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
+
+#out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label, tree_tth_2017_reference_mva], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label,tth_2017_reference_mva')
 #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label], dtype = [('train_id','<u8'), ('sample_id','<u8'), ('mass','<f8'),('weight','<f8'), ('mva_score','<f8'),('signal_mass_label','<u8')])
-root_numpy.array2root(out_array, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag), treename = 't')
+#root_numpy.array2root(out_array, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag), treename = 't')
 
 
 ### Make diagnostic plots ###

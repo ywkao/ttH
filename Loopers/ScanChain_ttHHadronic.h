@@ -113,6 +113,33 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_) {
     return true;
   }
 
+  else if (tag == "ttHHadronic_2017_Tag0") {
+    if (mass() < 100 || mass() > 180)                   return false;
+    if (lead_ptoM() < 0.333 || sublead_ptoM() < 0.25)   return false;
+    if (n_jets() < 2)                                   return false;
+    if (minIDMVA_ < -0.2)                               return false;
+    if (tthMVA() < 0.56)				return false;
+    return true;
+  }
+
+  else if (tag == "ttHHadronic_2017_Tag1") {
+    if (mass() < 100 || mass() > 180)                   return false;
+    if (lead_ptoM() < 0.333 || sublead_ptoM() < 0.25)   return false;
+    if (n_jets() < 2)                                   return false;
+    if (minIDMVA_ < -0.2)                               return false;
+    if (tthMVA() > 0.56 || tthMVA() < 0.48)             return false;
+    return true;
+  }
+
+  else if (tag == "ttHHadronic_2017_Tag2") {
+    if (mass() < 100 || mass() > 180)                   return false;
+    if (lead_ptoM() < 0.333 || sublead_ptoM() < 0.25)   return false;
+    if (n_jets() < 2)                                   return false;
+    if (minIDMVA_ < -0.2)                               return false;
+    if (tthMVA() > 0.48 || tthMVA() < 0.38)             return false;
+    return true;
+  }
+
   else 
     cout << "Did not recognize tag name" << endl;
   return false;

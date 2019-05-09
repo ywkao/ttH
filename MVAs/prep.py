@@ -86,6 +86,8 @@ if args.one_mass_point:
   selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
+selection_final_fit      = '((label_ == 1 && signal_mass_label_ == 0))' 
+
 ptoM_cut = ""
 if args.cut_ptoM:
   if args.channel == "Hadronic":
@@ -94,12 +96,15 @@ if args.cut_ptoM:
     ptoM_cut = "&& (leadptoM_ > 0.33 && subleadptoM_ > 0.25)"
   selection_train += ptoM_cut
   selection_validation += ptoM_cut
+  selection_final_fit += ptoM_cut
 
 print "Selection for training events: %s" % selection_train
 print "Selection for validation events: %s" % selection_validation
+print "Selection for final fit events: %s" % selection_final_fit
 
 features = root_numpy.tree2array(tree, branches = branches, selection = selection_train) 
 features_validation = root_numpy.tree2array(tree, branches = branches, selection = selection_validation) 
+features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = selection_final_fit) 
 
 if args.sideband:
   handicap = ""
@@ -129,6 +134,7 @@ if do_dnn:
   i = 0
   print dnn_features
   for model in dnn_models:
+    dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = [features_final_fit[feat] for feat in dnn_features], objects = features_final_fit["objects_"])
     dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = [features_data[feat] for feat in dnn_features], objects = features_data["objects_"])
     dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = [features[feat] for feat in dnn_features], objects = features["objects_"])
     dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = [features_validation[feat] for feat in dnn_features], objects = features_validation["objects_"])
@@ -162,6 +168,7 @@ print training_feature_names
 global_features = []
 global_features_validation = []
 global_features_data = []
+global_features_final_fit = []
 global_features_data_sideband = []
 global_features_data_sideband_mc = []
 for feature in training_feature_names:
@@ -170,6 +177,7 @@ for feature in training_feature_names:
   global_features.append(features[feature])
   global_features_validation.append(features_validation[feature])
   global_features_data.append(features_data[feature])
+  global_features_final_fit.append(features_final_fit[feature])
   if args.sideband:
     global_features_data_sideband.append(features_data_sideband[feature])
     global_features_data_sideband_mc.append(features_data_sideband_mc[feature])
@@ -179,11 +187,13 @@ if do_dnn:
     global_features.append(dnn_predictions[i][0])
     global_features_validation.append(dnn_predictions[i][1])
     global_features_data.append(dnn_predictions[i][2])
+    global_features_final_fit.append(dnn_predictions[i][1])
 
 
 global_features = numpy.asarray(global_features)
 global_features_validation = numpy.asarray(global_features_validation)
 global_features_data = numpy.asarray(global_features_data)
+global_features_final_fit = numpy.asarray(global_features_final_fit)
 
 if args.sideband:
   global_features_data_sideband = numpy.asarray(global_features_data_sideband)
@@ -232,6 +242,18 @@ mvas_data = {}
 for name in mva_names:
   mvas_data[name] = numpy.asarray(features_data[name])
 
+label_final_fit = features_final_fit["label_"]
+multi_label_final_fit = features_final_fit["multi_label_"]
+weights_final_fit = features_final_fit["evt_weight_"]
+mass_final_fit = features_final_fit["mass_"]
+njets_final_fit = features_final_fit["njets_"]
+signal_mass_label_final_fit = features_final_fit["signal_mass_label_"]
+tth_2017_reference_mva_final_fit = features_final_fit["tth_2017_reference_mva_"]
+
+mvas_final_fit = {}
+for name in mva_names:
+  mvas_final_fit[name] = numpy.asarray(features_final_fit[name])
+
 if args.sideband:
   label_data_sideband = features_data_sideband["label_"]
   multi_label_data_sideband = features_data_sideband["multi_label_"]
@@ -255,6 +277,7 @@ if args.sideband:
 global_features = numpy.transpose(global_features)
 global_features_validation = numpy.transpose(global_features_validation)
 global_features_data = numpy.transpose(global_features_data)
+global_features_final_fit = numpy.transpose(global_features_final_fit)
 
 if args.sideband:
   global_features_data_sideband = numpy.transpose(global_features_data_sideband)
@@ -304,6 +327,17 @@ dset_tth_2017_reference_mva_data  = f_out.create_dataset("tth_2017_reference_mva
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_data", data=mvas_data[name])
 
+dset_global_final_fit = f_out.create_dataset("global_final_fit", data=global_features_final_fit)
+dset_label_final_fit = f_out.create_dataset("label_final_fit", data=label_final_fit)
+dset_multi_label_final_fit = f_out.create_dataset("multi_label_final_fit", data=multi_label_final_fit)
+dset_weights_final_fit = f_out.create_dataset("weights_final_fit", data=weights_final_fit)
+dset_mass_final_fit = f_out.create_dataset("mass_final_fit", data=mass_final_fit)
+dset_njets_final_fit = f_out.create_dataset("njets_final_fit", data=njets_final_fit)
+dset_signal_mass_label_final_fit  = f_out.create_dataset("signal_mass_label_final_fit", data=signal_mass_label_final_fit)
+dset_tth_2017_reference_mva_final_fit  = f_out.create_dataset("tth_2017_reference_mva_final_fit", data=tth_2017_reference_mva_final_fit)
+
+for name in mva_names:
+  dset_mva = f_out.create_dataset(name+"_final_fit", data=mvas_final_fit[name])
 
 if args.sideband:
   dset_global_data_sideband = f_out.create_dataset("global_data_sideband", data=global_features_data_sideband)

@@ -45,7 +45,8 @@ class DNN_Helper:
     self.features_validation = kwargs.get('features_validation', [])
     self.features_train = kwargs.get('features_train', [])
     self.features_data = kwargs.get('features_data', [])
-    
+    self.features_final_fit = kwargs.get('features_final_fit', [])   
+ 
     self.tag = kwargs.get('tag', '')
 
     self.batch_size = kwargs.get('batch_size', 10000)
@@ -78,7 +79,7 @@ class DNN_Helper:
       self.model.load_weights(self.weights_file)
 
     self.n_epochs = 0
-    self.predictions = { "train" : [], "validation" : [], "data" : [] } # store predictions for most recent epoch
+    self.predictions = { "train" : [], "validation" : [], "data" : [], "final_fit" : []} # store predictions for most recent epoch
     self.auc = { "train" : [], "validation" : [] } # store auc and unc for all epochs
     self.auc_unc = { "train" : [], "validation" : [] }
     self.tpr = { "train" : [], "validation" : [] } # store tpr, fpr for all epochs
@@ -90,7 +91,8 @@ class DNN_Helper:
     self.predictions["train"] = self.model.predict(self.features_train.features, self.batch_size).flatten()
     self.predictions["validation"] = self.model.predict(self.features_validation.features, self.batch_size).flatten()
     self.predictions["data"] = self.model.predict(self.features_data.features, self.batch_size).flatten()
-    return [self.predictions["train"], self.predictions["validation"], self.predictions["data"]]
+    self.predictions["final_fit"] = self.model.predict(self.features_final_fit.features, self.batch_size).flatten()
+    return [self.predictions["train"], self.predictions["validation"], self.predictions["data"], self.predictions["final_fit"]]
 
   def train(self, n_epochs, n_batch):
     if not self.prepped:
@@ -194,7 +196,7 @@ class DNN_Helper:
     plt.savefig('dnn_roc_%s_%s.pdf' % (reference.replace(" ", "_"), self.tag))
 
   def do_diagnostics(self):
-    numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"])
+    numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"], scores_final_fit = self.predictions["final_fit"])
     self.make_learning_curve()
     for ref in self.features_validation.references.iterkeys():
       self.make_comparison(ref)
