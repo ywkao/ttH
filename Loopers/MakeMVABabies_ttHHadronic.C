@@ -1,14 +1,14 @@
 #include "MakeMVABabies_ttHHadronic.h"
 #include "ScanChain_ttHHadronic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
   // Make baby ntuple
-  MakeBabyNtuple( Form("%s.root", ("MVABaby_ttHHadronic_" + ext).Data()));
+  MakeBabyNtuple( Form("%s.root", ("MVABaby_ttHHadronic_" + ext + idx).Data()));
 
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;
@@ -345,7 +345,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
 
-    TString mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year"));
+    if (mYear == "")
+      mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year"));
 
     if (is_wrong_tt_jets_sample(currentFileTitle, "Hadronic"))                        continue;
     if (bkg_options.Contains("impute") && (currentFileTitle.Contains("GJets_HT") || currentFileTitle.Contains("QCD"))) {
@@ -510,7 +511,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         top_tag_phi_ = -1;
       //}
 
-      evt_run_lumi_ = to_string(cms3.event()) + "_" + to_string(cms3.run()) + "_" + to_string(cms3.lumi()); 
+      evt_run_lumi_ = cms3.event();
 
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;

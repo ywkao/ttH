@@ -15,3 +15,6 @@ fi
 if [ ! -d n_minus_one_plots ]; then
   mkdir n_minus_one_plots
 fi
+
+source /home/users/sjmay/Utilities/ShellFunctions.sh
+export -f addHistos

@@ -7,6 +7,8 @@ import parallel_utils
 
 import argparse
 parser = argparse.ArgumentParser()
+parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str)
+parser.add_argument("--babymaker", help = "run mva_babymaker instead of looper", action="store_true")
 parser.add_argument("--baby_version", help = "version to match babies", type=str)
 parser.add_argument("--tag", help = "tag to identify these histograms", type=str)
 parser.add_argument("--selection", help = "selection for tagger", type=str)
@@ -243,24 +245,54 @@ def full_path(baby):
 
 command_list = []
 idx = 0
-for baby in babies_2016:
-  command_list.append('./ttHHadronicLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2016", "_" + str(idx))) 
-  idx += 1
-for baby in babies_2017:
-  command_list.append('./ttHHadronicLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2017", "_" + str(idx)))
-  idx += 1
-for baby in babies_2018:
-  command_list.append('./ttHHadronicLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2018", "_" + str(idx)))
-  idx += 1
+
+if args.babymaker:
+  for baby in babies_2016:
+    command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, full_path(baby), "2016", "_" + str(idx)))
+    idx += 1
+  for baby in babies_2017:
+    command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, full_path(baby), "2017", "_" + str(idx)))
+    idx += 1
+  for baby in babies_2018:
+    command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, full_path(baby), "2018", "_" + str(idx)))
+    idx += 1
 
 
+else:
+  for baby in babies_2016:
+    command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2016", "_" + str(idx))) 
+    idx += 1
+  for baby in babies_2017:
+    command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2017", "_" + str(idx)))
+    idx += 1
+  for baby in babies_2018:
+    command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2018", "_" + str(idx)))
+    idx += 1
 
-nPar = 20
+nPar = 12
 
 parallel_utils.submit_jobs(command_list, nPar)
 
-histos = "%s_%s_histogramsRunII" % (args.selection, args.tag)
-parallel_utils.run("addHistos %s %s %d %d" % (histos, histos, len(babies), nPar))
+if args.babymaker:
+  histos = glob.glob("MVABaby_ttH%s_%s_*.root" % (args.channel, args.tag))
+else:
+  histos = glob.glob("%s_%s_histogramsRunII_*.root" % (args.selection, args.tag))
+good_histos = []
+for hist in histos:
+  size = os.stat(hist).st_size * (1./(1024))
+  if size >= 1.:
+    good_histos.append(hist)
+    print "good hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024*1024)))
+  else:
+    print "bad  hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024*1024)))
+
+target = " "
+for hist in good_histos:
+  target += "%s " % hist
+
+os.system('hadd -f -k -j 10 "%s_%s_histogramsRunII.root" %s' % (args.selection, args.tag, target))
+
 
 # Cleanup
-os.system("rm %s" % histos + "_*.root")
+for hist in histos:
+  os.system("rm %s" % hist)

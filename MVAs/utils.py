@@ -14,14 +14,9 @@ def numpy_to_tree(dict, file_name, tree_name = "t"): # dict should contain {"bra
 
   branches = {}
   for branch in dict.iterkeys():
-    if branch != "evt_run_lumi":
-      b = numpy.empty((1), dtype = "float32")
-      branches[branch] = b
-      t.Branch(branch, branches[branch], branch + "/F") 
-    else:
-      b = numpy.empty((1), dtype = "str")
-      branches[branch] = b
-      t.Branch(branch, branches[branch], branch + "/S")
+    b = numpy.empty((1), dtype = "float32")
+    branches[branch] = b
+    t.Branch(branch, branches[branch], branch + "/F") 
  
   for i in range(n_events):
     for branch in dict.iterkeys():

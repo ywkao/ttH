@@ -22,29 +22,38 @@ int main(int argc, char* argv[]) {
 
   TChain *ch = new TChain("tthLeptonicTagDumper/trees/tth_13TeV_all");
 
-  if (year.Contains("RunII")) {
-    if (year == "RunII") {
-      add_samples(ch, "2016_RunII");
-      add_samples(ch, "2017_RunII");
-      add_samples(ch, "2018_RunII");
+  TString file = argc <= 5 ? "all" : argv[5];
+  TString mYear = argc <= 6 ? "" : argv[6];
+  TString idx = argc <= 7 ? "" : argv[7];
+
+  if (file == "all") {
+    if (year.Contains("RunII")) {
+      if (year == "RunII") {
+	add_samples(ch, "2016_RunII");
+	add_samples(ch, "2017_RunII");
+	add_samples(ch, "2018_RunII");
+      }
+      else {
+	if (year.Contains("2016"))
+	  add_samples(ch, "2016_RunII");
+	if (year.Contains("2017"))
+	  add_samples(ch, "2017_RunII");
+	if (year.Contains("2018"))
+	  add_samples(ch, "2018_RunII");
+      }
     }
-    else {
-      if (year.Contains("2016"))
-        add_samples(ch, "2016_RunII");
-      if (year.Contains("2017"))
-        add_samples(ch, "2017_RunII");
-      if (year.Contains("2018"))
-        add_samples(ch, "2018_RunII");
+    else if (year == "All") {
+      add_samples(ch, "2016");
+      add_samples(ch, "2017");
     }
+    else
+      add_samples(ch, year);
   }
-  else if (year == "All") {
-    add_samples(ch, "2016");
-    add_samples(ch, "2017");
-  }
+
   else
-    add_samples(ch, year);
+    ch->Add(file);
 
   BabyMaker *looper = new BabyMaker();
-  looper->ScanChain(ch, tag, year, ext, bkg_options);
+  looper->ScanChain(ch, tag, year, ext, bkg_options, mYear, idx);
   return 0; 
 }

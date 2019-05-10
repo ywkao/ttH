@@ -1,7 +1,7 @@
 #include "ScanChain_ttHLeptonic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-  TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + ".root", "RECREATE");
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+  TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + idx + ".root", "RECREATE");
   f1->cd();
 
   // Benchmark
@@ -11,11 +11,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   bool evaluate_mva = xml_file != "none";
 
   // Make MVA Optimization Baby
-  OptimizationBabyMaker* baby = new OptimizationBabyMaker();
+  //OptimizationBabyMaker* baby = new OptimizationBabyMaker();
   TString xml_file_noExt = xml_file;
   xml_file_noExt.ReplaceAll(".xml", "");
-  TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt + "_" + tag;
-  baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
+  //TString optimization_baby_name = "Optimization/MVAOptimizationBaby_" + ext + "_" + xml_file_noExt + "_" + tag;
+  //baby->MakeBabyNtuple( Form("%s.root", optimization_baby_name.Data()));
 
   // Create "process" objects
   vector<Process*> vProcess = generate_processes(f1);
@@ -189,7 +189,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma");
     bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG");
-    TString mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year")); 
+    if (mYear == "")
+      mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year")); 
 
     if (isSignal) {
       if (categorize_signal_sample(currentFileTitle) != 0)
@@ -715,7 +716,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     cout << Form( "ERROR: number of events from files (%d) is not equal to total number of events (%d)", nEventsChain, nEventsTotal ) << endl;
   }
  
-  baby->CloseBabyNtuple();
+  //baby->CloseBabyNtuple();
  
   //delete rand_map;
 
