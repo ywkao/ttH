@@ -511,7 +511,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         top_tag_phi_ = -1;
       //}
 
-      evt_run_lumi_ = cms3.event();
+      evt_ = cms3.event();
+      run_ = cms3.run();
+      lumi_ = cms3.lumi();
 
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;

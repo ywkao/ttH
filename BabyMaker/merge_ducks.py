@@ -37,7 +37,7 @@ old_files = glob.glob(destination + "/*.root")
 if len(old_files) > 0:
   os.system("rm %s/*.root" % destination)
 
-nPar = 1
+nPar = 4
 command_list = []
 
 for dir in dirs:
@@ -59,9 +59,9 @@ for dir in dirs:
   #print("addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar))
   #os.system("addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar))
 
-parallel_utils.submit_jobs(command_list, 10, False)
+parallel_utils.submit_jobs(command_list, 8, False)
 
-for dir in dirs:  
+#for dir in dirs:  
   # Delete intermediate files
-  name = dir.split("/")[-1]
-  os.system("rm %s" % destination + name + "/merged_ntuple_*.root")
+  #name = dir.split("/")[-1]
+  #os.system("rm %s" % destination + name + "/merged_ntuple_*.root")

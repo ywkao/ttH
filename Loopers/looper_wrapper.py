@@ -16,7 +16,6 @@ parser.add_argument("--bdt", help = "bdt to evaluate", type=str, default="none")
 parser.add_argument("--bkg_options", help = "how to treat bkg", type=str, default="none")
 args = parser.parse_args()
 
-#babies = glob.glob("merged_babies/*" + args.baby_wildcard + "*/merged_ntuple.root")
 babies_2016 = [
  		"DoubleEG_Run2016B-17Jul2018_ver1-v1_MINIAOD_RunII",
                 "DoubleEG_Run2016B-17Jul2018_ver2-v1_MINIAOD_RunII",
@@ -243,34 +242,44 @@ def full_path(baby):
   full_path_baby = "merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
   return full_path_baby
 
+def little_babies(baby):
+  babies = glob.glob("merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
+  return babies
+
 command_list = []
 idx = 0
 
+# MVA BabyMaker
 if args.babymaker:
   for baby in babies_2016:
-    command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, full_path(baby), "2016", "_" + str(idx)))
-    idx += 1
+    for little_baby in little_babies(baby):
+      command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2016", "_" + str(idx)))
+      idx += 1
   for baby in babies_2017:
-    command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, full_path(baby), "2017", "_" + str(idx)))
-    idx += 1
+    for little_baby in little_babies(baby):
+      command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2017", "_" + str(idx)))
+      idx += 1
   for baby in babies_2018:
-    command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, full_path(baby), "2018", "_" + str(idx)))
-    idx += 1
+    for little_baby in little_babies(baby):
+      command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2018", "_" + str(idx)))
+      idx += 1
 
-
+# Loopers
 else:
   for baby in babies_2016:
-    command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2016", "_" + str(idx))) 
-    idx += 1
+    for little_baby in little_babies(baby):
+      command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2016", "_" + str(idx))) 
+      idx += 1
   for baby in babies_2017:
-    command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2017", "_" + str(idx)))
-    idx += 1
+    for little_baby in little_babies(baby):
+      command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2017", "_" + str(idx)))    
+      idx += 1
   for baby in babies_2018:
-    command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, full_path(baby), "2018", "_" + str(idx)))
-    idx += 1
+    for little_baby in little_babies(baby):
+      command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2018", "_" + str(idx)))    
+      idx += 1
 
-nPar = 12
-
+nPar = 18
 parallel_utils.submit_jobs(command_list, nPar)
 
 if args.babymaker:
@@ -282,15 +291,19 @@ for hist in histos:
   size = os.stat(hist).st_size * (1./(1024))
   if size >= 1.:
     good_histos.append(hist)
-    print "good hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024*1024)))
+    print "good hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024)))
   else:
-    print "bad  hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024*1024)))
+    print "bad  hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024)))
 
 target = " "
 for hist in good_histos:
   target += "%s " % hist
 
-os.system('hadd -f -k -j 10 "%s_%s_histogramsRunII.root" %s' % (args.selection, args.tag, target))
+if args.babymaker:
+  master = "MVABaby_ttH%s_%s.root" % (args.channel, args.tag)
+else:
+  master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag)
+os.system('hadd -f -k -j 10 %s %s' % (master, target))
 
 
 # Cleanup

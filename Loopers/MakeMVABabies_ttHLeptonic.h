@@ -38,7 +38,9 @@ class BabyMaker {
     // Variable names
     vector<string> mva_branches = {"lep_pt_", "minIDMVA_", "maxIDMVA_", "subleadPSV_", "leadPSV_", "nb_loose_", "njets_",  };
 
-    int     	evt_run_lumi_;    
+    unsigned long long          evt_;
+    unsigned long long          run_;
+    unsigned long long          lumi_;
     int 	label_;
     int 	multi_label_;
     int         data_sideband_label_;
@@ -139,7 +141,9 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("mva_branches"	, &mva_branches );
 
-  BabyTree_->Branch("evt_run_lumi_"       , &evt_run_lumi_  );
+  BabyTree_->Branch("evt_"       , &evt_  );
+  BabyTree_->Branch("run_"       , &run_  );
+  BabyTree_->Branch("lumi_"       , &lumi_  );
   BabyTree_->Branch("evt_weight_"     	, &evt_weight_  );
   BabyTree_->Branch("label_"     	, &label_       );
   BabyTree_->Branch("multi_label_"            , &multi_label_       );

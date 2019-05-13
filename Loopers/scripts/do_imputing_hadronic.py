@@ -36,9 +36,9 @@ dummy_input = raw_input("You probably want to update ttHLooper.h with results of
 
 os.chdir("../")
 command_list = []
-#command_list.append('./ttHHadronicLooper "ttHHadronic_RunII_MVA_Presel" "RunII" "%s" "%s" "impute"' % (args.tag + "_impute", bdt))
-#command_list.append('./ttHHadronicLooper "ttHHadronic_RunII_MVA_Presel_CutPtoM_light" "RunII" "%s" "%s" "impute"' % (args.tag + "_impute", bdt))
-#command_list.append('./ttHHadronicLooper "ttHHadronic_RunII_MVA_Presel_CutPtoM" "RunII" "%s" "%s" "impute"' % (args.tag + "_impute", bdt))
+#command_list.append('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --bdt "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute__bdt.xml"' % (args.tag + "_impute"))
+#command_list.append('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_CutPtoM" --bkg_options "impute" --bdt "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute_cutPtoM__bdt.xml"' % (args.tag + "_impute"))
+
 parallel_utils.submit_jobs(command_list, 3)
 command_list = []
 
@@ -50,8 +50,9 @@ os.chdir("Plots")
 do_mva = True
 if do_mva:
   os.chdir("../")
-  parallel_utils.run('./ttHHadronicMVABabyMaker "ttHHadronic_RunII_MVA_Presel" "RunII" "%s_RunII_MVA_Presel_impute" "impute"' % (args.tag))
+  #parallel_utils.run('./ttHHadronicMVABabyMaker "ttHHadronic_RunII_MVA_Presel" "RunII" "%s_RunII_MVA_Presel_impute" "impute"' % (args.tag))
   #parallel_utils.run('./ttHHadronicMVABabyMaker "ttHHadronic_2017_Presel" "RunII_2017" "%s_2017_Presel_impute" "impute"' % (args.tag))
+  parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_CutPtoM" --bkg_options "impute" --babymaker' % (args.tag + "_2017_Presel_impute"))
 
   os.chdir("../MVAs/")
 

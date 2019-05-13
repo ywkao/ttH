@@ -48,6 +48,10 @@ top_tag_score, top_tag_score_validation, top_tag_score_data = f['top_tag_score']
 tth_ttPP_mva, tth_ttPP_mva_validation, tth_ttPP_mva_data = f['tth_ttPP_mva'], f['tth_ttPP_mva_validation'], f['tth_ttPP_mva_data']
 tth_dipho_mva, tth_dipho_mva_validation, tth_dipho_mva_data = f['tth_dipho_mva'], f['tth_dipho_mva_validation'], f['tth_dipho_mva_data']
 tth_std_mva, tth_std_mva_validation, tth_std_mva_data = f['tth_std_mva'], f['tth_std_mva_validation'], f['tth_std_mva_data']
+evt_data = f['evt_data']
+run_data = f['run_data']
+lumi_data = f['lumi_data']
+
 
 # Features
 leptonic_single_lstm = True
@@ -64,7 +68,7 @@ else:
 
 
 # DNN Helper
-dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_run_lumi_data = evt_run_lumi_data)
+dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data)
 
 # Train
 dnn.train_with_early_stopping()

@@ -306,7 +306,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
 
       // Variable definitions
-      evt_run_lumi_ = cms3.event();
+      evt_ = cms3.event();
+      run_ = cms3.run();
+      lumi_ = cms3.lumi();
 
       lep_pt_ = leps[0].Pt();
       lep_eta_ = leps[0].Eta();
