@@ -45,7 +45,7 @@ class DNN_Helper:
     self.features_validation = kwargs.get('features_validation', [])
     self.features_train = kwargs.get('features_train', [])
     self.features_data = kwargs.get('features_data', [])
-    self.features_final_fit = kwargs.get('features_final_fit', [])   
+    self.features_final_fit = kwargs.get('features_final_fit', "none")   
     self.evt_data = kwargs.get('evt_data', [])
     self.run_data = kwargs.get('run_data', [])
     self.lumi_data = kwargs.get('lumi_data', [])
@@ -94,7 +94,7 @@ class DNN_Helper:
     self.predictions["train"] = self.model.predict(self.features_train.features, self.batch_size).flatten()
     self.predictions["validation"] = self.model.predict(self.features_validation.features, self.batch_size).flatten()
     self.predictions["data"] = self.model.predict(self.features_data.features, self.batch_size).flatten()
-    if len(self.features_final_fit) == 0:
+    if self.features_final_fit == "none":
       self.predictions["final_fit"] = []
     else:
       self.predictions["final_fit"] = self.model.predict(self.features_final_fit.features, self.batch_size).flatten()
@@ -168,6 +168,18 @@ class DNN_Helper:
       f_out.write(self.model.to_json())
 
     return
+
+  def debug(self):
+    self.model.load_weights(self.weights_file)    
+    self.predictions["data"] = self.model.predict(self.features_data.features, self.batch_size).flatten()
+    for i in range(len(self.predictions["data"])):
+      print "Event", self.run_data[i], self.lumi_data[i], self.evt_data[i]
+      print "Global features"
+      print self.features_data.global_features[i]
+      print "Object features"
+      print self.features_data.objects[i]
+      print "DNN Score"
+      print self.predictions["data"][i]
 
   def initialize_plot(self):
     fig = plt.figure()

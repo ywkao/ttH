@@ -56,6 +56,7 @@ lumi_data = f['lumi_data']
 # Features
 leptonic_single_lstm = True
 
+
 if args.channel == "Hadronic" or leptonic_single_lstm:
   dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = global_features, objects = object_features, label = label, weights = weights, references = { "Top Tag Score" : top_tag_score, "ttPP BDT" : tth_ttPP_mva, "Dipho BDT" : tth_dipho_mva, "Baseline BDT" : tth_std_mva}, no_prep = True)
   dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = global_features_validation, objects = object_features_validation, label = label_validation, weights = weights_validation, references = { "Top Tag Score" : top_tag_score_validation, "ttPP BDT" : tth_ttPP_mva_validation, "Dipho BDT" : tth_dipho_mva_validation, "Baseline BDT" : tth_std_mva_validation}, no_prep = True)
@@ -66,13 +67,17 @@ else:
   dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = global_features_validation, objects = jet_features_validation, leptons = lepton_features_validation, label = label_validation, weights = weights_validation, references = { "Top Tag Score" : top_tag_score_validation, "ttPP BDT" : tth_ttPP_mva_validation, "Dipho BDT" : tth_dipho_mva_validation, "Baseline BDT" : tth_std_mva_validation}, no_prep = True)
   dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = global_features_data, objects = jet_features_data, leptons = lepton_features_data, label = label_data, weights = weights_data, references = { "Top Tag Score" : top_tag_score_data, "ttPP BDT" : tth_ttPP_mva_data, "Dipho BDT" : tth_dipho_mva_data, "Baseline BDT" : tth_std_mva_data}, no_prep = True)
 
-
 # DNN Helper
 dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data)
 
-# Train
-dnn.train_with_early_stopping()
+if args.load:
+  dnn.weights_file = args.load
+  dnn.debug()
 
-# Diagnostics
-dnn.do_diagnostics()
+else:
+  # Train
+  dnn.train_with_early_stopping()
+
+  # Diagnostics
+  dnn.do_diagnostics()
 
