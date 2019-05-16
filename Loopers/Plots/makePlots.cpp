@@ -804,6 +804,15 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hMass_PassPtToM", "m_{#gamma#gamma} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     vInfo[vInfo.size()-1] = "Evts Failing p_{T}/m_{#gamma#gamma} Cuts";
     make_plot(c1, vFiles[i], vNames[i], "hMass_FailPtToM", "m_{#gamma#gamma} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+
+    vInfo[vInfo.size()-1] = "After Cut on MVA";
+    vInfo.push_back("");    
+    vInfo[vInfo.size()-1] = "Evts Passing p_{T}/m_{#gamma#gamma} Cuts";
+    make_plot(c1, vFiles[i], vNames[i], "hMass_PassPtToM_AfterBDTCut", "m_{#gamma#gamma} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    vInfo[vInfo.size()-1] = "Evts Failing p_{T}/m_{#gamma#gamma} Cuts";
+    make_plot(c1, vFiles[i], vNames[i], "hMass_FailPtToM_AfterBDTCut", "m_{#gamma#gamma} [GeV]", vBkgs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+
+
     vInfo[vInfo.size()-1] = "";
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);

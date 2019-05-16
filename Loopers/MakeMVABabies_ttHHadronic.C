@@ -511,6 +511,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         top_tag_phi_ = -1;
       //}
 
+      year_ = mYear == "2016" ? 2016 : (mYear == "2017" ? 2017 : (mYear == "2018" ? 2018 : -1)); 
+
       evt_ = cms3.event();
       run_ = cms3.run();
       lumi_ = cms3.lumi();

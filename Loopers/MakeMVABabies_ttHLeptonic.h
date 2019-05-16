@@ -38,6 +38,7 @@ class BabyMaker {
     // Variable names
     vector<string> mva_branches = {"lep_pt_", "minIDMVA_", "maxIDMVA_", "subleadPSV_", "leadPSV_", "nb_loose_", "njets_",  };
 
+    int 	year_;
     unsigned long long          evt_;
     unsigned long long          run_;
     unsigned long long          lumi_;
@@ -141,6 +142,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("mva_branches"	, &mva_branches );
 
+  BabyTree_->Branch("year_"       , &year_  );
   BabyTree_->Branch("evt_"       , &evt_  );
   BabyTree_->Branch("run_"       , &run_  );
   BabyTree_->Branch("lumi_"       , &lumi_  );

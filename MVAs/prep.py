@@ -71,9 +71,9 @@ if args.no_psv:
   to_remove += ["leadPSV_", "subleadPSV_"]
 
 if args.channel == "Hadronic":
-  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_", "evt_", "run_", "lumi_"]))
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_", "evt_", "run_", "lumi_", "year_"]))
 elif args.channel == "Leptonic":
-  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_", "evt_", "run_", "lumi_"]))
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_", "evt_", "run_", "lumi_", "year_"]))
 
 # grab features
 train_frac = args.train_frac
@@ -138,7 +138,8 @@ if do_dnn:
     dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = [features_data[feat] for feat in dnn_features], objects = features_data["objects_"])
     dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = [features[feat] for feat in dnn_features], objects = features["objects_"])
     dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = [features_validation[feat] for feat in dnn_features], objects = features_validation["objects_"])
-    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, weights_file = model)
+    dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = [features_final_fit[feat] for feat in dnn_features], objects = features_final_fit["objects_"])
+    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, weights_file = model)
     #dnn.predict()
     #dnn_predictions.append([dnn.predictions["train"], dnn.predictions["validation"], dnn.predictions["data"]])
     dnn_predictions.append(dnn.predict())
@@ -187,7 +188,7 @@ if do_dnn:
     global_features.append(dnn_predictions[i][0])
     global_features_validation.append(dnn_predictions[i][1])
     global_features_data.append(dnn_predictions[i][2])
-    global_features_final_fit.append(dnn_predictions[i][1])
+    global_features_final_fit.append(dnn_predictions[i][3])
 
 
 global_features = numpy.asarray(global_features)
@@ -216,6 +217,8 @@ tth_2017_reference_mva = features["tth_2017_reference_mva_"]
 evt = features["evt_"]
 run = features["run_"]
 lumi = features["lumi_"]
+process_id = features["process_id_"]
+year = features["year_"]
 
 mvas = {}
 for name in mva_names:
@@ -231,6 +234,8 @@ tth_2017_reference_mva_validation = features_validation["tth_2017_reference_mva_
 evt_validation = features_validation["evt_"]
 run_validation = features_validation["run_"]
 lumi_validation = features_validation["lumi_"]
+process_id_validation = features_validation["process_id_"]
+year_validation = features_validation["year_"]
 
 
 mvas_validation = {}
@@ -247,6 +252,8 @@ tth_2017_reference_mva_data = features_data["tth_2017_reference_mva_"]
 evt_data = features_data["evt_"]
 run_data = features_data["run_"]
 lumi_data = features_data["lumi_"]
+process_id_data = features_data["process_id_"]
+year_data = features_data["year_"]
 
 mvas_data = {}
 for name in mva_names:
@@ -262,6 +269,8 @@ tth_2017_reference_mva_final_fit = features_final_fit["tth_2017_reference_mva_"]
 evt_final_fit = features_final_fit["evt_"]
 run_final_fit = features_final_fit["run_"]
 lumi_final_fit = features_final_fit["lumi_"]
+process_id_final_fit = features_final_fit["process_id_"]
+year_final_fit = features_final_fit["year_"]
 
 
 mvas_final_fit = {}
@@ -315,6 +324,8 @@ dset_tth_2017_reference_mva  = f_out.create_dataset("tth_2017_reference_mva", da
 dset_evt = f_out.create_dataset("evt", data=evt)
 dset_run = f_out.create_dataset("run", data=run)
 dset_lumi = f_out.create_dataset("lumi", data=lumi)
+dset_process_id = f_out.create_dataset("process_id", data=process_id)
+dset_year = f_out.create_dataset("year", data=year)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name, data=mvas[name])
@@ -330,6 +341,8 @@ dset_tth_2017_reference_mva_validation  = f_out.create_dataset("tth_2017_referen
 dset_evt_validation = f_out.create_dataset("evt_validation", data=evt_validation)
 dset_run_validation = f_out.create_dataset("run_validation", data=run_validation)
 dset_lumi_validation = f_out.create_dataset("lumi_validation", data=lumi_validation)
+dset_process_id_validation = f_out.create_dataset("process_id_validation", data=process_id_validation)
+dset_year_validation = f_out.create_dataset("year_validation", data=year_validation)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_validation", data=mvas_validation[name])
@@ -346,6 +359,8 @@ dset_tth_2017_reference_mva_data  = f_out.create_dataset("tth_2017_reference_mva
 dset_evt_data = f_out.create_dataset("evt_data", data=evt_data)
 dset_run_data = f_out.create_dataset("run_data", data=run_data)
 dset_lumi_data = f_out.create_dataset("lumi_data", data=lumi_data)
+dset_process_id_data = f_out.create_dataset("process_id_data", data=process_id_data)
+dset_year_data = f_out.create_dataset("year_data", data=year_data)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_data", data=mvas_data[name])
@@ -361,6 +376,8 @@ dset_tth_2017_reference_mva_final_fit  = f_out.create_dataset("tth_2017_referenc
 dset_evt_final_fit = f_out.create_dataset("evt_final_fit", data=evt_final_fit)
 dset_run_final_fit = f_out.create_dataset("run_final_fit", data=run_final_fit)
 dset_lumi_final_fit = f_out.create_dataset("lumi_final_fit", data=lumi_final_fit)
+dset_process_id_final_fit = f_out.create_dataset("process_id_final_fit", data=process_id_final_fit)
+dset_year_final_fit = f_out.create_dataset("year_final_fit", data=year_final_fit)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_final_fit", data=mvas_final_fit[name])

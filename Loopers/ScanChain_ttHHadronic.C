@@ -429,10 +429,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   
       vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
       
-      if (leadptoM_ > 0.33 && subleadptoM_ > 0.25)
+      if (leadptoM_ > 0.33 && subleadptoM_ > 0.25) {
 	vProcess[processId]->fill_histogram("hMass_PassPtToM", mass(), evt_weight, vId);
-      else
+	if (mva_value > 0.9)
+	  vProcess[processId]->fill_histogram("hMass_PassPtToM_AfterBDTCut", mass(), evt_weight, vId);
+      }
+      else {
 	vProcess[processId]->fill_histogram("hMass_FailPtToM", mass(), evt_weight, vId);
+	if (mva_value > 0.9)
+	  vProcess[processId]->fill_histogram("hMass_FailPtToM_AfterBDTCut", mass(), evt_weight, vId);
+      }
 
       cout.setf(ios::fixed);
       cout << std::setprecision(6);

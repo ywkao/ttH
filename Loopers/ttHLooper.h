@@ -45,6 +45,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hMass", 50, 0, 250);
     v[i]->add_histogram("hMass_PassPtToM", 40, 100, 180);
     v[i]->add_histogram("hMass_FailPtToM", 40, 100, 180);
+    v[i]->add_histogram("hMass_PassPtToM_AfterBDTCut", 40, 100, 180);
+    v[i]->add_histogram("hMass_FailPtToM_AfterBDTCut", 40, 100, 180);
     v[i]->add_histogram("hMassAN", 80, 100, 180);
     v[i]->add_histogram("hRapidity", 25, -3, 3);
     v[i]->add_histogram("hDiphotonSumPt", 25, 0, 1000);

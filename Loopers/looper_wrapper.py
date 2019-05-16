@@ -14,6 +14,7 @@ parser.add_argument("--tag", help = "tag to identify these histograms", type=str
 parser.add_argument("--selection", help = "selection for tagger", type=str)
 parser.add_argument("--bdt", help = "bdt to evaluate", type=str, default="none")
 parser.add_argument("--bkg_options", help = "how to treat bkg", type=str, default="none")
+parser.add_argument("--years", help = "which years to run for", type=str, default="2016,2017,2018")
 args = parser.parse_args()
 
 babies_2016 = [
@@ -251,35 +252,41 @@ idx = 0
 
 # MVA BabyMaker
 if args.babymaker:
-  for baby in babies_2016:
-    for little_baby in little_babies(baby):
-      command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2016", "_" + str(idx)))
-      idx += 1
-  for baby in babies_2017:
-    for little_baby in little_babies(baby):
-      command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2017", "_" + str(idx)))
-      idx += 1
-  for baby in babies_2018:
-    for little_baby in little_babies(baby):
-      command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2018", "_" + str(idx)))
-      idx += 1
+  if "2016" in args.years:
+    for baby in babies_2016:
+      for little_baby in little_babies(baby):
+	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2016", "_" + str(idx)))
+	idx += 1
+  if "2017" in args.years:
+    for baby in babies_2017:
+      for little_baby in little_babies(baby):
+	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2017", "_" + str(idx)))
+	idx += 1
+  if "2018" in args.years:
+    for baby in babies_2018:
+      for little_baby in little_babies(baby):
+	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2018", "_" + str(idx)))
+	idx += 1
 
 # Loopers
 else:
-  for baby in babies_2016:
-    for little_baby in little_babies(baby):
-      command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2016", "_" + str(idx))) 
-      idx += 1
-  for baby in babies_2017:
-    for little_baby in little_babies(baby):
-      command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2017", "_" + str(idx)))    
-      idx += 1
-  for baby in babies_2018:
-    for little_baby in little_babies(baby):
-      command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2018", "_" + str(idx)))    
-      idx += 1
+  if "2016" in args.years:
+    for baby in babies_2016:
+      for little_baby in little_babies(baby):
+	command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2016", "_" + str(idx))) 
+	idx += 1
+  if "2017" in args.years:
+    for baby in babies_2017:
+      for little_baby in little_babies(baby):
+	command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2017", "_" + str(idx)))    
+	idx += 1
+  if "2018" in args.years:
+    for baby in babies_2018:
+      for little_baby in little_babies(baby):
+	command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2018", "_" + str(idx)))    
+	idx += 1
 
-nPar = 18
+nPar = 24
 parallel_utils.submit_jobs(command_list, nPar)
 
 if args.babymaker:

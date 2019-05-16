@@ -53,6 +53,8 @@ tth_2017_reference_mva = utils.load_array(f, 'tth_2017_reference_mva')
 evt = utils.load_array(f, 'evt')
 run = utils.load_array(f, 'run')
 lumi = utils.load_array(f, 'lumi')
+process_id = utils.load_array(f, 'process_id')
+year = utils.load_array(f, 'year')
 
 if args.sideband:
   global_features = utils.load_array(f, 'global_data_sideband')
@@ -74,6 +76,8 @@ tth_2017_reference_mva_validation = utils.load_array(f, 'tth_2017_reference_mva_
 evt_validation = utils.load_array(f, 'evt_validation')
 run_validation = utils.load_array(f, 'run_validation')
 lumi_validation = utils.load_array(f, 'lumi_validation')
+process_id_validation = utils.load_array(f, 'process_id_validation')
+year_validation = utils.load_array(f, 'year_validation')
 
 global_features_data = utils.load_array(f, 'global_data')
 label_data = utils.load_array(f, 'label_data')
@@ -86,6 +90,8 @@ tth_2017_reference_mva_data = utils.load_array(f, 'tth_2017_reference_mva_data')
 evt_data = utils.load_array(f, 'evt_data')
 run_data = utils.load_array(f, 'run_data')
 lumi_data = utils.load_array(f, 'lumi_data')
+process_id_data = utils.load_array(f, 'process_id_data')
+year_data = utils.load_array(f, 'year_data')
 
 global_features_final_fit = utils.load_array(f, 'global_final_fit')
 label_final_fit = utils.load_array(f, 'label_final_fit')
@@ -98,6 +104,8 @@ tth_2017_reference_mva_final_fit = utils.load_array(f, 'tth_2017_reference_mva_f
 evt_final_fit = utils.load_array(f, 'evt_final_fit')
 run_final_fit = utils.load_array(f, 'run_final_fit')
 lumi_final_fit = utils.load_array(f, 'lumi_final_fit')
+process_id_final_fit = utils.load_array(f, 'process_id_final_fit')
+year_final_fit = utils.load_array(f, 'year_final_fit')
 
 train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
 nTrain = int(len(label)*train_frac)
@@ -260,6 +268,8 @@ tree_tth_2017_reference_mva = numpy.concatenate((tth_2017_reference_mva, tth_201
 tree_evt = numpy.concatenate((evt, evt_validation, evt_data, evt_final_fit))
 tree_run = numpy.concatenate((run, run_validation, run_data, run_final_fit))
 tree_lumi = numpy.concatenate((lumi, lumi_validation, lumi_data, lumi_final_fit))
+tree_process_id = numpy.concatenate((process_id, process_id_validation, process_id_data, process_id_final_fit))
+tree_year = numpy.concatenate((year, year_validation, year_data, year_final_fit))
 
 
 tree_train_id = tree_train_id.astype(numpy.int64)
@@ -272,8 +282,10 @@ tree_tth_2017_reference_mva = tree_tth_2017_reference_mva.astype(numpy.float64)
 tree_evt = tree_evt.astype(numpy.uint64)
 tree_run = tree_run.astype(numpy.uint64)
 tree_lumi = tree_lumi.astype(numpy.uint64)
+tree_process_id = tree_process_id.astype(numpy.int64)
+tree_year = tree_year.astype(numpy.int64)
 
-dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva}
+dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year}
 utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
 
 #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label, tree_tth_2017_reference_mva], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label,tth_2017_reference_mva')
