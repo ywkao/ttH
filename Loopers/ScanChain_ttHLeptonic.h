@@ -108,6 +108,40 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_m
     return true;
   }
 
+  else if (tag == "ttHLeptonic_2017_TagsInclusive") {
+    if (mass() < 100 || mass() > 180)                   return false;
+    if (lead_ptoM() < 0.33 || sublead_ptoM() < 0.25)    return false;
+    if (n_jets() < 1)                                   return false;
+    if (nb_medium() < 1)                                return false;
+    if (minIDMVA_ < -0.2)           			return false;
+    if (n_lep_medium < 1)                               return false;
+    if (tthMVA() < 0.3)                                 return false;
+    return true;
+  }
+
+  else if (tag == "ttHLeptonic_2017_Tag0") {
+    if (mass() < 100 || mass() > 180)                   return false;
+    if (lead_ptoM() < 0.33 || sublead_ptoM() < 0.25)    return false;
+    if (n_jets() < 1)                                   return false;
+    if (nb_medium() < 1)				return false;
+    if (minIDMVA_ < -0.2)                               return false;
+    if (n_lep_medium < 1)                               return false;
+    if (tthMVA() < 0.6)                                 return false;
+    return true;
+  }
+
+  else if (tag == "ttHLeptonic_2017_Tag1") {
+    if (mass() < 100 || mass() > 180)                   return false;
+    if (lead_ptoM() < 0.33 || sublead_ptoM() < 0.25)    return false;
+    if (n_jets() < 1)                                   return false;
+    if (nb_medium() < 1)				return false;
+    if (minIDMVA_ < -0.2)                               return false;
+    if (n_lep_medium < 1)                               return false;
+    if (tthMVA() > 0.6 || tthMVA() < 0.3)               return false;
+    return true;
+  }
+
+
   else
     cout << "Did not recognize tag name" << endl;
   return false;

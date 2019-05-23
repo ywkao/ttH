@@ -39,7 +39,12 @@ command_list = []
 #command_list.append('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --bdt "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute__bdt.xml"' % (args.tag + "_impute"))
 #command_list.append('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_CutPtoM" --bkg_options "impute" --bdt "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute_cutPtoM__bdt.xml"' % (args.tag + "_impute"))
 
-parallel_utils.submit_jobs(command_list, 3)
+#parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_TagsInclusive" --bkg_options "impute"' % (args.tag + "_impute"))
+#parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_Tag0" --bkg_options "impute"' % (args.tag + "_impute"))
+#parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_Tag1" --bkg_options "impute"' % (args.tag + "_impute"))
+#parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_Tag2" --bkg_options "impute"' % (args.tag + "_impute"))
+
+#parallel_utils.submit_jobs(command_list, 3)
 command_list = []
 
 os.chdir("Plots")
@@ -52,7 +57,7 @@ if do_mva:
   os.chdir("../")
   #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "scale_diphoton" --babymaker' % (args.tag + "_RunII_MVA_Presel_scale_diphoton"))
   parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --babymaker' % (args.tag + "_RunII_MVA_Presel_impute"))
-  parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_Presel" --bkg_options "impute" --babymaker --years "2017"' % (args.tag + "_2017_Presel_impute"))
+  #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_Presel" --bkg_options "impute" --babymaker --years "2017"' % (args.tag + "_2017_Presel_impute"))
 
   os.chdir("../MVAs/")
 
@@ -64,8 +69,8 @@ if do_mva:
   #parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_dnn_features_ttGG.hdf5" --tag "ttHHadronic_ttH_vs_ttGG_%s" --channel "Hadronic"' % (args.tag, args.tag))
 
   # 2017 Ref BDT
-  parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_2017_Presel_impute.root" --channel "Hadronic"' % (args.tag))
-  parallel_utils.run('python train.py --input "ttHHadronic_%s_2017_Presel_impute_features.hdf5" --channel "Hadronic" --tag "_%s_2017_Presel_impute" --ext ""' % (args.tag, args.tag))
+  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_2017_Presel_impute.root" --channel "Hadronic"' % (args.tag))
+  #parallel_utils.run('python train.py --input "ttHHadronic_%s_2017_Presel_impute_features.hdf5" --channel "Hadronic" --tag "_%s_2017_Presel_impute" --ext ""' % (args.tag, args.tag))
 
   # BDT
   #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_scale_diphoton.root" --channel "Hadronic" --cut_ptoM --tag "cutPtoM"' % (args.tag))
@@ -73,10 +78,10 @@ if do_mva:
 
   #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --cut_ptoM --tag "cutPtoM"' % (args.tag))
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_featurescutPtoM.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_impute_cutPtoM" --ext ""' % (args.tag, args.tag))
-  parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic"' % (args.tag))
-  parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_features.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_impute" --ext ""' % (args.tag, args.tag))
+  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic"' % (args.tag))
+  #parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_features.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_impute" --ext ""' % (args.tag, args.tag))
   #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --dnn_models "dnn_weights/ttHHadronic_ttH_vs_dipho_%s_weights_00.hdf5,dnn_weights/ttHHadronic_ttH_vs_ttGG_%s_weights_00.hdf5" --tag "addDNNs"' % (args.tag, args.tag, args.tag))
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_featuresaddDNNs.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_impute_addDNNs" --ext ""' % (args.tag, args.tag))
 
-  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --dnn_models "dnn_weights/ttHHadronic_ttH_vs_dipho_%s_weights_00.hdf5,dnn_weights/ttHHadronic_ttH_vs_ttGG_%s_weights_00.hdf5" --tag "addDNNs_addTopTag" --do_top_tag' % (args.tag, args.tag, args.tag))
-  #parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_featuresaddDNNs_addTopTag.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_impute_addDNNs_addTopTag" --ext ""' % (args.tag, args.tag))
+  parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --dnn_models "dnn_weights/ttHHadronic_ttH_vs_dipho_%s_weights_00.hdf5,dnn_weights/ttHHadronic_ttH_vs_ttGG_%s_weights_00.hdf5" --tag "addDNNs_addTopTag" --do_top_tag' % (args.tag, args.tag, args.tag))
+  parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_featuresaddDNNs_addTopTag.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_impute_addDNNs_addTopTag" --ext ""' % (args.tag, args.tag))

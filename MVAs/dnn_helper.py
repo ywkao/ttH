@@ -46,6 +46,7 @@ class DNN_Helper:
     self.features_train = kwargs.get('features_train', [])
     self.features_data = kwargs.get('features_data', [])
     self.features_final_fit = kwargs.get('features_final_fit', "none")   
+    self.mass_data = kwargs.get('mass_data', [])
     self.evt_data = kwargs.get('evt_data', [])
     self.run_data = kwargs.get('run_data', [])
     self.lumi_data = kwargs.get('lumi_data', [])
@@ -174,6 +175,7 @@ class DNN_Helper:
     self.predictions["data"] = self.model.predict(self.features_data.features, self.batch_size).flatten()
     for i in range(len(self.predictions["data"])):
       print "Event", self.run_data[i], self.lumi_data[i], self.evt_data[i]
+      print "Mass", self.mass_data[i]
       print "Global features"
       print self.features_data.global_features[i]
       print "Object features"
@@ -214,7 +216,7 @@ class DNN_Helper:
     plt.savefig('dnn_roc_%s_%s.pdf' % (reference.replace(" ", "_"), self.tag))
 
   def do_diagnostics(self):
-    numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"], scores_final_fit = self.predictions["final_fit"], evt_data = self.evt_data, run_data = self.run_data, lumi_data = self.lumi_data)
+    numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"], scores_final_fit = self.predictions["final_fit"], evt_data = self.evt_data, run_data = self.run_data, lumi_data = self.lumi_data, mass_data = self.mass_data)
     self.make_learning_curve()
     for ref in self.features_validation.references.iterkeys():
       self.make_comparison(ref)

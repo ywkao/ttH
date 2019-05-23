@@ -285,7 +285,7 @@ tree_lumi = tree_lumi.astype(numpy.uint64)
 tree_process_id = tree_process_id.astype(numpy.int64)
 tree_year = tree_year.astype(numpy.int64)
 
-dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year}
+dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run}
 utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
 
 #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label, tree_tth_2017_reference_mva], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label,tth_2017_reference_mva')
