@@ -268,7 +268,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       // Fill mva baby before any selections
       int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
-      int processId = categorize_process(currentFileTitle, genPhotonId);
+      int processId = categorize_process(currentFileTitle);//, genPhotonId);
       if (processId == 17)
         processId = 3; // use Madgraph GJets instead of Pythia
 

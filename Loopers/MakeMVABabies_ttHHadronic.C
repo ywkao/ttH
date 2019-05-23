@@ -404,7 +404,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       // Decide what type of sample this is
       int genPhotonId = categorize_photons(leadGenMatch(), subleadGenMatch());
-      process_id_ = categorize_process(currentFileTitle, genPhotonId);
+      process_id_ = categorize_process(currentFileTitle); //genPhotonId);
 
       evt_weight_ = 1.;
 
