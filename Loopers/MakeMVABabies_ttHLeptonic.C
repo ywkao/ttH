@@ -97,7 +97,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   }
 
 
-
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 

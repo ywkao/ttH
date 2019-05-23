@@ -54,7 +54,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   gjet_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
   gjet_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
 
-  gjet_mva->BookMVA("BDT", gjet_bdt_file);
+  //gjet_mva->BookMVA("BDT", gjet_bdt_file);
 
 
   // ttH MVA Business
@@ -410,7 +410,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       // GJets Reweighting
       double gjet_mva_value = -999;
-      gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" ));
+      //gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" ));
 
       // Skipping events/samples
       if (is_low_stats_process(currentFileTitle))       continue;
