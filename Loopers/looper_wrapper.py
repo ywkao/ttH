@@ -240,11 +240,11 @@ babies_2018 = [
 ]
 
 def full_path(baby):
-  full_path_baby = "merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
+  full_path_baby = "/home/users/sjmay/ttH/Loopers/merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
   return full_path_baby
 
 def little_babies(baby):
-  babies = glob.glob("merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
+  babies = glob.glob("/home/users/sjmay/ttH/Loopers/merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
   return babies
 
 command_list = []
