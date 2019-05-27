@@ -181,7 +181,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   gjet_mva->AddVariable("leadIDMVA_", &leadIDMVA_);
   gjet_mva->AddVariable("subleadIDMVA_", &subleadIDMVA_);
 
-  gjet_mva->BookMVA("BDT", gjet_bdt_file); 
+  //gjet_mva->BookMVA("BDT", gjet_bdt_file); 
 
 
   // File Loop
@@ -393,7 +393,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Gamma + jets reweighting
       double gjet_mva_value = -999;	
 
-      gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" )); 
+      //gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" )); 
 
       /* turn this off for now
       if (combine_gjets_samples) {

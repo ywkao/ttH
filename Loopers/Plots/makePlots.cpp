@@ -29,7 +29,8 @@ std::map<TString, TString> mLabels = {
 	{"QCD_GammaJets_imputed", "(#gamma) + Jets (Data)"},
 	{"TTV", "t#bar{t}V"},
         {"VV", "VV"},
-        {"tV", "t + V"}
+        {"tV", "t + V"},
+	{"FCNC", "FCNC"}
 };
 
 std::map<TString, int> mColors = {
@@ -47,7 +48,8 @@ std::map<TString, int> mColors = {
 	{"QCD_GammaJets_imputed", kGray},
 	{"TTV", kPink},
 	{"tV", kPink-6},
-	{"VV", kPink+6}
+	{"VV", kPink+6},
+	{"FCNC", kBlack}
 };
 
 std::map<TString, TString> mLatex = {
@@ -66,6 +68,7 @@ std::map<TString, TString> mLatex = {
 	{"TTV", "$t\\bar{t}+V$"},
         {"VV", "$VV$"},
         {"tV", "$tV$"},
+	{"FCNC", "FCNC"}
 };
 
 
@@ -114,8 +117,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   TH1D* hSig_TTH = (TH1D*)file->Get(hist_name + "_ttH" + extension);
   TH1D* hSig_THQ = (TH1D*)file->Get(hist_name + "_THQ" + extension);
   TH1D* hSig_THW = (TH1D*)file->Get(hist_name + "_THW" + extension);
+  TH1D* hSig_FCNC = (TH1D*)file->Get(hist_name + "_FCNC" + extension);
   vector<TH1D*> hSig = {hSig_TTH, hSig_THQ, hSig_THW};
-  hSig = {hSig_TTH};
+  hSig = {hSig_TTH, hSig_FCNC};
 
   vector<TH1D*> hBkg;
   Comparison* c;
@@ -130,7 +134,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     if (file_ref != nullptr)
       vLegendLabels = {"2017 Data (New)", "ttH (M125)", "2017 Data (Old)"};
     else 
-      vLegendLabels = {year + " Data", "ttH (M125)"};
+      //      vLegendLabels = {year + " Data", "ttH (M125)"};
+      vLegendLabels = {year + " Data", "ttH (M125)", "FCNC"};
     
       //vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
     //}
