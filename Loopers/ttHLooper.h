@@ -305,7 +305,7 @@ vector<TH1D*> generate_1Dhist_vector(TString name, int length, int nBins, float 
   return hVec;
 }
 
-int categorize_process(TString currentFileTitle/*, int genPhotonId*/) {
+int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
   if (currentFileTitle.Contains("ttHJet")) // && currentFileTitle.Contains("M125"))
     return 0;
   else if (currentFileTitle.Contains("DY"))
@@ -318,32 +318,30 @@ int categorize_process(TString currentFileTitle/*, int genPhotonId*/) {
   //  return 4;
   else if (currentFileTitle.Contains("QCD"))
     return 4;
-  /*
+
   else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || (currentFileTitle.Contains("TTJets")) || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic")) {
-    if (genPhotonId == 2) // pp
+    if (genPhotonId != -1) {
+      if (genPhotonId == 2) // pp
+        return 5;
+      else if (genPhotonId == 1) // pf
+        return 6;
+      else if (genPhotonId == 0) // ff
+        return 9;
+    }
+    else {
+      if (currentFileTitle.Contains("TTGG"))
       return 5;
-    if (genPhotonId == 1) // pf
-      return 6;
-    if (genPhotonId == 0) // ff
-      return 9;  
+      else if (currentFileTitle.Contains("TTGJets"))
+	return 6;
+      else if ((currentFileTitle.Contains("TTJets")) || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic"))
+      return 9;
+    }
   }
-  */
-  else if (currentFileTitle.Contains("TTGG"))
-    return 5;
-  else if (currentFileTitle.Contains("TTGJets"))
-    return 6;
-  else if ((currentFileTitle.Contains("TTJets")) || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic"))
-    return 9;
-  //else if (currentFileTitle.Contains("TTGG"))
-  //  return 5; // split into hadronic/semileptonic/dileptonic
-  //else if (currentFileTitle.Contains("TTGJets"))
-  //  return 6; // split into hadronic/semileptonic/dileptonic 
+
   else if (currentFileTitle.Contains("WG") || currentFileTitle.Contains("ZG"))
     return 7;
   else if (currentFileTitle.Contains("WJets") && !currentFileTitle.Contains("TTW"))
     return 8;
-  //else if (currentFileTitle.Contains("TTJets"))
-  //  return 9; // split into hadronic/semileptonic/dileptonic
   else if (currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"))
     return 10;
   else if (currentFileTitle.Contains("THQ"))
