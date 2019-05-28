@@ -48,6 +48,7 @@ class BabyMaker {
     int 	signal_mass_label_;
     float	evt_weight_;
     int 	process_id_;
+    int         genPhotonId_;
     float	rand_;
     float 	super_rand_;
     float	mass_;
@@ -151,6 +152,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("multi_label_"            , &multi_label_       );
   BabyTree_->Branch("data_sideband_label_"            , &data_sideband_label_       );
   BabyTree_->Branch("signal_mass_label_"            , &signal_mass_label_       );
+  BabyTree_->Branch("genPhotonId_"     	, &genPhotonId_  );
   BabyTree_->Branch("process_id_"     	, &process_id_  );
   BabyTree_->Branch("rand_"            , &rand_       );
   BabyTree_->Branch("super_rand_"            , &super_rand_       );

@@ -305,7 +305,7 @@ vector<TH1D*> generate_1Dhist_vector(TString name, int length, int nBins, float 
   return hVec;
 }
 
-int categorize_process(TString currentFileTitle, int genPhotonId) {
+int categorize_process(TString currentFileTitle/*, int genPhotonId*/) {
   if (currentFileTitle.Contains("ttHJet")) // && currentFileTitle.Contains("M125"))
     return 0;
   else if (currentFileTitle.Contains("DY"))
@@ -318,7 +318,7 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
   //  return 4;
   else if (currentFileTitle.Contains("QCD"))
     return 4;
-
+  /*
   else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || (currentFileTitle.Contains("TTJets")) || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic")) {
     if (genPhotonId == 2) // pp
       return 5;
@@ -327,7 +327,13 @@ int categorize_process(TString currentFileTitle, int genPhotonId) {
     if (genPhotonId == 0) // ff
       return 9;  
   }
-
+  */
+  else if (currentFileTitle.Contains("TTGG"))
+    return 5;
+  else if (currentFileTitle.Contains("TTGJets"))
+    return 6;
+  else if ((currentFileTitle.Contains("TTJets")) || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic"))
+    return 9;
   //else if (currentFileTitle.Contains("TTGG"))
   //  return 5; // split into hadronic/semileptonic/dileptonic
   //else if (currentFileTitle.Contains("TTGJets"))
@@ -1457,6 +1463,7 @@ const vector<TString> vSamples_2017_RunII = {
                 "TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
                 "TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
 		*/
+                "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
 
 		// ttH Signal
 		//"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
