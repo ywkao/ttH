@@ -270,7 +270,7 @@ tree_run = numpy.concatenate((run, run_validation, run_data, run_final_fit))
 tree_lumi = numpy.concatenate((lumi, lumi_validation, lumi_data, lumi_final_fit))
 tree_process_id = numpy.concatenate((process_id, process_id_validation, process_id_data, process_id_final_fit))
 tree_year = numpy.concatenate((year, year_validation, year_data, year_final_fit))
-
+tree_global_features = numpy.concatenate((global_features, global_features_validation, global_features_data, global_features_final_fit))
 
 tree_train_id = tree_train_id.astype(numpy.int64)
 tree_sample_id = tree_sample_id.astype(numpy.int64)
@@ -284,8 +284,9 @@ tree_run = tree_run.astype(numpy.uint64)
 tree_lumi = tree_lumi.astype(numpy.uint64)
 tree_process_id = tree_process_id.astype(numpy.int64)
 tree_year = tree_year.astype(numpy.int64)
+tree_global_features = tree_global_features.astype(numpy.float64)
 
-dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run}
+dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}
 utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
 
 #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label, tree_tth_2017_reference_mva], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label,tth_2017_reference_mva')

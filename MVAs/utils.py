@@ -14,13 +14,22 @@ def numpy_to_tree(dict, file_name, tree_name = "t"): # dict should contain {"bra
 
   branches = {}
   for branch in dict.iterkeys():
-    b = numpy.empty((1), dtype = "float32")
-    branches[branch] = b
-    t.Branch(branch, branches[branch], branch + "/F") 
+    if branch == "global_features":
+      b = numpy.empty((1, len(dict[branch][0])), dtype = "float32")
+      branches[branch] = b
+      t.Branch(branch, branches[branch], "%s[%d]/F" % (branch, len(dict[branch][0])))
+    else:
+      b = numpy.empty((1), dtype = "float32")
+      branches[branch] = b
+      t.Branch(branch, branches[branch], branch + "/F") 
  
   for i in range(n_events):
     for branch in dict.iterkeys():
-      branches[branch][0] = dict[branch][i]
+      if branch == "global_features":
+	for j in range(len(dict[branch][i])):
+	  branches[branch][0][j] = dict[branch][i][j]
+      else:
+        branches[branch][0] = dict[branch][i]
     t.Fill()
 
   f.Write()

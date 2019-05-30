@@ -517,8 +517,13 @@ const double diphoton_factor_hadronic_runII = 1.2247879210012904;
 const double gjets_factor_hadronic_runII    = 1.8330524459247017;
 const double qcd_factor_hadronic_runII      = 2.0797761555731786;
 
-const double qcd_gjets_impute_factor_hadronic_runII = 0.9433630221924071; 
-const double diphoton_impute_factor_hadronic_runII  = 1.24575175003913; 
+//v1.5
+//const double qcd_gjets_impute_factor_hadronic_runII = 0.9433630221924071; 
+//const double diphoton_impute_factor_hadronic_runII  = 1.24575175003913; 
+//v1.6
+const double qcd_gjets_impute_factor_hadronic_runII = 0.9537308742404281;
+const double diphoton_impute_factor_hadronic_runII  = 1.289449696556433;
+
 
 const double diphoton_factor_leptonic_runII = 1.919798;
 const double gjets_factor_leptonic_runII    = 1.919798;
@@ -691,14 +696,14 @@ TF1* get_photon_ID_shape(TString type) {
   }
 
   else if (type == "fake_runII") {
-    f_IDMVA->SetParameter(0, 7513.99);
-    f_IDMVA->SetParameter(1, -10002.3);
-    f_IDMVA->SetParameter(2, 11186.2);
-    f_IDMVA->SetParameter(3, -6361.53);
-    f_IDMVA->SetParameter(4, -5173.1);
-    f_IDMVA->SetParameter(5, 2221.39);
-    f_IDMVA->SetParameter(6, 29594.1);
-    f_IDMVA->SetParameter(7, -22148.4);
+    f_IDMVA->SetParameter(0, 9284.03);
+    f_IDMVA->SetParameter(1, -11984.8);
+    f_IDMVA->SetParameter(2, 17992.1);
+    f_IDMVA->SetParameter(3, -8591.4);
+    f_IDMVA->SetParameter(4, -13340.2);
+    f_IDMVA->SetParameter(5, 4961.52);
+    f_IDMVA->SetParameter(6, 40897.6);
+    f_IDMVA->SetParameter(7, -30331.9);
   }
 
   else if (type == "fake_barrel_lowPt") {
@@ -1102,7 +1107,7 @@ double helicity(const TLorentzVector particle_1, const TLorentzVector particle_2
 
 double convert_tmva_to_prob(double score) {
   // Undo TMVA transformation
-  double raw_score = -0.5 * log( 0.5 * (( 2 / (score + 1)) - 1));
+  double raw_score = -0.5 * log( (2 / (score + 1)) - 1);
 
   // Apply logistic (sigmoid) transformation
   double prob = 1 / (1 + exp(-raw_score));
@@ -1623,7 +1628,7 @@ void add_samples(TChain* ch, TString year) {
   vector<TString> vSamples;
 
   if (runII) {
-    tag = "v1.5";
+    tag = "v1.6";
     location = "/home/users/sjmay/ttH/Loopers/merged_babies";
     if (year.Contains("2016"))
       vSamples = vSamples_2016_RunII;

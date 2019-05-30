@@ -313,7 +313,7 @@ if args.babymaker:
   master = "MVABaby_ttH%s_%s.root" % (args.channel, args.tag)
 else:
   master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag)
-os.system('hadd -f -k -j 10 %s %s' % (master, target))
+os.system('hadd -f -k -j 3 %s %s' % (master, target))
 
 
 # Cleanup
