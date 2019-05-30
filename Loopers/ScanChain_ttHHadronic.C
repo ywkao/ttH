@@ -89,6 +89,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   float jet6_eta_;
   float jet6_btag_;
 
+  float m1_;
+  float m2_;
   
   float leadPSV_;
   float subleadPSV_;
@@ -381,6 +383,34 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       met_ = MetPt();
 
+      m1_ = 0;
+      m2_ = 0;
+      float minMassDiff = 123456;
+      if (njets_ >= 4) {
+	TLorentzVector lead4JetsP4[4] = {jets[0], jets[1], jets[2], jets[3]};
+	float lead4JetsBTag[4] = {jet1_btag_, jet2_btag_, jet3_btag_, jet4_btag_};
+	for (int i = 0; i < 4; i++) {
+	  TLorentzVector t1 = diphoton + jets[i];
+	  TLorentzVector t2;
+	  for (int j = 0; j < 4; j++) {
+
+	    if (j == i) continue;
+	    t2 += jets[j];
+	    
+	  }
+
+	  float massDiff = abs(t1.M()-172) + abs(t2.M()-172);
+	  if (massDiff < minMassDiff) {
+	    minMassDiff = massDiff;
+	    m1_ = t1.M();
+	    m2_ = t2.M();
+
+	  }
+	  
+	}
+	
+      }
+      
       if (evaluate_mva) 
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       double reference_mva = tthMVA();
@@ -428,6 +458,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hGJet_BDT", gjet_mva_value, evt_weight, vId);
       vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   
       vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMassTop1", m1_, evt_weight, vId);   
+      vProcess[processId]->fill_histogram("hMassTop2", m2_, evt_weight, vId);   
       
       if (leadptoM_ > 0.33 && subleadptoM_ > 0.25) {
 	vProcess[processId]->fill_histogram("hMass_PassPtToM", mass(), evt_weight, vId);
