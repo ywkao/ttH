@@ -127,7 +127,7 @@ while True:
       # save some information for the dashboard
       total_summary[dataset] = task.get_task_summary()
     # parse the total summary and write out the dashboard
-    #StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
+    StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
     os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker")
     if allcomplete:
         print ""
