@@ -64,6 +64,14 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_) {
   if (!(leadPassEVeto() && subleadPassEVeto()))       return false; // always require e veto
   if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)    return false; // don't use photon ID below -0.9
 
+  if (tag == "ttHHadronic_RunII_MVA_Presel_veryLoose") {
+    if (mass() < 100) 					return false;
+    if (n_jets() < 2)					return false;
+    if (nb_loose() < 1)					return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)		return false;
+    return true;
+  }
+  
   if (tag == "ttHHadronic_RunII_MVA_Presel") {
     if (mass() < 100) 					return false;
     if (n_jets() < 3)					return false;

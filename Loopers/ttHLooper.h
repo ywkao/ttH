@@ -29,8 +29,9 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "TTV"));
   v.push_back(new Process(f, "VV"));
   v.push_back(new Process(f, "tV"));
-  v.push_back(new Process(f, "FCNC"));
-  //v.push_back(new Process
+  v.push_back(new Process(f, "FCNC_hut"));
+  v.push_back(new Process(f, "FCNC_hct"));
+ //v.push_back(new Process
 
   return v;
 }
@@ -59,6 +60,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hDiphotonMassResolutionLowMVA", 25, 0, 0.1);
     v[i]->add_histogram("hDiphotonMassResolutionMedMVA", 25, 0, 0.1);
     v[i]->add_histogram("hDiphotonMassResolutionHighMVA", 25, 0, 0.1);
+    v[i]->add_histogram("hMassTop1", 100, 0, 500);
+    v[i]->add_histogram("hMassTop2", 100, 0, 500);
 
     v[i]->add_histogram("hGJet_BDT", 100, 0, 1);
 
@@ -365,8 +368,10 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
     return 20;
   else if (currentFileTitle.Contains("ST_tW") || currentFileTitle.Contains("tZq"))
     return 21;
-  else if (currentFileTitle.Contains("FCNC"))
+  else if (currentFileTitle.Contains("FCNC") && currentFileTitle.Contains("hut") )
     return 22;
+  else if (currentFileTitle.Contains("FCNC") && currentFileTitle.Contains("hct") )
+    return 23;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -1467,6 +1472,7 @@ const vector<TString> vSamples_2017_RunII = {
                 "TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
 		*/
                 "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
+                "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
 
 		// ttH Signal
 		//"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",

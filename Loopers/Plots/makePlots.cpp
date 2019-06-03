@@ -30,7 +30,9 @@ std::map<TString, TString> mLabels = {
 	{"TTV", "t#bar{t}V"},
         {"VV", "VV"},
         {"tV", "t + V"},
-	{"FCNC", "FCNC"}
+	{"FCNC_hut", "FCNC_hut"},
+	{"FCNC_hct", "FCNC_hct"}
+
 };
 
 std::map<TString, int> mColors = {
@@ -48,8 +50,7 @@ std::map<TString, int> mColors = {
 	{"QCD_GammaJets_imputed", kGray},
 	{"TTV", kPink},
 	{"tV", kPink-6},
-	{"VV", kPink+6},
-	{"FCNC", kBlack}
+	{"VV", kPink+6}
 };
 
 std::map<TString, TString> mLatex = {
@@ -68,7 +69,9 @@ std::map<TString, TString> mLatex = {
 	{"TTV", "$t\\bar{t}+V$"},
         {"VV", "$VV$"},
         {"tV", "$tV$"},
-	{"FCNC", "FCNC"}
+	{"FCNC_hut", "FCNC_hut"},
+	{"FCNC_hct", "FCNC_hct"}
+
 };
 
 
@@ -117,9 +120,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   TH1D* hSig_TTH = (TH1D*)file->Get(hist_name + "_ttH" + extension);
   TH1D* hSig_THQ = (TH1D*)file->Get(hist_name + "_THQ" + extension);
   TH1D* hSig_THW = (TH1D*)file->Get(hist_name + "_THW" + extension);
-  TH1D* hSig_FCNC = (TH1D*)file->Get(hist_name + "_FCNC" + extension);
-  vector<TH1D*> hSig = {hSig_TTH, hSig_THQ, hSig_THW};
-  hSig = {hSig_TTH, hSig_FCNC};
+  TH1D* hSig_FCNC_hut = (TH1D*)file->Get(hist_name + "_FCNC_hut" + extension);
+  TH1D* hSig_FCNC_hct = (TH1D*)file->Get(hist_name + "_FCNC_hct" + extension);
+  vector<TH1D*> hSig;// = {hSig_TTH, hSig_THQ, hSig_THW};
+  hSig = {hSig_TTH, hSig_FCNC_hut, hSig_FCNC_hct};
 
   vector<TH1D*> hBkg;
   Comparison* c;
@@ -135,7 +139,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       vLegendLabels = {"2017 Data (New)", "ttH (M125)", "2017 Data (Old)"};
     else 
       //      vLegendLabels = {year + " Data", "ttH (M125)"};
-      vLegendLabels = {year + " Data", "ttH (M125)", "FCNC"};
+      vLegendLabels = {year + " Data", "ttH (M125)", "FCNC_hut", "FCNC_hct"};
     
       //vLegendLabels = {year + " Data", "ttH (M125)", "tHq (M125)", "tHW (M125)"};
     //}
@@ -637,6 +641,9 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hRapidity", "Y_{#gamma#gamma} [GeV^{1/2}]", vBkgs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hDiphotonSumPt", "p_{T}(#gamma_{1}) + p_{T}(#gamma_{2}) [GeV]", vBkgs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hDiphotonCosPhi", "|cos(#Delta #phi_{#gamma 1, #gamma 2})|", vBkgs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+
+    make_plot(c1, vFiles[i], vNames[i], "hMassTop1", "m_{#gamma#gammaj} [GeV]", vBkgs, 0,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hMassTop2", "m_{jjj} [GeV]", vBkgs, 0,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
 
     make_plot(c1, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hNbLoose", "N_{b-jets} (Loose)", vBkgs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
