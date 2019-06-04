@@ -1,7 +1,7 @@
 #include "MakeMVABabies_ttHLeptonic.h"
 #include "ScanChain_ttHLeptonic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool fcnc = false, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -119,7 +119,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
-    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
+    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG") || currentFileTitle.Contains("FCNC"); 
     if (mYear == "")
       mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year"));
 
@@ -284,7 +284,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       }
 
 
-      label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 0 ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data sidebands
+      if (fcnc)
+        label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 22 || process_id_ == 23) ? 1 : 0; // 0 = bkg, 1 = fcnc, 2 = data
+      else {
+        label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 0 ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data sidebands
+	if (process_id_ == 22 || process_id_ == 23)
+	  label_ = -1; // don't use FCNC as a bkg when ttH is signal
+      }
+
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 

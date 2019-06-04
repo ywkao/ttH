@@ -26,6 +26,9 @@ int main(int argc, char* argv[]) {
   TString mYear = argc <= 6 ? "" : argv[6];
   TString idx = argc <= 7 ? "" : argv[7];
 
+  TString fcnc = argc <= 8 ? "" : argv[8];
+  bool fcnc_ = fcnc == "FCNC";
+
   if (file == "all") {
     if (year.Contains("RunII")) {
       if (year == "RunII") {
@@ -54,6 +57,6 @@ int main(int argc, char* argv[]) {
     ch->Add(file);
 
   BabyMaker *looper = new BabyMaker();
-  looper->ScanChain(ch, tag, year, ext, bkg_options, mYear, idx);
+  looper->ScanChain(ch, tag, year, ext, bkg_options, mYear, idx, fcnc_);
   return 0; 
 }

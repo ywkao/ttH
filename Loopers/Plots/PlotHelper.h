@@ -675,7 +675,7 @@ void Comparison::set_histogram_options(int color1, int color2)
     mStack->GetXaxis()->SetLabelSize(0);
   }
 
-  vector<int> vColorsSignal = {kBlack, kRed, kBlue, kGreen, kViolet};
+  vector<int> vColorsSignal = {kBlack, kRed+3, kOrange+10, kGray, kGreen+4}; 
   for (int i=0; i<mVHSignal.size(); i++) {
     //mVHSignal[i]->SetFillColor(kBlack);
     mVHSignal[i]->SetLineColor(vColorsSignal[i]);

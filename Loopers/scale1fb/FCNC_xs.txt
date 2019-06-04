@@ -1,0 +1,24 @@
+* xs for ST and TT FCNC: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopFCNCxsection
+
+** Br(Hgg) = 2.28E-03, Br(Hbb) = 5.77E-01
+*** https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR2014
+
+** Br(t->bw->blv) = 0.338, Br(t->qqb) = 0.665
+*** l = e/mu/tau
+*** http://pdg.lbl.gov/2018/listings/rpp2018-list-t-quark.pdf
+
+** ST xs
+|                 |      xs (pb) | xs*Br(Hbb)*Br(tbWlv) (pb) | xs*Br(Hgg)*Br(tbWlv) (pb) | xs*Br(Hgg)*Br(tbWqq) (pb) |
+|-----------------+--------------+---------------------------+---------------------------+---------------------------|
+| ST (total, hut) | 6.352707e+01 |                 12.389430 |               0.048956501 |               0.096319744 |
+| ST (top,   hut) | 7.257872e+01 |                 14.154737 |               0.055932065 |                0.11004386 |
+| ST (anti,  hut) | 9.051648e+00 |                 1.7653067 |              6.9755620e-3 |               0.013724109 |
+| ST (total, hct) | 5.014804e+00 |                0.97801716 |              3.8646086e-3 |              7.6034458e-3 |
+| ST (top,   hct) | 9.987432e+00 |                 1.9478089 |              7.6967146e-3 |               0.015142944 |
+| ST (anti,  hct) | 4.972628e+00 |                0.96979175 |              3.8321060e-3 |              7.5394986e-3 |
+
+** TT xs
+|                 | xs*Br(tbW) (pb) | xs*Br(tbWlv) (pb) | xs*Br(tbWqq) (pb) | xs*Br(tbWqq)*Br(Hbb) (pb) | xs*Br(tbWlv)*Br(Hgg) | xs*Br(tbWqq)*Br(Hgg) |
+|-----------------+-----------------+-------------------+-------------------+---------------------------+----------------------+----------------------|
+| TT (total, hut) |    9.713792e+01 |      3.147269e+01 |      6.566524e+01 |                 37.888843 |          0.071757733 |           0.14971675 |
+| TT (total, hct) |    9.712089e+01 |      3.146717e+01 |      6.565372e+01 |                 37.882196 |          0.071745148 |           0.14969048 |

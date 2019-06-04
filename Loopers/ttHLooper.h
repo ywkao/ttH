@@ -29,8 +29,10 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "TTV"));
   v.push_back(new Process(f, "VV"));
   v.push_back(new Process(f, "tV"));
-  v.push_back(new Process(f, "FCNC_hut"));
-  v.push_back(new Process(f, "FCNC_hct"));
+  v.push_back(new Process(f, "TT_FCNC_hut"));
+  v.push_back(new Process(f, "TT_FCNC_hct"));
+  v.push_back(new Process(f, "ST_FCNC_hut"));
+  v.push_back(new Process(f, "ST_FCNC_hct"));
  //v.push_back(new Process
 
   return v;
@@ -368,10 +370,14 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
     return 20;
   else if (currentFileTitle.Contains("ST_tW") || currentFileTitle.Contains("tZq"))
     return 21;
-  else if (currentFileTitle.Contains("FCNC") && currentFileTitle.Contains("hut") )
+  else if (currentFileTitle.Contains("TT_FCNC") && currentFileTitle.Contains("hut") )
     return 22;
-  else if (currentFileTitle.Contains("FCNC") && currentFileTitle.Contains("hct") )
+  else if (currentFileTitle.Contains("TT_FCNC") && currentFileTitle.Contains("hct") )
     return 23;
+  else if (currentFileTitle.Contains("ST_FCNC") && currentFileTitle.Contains("hut") )
+    return 24;
+  else if (currentFileTitle.Contains("ST_FCNC") && currentFileTitle.Contains("hct") )
+    return 25;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -910,14 +916,18 @@ bool is_low_stats_process(TString currentFileTitle) {
 }
 
 int categorize_signal_sample(TString currentFileTitle) {
-  if (currentFileTitle.Contains("M125")) { // save for fgg final fit purposes
-    return 0; 
-  }
-  else if (currentFileTitle.Contains("M127")) {
-    return 1; // save for bdt optimization purposes
+  if (currentFileTitle.Contains("ttHJet")) {
+    if (currentFileTitle.Contains("M125")) { // save for fgg final fit purposes
+      return 0; 
+    }
+    else if (currentFileTitle.Contains("M127")) {
+      return 1; // save for bdt optimization purposes
+    }
+    else
+      return 2; // don't need to save for anything, do with it what you please
   }
   else
-    return 2; // don't need to save for anything, do with it what you please
+    return 0;
 }
 
 int categorize_photons(int leadGenMatch, int subleadGenMatch) {

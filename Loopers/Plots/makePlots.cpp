@@ -31,9 +31,10 @@ std::map<TString, TString> mLabels = {
         {"VV", "VV"},
         {"tV", "t + V"},
 	{"ttH", "ttH (M125)"},
-	{"FCNC_hut", "FCNC (Hut)"},
-	{"FCNC_hct", "FCNC (Hct)"}
-
+	{"TT_FCNC_hut", "t#bar{t} FCNC (Hut)"},
+	{"TT_FCNC_hct", "t#bar{t} FCNC (Hct)"},
+	{"ST_FCNC_hut", "t FCNC (Hut)"},
+        {"ST_FCNC_hct", "t FCNC (Hct)"}
 };
 
 std::map<TString, int> mColors = {
@@ -70,9 +71,10 @@ std::map<TString, TString> mLatex = {
 	{"TTV", "$t\\bar{t}+V$"},
         {"VV", "$VV$"},
         {"tV", "$tV$"},
-	{"FCNC_hut", "FCNC (Hut)"},
-	{"FCNC_hct", "FCNC (Hct)"}
-
+	{"TT_FCNC_hut", "$t\\bar{t}$ FCNC (Hut)"},
+        {"TT_FCNC_hct", "$t\\bar{t}$ FCNC (Hct)"},
+        {"ST_FCNC_hut", "$t$ FCNC (Hut)"},
+        {"ST_FCNC_hct", "$t$ FCNC (Hct)"}
 };
 
 
@@ -640,8 +642,8 @@ int main(int argc, char* argv[])
     for (int i = 0; i < t_sig->GetEntries(); i++)
       vSigs.push_back(((TObjString *)(t_sig->At(i)))->String());
     cout << "Plotting the following as signals: "; 
-    for (int i = 0; i < vBkgs.size(); i++)
-      cout << vBkgs[i] << ", ";
+    for (int i = 0; i < vSigs.size(); i++)
+      cout << vSigs[i] << ", ";
     cout << endl;
   }
 

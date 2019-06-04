@@ -15,7 +15,11 @@ parser.add_argument("--selection", help = "selection for tagger", type=str)
 parser.add_argument("--bdt", help = "bdt to evaluate", type=str, default="none")
 parser.add_argument("--bkg_options", help = "how to treat bkg", type=str, default="none")
 parser.add_argument("--years", help = "which years to run for", type=str, default="2016,2017,2018")
+parser.add_argument("--fcnc", help = "run babymaker with fcnc as signal, ttH as bkg", action="store_true")
 args = parser.parse_args()
+
+if args.fcnc:
+  args.tag += "_FCNC"
 
 babies_2016 = [
  		"DoubleEG_Run2016B-17Jul2018_ver1-v1_MINIAOD_RunII",
@@ -174,9 +178,21 @@ babies_2017 = [
                 # t + gamma
                 "TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
 
-                # FCNC ttbar
-                "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
-                "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+		# TT FCNC Hut
+		"TT_FCNC-TtoHJ_aTleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
+		"TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
+		"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+		"TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+		# TT FCNC Hct
+		"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+		"TT_FCNC-T2HJ_aTleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
+		"TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII",
+		"TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
+		# ST FCNC Hut
+		"ST_FCNC-TH_Thadronic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+		"ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+		# ST FCNC Hct
+		"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII"	
  
 ]
 
@@ -260,17 +276,17 @@ if args.babymaker:
   if "2016" in args.years:
     for baby in babies_2016:
       for little_baby in little_babies(baby):
-	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2016", "_" + str(idx)))
+	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2016", "_" + str(idx), "FCNC" if args.fcnc else ""))
 	idx += 1
   if "2017" in args.years:
     for baby in babies_2017:
       for little_baby in little_babies(baby):
-	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2017", "_" + str(idx)))
+	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2017", "_" + str(idx), "FCNC" if args.fcnc else ""))
 	idx += 1
   if "2018" in args.years:
     for baby in babies_2018:
       for little_baby in little_babies(baby):
-	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2018", "_" + str(idx)))
+	command_list.append('./ttH%sMVABabyMaker "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bkg_options, little_baby, "2018", "_" + str(idx), "FCNC" if args.fcnc else ""))
 	idx += 1
 
 # Loopers

@@ -24,7 +24,7 @@ class BabyMaker {
       if (BabyFile_) delete BabyFile_;
       if (BabyTree_) delete BabyTree_;
     }
-    void ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear, TString idx, bool blind, bool fast, int nEvents, string skimFilePrefix);
+    void ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear, TString idx, bool fcnc, bool blind, bool fast, int nEvents, string skimFilePrefix);
     void MakeBabyNtuple(const char *);
     void InitBabyNtuple();
     void FillBabyNtuple();
@@ -125,6 +125,8 @@ class BabyMaker {
     float	met_phi_; 
 
     float       helicity_angle_;
+    float	m_ggj_;
+    float	m_jjj_;
 };
 
 inline
@@ -220,6 +222,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("met_phi_"           , &met_phi_      );
 
   BabyTree_->Branch("helicity_angle_"           , &helicity_angle_      );
+  BabyTree_->Branch("m_ggj_"           , &m_ggj_      );
+  BabyTree_->Branch("m_jjj_"           , &m_jjj_      );
 
   return;
 }

@@ -191,6 +191,8 @@ if args.multi:
 print param
 
 n_round = 300 if args.channel == "Hadronic" else 150
+if "FCNC" in args.input:
+  n_round = 50
 evallist = [(d_train, 'train'), (d_test, 'test')]
 progress = {}
 

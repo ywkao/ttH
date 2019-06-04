@@ -278,11 +278,12 @@
 	"TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 0.071745148, "br" : 1.0, "commment" : "see FCNC_xs.txt"},
 	"TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 0.14969048, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
 	"TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 0.14971675, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
-	"TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 0.071745148, "br" : 1.0, "commment" : "see FCNC_xs.txt"},
-	"TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 0.071757733, "br" : 1.0, "commment" : "see FCNC_xs.txt"},
+	"TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 0.14969048, "br" : 1.0, "commment" : "see FCNC_xs.txt"},
+	"TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 0.14971675, "br" : 1.0, "commment" : "see FCNC_xs.txt"},
 	"TT_FCNC-TtoHJ_aTleptonic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 0.071757733, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
 	"TT_FCNC-T2HJ_aTleptonic_HToaa_eta_hct-MadGraph5-pythia8"  : { "xs" : 0.071745148, "br" : 1.0, "commment" : "see FCNC_xs.txt"},
 	"ST_FCNC-TH_Thadronic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 0.11004386, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
 	"ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8" : { "xs" : 0.055932065, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
-	"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 7.6967146e-3, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
+	"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 3.8646086e-3, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
+	"ST_FCNC-TH_Thadronic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 7.6034458e-3, "br" : 1.0, "comment" : "see FCNC_xs.txt"}
 }

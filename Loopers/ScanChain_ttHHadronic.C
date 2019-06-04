@@ -200,7 +200,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
-    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG"); 
+    bool isSignal = currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG") || currentFileTitle.Contains("FCNC"); 
 
     if (isSignal) {
       if (categorize_signal_sample(currentFileTitle) != 0)
@@ -383,34 +383,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       met_ = MetPt();
 
-      m1_ = 0;
-      m2_ = 0;
-      float minMassDiff = 123456;
-      if (njets_ >= 4) {
-	TLorentzVector lead4JetsP4[4] = {jets[0], jets[1], jets[2], jets[3]};
-	float lead4JetsBTag[4] = {jet1_btag_, jet2_btag_, jet3_btag_, jet4_btag_};
-	for (int i = 0; i < 4; i++) {
-	  TLorentzVector t1 = diphoton + jets[i];
-	  TLorentzVector t2;
-	  for (int j = 0; j < 4; j++) {
+      calculate_masses(diphoton, jets, m1_, m2_);
 
-	    if (j == i) continue;
-	    t2 += jets[j];
-	    
-	  }
-
-	  float massDiff = abs(t1.M()-172) + abs(t2.M()-172);
-	  if (massDiff < minMassDiff) {
-	    minMassDiff = massDiff;
-	    m1_ = t1.M();
-	    m2_ = t2.M();
-
-	  }
-	  
-	}
-	
-      }
-      
       if (evaluate_mva) 
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       double reference_mva = tthMVA();
