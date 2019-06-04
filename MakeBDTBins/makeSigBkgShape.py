@@ -55,7 +55,7 @@ def GetDataset(t, cut, tag, savepath, debug=False):
     print "bin dataset", d_mgg_bin.sumEntries(), d_mgg_bin.numEntries()
 
 
-    '''
+    
     rv_sample_id = RooRealVar("sample_id","",0,2)
     rv_mass = RooRealVar("mass","",100,180)
     rv_weight = RooRealVar("weight","",-999,999)
@@ -66,8 +66,16 @@ def GetDataset(t, cut, tag, savepath, debug=False):
     d_mgg_unbin_w = RooDataSet(d_mgg_unbin.GetName(), "", d_mgg_unbin, d_mgg_unbin.get(), "1", "weight") 
     #print d_mgg_unbin.sumEntries(), d_mgg_unbin.numEntries()
     print "unbin dataset", d_mgg_unbin_w.sumEntries(), d_mgg_unbin_w.numEntries()
-    '''
-    
+
+    rv_mass_hgg = RooRealVar("CMS_hgg_mass","",100,180)
+    print d_mgg_unbin_w.numEntries()
+    d_mgg_unbin_w.addColumn(rv_mass_hgg)
+    d_mgg_unbin_w.Print()
+    for i in range(d_mgg_unbin_w.numEntries()):
+        print d_mgg_unbin_w.get(i).getRealValue("mass")#, d_mgg_unbin_w.get(i).getRealValue("CMS_hgg_mass") 
+        rv_mass_hgg.setVal(d_mgg_unbin_w.get(i).getRealValue("mass"))
+        d_mgg_unbin_w.add(RooArgSet(rv_mass_hgg))
+        
     if debug:
 
         h_mgg_sig = TH1F("h_mgg_sig", "h_mgg_sig", 160, 100, 180)
@@ -107,7 +115,8 @@ def GetDataset(t, cut, tag, savepath, debug=False):
         c1.SaveAs(savepath+"/" + tag + "_data_mc.png")
         c1.SaveAs(savepath+"/" + tag + "_data_mc.pdf")
 
-    return d_mgg_bin
+    #return d_mgg_bin
+    return d_mgg_unbin_w
 
 def GetSigPdf(events, tag, savename, savepath, modelpath):
 
@@ -183,17 +192,18 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath):
     w.var("CMS_hgg_mass").setRange("SL", 100, 120)
     w.var("CMS_hgg_mass").setRange("SU", 130, 180)
 
-    w.factory("Exponential::"+tag+"(CMS_hgg_mass, tau[-1,-10,0])")
+    w.factory("Exponential::"+tag+"(CMS_hgg_mass, tau[-2,-10,1])")
     
     w.pdf(tag).fitTo(events, RooFit.Range("SL,SU"))
 
     frame = w.var("CMS_hgg_mass").frame()
 
-    events.plotOn(frame, RooFit.CutRange("unblindReg_1"), RooFit.Binning(80))
-    events.plotOn(frame, RooFit.CutRange("unblindReg_2"), RooFit.Binning(80))
-    #events.plotOn(frame, RooFit.Invisible())
+    #events.plotOn(frame, RooFit.CutRange("unblindReg_1"), RooFit.Binning(80))
+    #events.plotOn(frame, RooFit.CutRange("unblindReg_2"), RooFit.Binning(80))
+    events.plotOn(frame)#, RooFit.Invisible())
 
     w.pdf(tag).plotOn(frame)
+    w.pdf(tag).paramOn(frame)
 
     w.var("CMS_hgg_mass").setRange("blind",120,130)
     l=ROOT.RooArgSet(w.var("CMS_hgg_mass"))
@@ -236,16 +246,16 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath):
 #filename = "/home/users/sjmay/ttH/Loopers/MVABaby_ttHHadronic_v1.5_8May2019_forHualin_2017_Presel_impute.root"
 #filename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__unblinded_forHualin_15May2019_2017_Presel_impute_FinalFitTree.root"
 #filename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__unblinded_forHualin_15May2019_RunII_MVA_Presel_impute_cutPtoM_FinalFitTree.root"
-#filename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__unblinded_forHualin_15May2019_RunII_MVA_Presel_impute_FinalFitTree.root"
+#hadfilename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__unblinded_forHualin_15May2019_RunII_MVA_Presel_impute_FinalFitTree.root"
 #filename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.5_forHualin_16May2019_RunII_MVA_Presel_impute_cutPtoM_FinalFitTree.root"
 #filename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.5_forHualin_16May2019_RunII_MVA_Presel_impute_FinalFitTree.root"
 
 # had
-#hadfilename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.6_28May2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root"
-hadfilename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__unblinded_forHualin_15May2019_2017_Presel_impute_FinalFitTree.root"
+hadfilename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.6_28May2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root"
+#hadfilename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__unblinded_forHualin_15May2019_2017_Presel_impute_FinalFitTree.root"
 # lep
-#lepfilename = "/home/users/sjmay/ttH/MVAs/ttHLeptonic__v1.6_28May2019_RunII_MVA_Presel_addDNN_FinalFitTree.root"
-lepfilename = "/home/users/hmei/ttH/MVAs/ttHLeptonic_test2017_FinalFitTree.root"
+lepfilename = "/home/users/sjmay/ttH/MVAs/ttHLeptonic__v1.6_28May2019_RunII_MVA_Presel_addDNN_FinalFitTree.root"
+#lepfilename = "/home/users/hmei/ttH/MVAs/ttHLeptonic_test2017_FinalFitTree.root"
 #tag = "TTHHadronicTag"
 #tag = "TTHLeptonicTag"
 filename = ""
@@ -261,6 +271,7 @@ def ParseOption():
     parser.add_argument('-i', dest='index', type=str, help='for version')
     parser.add_argument('--tag', dest='tag', type=str, help='lep or had')
     parser.add_argument('--modelPath', dest='modelPath', type=str, help='model path')
+    parser.add_argument('--savepath', dest='savepath', type=str, help='model path')
     args = parser.parse_args()
     return args
 
@@ -272,7 +283,8 @@ if tag == "TTHHadronicTag":
 if tag == "TTHLeptonicTag":
     filename = lepfilename
 
-savepath = "/home/users/hmei/public_html/2019/20190531_ttH_BDT_bins/"
+#savepath = "/home/users/hmei/public_html/2019/20190603_ttH_BDT_bins_had/"
+savepath = args.savepath
 
 f = TFile.Open(filename)
 t = f.Get("t")
@@ -284,16 +296,16 @@ modelpath = args.modelPath
 ### sample_id: 0 bkg, 1 sig, 2 data
 ### signal_mass_label: 0 mH125
 
-#d_mgg_sig = GetDataset(t, "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 ", tag, savepath, True) # mH125
-d_mgg_sig = GetDataset(t, "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 ", tag, savepath, True) # mH125
+d_mgg_sig = GetDataset(t, "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 ", tag, savepath, True) # mH125
+#d_mgg_sig = GetDataset(t, "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 ", tag, savepath, True) # mH125
 GetSigPdf(d_mgg_sig,
           "hggpdfsmrel_13TeV_TTH_" + tag + "_"+str(args.nbin),
           "CMS-HGG_sigfit_mva_TTH_" + tag + "_"+str(args.nbin)+"_v" + str(args.index),
           savepath, modelpath
 )
 
-#d_mgg_bkg = GetDataset(t, "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) ", tag, savepath, False)
-d_mgg_bkg = GetDataset(t, "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) ", tag, savepath, False)
+d_mgg_bkg = GetDataset(t, "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) ", tag, savepath, False)
+#d_mgg_bkg = GetDataset(t, "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) ", tag, savepath, False)
 GetBkgPdf(d_mgg_bkg,"CMS_hgg_" + tag + "_" + str(args.nbin) + "_13TeV_bkgshape", "CMS-HGG_bkg_TTH_" + tag + "_" + str(args.nbin) + "_v" + str(args.index), savepath, modelpath)
 
 # ------------------------------------------------------------------------#
