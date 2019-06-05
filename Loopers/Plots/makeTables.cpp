@@ -18,7 +18,7 @@ std::map<TString, TString> mLatex = {
         {"DiPhoton", "$\\gamma\\gamma$ + Jets"},
         {"GammaJets", "$\\gamma$ + Jets"},
 	{"GammaJets_Madgraph", "$\\gamma$ + Jets (MadGraph)"},
-	{"QCD_GammaJets_imputed", "($\\gamma$) + Jets (Data Sideband)"},
+	{"QCD_GammaJets_imputed", "($\\gamma$) + Jets (Data)"},
         {"QCD", "QCD"},
         {"TTGG", "$t\\bar{t}+\\gamma\\gamma$"},
         {"TTGJets", "$t\\bar{t}+\\gamma$ + Jets"},
@@ -91,7 +91,6 @@ std::map<int, TString> mPhotonLocations = {
 
 void make_table_std(TFile* file, TString hist_name, vector<TString> vBkgs, vector<TString> vSigs, TString label, TString ext = "") {
   TH1D* hData = (TH1D*)file->Get(hist_name + "_Data" + ext);
-  //TH1D* hSig = (TH1D*)file->Get(hist_name + "_ttH" + ext);
   TH1D* hBkg;
   vector<TH1D*> vHBkg;
   vector<TH1D*> vHSig;
@@ -110,7 +109,6 @@ void make_table_std(TFile* file, TString hist_name, vector<TString> vBkgs, vecto
   int n_bins = hData->GetSize()-2;
   double yield_data_unc, yield_signal_unc, yield_bkg_unc;
   double yield_data = hData->IntegralAndError(0, n_bins+1, yield_data_unc);
-  //double yield_signal = hSig->IntegralAndError(0, n_bins+1, yield_signal_unc);
   double yield_bkg = hBkg->IntegralAndError(0, n_bins+1, yield_bkg_unc);
   vector<double> yield_mc;
   vector<double> yield_mc_unc;
@@ -131,7 +129,7 @@ void make_table_std(TFile* file, TString hist_name, vector<TString> vBkgs, vecto
   cout << endl << "Standard table: " << label << endl;
   cout << "\\begin{center} \\Fontvi" << endl;
   cout << "\\begin{tabular}{| r || r | r|} \\hline" << endl;
-  cout << "Process & Yield & Frac. of total bkg. \\\\ \\hline" << endl;
+  cout << "Process & Yield & $\\mathcal F$ of bkg \\\\ \\hline" << endl;
   for (int i = 0; i < vBkgs.size(); i++) {
     cout << mLatex.find(vBkgs[i])->second << " & " << yield_mc[i] << " $\\pm$ " << yield_mc_unc[i] << " & " << yield_mc[i]/yield_bkg << " \\\\ ";
     if (i == vBkgs.size() - 1)
@@ -149,7 +147,6 @@ void make_table_std(TFile* file, TString hist_name, vector<TString> vBkgs, vecto
       cout << endl;
   }
 
-  //cout << "Signal & " << yield_signal << " $\\pm$ " << yield_signal_unc << " & " << yield_signal/yield_bkg << " \\\\ \\hline" << endl;
   cout << "\\end{tabular} \\end{center}" << endl;
 
   delete hData;
@@ -165,14 +162,12 @@ void make_table_std(TFile* file, TString hist_name, vector<TString> vBkgs, vecto
 
 void make_table_multiple(vector<TFile*> vF, TString hist_name, vector<TString> vBkgs, vector<TString> vSigs, vector<TString> vLabels) {  
   vector<TH1D*> hData;
-  //vector<TH1D*> hSig;
   vector<TH1D*> hBkg;
   vector<vector<TH1D*>> vHBkg;
   vector<vector<TH1D*>> vHSig;
 
   for (int i = 0; i < vF.size(); i++) {
     hData.push_back((TH1D*)vF[i]->Get(hist_name + "_Data"));
-    //hSig.push_back((TH1D*)vF[i]->Get(hist_name + "_ttH"));
     vector<TH1D*> vHTemp;
     for (int j = 0; j < vBkgs.size(); j++) {
       vHTemp.push_back((TH1D*)vF[i]->Get(hist_name + "_" + vBkgs[j]));
@@ -197,7 +192,6 @@ void make_table_multiple(vector<TFile*> vF, TString hist_name, vector<TString> v
   vector<double> yield_signal_unc(vF.size());
   vector<double> yield_bkg_unc(vF.size());
   vector<double> yield_data(vF.size());
-  //vector<double> yield_signal(vF.size());
   vector<double> yield_bkg(vF.size());
   vector<vector<double>> yield_mc(vF.size(), vector<double>(vBkgs.size()));
   vector<vector<double>> yield_mc_unc(vF.size(), vector<double>(vBkgs.size()));
@@ -207,7 +201,6 @@ void make_table_multiple(vector<TFile*> vF, TString hist_name, vector<TString> v
   for (int i = 0; i < vF.size(); i++) {
     n_bins[i] = hData[i]->GetSize()-2;
     yield_data[i] = hData[i]->IntegralAndError(0, n_bins[i]+1, yield_data_unc[i]);
-    //yield_signal[i] = hSig[i]->IntegralAndError(0, n_bins[i]+1, yield_signal_unc[i]);
     yield_bkg[i] = hBkg[i]->IntegralAndError(0, n_bins[i]+1, yield_bkg_unc[i]);
     for (int j = 0; j < vBkgs.size(); j++) {
       yield_mc[i][j] = vHBkg[i][j]->IntegralAndError(0, n_bins[i]+1, yield_mc_unc[i][j]);
@@ -220,7 +213,6 @@ void make_table_multiple(vector<TFile*> vF, TString hist_name, vector<TString> v
   cout.setf(ios::fixed);
   cout << std::setprecision(2) << endl;
 
-  //cout << endl << "Standard table: " << label << endl;
   cout << "\\begin{center} \\Fontvi" << endl;
   cout << "\\begin{tabular}{| r ||";
   for (int i = 0; i < vF.size(); i++)
@@ -254,9 +246,6 @@ void make_table_multiple(vector<TFile*> vF, TString hist_name, vector<TString> v
     cout << " & " << yield_data[i]  << " $\\pm$ " << yield_data_unc[i] << " & " << yield_data[i]/yield_bkg[i] << " & " << yield_data[i]/yield_data[0];
   cout << " \\\\ \\hline" << endl;
   
-  //cout << "Signal";
-  //for (int i = 0; i < vF.size(); i++)
-  //  cout << " & " << yield_signal[i]  << " $\\pm$ " << yield_signal_unc[i] << " & " << yield_signal[i]/yield_bkg[i] << " & " << yield_signal[i]/yield_signal[0];
   for (int i = 0; i < vSigs.size(); i++) {
     cout << mLatex.find(vSigs[i])->second;
     for (int j = 0; j < vF.size(); j++)
@@ -457,59 +446,5 @@ int main(int argc, char* argv[])
     make_table_multiple(vF, "hNVtx", backgrounds, signals, vLabels); 
   }
 
-  /*
-  if (argc == 2) {
-    TString file_path = argv[1];
-    TString year = file_path.Contains("2017") ? "2017" : "2016";
-    TFile* f = new TFile(file_path);
-    vector<TString> vBkgs;
-    if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
-    else if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
-
-    if (file_path.Contains("impute"))
-      vBkgs.push_back("QCD_GammaJets_imputed");
-
-    TString label = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", "");
-    make_table_std(f, "hNVtx", vBkgs, label);
-    make_table_std(f, "hNVtx", vBkgs, label, "Year_0");
-    make_table_std(f, "hNVtx", vBkgs, label, "Year_1");
-    make_table_std(f, "hNVtx", vBkgs, label, "Year_2");
-    make_table_components(f, "hNVtx", vBkgs, label, mYears, "Year");
-    make_table_components(f, "hNVtx", vBkgs, label, mLeptons, "GenLepton");
-    make_table_components(f, "hNVtx", vBkgs, label, mPhotons, "GenPhoton"); 
-    make_table_components(f, "hNVtx", vBkgs, label, mPhotonsDetail, "GenPhotonDetail");
-    make_table_components(f, "hNVtx", vBkgs, label, mPhotonLocations, "PhotonLocations", true);
-    vBkgs.push_back("Data"); 
-    make_table_components(f, "hNVtx", vBkgs, label, mRecoLeptons, "RecoLepton");
-  }
-
-  else if (argc >= 3) {
-    vector<TString> file_paths;
-    for (int i = 1; i < argc; i++)
-      file_paths.push_back(argv[i]);
-
-    TString year = file_paths[0].Contains("2017") ? "2017" : "2016";
-
-    vector<TFile*> vF;
-    vector<TString> vLabels;
-    for (int i = 0; i < file_paths.size(); i++) {
-      vF.push_back(new TFile(file_paths[i]));
-      vLabels.push_back((file_paths[i].ReplaceAll("../", "")).ReplaceAll(".root", ""));
-    }
-  
-    vector<TString> vBkgs;
-    if (year == "2016")
-      vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "VG", "DY", "TGamma", "THQ", "THW", "ggH"};
-    else if (year == "2017")
-      vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "TGamma", "THW", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
-
-    vBkgs.push_back("QCD_GammaJets_imputed");
-
-    make_table_multiple(vF, "hNVtx", vBkgs, vLabels); 
-
-  }
-  */
 }
 
