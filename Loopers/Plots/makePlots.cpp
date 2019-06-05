@@ -71,6 +71,7 @@ std::map<TString, TString> mLatex = {
 	{"TTV", "$t\\bar{t}+V$"},
         {"VV", "$VV$"},
         {"tV", "$tV$"},
+	{"ttH", "$t\\bar{t}H$"},
 	{"TT_FCNC_hut", "$t\\bar{t}$ FCNC (Hut)"},
         {"TT_FCNC_hct", "$t\\bar{t}$ FCNC (Hct)"},
         {"ST_FCNC_hut", "$t$ FCNC (Hut)"},
