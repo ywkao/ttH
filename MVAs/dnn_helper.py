@@ -154,16 +154,20 @@ class DNN_Helper:
     bad_epochs = 0
     while keep_training:
       auc_train, auc = self.train(epochs, self.batch_size_train)
-      if auc > best_auc:
-	best_auc = auc
-	bad_epochs = 0
+      improvement = ((1-best_auc)-(1-auc))/(1-best_auc)
+      if improvement > 0.01:
+          print "Improvement in (1-AUC) of %.3f percent! Keeping batch size the same" % improvement*100.
+          best_auc = auc
+          bad_epochs = 0
+      elif self.batch_size_train * 4 < 50000:
+          print "Improvement in (1-AUC) of %.3f percent. Increasing batch size" % improvement*100.
+          self.batch_size_train *= 4
+          bad_epochs = 0
+      elif improvement > 0:
+          print "Improvement in (1-AUC) of %.3f percent. Can't increase batch size anymore" % improvement*100. 
+          bad_epochs = 0
       else:
-	if self.batch_size_train * 4 < 100000:
-	  self.batch_size_train *= 4
-	  bad_epochs = 0
-	else:
-	  bad_epochs += 1
-	if bad_epochs >= 2:
+          print "AUC did not improve and we can't increase batch size anymore. Stopping training."
           keep_training = False
 
     self.model.save_weights("dnn_weights/" + self.tag + "_weights.hdf5")

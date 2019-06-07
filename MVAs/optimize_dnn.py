@@ -30,7 +30,7 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["n_lstm"] = int(n_lstm)
     config["maxnorm"] = maxnorm
     config["dropout_rate"] = dropout_rate
-    config["learning_rate"] = learning_rate
+    config["learning_rate"] = 10**(learning_rate)
     config["start_batch"] = int(start_batch)
 
     trained_dnn = train_dnn_core.train(args, config)
@@ -56,7 +56,7 @@ pbounds = {
     "n_lstm" : (1,5), 
     "maxnorm" : (0.1, 100), 
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (0.000001, 1.0),
+    "learning_rate" : (-5, -0.5),
     "start_batch" : (256, 2048)
 }
 
@@ -69,7 +69,7 @@ starting_point = {
     "n_lstm" : 3, 
     "maxnorm" : 3, 
     "dropout_rate" : 0.25, 
-    "learning_rate" : 0.001,
+    "learning_rate" : -3,
     "start_batch" : 512
 }
 
