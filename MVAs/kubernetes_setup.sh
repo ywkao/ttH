@@ -2,8 +2,7 @@
 # 1. Make pod: kubectl create -f mytensorflow.yaml
 # 2. Connect to pod: kubectl exec -it mytensorflow-sam  -n cms -- /bin/bash
 # 3. apt-get install wget
-# 4. wget http://uaf-8.t2.ucsd.edu/~sjmay/ttH/nautilus/kubernetes_setup.sh
-
+# 4. wget https://github.com/sam-may/ttH/blob/master/MVAs/kubernetes_setup.sh 
 apt-get install openssh-client
 apt-get install vim
 apt-get install git
