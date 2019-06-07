@@ -19,7 +19,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import dnn_helper
-import significance_utils
 import utils
 import ks_test
 
