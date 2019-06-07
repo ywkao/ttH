@@ -33,31 +33,43 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["learning_rate"] = 10**(learning_rate)
     config["start_batch"] = int(start_batch)
 
-    trained_dnn = train_dnn_core.train(args, config)
-
-    full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
+    # Check if a json already exists and if this entry has already been calculated
+    found_results = False
+    with open(log, "r") as f_in:
+        results = json.load(f_in)
+        for entry in results.iterkeys():
+            if entry["config"] == config:
+                print "Found previous results from json file"
+                full_results[idx] = entry
+                found_results = True
+                target = entry["results"]["auc_test"][-1]
+    
+    if not found_results:
+        trained_dnn = train_dnn_core.train(args, config)
+        full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
+        target = trained_dnn.auc["validation"][-1]
 
     with open(log, "w") as f_out:
         json.dump(full_results, f_out, indent=4, sort_keys=True)
 
     idx += 1
-    return trained_dnn.auc["validation"][-1]
+    return target 
 
 idx = 0
 log = "bayes_dnn_hyperparam_scan_%s_%s.json" % (args.channel, args.tag)
 full_results = {}
 
 pbounds = {
-    "n_nodes_dense_1" : (300, 300), 
-    "n_nodes_dense_2" : (200, 200), 
-    "n_dense_1" : (1,1), 
-    "n_dense_2" : (4,4), 
+    "n_nodes_dense_1" : (100, 500), 
+    "n_nodes_dense_2" : (25, 200), 
+    "n_dense_1" : (1,3), 
+    "n_dense_2" : (1,4), 
     "n_nodes_lstm" : (25, 150), 
     "n_lstm" : (1,5), 
     "maxnorm" : (0.1, 100), 
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-5, -0.5),
-    "start_batch" : (256, 2048)
+    "learning_rate" : (-5, -2),
+    "start_batch" : (256, 20000)
 }
 
 starting_point = {

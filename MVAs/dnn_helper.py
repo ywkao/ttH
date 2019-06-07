@@ -163,9 +163,12 @@ class DNN_Helper:
           print "Improvement in (1-AUC) of %.3f percent. Increasing batch size" % improvement*100.
           self.batch_size_train *= 4
           bad_epochs = 0
+          if auc > best_auc:
+              best_auc = auc
       elif improvement > 0:
           print "Improvement in (1-AUC) of %.3f percent. Can't increase batch size anymore" % improvement*100. 
           bad_epochs = 0
+          best_auc = auc
       else:
           print "AUC did not improve and we can't increase batch size anymore. Stopping training."
           keep_training = False
