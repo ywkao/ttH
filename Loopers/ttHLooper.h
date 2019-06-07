@@ -243,8 +243,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonEta_elec", 10, -3, 3);
     v[i]->add_histogram("hPhotonEta_fake", 10, -3, 3);
 
-    v[i]->add_histogram("hHadronicMVA", 25, -1.0, 1.0);
-    v[i]->add_histogram("hLeptonicMVA", 25, -1.0, 1.0);
+    v[i]->add_histogram("hHadronicMVA", 20, 0, 1.0);
+    v[i]->add_histogram("hLeptonicMVA", 20, 0, 1.0);
 
     v[i]->add_histogram("hHadronicMVA_coarse", 10, 0.0, 1.0);
     v[i]->add_histogram("hLeptonicMVA_coarse", 10, 0.0, 1.0);

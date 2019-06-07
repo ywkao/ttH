@@ -148,7 +148,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     mva->AddVariable("dipho_rapidity_", &dipho_rapidity_);
     mva->AddVariable("met_", &met_);
 
-    mva->AddVariable("top_tag_score_", &top_tag_score_);
+    //mva->AddVariable("top_tag_score_", &top_tag_score_);
     
     mva->AddVariable("dipho_pt_over_mass_", &dipho_pt_over_mass_);
     mva->AddVariable("helicity_angle_", &helicity_angle_);

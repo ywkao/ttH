@@ -112,7 +112,7 @@ optimizer.maximize(
         init_points = 1,
         n_iter = 1000,
         acq = "ei",
-        xi = 0.1,
+        xi = 0.001,
 )
 
 for i, res in enumerate(optimizer.res):

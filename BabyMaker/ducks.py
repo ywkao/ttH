@@ -98,9 +98,9 @@ while True:
     for dataset, info in datasets.iteritems():
       if args.data_only and not info["isData"]:
         continue
-      if "VHToGG" in dataset:
-        print "Skipping VH for now"
-        continue
+      #if "VHToGG" in dataset:
+      #  print "Skipping VH for now"
+      #  continue
       #if not ("Run2016" in dataset or "Run2017" in dataset or "Run2018" in dataset): 
       #  continue
       print "Submitting jobs for: ", dataset

@@ -307,7 +307,7 @@ else:
 	command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2018", "_" + str(idx)))    
 	idx += 1
 
-nPar = 24
+nPar = 36
 parallel_utils.submit_jobs(command_list, nPar)
 
 if args.babymaker:
@@ -331,7 +331,7 @@ if args.babymaker:
   master = "MVABaby_ttH%s_%s.root" % (args.channel, args.tag)
 else:
   master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag)
-os.system('hadd -f -k -j 6 %s %s' % (master, target))
+os.system('hadd -f -k -j 8 %s %s' % (master, target))
 
 
 # Cleanup

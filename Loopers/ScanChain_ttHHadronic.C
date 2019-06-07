@@ -154,7 +154,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
     mva->AddVariable("helicity_angle_", &helicity_angle_);
 
-
+    if (xml_file.Contains("FCNC")) {
+      mva->AddVariable("m_ggj_", &m1_);
+      mva->AddVariable("m_jjj_", &m2_);
+    }
 
     mva->BookMVA("BDT", "../MVAs/" + xml_file);
   }

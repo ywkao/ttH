@@ -42,6 +42,8 @@ class DNN_Helper:
   def __init__(self, **kwargs):
     self.kwargs = kwargs
 
+    self.config = kwargs.get('config', {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512})
+
     self.features_validation = kwargs.get('features_validation', [])
     self.features_train = kwargs.get('features_train', [])
     self.features_data = kwargs.get('features_data', [])
@@ -54,7 +56,7 @@ class DNN_Helper:
     self.tag = kwargs.get('tag', '')
 
     self.batch_size = kwargs.get('batch_size', 10000)
-    self.batch_size_train = kwargs.get('batch_size_train', 512)
+    self.batch_size_train = self.config["start_batch"] 
 
     self.channel = self.features_validation.channel 
 
@@ -71,13 +73,15 @@ class DNN_Helper:
     self.n_object_features = len(self.features_validation.objects[0][0])
     self.n_global_features = len(self.features_validation.global_features[0])
 
-    if self.channel == "Hadronic":
-      self.model = dnn_model.baseline_v1(self.n_objects, self.n_object_features, self.n_global_features, False, False, 100)
+    self.model = dnn_model.tth_learner(self.n_objects, self.n_object_features, self.n_global_features, self.config)
 
-    elif self.channel == "Leptonic":
-      self.n_leptons = len(self.features_validation.leptons[0])
-      self.n_lepton_features = len(self.features_validation.leptons[0][0])
-      self.model = dnn_model.baseline_leptonic_v1(self.n_objects, self.n_object_features, self.n_leptons, self.n_lepton_features, self.n_global_features, False, False, 100)
+    #if self.channel == "Hadronic":
+    #  self.model = dnn_model.baseline_v1(self.n_objects, self.n_object_features, self.n_global_features, False, False, 100)
+
+    #elif self.channel == "Leptonic":
+    #  self.n_leptons = len(self.features_validation.leptons[0])
+    #  self.n_lepton_features = len(self.features_validation.leptons[0][0])
+    #  self.model = dnn_model.baseline_leptonic_v1(self.n_objects, self.n_object_features, self.n_leptons, self.n_lepton_features, self.n_global_features, False, False, 100)
 
     if self.weights_file:
       self.model.load_weights(self.weights_file)
