@@ -13,6 +13,7 @@ from sklearn import metrics
 import ROOT
 import root_numpy
 
+import tree_utils
 import utils
 import tmva_utils
 import ks_test
@@ -282,7 +283,7 @@ def train_bdt(config, invert=False):
   tree_global_features = tree_global_features.astype(numpy.float64)
 
   dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}
-  utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
+  tree_utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
 
   #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label, tree_tth_2017_reference_mva], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label,tth_2017_reference_mva')
   #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label], dtype = [('train_id','<u8'), ('sample_id','<u8'), ('mass','<f8'),('weight','<f8'), ('mva_score','<f8'),('signal_mass_label','<u8')])
