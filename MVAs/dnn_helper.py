@@ -124,8 +124,8 @@ class DNN_Helper:
       fpr_train, tpr_train, thresh_train = metrics.roc_curve(self.features_train.label, self.predictions["train"], pos_label = 1, sample_weight = self.features_train.weights)
       fpr_validation, tpr_validation, thresh_validation = metrics.roc_curve(self.features_validation.label, self.predictions["validation"], pos_label = 1, sample_weight = self.features_validation.weights)
 
-      auc, auc_unc = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 100)
-      auc_train, auc_unc_train = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, 100)
+      auc, auc_unc = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 25)
+      auc_train, auc_unc_train = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, 25)
 
       print("Test AUC: %.4f +/- %.4f" % (auc, auc_unc))
       print("Train  AUC: %.4f +/- %.4f" % (auc_train, auc_unc_train))

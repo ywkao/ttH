@@ -16,9 +16,10 @@ cd work
 git clone https://github.com/sam-may/ttH
 cd ttH/MVAs
 wget http://uaf-8.t2.ucsd.edu/~sjmay/ttH/nautilus/ttHHadronic_v1.6_28May2019_RunII_MVA_Presel_impute_dnn_features_ttGG.hdf5
-pip install tensorflow
+pip install tensorflow-gpu
 pip install keras
 pip install sklearn
 apt-get install -y python-subprocess32
 pip install matplotlib
 pip install bayesian-optimization
+mkdir dnn_weights
