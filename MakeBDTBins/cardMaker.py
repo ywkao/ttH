@@ -7,9 +7,10 @@ import sys
 
 class MakeCards():
 
-    def __init__(self, config=0): 
+    def __init__(self, savepath, cardname, config=0): 
 
-        self.cardname = "CMS-HGG_mva_13TeV_datacard.txt"
+        self.cardname = savepath + "/" + cardname #"CMS-HGG_mva_13TeV_datacard.txt"
+        print self.cardname
         self.txtfile =  open(self.cardname, "w")
                                   
         #inputs for datacard
@@ -55,23 +56,25 @@ class MakeCards():
                 if process == "data_obs":
                     self.inputRootNames.append("CMS-HGG_bkg_" + tagList[i] + postFix + ".root")
                     self.wsNames.append("wbkg_13TeV")
-                    self.modelNames.append("roohist_data_mass_" + tagList[i])
+                    self.modelNames.append("roohist_data_mass_" + tagList[i] + postFix)
 
-                if "hgg" in process:
+                if ("hgg" in process) or ("FCNC" in process) :
                     self.inputRootNames.append("CMS-HGG_sigfit_mva_" + process + "_" + tagList[i] + postFix + ".root")
                     self.wsNames.append("wsig_13TeV")
-                    self.modelNames.append("hggpdfsmrel_" + process + "_" + tagList[i])
+                    self.modelNames.append("hggpdfsmrel_" + process + "_" + tagList[i] + postFix)
                     
                 if "bkg" in process:
                     self.inputRootNames.append("CMS-HGG_bkg_" + tagList[i] + postFix + ".root")
                     self.wsNames.append("wbkg_13TeV")
-                    self.modelNames.append("CMS_hgg_bkgshape_" + tagList[i])
+                    self.modelNames.append("CMS_hgg_bkgshape_" + tagList[i] + postFix)
         
 
     def WriteShapes(self):
         
         if len(self.processNames) != len(self.tagNames) or len(self.processNames) != len(self.inputRootNames) or len(self.processNames) != len(self.wsNames) or len(self.processNames) != len(self.modelNames):
             print len(self.processNames), len(self.tagNames), len(self.inputRootNames), len(self.wsNames), len(self.modelNames)
+            print self.processNames
+            print self.inputRootNames
             raise Exception('check n_quantiles and useNCores')
 
         for i in range(len(self.processNames)):
@@ -123,12 +126,12 @@ class MakeCards():
         self.txtfile.write("------------\n")
         self.txtfile.write(lumi_l5)
         
-    def WriteCard(self, sigList, bkgList, tagList):
+    def WriteCard(self, sigList, bkgList, tagList, postFix):
         
         self.WriteBasicNum(-1,-1,-1)
 
         #self.PrepareNames(["TT_hut", "ST_hut"], self.processlist + ["bkg_mass"], tagList)
-        self.PrepareNames(sigList, bkgList, tagList, "")
+        self.PrepareNames(sigList, bkgList, tagList, postFix)
         self.WriteShapes()
 
         self.WriteObs(tagList, ["-1"]*len(tagList))
@@ -136,7 +139,28 @@ class MakeCards():
         self.WriteExpect(sigList, bkgList, tagList)
 
         
+import argparse
+def ParseOption():
 
-card = MakeCards()
+    parser = argparse.ArgumentParser(description='submit all')
+    parser.add_argument("--doFCNC", dest="doFCNC", default = False, action="store_true")
+    parser.add_argument("--postFix", dest='postFix', type=str)
+    parser.add_argument("--savepath", dest='savepath', type=str)
+    parser.add_argument('--tags', '--tags', nargs='+', type=str)
+    args = parser.parse_args()
+    return args
+
+args=ParseOption()
+
+sigList = ["ttH_hgg"]
+bkgList = ["ggH_hgg", "bkg_mass"]
+
+if args.doFCNC:
+    sigList = ["TT_FCNC_hut", "TT_FCNC_hct", "ST_FCNC_hut", "ST_FCNC_hct"]
+    bkgList.append("ttH_hgg")
+
+card = MakeCards(args.savepath, "CMS-HGG_mva_13TeV_datacard" + args.postFix + ".txt")
+card.WriteCard(sigList, bkgList, args.tags, args.postFix)
+
 #card.WriteCard(["ttH_hgg"],["ggH_hgg","bkg_mass"],["TTHHadronicTag"])
-card.WriteCard(["ttH_hgg"],["ggH_hgg", "bkg_mass"],["TTHHadronicTag_v0","TTHHadronicTag_v1","TTHHadronicTag_v2","TTHHadronicTag_v3"])
+#card.WriteCard(["ttH_hgg"],["ggH_hgg", "bkg_mass"],["TTHHadronicTag_v0","TTHHadronicTag_v1","TTHHadronicTag_v2","TTHHadronicTag_v3"], "")

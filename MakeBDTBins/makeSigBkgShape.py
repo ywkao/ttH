@@ -2,6 +2,7 @@ from ROOT import *
 from tdrStyle import *
 setTDRStyle()
 from subprocess import call
+import filenameDict as nameDict
 
 gSystem.AddIncludePath("-I$CMSSW_BASE/src/ ")
 #gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc481/libHiggsAnalysisCombinedLimit.so")
@@ -250,16 +251,16 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath):
 #filename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.5_forHualin_16May2019_RunII_MVA_Presel_impute_cutPtoM_FinalFitTree.root"
 #filename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.5_forHualin_16May2019_RunII_MVA_Presel_impute_FinalFitTree.root"
 
-# had
-hadfilename_tth = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.6_28May2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root"
-hadfilename_fcnc = "/home/users/sjmay/ttH/MVAs/ttHHadronic_4June2019_v1.7_impute_FinalFitTree.root"
-#hadfilename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__unblinded_forHualin_15May2019_2017_Presel_impute_FinalFitTree.root"
-# lep
-lepfilename_tth = "/home/users/sjmay/ttH/MVAs/ttHLeptonic__v1.6_28May2019_RunII_MVA_Presel_addDNN_FinalFitTree.root"
-lepfilename_fcnc = "/home/users/sjmay/ttH/MVAs/ttHLeptonic_4June2019_v1.7_FinalFitTree.root"
+## had
+#hadfilename_tth = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.6_28May2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root"
+#hadfilename_fcnc = "/home/users/sjmay/ttH/MVAs/ttHHadronic_4June2019_v1.7_impute_FinalFitTree.root"
+##hadfilename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__unblinded_forHualin_15May2019_2017_Presel_impute_FinalFitTree.root"
+## lep
+#lepfilename_tth = "/home/users/sjmay/ttH/MVAs/ttHLeptonic__v1.6_28May2019_RunII_MVA_Presel_addDNN_FinalFitTree.root"
+#lepfilename_fcnc = "/home/users/sjmay/ttH/MVAs/ttHLeptonic_4June2019_v1.7_FinalFitTree.root"
 #lepfilename = "/home/users/hmei/ttH/MVAs/ttHLeptonic_test2017_FinalFitTree.root"
 
-filename = ""
+
 
 ## do scan
 import argparse
@@ -282,14 +283,16 @@ def ParseOption():
 args=ParseOption()
 
 tag = args.tag
+filename = ""
+
 if "TTHHadronicTag" in tag:
-    filename = hadfilename_tth
+    filename = nameDict.namedict["TTHHadronicTag"] #hadfilename_tth
 if "TTHLeptonicTag" in tag:
-    filename = lepfilename_tth
+    filename = nameDict.namedict["TTHLeptonicTag"] #lepfilename_tth
 if "FCNCHadronicTag" in tag:
-    filename = hadfilename_fcnc
+    filename = nameDict.namedict["FCNCHadronicTag"] #hadfilename_fcnc
 if "FCNCLeptonicTag" in tag:
-    filename = lepfilename_fcnc
+    filename = nameDict.namedict["FCNCLeptonicTag"] #lepfilename_fcnc
 
 process = args.process
 savepath = args.savepath
