@@ -1,5 +1,3 @@
-import ROOT
-import root_numpy
 import numpy
 from sklearn import metrics
 import keras
