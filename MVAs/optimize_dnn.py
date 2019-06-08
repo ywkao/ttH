@@ -63,6 +63,11 @@ idx = 0
 log = "bayes_dnn_hyperparam_scan_%s_%s.json" % (args.channel, args.tag)
 full_results = {}
 
+with open(log) as f_in:
+    full_results = json.load(log)
+    idx += len(full_results.iterkeys())
+    print "Loaded %d previous results from log file" % len(full_results.iterkeys())
+
 pbounds = {
     "n_nodes_dense_1" : (100, 500), 
     "n_nodes_dense_2" : (25, 200), 
