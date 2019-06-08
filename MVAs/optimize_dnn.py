@@ -36,19 +36,6 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["learning_rate"] = learning_rate
     config["start_batch"] = int(start_batch)
 
-    """
-    # Check if a json already exists and if this entry has already been calculated
-    found_results = False
-    with open(log, "r") as f_in:
-        results = json.load(f_in)
-        for entry in results.iterkeys():
-            if results[entry]["config"] == config:
-                print "Found previous results from json file"
-                full_results[idx] = entry
-                found_results = True
-                target = entry["results"]["auc_test"][-1]
-    """
-    #if not found_results:
     trained_dnn = train_dnn_core.train(args, config)
     full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
     target = trained_dnn.auc["validation"][-1]
@@ -62,11 +49,6 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
 idx = 0
 log = "bayes_dnn_hyperparam_scan_%s_%s.json" % (args.channel, args.tag)
 full_results = {}
-
-with open(log) as f_in:
-    full_results = json.load(log)
-    idx += len(full_results.iterkeys())
-    print "Loaded %d previous results from log file" % len(full_results.iterkeys())
 
 pbounds = {
     "n_nodes_dense_1" : (100, 500), 
@@ -105,7 +87,13 @@ official_log = "log_%s_%s.json" % (args.channel, args.tag)
 logger = JSONLogger(path=official_log)
 optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 
-load_logs(optimizer, logs=[official_log])
+if os.path.isfile(official_log):
+    load_logs(optimizer, logs=[official_log])
+    with open(log) as f_in:
+        full_results = json.load(f_in)
+        idx += len(full_results.keys())
+        print "Loaded %d previous results from log file" % len(full_results.keys())
+
 
 optimizer.probe(params = starting_point, lazy = True)
 
