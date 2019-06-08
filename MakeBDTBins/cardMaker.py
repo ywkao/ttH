@@ -144,8 +144,10 @@ def ParseOption():
 
     parser = argparse.ArgumentParser(description='submit all')
     parser.add_argument("--doFCNC", dest="doFCNC", default = False, action="store_true")
+    parser.add_argument("--doMultiSig", dest="doMultiSig", default = False, action="store_true")
     parser.add_argument("--postFix", dest='postFix', type=str)
     parser.add_argument("--savepath", dest='savepath', type=str)
+    parser.add_argument("--FCNCSig", dest='FCNCSig', type=str)
     parser.add_argument('--tags', '--tags', nargs='+', type=str)
     args = parser.parse_args()
     return args
@@ -156,7 +158,10 @@ sigList = ["ttH_hgg"]
 bkgList = ["ggH_hgg", "bkg_mass"]
 
 if args.doFCNC:
-    sigList = ["TT_FCNC_hut", "TT_FCNC_hct", "ST_FCNC_hut", "ST_FCNC_hct"]
+    if args.doMultiSig:
+        sigList = ["TT_FCNC_hut", "TT_FCNC_hct", "ST_FCNC_hut", "ST_FCNC_hct"]
+    else:
+        sigList = [args.FCNCSig]
     bkgList.append("ttH_hgg")
 
 card = MakeCards(args.savepath, "CMS-HGG_mva_13TeV_datacard" + args.postFix + ".txt")
