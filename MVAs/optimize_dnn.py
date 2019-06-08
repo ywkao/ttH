@@ -49,8 +49,8 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
         full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
         target = trained_dnn.auc["validation"][-1]
 
-    with open(log, "w") as f_out:
-        json.dump(full_results, f_out, indent=4, sort_keys=True)
+        with open(log, "w") as f_out:
+            json.dump(full_results, f_out, indent=4, sort_keys=True)
 
     idx += 1
     return target 
@@ -95,6 +95,7 @@ optimizer = BayesianOptimization(
 with open(log) as f_in:
     past_results = json.load(f_in)
     for past_entry in past_results.iterkeys():
+        print "Probing past result"
         optimizer.probe(params = past_results[past_entry]["config"], lazy = True)
         idx += 1
 
