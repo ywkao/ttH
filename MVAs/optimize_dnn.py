@@ -2,6 +2,9 @@ import os, sys
 import json
 
 from bayes_opt import BayesianOptimization
+from bayes_opt.observer import JSONLogger
+from bayes_opt.event import Events
+from bayes_opt.util import load_logs
 
 sys.path.append("../Loopers")
 import parallel_utils
@@ -30,9 +33,10 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["n_lstm"] = int(n_lstm)
     config["maxnorm"] = maxnorm
     config["dropout_rate"] = dropout_rate
-    config["learning_rate"] = 10**(learning_rate)
+    config["learning_rate"] = learning_rate
     config["start_batch"] = int(start_batch)
 
+    """
     # Check if a json already exists and if this entry has already been calculated
     found_results = False
     with open(log, "r") as f_in:
@@ -43,14 +47,14 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
                 full_results[idx] = entry
                 found_results = True
                 target = entry["results"]["auc_test"][-1]
-    
-    if not found_results:
-        trained_dnn = train_dnn_core.train(args, config)
-        full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
-        target = trained_dnn.auc["validation"][-1]
+    """
+    #if not found_results:
+    trained_dnn = train_dnn_core.train(args, config)
+    full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
+    target = trained_dnn.auc["validation"][-1]
 
-        with open(log, "w") as f_out:
-            json.dump(full_results, f_out, indent=4, sort_keys=True)
+    with open(log, "w") as f_out:
+        json.dump(full_results, f_out, indent=4, sort_keys=True)
 
     idx += 1
     return target 
@@ -68,7 +72,7 @@ pbounds = {
     "n_lstm" : (1,5), 
     "maxnorm" : (0.1, 100), 
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-5, -2),
+    "learning_rate" : (0.00001, 0.01),
     "start_batch" : (256, 20000)
 }
 
@@ -81,8 +85,8 @@ starting_point = {
     "n_lstm" : 3, 
     "maxnorm" : 3, 
     "dropout_rate" : 0.25, 
-    "learning_rate" : -3,
-    "start_batch" : 512
+    "learning_rate" : 0.001,
+    "start_batch" : 1024
 }
 
 optimizer = BayesianOptimization(
@@ -92,12 +96,11 @@ optimizer = BayesianOptimization(
     random_state=1,
 )
 
-with open(log) as f_in:
-    past_results = json.load(f_in)
-    for past_entry in past_results.iterkeys():
-        print "Probing past result"
-        optimizer.probe(params = past_results[past_entry]["config"], lazy = True)
-        idx += 1
+official_log = "log_%s_%s.json" % (args.channel, args.tag)
+logger = JSONLogger(path=official_log)
+optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
+
+load_logs(optimizer, logs=[official_log])
 
 optimizer.probe(params = starting_point, lazy = True)
 
