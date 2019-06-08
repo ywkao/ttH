@@ -84,8 +84,6 @@ optimizer = BayesianOptimization(
 )
 
 official_log = "log_%s_%s.json" % (args.channel, args.tag)
-logger = JSONLogger(path=official_log)
-optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 
 if os.path.isfile(official_log):
     load_logs(optimizer, logs=[official_log])
@@ -94,12 +92,14 @@ if os.path.isfile(official_log):
         idx += len(full_results.keys())
         print "Loaded %d previous results from log file" % len(full_results.keys())
 
+logger = JSONLogger(path=official_log)
+optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 
 optimizer.probe(params = starting_point, lazy = True)
 
 optimizer.maximize(
         init_points = 1,
-        n_iter = 1000,
+        n_iter = 1,
         acq = "ei",
         xi = 0.001,
 )
