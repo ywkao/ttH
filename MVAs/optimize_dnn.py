@@ -38,7 +38,7 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     with open(log, "r") as f_in:
         results = json.load(f_in)
         for entry in results.iterkeys():
-            if entry["config"] == config:
+            if results[entry]["config"] == config:
                 print "Found previous results from json file"
                 full_results[idx] = entry
                 found_results = True
@@ -91,6 +91,12 @@ optimizer = BayesianOptimization(
     verbose=2, # verbose = 1 prints only when a maximum is observed, verbose = 0 is silent
     random_state=1,
 )
+
+with open(log) as f_in:
+    past_results = json.load(f_in)
+    for past_entry in past_results.iterkeys():
+        optimizer.probe(params = past_results[past_entry]["config"], lazy = True)
+        idx += 1
 
 optimizer.probe(params = starting_point, lazy = True)
 
