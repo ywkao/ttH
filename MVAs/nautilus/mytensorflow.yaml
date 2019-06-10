@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mytensorflow-sam
+  namespace: cms
+  labels:
+    k8s-app: mytensorflow-sam
+spec:
+      containers:
+      - name: mytensorflow-sam
+        image: tensorflow/tensorflow:latest-gpu-py3
+        imagePullPolicy: Always
+        command: ["sh", "-c", "sleep infinity"]
+        resources:
+           limits:
+             nvidia.com/gpu: 1
+             memory: 6Gi
+           requests:
+             nvidia.com/gpu: 1
+             memory: 4Gi
+             cpu: 1

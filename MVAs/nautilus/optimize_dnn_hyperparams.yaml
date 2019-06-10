@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: optimize_dnn_hyperparams
+spec:
+  template:
+    spec:
+      containers:
+      - name: mytensorflow-sam 
+        image: tensorflow/tensorflow:latest-gpu-py3
+        imagePullPolicy: Always
+        command:
+        - "source"
+        args:
+        - "/opt/repo/ttH/MVAs/nautilus/nautilus_exe.sh"
+        volumeMounts:
+        - name: git-repo
+          mountPath: /opt/repo
+        resources:
+          limits:
+            memory: 48Gi
+            cpu: "6"
+            nvidia.com/gpu: "1"
+          requests:
+            memory: 4Gi
+            cpu: "1"
+            nvidia.com/gpu: "1"    
+      initContainers:
+      - name: init-clone-repo
+        image: alpine/git
+        args:
+          - clone
+          - --single-branch
+          - https://github.com/sam-may/ttH 
+          - /opt/repo/ttH
+        volumeMounts:
+          - name: git-repo
+            mountPath: /opt/repo
+      volumes:
+      - name: git-repo
+        emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 5
