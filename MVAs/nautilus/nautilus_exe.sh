@@ -2,7 +2,6 @@
 # 1. Make pod: kubectl create -f optimize_dnn_hyperparams.yaml 
 # 2. Connect to pod: kubectl exec -it mytensorflow-sam  -n cms -- /bin/bash
 cd ../
-apt-get install wget
 apt-get install openssh-client
 apt-get install vim
 apt-get install git
