@@ -2,17 +2,18 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: optimizednnhyperparams
+  namespace: cms
+  labels:
+    k8s-app: mytensorflow-sam
 spec:
   template:
     spec:
       containers:
-      - name: mytensorflow-sam 
+      - name: optimizednnhyperparams
         image: tensorflow/tensorflow:latest-gpu-py3
         imagePullPolicy: Always
         command:
-          - "apt-get install wget"
-          - "wget https://github.com/sam-may/ttH/blob/master/MVAs/nautilus/nautilus_exe.sh"
-          - "source nautilus_exe.sh"
+          - "apt-get install wget && wget https://github.com/sam-may/ttH/blob/master/MVAs/nautilus/nautilus_exe.sh && source nautilus_exe.sh"
         resources:
           limits:
             memory: 48Gi
@@ -21,5 +22,6 @@ spec:
           requests:
             memory: 4Gi
             cpu: "1"
-            nvidia.com/gpu: "1"    
-  backoffLimit: 5
+            nvidia.com/gpu: "1" 
+      restartPolicy: Never   
+  backoffLimit: 1
