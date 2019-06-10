@@ -31,9 +31,9 @@ def create_pairs(y, n):
     while len(labels) < n:
         pair = numpy.random.randint(0, len(y), 2)
         label = 0 if y[pair[0]] == y[pair[1]] else 1 # 0 = similar, 1 = dissimilar
-        if label == 0:
-            if random.random() < 0.75:
-                continue
+        #if label == 0:
+        #    if random.random() < 0.75:
+        #        continue
         pairs.append(pair)
         labels.append(label)
 
