@@ -155,7 +155,8 @@ def ParseOption():
 args=ParseOption()
 
 sigList = ["ttH_hgg"]
-bkgList = ["ggH_hgg", "bkg_mass"]
+#bkgList = ["ggH_hgg", "bkg_mass"]
+bkgList = ["bkg_mass"]
 
 if args.doFCNC:
     if args.doMultiSig:
