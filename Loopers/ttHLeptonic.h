@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("merged_babies/DoubleEG_Run2017E-31Mar2018-v1_MINIAOD_forHualin_2017__ttH_Babies_v94.7_2017/merged_ntuple.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
+// makeCMS3ClassFiles("merged_babies/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII_ttH_Babies_RunIIv1.7/merged_ntuple_1.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
 
 #ifndef ttHLeptonic_H
 #define ttHLeptonic_H
@@ -367,6 +367,9 @@ class ttHLeptonic {
   float    tthMVA_;
   TBranch *tthMVA_branch;
   bool     tthMVA_isLoaded;
+  float    tthMVA_RunII_;
+  TBranch *tthMVA_RunII_branch;
+  bool     tthMVA_RunII_isLoaded;
   float    jet_pt1_;
   TBranch *jet_pt1_branch;
   bool     jet_pt1_isLoaded;
@@ -870,6 +873,7 @@ void LoadAllBranches();
   const float &MetPhi();
   const float &mT();
   const float &tthMVA();
+  const float &tthMVA_RunII();
   const float &jet_pt1();
   const float &jet_eta1();
   const float &jet_phi1();
@@ -1122,6 +1126,7 @@ namespace tas {
   const float &MetPhi();
   const float &mT();
   const float &tthMVA();
+  const float &tthMVA_RunII();
   const float &jet_pt1();
   const float &jet_eta1();
   const float &jet_phi1();

@@ -33,7 +33,7 @@ double scale1fb_2017_RunII(TString currentFileTitle) {
         {"ZZ_TuneCUETP8M1_13TeV-pythia8", 0.0000000000},
         {"tZq_ll_4f_13TeV-amcatnlo-pythia8", 0.0000000000},
         {"TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hut-MadGraph5-pythia8", 0.0001487481},
-        {"DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8", 0.0000253231},
+        {"DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8", 0.4051694148},
         {"TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8", 0.0001488655},
         {"ttHJetToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8", 0.0000037046},
         {"WGToLNuG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8", 0.0000170259},

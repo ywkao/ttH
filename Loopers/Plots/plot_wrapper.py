@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 import parallel_utils
 
-if "impute" in args.input_file:
+if "impute" in args.input_file or "Hadronic" in args.input_file:
   args.backgrounds = args.backgrounds.replace("GammaJets", "QCD_GammaJets_imputed")
 
 parallel_utils.run('./makePlots "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))

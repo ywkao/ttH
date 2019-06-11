@@ -80,6 +80,15 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_) {
     return true;
   }
 
+  else if (tag == "ttHHadronic_RunII_SR_Inclusive") {
+    if (mass() < 100)                   return false;
+    if (n_jets() < 3)                   return false;
+    if (nb_loose() < 1)                 return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
+    if (tthMVA_RunII() < 0.9675)        return false;
+    return true;
+  }    
+
   else if (tag == "ttHHadronic_RunII_MVA_Presel_CutPtoM_light") {
     if (mass() < 100)                                   return false;
     if (lead_ptoM() < 0.2 || sublead_ptoM() < 0.2)      return false;
@@ -258,10 +267,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet1_pt(), jet1_eta(), jet1_phi(), jet1_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet1_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet1_bdiscriminant());
+    jet_discs.push_back(jet1_bdiscriminant());
     jet_discs.push_back(jet1_bbdiscriminant());
     jet_discs.push_back(jet1_cdiscriminant());
     jet_discs.push_back(jet1_udsgdiscriminant());   
@@ -273,10 +279,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet2_pt(), jet2_eta(), jet2_phi(), jet2_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet2_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet2_bdiscriminant());
+    jet_discs.push_back(jet2_bdiscriminant());
     jet_discs.push_back(jet2_bbdiscriminant());
     jet_discs.push_back(jet2_cdiscriminant());
     jet_discs.push_back(jet2_udsgdiscriminant());
@@ -288,10 +291,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet3_pt(), jet3_eta(), jet3_phi(), jet3_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet3_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet3_bdiscriminant());
+    jet_discs.push_back(jet3_bdiscriminant());
     jet_discs.push_back(jet3_bbdiscriminant());
     jet_discs.push_back(jet3_cdiscriminant());
     jet_discs.push_back(jet3_udsgdiscriminant());
@@ -303,10 +303,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet4_pt(), jet4_eta(), jet4_phi(), jet4_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet4_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet4_bdiscriminant());
+    jet_discs.push_back(jet4_bdiscriminant());
     jet_discs.push_back(jet4_bbdiscriminant());
     jet_discs.push_back(jet4_cdiscriminant());
     jet_discs.push_back(jet4_udsgdiscriminant());
@@ -318,10 +315,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet5_pt(), jet5_eta(), jet5_phi(), jet5_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet5_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet5_bdiscriminant());
+    jet_discs.push_back(jet5_bdiscriminant());
     jet_discs.push_back(jet5_bbdiscriminant());
     jet_discs.push_back(jet5_cdiscriminant());
     jet_discs.push_back(jet5_udsgdiscriminant());
@@ -333,10 +327,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet6_pt(), jet6_eta(), jet6_phi(), jet6_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet6_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet6_bdiscriminant());
+    jet_discs.push_back(jet6_bdiscriminant());
     jet_discs.push_back(jet6_bbdiscriminant());
     jet_discs.push_back(jet6_cdiscriminant());
     jet_discs.push_back(jet6_udsgdiscriminant());
@@ -348,10 +339,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet7_pt(), jet7_eta(), jet7_phi(), jet7_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet7_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet7_bdiscriminant());
+    jet_discs.push_back(jet7_bdiscriminant());
     jet_discs.push_back(jet7_bbdiscriminant());
     jet_discs.push_back(jet7_cdiscriminant());
     jet_discs.push_back(jet7_udsgdiscriminant());
@@ -363,10 +351,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet8_pt(), jet8_eta(), jet8_phi(), jet8_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet8_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet8_bdiscriminant());
+    jet_discs.push_back(jet8_bdiscriminant());
     jet_discs.push_back(jet8_bbdiscriminant());
     jet_discs.push_back(jet8_cdiscriminant());
     jet_discs.push_back(jet8_udsgdiscriminant());
@@ -378,10 +363,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet9_pt(), jet9_eta(), jet9_phi(), jet9_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet9_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet9_bdiscriminant());
+    jet_discs.push_back(jet9_bdiscriminant());
     jet_discs.push_back(jet9_bbdiscriminant());
     jet_discs.push_back(jet9_cdiscriminant());
     jet_discs.push_back(jet9_udsgdiscriminant());
@@ -393,10 +375,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet10_pt(), jet10_eta(), jet10_phi(), jet10_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet10_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet10_bdiscriminant());
+    jet_discs.push_back(jet10_bdiscriminant());
     jet_discs.push_back(jet10_bbdiscriminant());
     jet_discs.push_back(jet10_cdiscriminant());
     jet_discs.push_back(jet10_udsgdiscriminant());
@@ -408,10 +387,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet11_pt(), jet11_eta(), jet11_phi(), jet11_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet11_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet11_bdiscriminant());
+    jet_discs.push_back(jet11_bdiscriminant());
     jet_discs.push_back(jet11_bbdiscriminant());
     jet_discs.push_back(jet11_cdiscriminant());
     jet_discs.push_back(jet11_udsgdiscriminant());
@@ -423,10 +399,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet12_pt(), jet12_eta(), jet12_phi(), jet12_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet12_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet12_bdiscriminant());
+    jet_discs.push_back(jet12_bdiscriminant());
     jet_discs.push_back(jet12_bbdiscriminant());
     jet_discs.push_back(jet12_cdiscriminant());
     jet_discs.push_back(jet12_udsgdiscriminant());
@@ -438,10 +411,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet13_pt(), jet13_eta(), jet13_phi(), jet13_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet13_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet13_bdiscriminant());
+    jet_discs.push_back(jet13_bdiscriminant());
     jet_discs.push_back(jet13_bbdiscriminant());
     jet_discs.push_back(jet13_cdiscriminant());
     jet_discs.push_back(jet13_udsgdiscriminant());
@@ -453,10 +423,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet14_pt(), jet14_eta(), jet14_phi(), jet14_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet14_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet14_bdiscriminant());
+    jet_discs.push_back(jet14_bdiscriminant());
     jet_discs.push_back(jet14_bbdiscriminant());
     jet_discs.push_back(jet14_cdiscriminant());
     jet_discs.push_back(jet14_udsgdiscriminant());
@@ -468,10 +435,7 @@ vector<vector<float>> make_jet_objects(TString year, TLorentzVector diphoton, bo
     jet_p4.SetPtEtaPhiE(jet15_pt(), jet15_eta(), jet15_phi(), jet15_energy());
 
     vector<float> jet_discs;
-    if (year == "2016")
-      jet_discs.push_back(jet15_b_DeepCSV_discriminant());
-    else
-      jet_discs.push_back(jet15_bdiscriminant());
+    jet_discs.push_back(jet15_bdiscriminant());
     jet_discs.push_back(jet15_bbdiscriminant());
     jet_discs.push_back(jet15_cdiscriminant());
     jet_discs.push_back(jet15_udsgdiscriminant());
@@ -487,136 +451,91 @@ vector<TLorentzVector> make_jets(vector<double> &btag_scores, TString year) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet1_pt(), jet1_eta(), jet1_phi(), jet1_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet1_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet1_bdiscriminant());
+    btag_scores.push_back(jet1_bdiscriminant());
   }
   if (jet2_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet2_pt(), jet2_eta(), jet2_phi(), jet2_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet2_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet2_bdiscriminant());
+    btag_scores.push_back(jet2_bdiscriminant());
   }
   if (jet3_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet3_pt(), jet3_eta(), jet3_phi(), jet3_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet3_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet3_bdiscriminant());
+    btag_scores.push_back(jet3_bdiscriminant());
   }
   if (jet4_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet4_pt(), jet4_eta(), jet4_phi(), jet4_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet4_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet4_bdiscriminant());
+    btag_scores.push_back(jet4_bdiscriminant());
   }
   if (jet5_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet5_pt(), jet5_eta(), jet5_phi(), jet5_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet5_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet5_bdiscriminant());
+    btag_scores.push_back(jet5_bdiscriminant());
   }
   if (jet6_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet6_pt(), jet6_eta(), jet6_phi(), jet6_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet6_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet6_bdiscriminant());
+    btag_scores.push_back(jet6_bdiscriminant());
   }
   if (jet7_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet7_pt(), jet7_eta(), jet7_phi(), jet7_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet7_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet7_bdiscriminant());
+    btag_scores.push_back(jet7_bdiscriminant());
   }
   if (jet8_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet8_pt(), jet8_eta(), jet8_phi(), jet8_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet8_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet8_bdiscriminant());
+    btag_scores.push_back(jet8_bdiscriminant());
   }
   if (jet9_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet9_pt(), jet9_eta(), jet9_phi(), jet9_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet9_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet9_bdiscriminant());
+    btag_scores.push_back(jet9_bdiscriminant());
   }
   if (jet10_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet10_pt(), jet10_eta(), jet10_phi(), jet10_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet10_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet10_bdiscriminant());
+    btag_scores.push_back(jet10_bdiscriminant());
   }
   if (jet11_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet11_pt(), jet11_eta(), jet11_phi(), jet11_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet11_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet11_bdiscriminant());
+    btag_scores.push_back(jet11_bdiscriminant());
   }
   if (jet12_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet12_pt(), jet12_eta(), jet12_phi(), jet12_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet12_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet12_bdiscriminant());
+    btag_scores.push_back(jet12_bdiscriminant());
   }
   if (jet13_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet13_pt(), jet13_eta(), jet13_phi(), jet13_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet13_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet13_bdiscriminant());
+    btag_scores.push_back(jet13_bdiscriminant());
   }
   if (jet14_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet14_pt(), jet14_eta(), jet14_phi(), jet14_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet14_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet14_bdiscriminant());
+    btag_scores.push_back(jet14_bdiscriminant());
   }
   if (jet15_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet15_pt(), jet15_eta(), jet15_phi(), jet15_energy());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet15_b_DeepCSV_discriminant());
-    else
-      btag_scores.push_back(jet15_bdiscriminant());
+    btag_scores.push_back(jet15_bdiscriminant());
   }
   return vJets;
 }

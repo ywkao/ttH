@@ -153,6 +153,7 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hPhotonDeltaRGen", 50, 0, 0.15);
 
     v[i]->add_histogram("htthMVA", 50, -1, 1);
+    v[i]->add_histogram("htthMVA_RunII", 50, 0, 1);
     v[i]->add_histogram("hMaxBTag", 50, 0, 1);
     v[i]->add_histogram("hSecondMaxBTag", 50, 0, 1);  
 
@@ -426,7 +427,7 @@ bool has_ttX_overlap(TString currentFileTitle, int lead_prompt, int sublead_prom
 }
 
 bool has_simple_vgamma_overlap(TString currentFileTitle, int genPhotonId) {
-  if (!(currentFileTitle.Contains("DYJetsToLL")))
+  if (!(currentFileTitle.Contains("DYJetsToLL_M-50")))
     return false;
   else if (genPhotonId == 2 || genPhotonId == 1) // don't take PP,PF events from DY sample now that we have Z+gamma for all 3 years
     return true;

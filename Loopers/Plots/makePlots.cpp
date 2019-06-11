@@ -832,6 +832,8 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA_coarse", "Hadronic MVA Score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA_fine", "Hadronic MVA Score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx); 
 
+    make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII", "MVA Score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+
     vInfo.push_back("N_{jets} #geq 5");
     make_plot(c1, vFiles[i], vNames[i], "hPhotonMaxIDMVA_NJets5+", "Max #gamma ID", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hPhotonMinIDMVA_NJets5+", "Min #gamma ID", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx); 

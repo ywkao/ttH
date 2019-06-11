@@ -711,6 +711,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, vId);
       vProcess[processId]->fill_histogram("htthMVA", tthMVA(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII", tthMVA_RunII(), evt_weight, vId);
 
       if (lead_photon_type() == 1)
         vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", maxID, evt_weight, vId);
