@@ -187,9 +187,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         if (!pass_json(mYear, cms3.run(), cms3.lumi()))         continue;
       }
 
-      // Blinded region
-      if (isData && blind && mass() > 120 && mass() < 130)      continue;
-
       evt_weight_ = 1.;
 
       if (year.Contains("RunII") && !isData) {
@@ -234,6 +231,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       // Scale bkg weight
       evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Leptonic");
+
+      // Blinded region
+      if (isData && process_id_ != 18 && blind && mass() > 120 && mass() < 130)  continue;
 
       // Skipping events/samples
       if (is_low_stats_process(currentFileTitle))       continue;
@@ -295,7 +295,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 
-      tth_2017_reference_mva_ = year == "2017" ? tthMVA() : -999;
+      tth_2017_reference_mva_ = tthMVA();
+      //tth_2017_reference_mva_ = year == "2017" ? tthMVA() : -999;
 
       if (tag == "ttHLeptonic_data_sideband_0b") {
 	if (nb_medium() == 0)

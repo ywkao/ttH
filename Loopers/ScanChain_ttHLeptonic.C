@@ -244,14 +244,12 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (!pass_json(mYear, cms3.run(), cms3.lumi()))		continue;
       }
 
-      // Blinded region 
-      if (isData && blind && mass() > 120 && mass() < 130)        continue;
 
       // Fill mva baby before any selections
       int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
       int processId = categorize_process(currentFileTitle, genPhotonId);
       if (processId == 17)
-	processId = 3; // use Madgraph GJets instead of Pythia
+	    processId = 3; // use Madgraph GJets instead of Pythia
 
       int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
       int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
@@ -341,6 +339,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Scale bkg weight
       evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Leptonic");
 
+      // Blinded region 
+      if (isData && processId != 18 && blind && mass() > 120 && mass() < 130)        continue;
 
       if (bkg_options == "old_vgamma") {
 	if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))	continue;

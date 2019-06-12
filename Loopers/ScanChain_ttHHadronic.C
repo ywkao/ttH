@@ -268,9 +268,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (!pass_json(mYear, cms3.run(), cms3.lumi()))            continue;
       }
 
-      // Blinded region
-      if (isData && blind && mass() > 120 && mass() < 130)	continue;
-
       // Fill mva baby before any selections
       int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
       int processId = categorize_process(currentFileTitle, genPhotonId);
@@ -318,6 +315,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         if (isData)
           impute_photon_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, evt_weight, processId);
       }
+
+      // Blinded region
+      if (isData && processId != 18 && blind && mass() > 120 && mass() < 130)  continue;
 
       // Scale bkg weight
       evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Hadronic");
