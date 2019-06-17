@@ -1,10 +1,10 @@
 # This script gets you set up to train DNNs on kubernetes
 # 1. Make pod: kubectl create -f optimize_dnn_hyperparams.yaml 
 # 2. Connect to pod: kubectl exec -it mytensorflow-sam  -n cms -- /bin/bash
-sudo apt-get install openssh-client
-sudo apt-get install vim
-sudo apt-get install git
-sudo apt-get install python2.7
+apt-get install openssh-client
+apt-get install vim
+apt-get install git
+apt-get install python2.7
 wget https://bootstrap.pypa.io/get-pip.py
 python2.7 get-pip.py
 rm /usr/local/bin/python
@@ -17,7 +17,7 @@ wget http://uaf-8.t2.ucsd.edu/~sjmay/ttH/nautilus/ttHHadronic_v1.6_28May2019_Run
 pip install tensorflow-gpu
 pip install keras
 pip install sklearn
-sudo apt-get install -y python-subprocess32
+apt-get install -y python-subprocess32
 pip install matplotlib
 pip install bayesian-optimization
 mkdir dnn_weights
