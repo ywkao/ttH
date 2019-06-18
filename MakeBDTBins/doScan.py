@@ -63,8 +63,8 @@ def doScan_oneCore(lowIndex, highIndex, mva_score_n, lowCut, highCut, tag, model
       
     call("python makeSigBkgShape.py -l " + str(lowCut_) + " --hi " + str(middleCut_) + " --tag " + tag1 + " --modelPath " + modelPath + " --savepath " + savepath + " -p " + sig, shell=True)
     call("python makeSigBkgShape.py -l " + str(middleCut_) + " --hi " + str(highCut_) + " --tag " + tag2 + " --modelPath " + modelPath + " --savepath " + savepath + " -p " + sig, shell=True)
-#    call("python makeSigBkgShape.py -l " + str(lowCut_) + " --hi " + str(middleCut_) + " --tag " + tag1 + " --modelPath " + modelPath + " --savepath " + savepath + " -p ggH_hgg" , shell=True)
-#    call("python makeSigBkgShape.py -l " + str(middleCut_) + " --hi " + str(highCut_) + " --tag " + tag2 + " --modelPath " + modelPath + " --savepath " + savepath + " -p ggH_hgg", shell=True)
+    call("python makeSigBkgShape.py -l " + str(lowCut_) + " --hi " + str(middleCut_) + " --tag " + tag1 + " --modelPath " + modelPath + " --savepath " + savepath + " -p ggH_hgg" , shell=True)
+    call("python makeSigBkgShape.py -l " + str(middleCut_) + " --hi " + str(highCut_) + " --tag " + tag2 + " --modelPath " + modelPath + " --savepath " + savepath + " -p ggH_hgg", shell=True)
     if "FCNC" in sig:
       call("python makeSigBkgShape.py -l " + str(lowCut_) + " --hi " + str(middleCut_) + " --tag " + tag1 + " --modelPath " + modelPath + " --savepath " + savepath + " -p ttH_hgg" , shell=True)
       call("python makeSigBkgShape.py -l " + str(middleCut_) + " --hi " + str(highCut_) + " --tag " + tag2 + " --modelPath " + modelPath + " --savepath " + savepath + " -p ttH_hgg", shell=True)

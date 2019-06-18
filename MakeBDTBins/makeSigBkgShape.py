@@ -119,7 +119,7 @@ def GetDataset(t, cut, tag, savepath, doUnbin, debug=False):
     else:
         return d_mgg_bin, h_mgg.GetMaximum()
 
-def GetSigPdf(events, tag, savename, savepath, modelpath, maxInHist):
+def GetSigPdf(events, norm, tag, savename, savepath, modelpath, maxInHist):
 
     # input is a RooDataSet
     # tag is TTHHadronic_n
@@ -129,7 +129,7 @@ def GetSigPdf(events, tag, savename, savepath, modelpath, maxInHist):
     w.factory("CMS_hgg_mass[100,180]")
     w.factory("MH[125]")
 
-    norm = events.sumEntries()
+    #norm = events.sumEntries()
     print "sumEtries: ", norm
     
     # change pdf name, parameters name
@@ -350,8 +350,13 @@ sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + 
 bkgCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) " 
 #bkgCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) " 
 
-d_mgg_sig, maxInHist = GetDataset(t, sigCut, tag, savepath, False, True) # mH125
-GetSigPdf(d_mgg_sig, "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist)
+d_mgg_sig, maxInHist = GetDataset(t, sigCut, tag, savepath, False, False) # mH125
+if process == "ggH_hgg":
+    sigCut2 = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == 0"
+    d_mgg_sig_2, maxInHist_2 = GetDataset(t, sigCut2, tag, savepath, False, False)
+    GetSigPdf(d_mgg_sig_2, d_mgg_sig.sumEntries(), "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist_2)
+else:    
+    GetSigPdf(d_mgg_sig, d_mgg_sig.sumEntries(), "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist)
 
 if not args.skipBkg:
     d_mgg_bkg, maxInHist = GetDataset(t, bkgCut, tag, savepath,False, False)
