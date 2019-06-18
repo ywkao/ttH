@@ -29,9 +29,9 @@ def train(args, config):
 
 
   object_features, object_features_validation, object_features_data = f['object'], f['object_validation'], f['object_data']
-  if args.channel == "Leptonic":
-    jet_features, jet_features_validation, jet_features_data = f['jet'], f['jet_validation'], f['jet_data']
-    lepton_features, lepton_features_validation, lepton_features_data = f['lepton'], f['lepton_validation'], f['lepton_data']
+  #if args.channel == "Leptonic":
+  #  jet_features, jet_features_validation, jet_features_data = f['jet'], f['jet_validation'], f['jet_data']
+  #  lepton_features, lepton_features_validation, lepton_features_data = f['lepton'], f['lepton_validation'], f['lepton_data']
 
   global_features, global_features_validation, global_features_data = f['global'], f['global_validation'], f['global_data']
   label, label_validation, label_data = f['label'], f['label_validation'], f['label_data']

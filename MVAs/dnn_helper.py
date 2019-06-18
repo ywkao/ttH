@@ -127,7 +127,7 @@ class DNN_Helper:
       auc, auc_unc = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 0)
       auc_train, auc_unc_train = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, 0)
 
-      print("Test AUC: %.4f +/- %.4f" % (auc, auc_unc))
+      print("Test   AUC: %.4f +/- %.4f" % (auc, auc_unc))
       print("Train  AUC: %.4f +/- %.4f" % (auc_train, auc_unc_train))
 
       self.tpr["validation"].append(tpr_validation)

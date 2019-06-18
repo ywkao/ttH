@@ -28,13 +28,13 @@ command_list = []
 #command_list.append('python prep.py --channel "Hadronic" --input "../Loopers/MVABaby_ttHHadronic_%s.root" --ttH_vs_tH' % (args.tag))
 #command_list.append('python prep_dnn.py --channel "Hadronic" --input "../Loopers/MVABaby_ttHHadronic_%s.root" --signal "ttH" --backgrounds "tH"' % (args.tag))
 #command_list.append('python prep.py --channel "Leptonic" --input "../Loopers/MVABaby_ttHLeptonic_%s.root" --ttH_vs_tH' % (args.tag))
-#command_list.append('python prep_dnn.py --channel "Leptonic" --input "../Loopers/MVABaby_ttHLeptonic_%s.root" --signal "ttH" --backgrounds "tH"' % (args.tag))
+#command_list.append('python prep_dnn.py --channel "Leptonic" --input "../Loopers/MVABaby_ttHLeptonic_%s.root" --signal "ttH" --backgrounds "tH" --z_score' % (args.tag))
 parallel_utils.submit_jobs(command_list, 4)
 
 # Train
 #parallel_utils.run('python train.py --input "ttHHadronic_%s_features.hdf5" --channel "Hadronic" --tag "ttH_vs_tH_%s" --ext ""' % (args.tag, args.tag))
 #parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_dnn_features_.hdf5" --tag "ttHHadronic_ttH_vs_tH_%s" --channel "Hadronic"' % (args.tag, args.tag))
 
-parallel_utils.run('python train.py --input "ttHLeptonic_%s_features.hdf5" --channel "Leptonic" --tag "ttH_vs_tH_%s" --ext ""' % (args.tag, args.tag))
-#parallel_utils.run('python train_dnn.py --input "ttHLeptonic_%s_dnn_features_.hdf5" --tag "ttHLeptonic_ttH_vs_tH_%s" --channel "Leptonic"' % (args.tag, args.tag))
+#parallel_utils.run('python train.py --input "ttHLeptonic_%s_features.hdf5" --channel "Leptonic" --tag "ttH_vs_tH_%s" --ext ""' % (args.tag, args.tag))
+parallel_utils.run('python train_dnn.py --input "ttHLeptonic_%s_dnn_features_.hdf5" --tag "ttHLeptonic_ttH_vs_tH_%s" --channel "Leptonic"' % (args.tag, args.tag))
 

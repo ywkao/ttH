@@ -4,6 +4,7 @@ import ROOT
 import numpy
 import root_numpy
 import math
+import json
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -76,8 +77,6 @@ features = root_numpy.tree2array(tree, branches = branches, selection = '((label
 features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
 features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))')
 
-#features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, selection))
-#features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, selection))
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d' % (data_label))
 
 
@@ -118,18 +117,11 @@ def preprocess_sigmoid(array):
   alpha = (array - mean)*(1./std)
   return (1 - numpy.exp(-alpha))/(1 + numpy.exp(-alpha))
 
-def create_array(features_list, names):
-  print [feat for feat in names if ("objects_" not in feat and "leptons_" != feat and "jets_" != feat)]
-  arr = [features_list[feat] for feat in names if ("objects_" not in feat and "leptons_" != feat and "jets_" != feat)]
-  if args.z_score:
-    for feat in arr:
-      feat = preprocess(feat)
-  return numpy.transpose(numpy.array(arr))
 
-global_features = create_array(features, feature_names)
-global_features_validation = create_array(features_validation, feature_names)
-global_features_data = create_array(features_data, feature_names)
-global_features_final_fit = create_array(features_final_fit, feature_names)
+def preprocess(array, mean, std):
+  array[array != pad_value] += -mean
+  array[array != pad_value] *= 1./std
+  return array
 
 def get_mean_and_std(array):
   array_trimmed = array[array != pad_value]
@@ -141,12 +133,32 @@ def get_mean_and_std(array):
     std = 1
   return mean, std
 
-def preprocess(array, mean, std):
-  array[array != pad_value] += -mean
-  array[array != pad_value] *= 1./std
-  return array
+if args.z_score:
+    preprocess_dict = {}
+    for feature in feature_names:
+        if ("objects_" not in feature and "leptons_" != feature and "jets_" != feature):
+            mean, stddev = get_mean_and_std(features[feature])
+            preprocess_dict[feature] = { "mean" : float(mean), "std_dev" : float(stddev)}
 
-def pad_array(array, n_objects):
+ 
+def create_array(features_list, names, dict_):
+    arr = []
+    for name in names:
+        if "leptons_" == name or "jets_" == name or "objects_" in name:
+            continue
+        else:
+            feat = numpy.array(features_list[name])
+            if args.z_score:
+                preprocessed_feat = preprocess(feat, dict_[name]["mean"], dict_[name]["std_dev"])
+            arr.append(preprocessed_feat)
+    return numpy.transpose(numpy.array(arr))
+
+global_features = create_array(features, feature_names, preprocess_dict)
+global_features_validation = create_array(features_validation, feature_names, preprocess_dict)
+global_features_data = create_array(features_data, feature_names, preprocess_dict)
+global_features_final_fit = create_array(features_final_fit, feature_names, preprocess_dict)
+
+def pad_array(array, n_objects, dict_):
   max_objects = n_objects
   nData = len(array)
   nFeatures = len(array[0][0])
@@ -159,48 +171,24 @@ def pad_array(array, n_objects):
 
   return y
 
-
 n_max_objects = 8
-object_features = pad_array(object_features, n_max_objects)
-object_features_validation = pad_array(object_features_validation, n_max_objects)
-object_features_data = pad_array(object_features_data, n_max_objects)
-object_features_final_fit = pad_array(object_features_final_fit, n_max_objects)
+object_features = pad_array(object_features, n_max_objects, preprocess_dict)
+object_features_validation = pad_array(object_features_validation, n_max_objects, preprocess_dict)
+object_features_data = pad_array(object_features_data, n_max_objects, preprocess_dict)
+object_features_final_fit = pad_array(object_features_final_fit, n_max_objects, preprocess_dict)
 
-if args.channel == "Leptonic":
-  n_max_jets = 6
-  jet_features = pad_array(jet_features, n_max_jets)
-  jet_features_validation = pad_array(jet_features_validation, n_max_jets)
-  jet_features_data = pad_array(jet_features_data, n_max_jets)
-  jet_features_final_fit = pad_array(jet_features_final_fit, n_max_jets)
+if args.z_score:
+    n_object_features = len(object_features[0][0])
+    for i in range(n_object_features):
+        mean, stddev = get_mean_and_std(object_features[:,:,i])
+        preprocess_dict["objects_" + str(i)] = { "mean" : mean, "std_dev" : stddev }
 
-  n_max_leptons = 2
-  lepton_features = pad_array(lepton_features, n_max_leptons)
-  lepton_features_validation = pad_array(lepton_features_validation, n_max_leptons)
-  lepton_features_data = pad_array(lepton_features_data, n_max_leptons)
-  lepton_features_final_fit = pad_array(lepton_features_final_fit, n_max_leptons)
+    with open("preprocess_scheme_%s_%s.json" % (args.channel, args.tag), "w") as f_out:
+                json.dump(preprocess_dict, f_out, indent=4, sort_keys=True)
 
-
-# use set of all signal events to get mean and std dev for preprocessing purposes
-#object_features_signal = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == 1')["objects_"]
-#object_features_signal = pad_array(object_features_signal)
-
-#for i in range(n_objects):
-#  for j in range(n_features):
-#    for k in range(5):
-#      print object_features[k][i][j]
-
-#for i in range(n_objects):
-#  for j in range(n_features):
-#    mean, std = get_mean_and_std(object_features_signal[:,i,j])
-#    print "Mean, std dev of object %d, feature %d: %.5f, %.5f" % (i, j, mean, std)
-#    object_features[:,i,j] = preprocess(object_features[:,i,j], mean, std)
-#    object_features_validation[:,i,j] = preprocess(object_features_validation[:,i,j], mean, std)
-#    object_features_data[:,i,j] = preprocess(object_features_data[:,i,j], mean, std)
-
-#for i in range(n_objects):
-#  for j in range(n_features):
-#    for k in range(5):
-#      print object_features[k][i][j]
+    for object_set in [object_features, object_features_validation, object_features_data, object_features_final_fit]:
+        for i in range(n_object_features):
+            object_set[:,:,i] = preprocess(object_set[:,:,i], preprocess_dict["objects_" + str(i)]["mean"], preprocess_dict["objects_" + str(i)]["std_dev"])
 
 label = features["label_"]
 multi_label = features["multi_label_"]
@@ -251,11 +239,6 @@ tth_std_mva_final_fit = features_final_fit["tth_std_mva_"]
 evt_final_fit = features_final_fit["evt_"]
 run_final_fit = features_final_fit["run_"]
 lumi_final_fit = features_final_fit["lumi_"]
-
-# reorganize features
-#object_features = numpy.transpose(object_features)
-#object_features_validation = numpy.transpose(object_features_validation)
-#object_features_data = numpy.transpose(object_features_data)
 
 # relabel labels
 if args.backgrounds != "all":
@@ -328,16 +311,5 @@ dset_tth_std_mva_final_fit = f_out.create_dataset("tth_std_mva_final_fit", data=
 dset_evt_final_fit = f_out.create_dataset("evt_final_fit", data=evt_final_fit)
 dset_run_final_fit = f_out.create_dataset("run_final_fit", data=run_final_fit)
 dset_lumi_final_fit = f_out.create_dataset("lumi_final_fit", data=lumi_final_fit)
-
-if args.channel == "Leptonic":
-  dset_jet = f_out.create_dataset("jet", data=jet_features)
-  dset_jet_validation = f_out.create_dataset("jet_validation", data=jet_features_validation)
-  dset_jet_data = f_out.create_dataset("jet_data", data=jet_features_data)
-  dset_jet_final_fit = f_out.create_dataset("jet_final_fit", data=jet_features_final_fit)
-
-  dset_lepton = f_out.create_dataset("lepton", data=lepton_features)
-  dset_lepton_validation = f_out.create_dataset("lepton_validation", data=lepton_features_validation)
-  dset_lepton_data = f_out.create_dataset("lepton_data", data=lepton_features_data)
-  dset_lepton_final_fit = f_out.create_dataset("lepton_final_fit", data=lepton_features_final_fit)
 
 f_out.close()
