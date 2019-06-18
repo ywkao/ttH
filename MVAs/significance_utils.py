@@ -68,8 +68,11 @@ def calc_sigma_eff(signal_data, weights):
   del h
   return popt[1], abs(popt[2])
 
-def events_passing_cut(events, cut, njets_cut = False):
+
+resonant_ids = [0, 11, 12, 14, 15, 16] # ttH, THQ, THW, ggH, VBF, VH
+def events_passing_cut(events, cut, njets_cut = False, choose_resonant = False):
   events_pass = {"mass" : [], "weights" : [], "mva_score" : []}
+  is_bkg = "process_id" in events.keys()
   for i in range(len(events["mass"])):
     pass_cut = True
     for mva_name in events["mva_score"].keys():
@@ -77,14 +80,20 @@ def events_passing_cut(events, cut, njets_cut = False):
         pass_cut = False
     if njets_cut:
       if not events["njets"][i] >= 5:
-	pass_cut = False
+	    pass_cut = False
+    if is_bkg and not choose_resonant: # only do non-resonant bkgs here
+        if events["process_id"][i] in resonant_ids:
+            pass_cut = False # ignore these here, we will deal with resonant bkgs separately
+    elif is_bkg and choose_resonant: # only do resonant bkgs here
+        if events["process_id"][i] not in resonant_ids:
+            pass_cut = False
     if pass_cut:
       events_pass["mass"].append(events["mass"][i])
       events_pass["weights"].append(events["weights"][i])
       events_pass["mva_score"].append(events["mva_score"]["bdt_score"][i])
   return events_pass
 
-def scan_za(cut_combos, signal_events, background_events, is_data, njets_cut = False):
+def scan_za(cut_combos, signal_events, background_events, is_data, njets_cut, mc_bkg_events):
   testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
 
   za_dict = []
@@ -101,6 +110,10 @@ def scan_za(cut_combos, signal_events, background_events, is_data, njets_cut = F
     # Get events passing cut
     signal_events_passing_cut = events_passing_cut(signal_events, cut_list, njets_cut)
     bkg_events_passing_cut = events_passing_cut(background_events, cut_list, njets_cut)
+    if is_data:
+      resonant_bkg_events_passing_cut = events_passing_cut(mc_bkg_events, cut_list, njets_cut, True)
+    else:
+      resonant_bkg_events_passing_cut = events_passing_cut(background_events, cut_list, njets_cut, True)
 
     # Calculate sigma eff
     mean_eff, sigma_eff = calc_sigma_eff(signal_events_passing_cut["mass"], signal_events_passing_cut["weights"])
@@ -121,15 +134,28 @@ def scan_za(cut_combos, signal_events, background_events, is_data, njets_cut = F
         bkg_events_mass_window.append(bkg_events_passing_cut["weights"][i])
     bkg_events_mass_window = numpy.asarray(bkg_events_mass_window)
     #b = ( 1. / testing_frac) * constant_estimate(bkg_events_mass_window, sigma_eff)
-    b, b_unc = constant_estimate(bkg_events_mass_window, sigma_eff, is_data)
+    b_non_res, b_non_res_unc = constant_estimate(bkg_events_mass_window, sigma_eff, is_data)
     if not is_data:
-      b *= ( 1. / testing_frac)
-      b_unc *= ( 1. / testing_frac)
+      b_non_res *= ( 1. / testing_frac)
+      b_non_res_unc *= ( 1. / testing_frac)
+
+    # Now add resonant bkg contribution
+    resonant_bkg_events_mass_window = []
+    for i in range(len(resonant_bkg_events_passing_cut["mass"])):
+      if resonant_bkg_events_passing_cut["mass"][i] > (mean_eff-2) - (1.645 * sigma_eff) and resonant_bkg_events_passing_cut["mass"][i] < (mean_eff-2) + (1.645 * sigma_eff): # (mean_eff-2) because we use the M127 ttH sample but M125 for other processes
+        resonant_bkg_events_mass_window.append(resonant_bkg_events_passing_cut["weights"][i])
+    resonant_bkg_events_mass_window = numpy.asarray(resonant_bkg_events_mass_window)
+    b_res = ( 1. / testing_frac) * numpy.sum(resonant_bkg_events_mass_window)
+    b_res_unc = ( 1. / testing_frac) * math.sqrt(numpy.sum(resonant_bkg_events_mass_window**2))
+
+    b = b_non_res + b_res
+    b_unc = ((b_non_res_unc**2) + (b_res_unc**2))**(0.5)
 
     # Calculate Z_A
     z_mc = Z_A(s, b)
     z_mc_unc = unc_ZA(s, b, s_unc, b_unc) if z_mc > 0 else 0
     print "s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)
+    print "non-resonant background: %.3f +/- %.3f, resonant background: %.3f +/- %.3f" % (b_non_res, b_non_res_unc, b_res, b_res_unc)
     print "za: %.3f +/- %.3f" % (z_mc, z_mc_unc)
     za_dict.append({"z_mc": z_mc, "cut_list" : cut_list}) 
     cuts.append(cut_list)
@@ -218,7 +244,7 @@ def extract_1d_curve(full_za_dict):
   #return n_sig_trimmed, za_trimmed
 
 
-def za_scores(n_quantiles, signal_events, background_events, is_data, njets_cut = False):
+def za_scores(n_quantiles, signal_events, background_events, is_data, njets_cut = False, mc_bkg_events = {}):
   # Calculate cuts corresponding to each quantile
   mva_cuts = {}
   for mva_name in signal_events["mva_score"].keys():
@@ -238,7 +264,7 @@ def za_scores(n_quantiles, signal_events, background_events, is_data, njets_cut 
   print "Performing %d-D scan with %d points" % (len(signal_events["mva_score"].keys()), len(cut_combos))
 
   # Perform full N-d scan
-  full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data, njets_cut) # Full N-d scan
+  full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data, njets_cut, mc_bkg_events) # Full N-d scan
 
   if len(mva_cuts.keys()) > 1:
     za_dict_1d = extract_1d_curve(full_za_dict)

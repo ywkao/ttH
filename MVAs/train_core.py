@@ -335,6 +335,8 @@ def train_bdt(config, invert=False):
 
     signal_weights = ks_test.logical_vector(weights_validation, y_test, 1)
     bkg_weights = ks_test.logical_vector(weights_validation, y_test, 0)
+   
+    bkg_process_id = ks_test.logical_vector(process_id_validation, y_test, 0)
 
     optimization_vars = args.optimization_vars.split(",") if args.optimization_vars else []
     for var in optimization_vars: 
@@ -343,11 +345,11 @@ def train_bdt(config, invert=False):
       data_mva_scores[var]   = utils.load_array(f, var + '_data')
 
     signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores, "njets" : signal_njets } 
-    bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores , "njets" : bkg_njets} 
-    data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores , "njets" : njets_data} 
+    bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores , "njets" : bkg_njets, "process_id" : bkg_process_id} 
+    data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores , "njets" : njets_data, "process_id" : numpy.zeros_like(mass_data)} 
 
     za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False, args.njets_cut)
-    za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True, args.njets_cut)
+    za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True, args.njets_cut, bkg_events)
     za = numpy.asarray(za)
 
     max_za = numpy.max(za)
