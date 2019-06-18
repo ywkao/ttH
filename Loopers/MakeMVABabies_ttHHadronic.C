@@ -454,6 +454,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       // Scale bkg weight
       evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Hadronic");
+ 
 
       if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
       if (!passes_selection(tag, minIDMVA_, maxIDMVA_)) continue;
@@ -463,10 +464,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       }
 
       if (fcnc) 
-	label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 22 || process_id_ == 23 || process_id_ == 24 || process_id_ == 25) ? 1 : 0; // 0 = bkg, 1 = fcnc, 2 = data
+	    label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 22 || process_id_ == 23 || process_id_ == 24 || process_id_ == 25) ? 1 : 0; // 0 = bkg, 1 = fcnc, 2 = data
       else { 
-	label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 0 ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data sidebands
-	if (process_id_ == 22 || process_id_ == 23)
+	    label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 0 ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data sidebands
+	    if (process_id_ == 22 || process_id_ == 23 || process_id_ == 24 || process_id_ == 25)
           label_ = -1; // don't use FCNC as a bkg when ttH is signal
       }
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
@@ -474,6 +475,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       tth_2017_reference_mva_ = tthMVA();
 
+      // Temporary!!! FIXME
+      //if (fcnc && process_id_ == 0)
+      //    evt_weight_ *= 100.;
 
       if (tag == "ttHHadronic_data_sideband_0b") {
 	if (nb_medium() == 0)

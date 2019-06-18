@@ -795,7 +795,7 @@
         "xs": 0.07425
     }, 
     "THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2": {
-        "br": 1.0, 
+        "br": 0.00227, 
         "filter_eff": 1, 
         "matched_xs": true, 
         "productions": {
@@ -804,7 +804,7 @@
                 "sum_of_weights": 1980260.0
             }
         }, 
-        "scale1fb_2016": 3.749507640410855e-05, 
+        "scale1fb_2016": 8.51138234373264e-08, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.07425
@@ -825,7 +825,7 @@
         "xs": 0.01517
     }, 
     "THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2": {
-        "br": 1.0, 
+        "br": 0.00227, 
         "filter_eff": 1, 
         "matched_xs": true, 
         "productions": {
@@ -834,7 +834,7 @@
                 "sum_of_weights": 997860.0
             }
         }, 
-        "scale1fb_2016": 1.5202533421522057e-05, 
+        "scale1fb_2016": 3.450975086685507e-08, 
         "scale1fb_2017": 0, 
         "scale1fb_2018": 0, 
         "xs": 0.01517

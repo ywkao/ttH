@@ -30,6 +30,7 @@ parser.add_argument("--no_lepton_id", help = "don't use lepton ID vars", action 
 parser.add_argument("--one_mass_point", help = "only use one signal mass point in training", action = "store_true")
 parser.add_argument("--cut_ptoM", help = "apply cuts on photon pT/mgg", action = "store_true")
 parser.add_argument("--fcnc", help = "use FCNC as signal, other SM Higgs processes as bkg", action = "store_true")
+parser.add_argument("--ttH_vs_tH", help = "use ttH as signal, tH as background", action = "store_true")
 
 args = parser.parse_args()
 
@@ -85,20 +86,29 @@ rand_branch = "super_rand_" if args.randomize else "rand_"
 
 data_label = 2
 
-if not args.fcnc:
+if args.fcnc:
+    selection_train      = '((label_ == 0%s%s) || (label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_validation = '((label_ == 0%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+
+    selection_final_fit      = '((process_id_ == -1 && signal_mass_label_ == 0))' # dummy selection, should not select any events
+
+elif args.ttH_vs_tH:
+  selection_train      = '((label_ == 0%s%s && (process_id_ == 11 || process_id_ == 12)) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+
+  selection_validation = '((label_ == 0%s%s && (process_id_ == 11 || process_id_ == 12)) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+
+  selection_final_fit      = '((label_ == 1 && signal_mass_label_ == 0))'
+
+
+else:
   selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
   if args.one_mass_point:
     selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+
   selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
   selection_final_fit      = '((label_ == 1 && signal_mass_label_ == 0))' 
-
-else:
-  selection_train      = '((label_ == 0%s%s) || (label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-  selection_validation = '((label_ == 0%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-
-  selection_final_fit      = '((process_id_ == -1 && signal_mass_label_ == 0))' # dummy selection, should not select any events
 
 ptoM_cut = ""
 if args.cut_ptoM:

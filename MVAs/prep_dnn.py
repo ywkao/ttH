@@ -54,13 +54,15 @@ train_frac = args.train_frac
 if args.backgrounds == "all":
   selection = ""
 else:
-  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2}
+  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11}
   selection = "&& ("
   procs = args.backgrounds.split(",") + args.signal.split(",")
   for i in range(len(procs)):
     selection += "((process_id_ == %d" % (process_dict[procs[i]])
     if procs[i] == "ttGG":
       selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
+    elif procs[i] == "tH":
+      selection += " || process_id_ == 12))"
     else:
       selection += "))"
     if i != len(procs) - 1:

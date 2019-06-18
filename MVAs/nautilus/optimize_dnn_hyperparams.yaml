@@ -12,7 +12,10 @@ spec:
       - name: optimizednnhyperparams
         image: tensorflow/tensorflow:latest-gpu-py3
         imagePullPolicy: Always
-        command: ["apt-get install wget && wget https://github.com/sam-may/ttH/blob/master/MVAs/nautilus/nautilus_exe.sh && source nautilus_exe.sh"]
+        command: 
+            - sh
+            - -c
+            - "apt-get install wget && wget https://raw.githubusercontent.com/sam-may/ttH/master/MVAs/nautilus/nautilus_exe.sh && ls -althr && chmod 755 nautilus_exe.sh && ./nautilus_exe.sh" 
         resources:
           limits:
             memory: 48Gi
@@ -23,4 +26,4 @@ spec:
             cpu: "1"
             nvidia.com/gpu: "1" 
       restartPolicy: Never   
-  backoffLimit: 1
+  backoffLimit: 0
