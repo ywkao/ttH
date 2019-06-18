@@ -159,7 +159,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       mva->AddVariable("m_jjj_", &m2_);
     }
 
-    mva->BookMVA("BDT", "../MVAs/" + xml_file);
+    mva->BookMVA("BDT", xml_file);
   }
 
   gjet_mva.reset(new TMVA::Reader( "!Color:Silent" )); 

@@ -176,7 +176,7 @@ def train_bdt(config, invert=False):
 	    'subsample': 1.0,
 	    'colsample_bytree': 1.0,
 	    'nthread' : 12,
-	    'min_child_weight' : 1,
+	    'min_child_weight' : (sum_neg_weights) / 100000., # min_child_weight depends on the absolute value of the weights
 	    }
   else:
     param = config["kparam"]

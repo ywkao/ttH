@@ -396,11 +396,15 @@ void make_table_vetos(TFile* file, TString process) {
 }
 
 vector<TString> tokenize(TString input, TString delimiter) {
-  TObjArray *t = input.Tokenize(delimiter);
-  vector<TString> v;
-  for (int i = 0; i < t->GetEntries(); i++)
-    v.push_back(((TObjString *)(t->At(i)))->String());
-  return v;
+    vector<TString> v;
+    if (!input.Contains(delimiter)) {
+        v.push_back(input);
+        return v;    
+    }
+    TObjArray *t = input.Tokenize(delimiter);
+    for (int i = 0; i < t->GetEntries(); i++)
+        v.push_back(((TObjString *)(t->At(i)))->String());
+    return v;
 }
 
 int main(int argc, char* argv[])
@@ -415,10 +419,12 @@ int main(int argc, char* argv[])
 
   vector<TString> signals = {"ttH"};
   vector<TString> backgrounds = {"DiPhoton", "GammaJets", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
-  if (argc > 2)
-    signals = tokenize(argv[2], "|");
-  if (argc > 3)
-    backgrounds = tokenize(argv[3], "|");
+  if (argc > 2) {
+      signals = tokenize(argv[2], "|");
+  }
+  if (argc > 3) {
+      backgrounds = tokenize(argv[3], "|");
+  }
 
   if (files.size() == 1) {
     TFile* f = new TFile(files[0]);

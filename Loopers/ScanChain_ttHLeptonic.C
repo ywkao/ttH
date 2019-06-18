@@ -163,7 +163,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     //mva->AddVariable("muon1_mini_iso_", &muon1_mini_iso_);
     //mva->AddVariable("muon2_mini_iso_", &muon2_mini_iso_);
 
-    mva->BookMVA("BDT", "../MVAs/" + xml_file);
+    mva->BookMVA("BDT", xml_file);
   }
 
   double w_gamma_yield = 0;
