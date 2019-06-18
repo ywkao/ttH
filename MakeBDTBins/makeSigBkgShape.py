@@ -119,7 +119,7 @@ def GetDataset(t, cut, tag, savepath, doUnbin, debug=False):
     else:
         return d_mgg_bin, h_mgg.GetMaximum()
 
-def GetSigPdf(events, tag, savename, savepath, modelpath):
+def GetSigPdf(events, norm, tag, savename, savepath, modelpath, maxInHist):
 
     # input is a RooDataSet
     # tag is TTHHadronic_n
@@ -129,20 +129,13 @@ def GetSigPdf(events, tag, savename, savepath, modelpath):
     w.factory("CMS_hgg_mass[100,180]")
     w.factory("MH[125]")
 
-    norm = events.sumEntries()
+    #norm = events.sumEntries()
     print "sumEtries: ", norm
     
     # change pdf name, parameters name
     w.factory("DoubleCB:"+tag+"(CMS_hgg_mass, mean_"+tag+"[125,120,130], sigma_"+tag+"[1,0,5], a1_"+tag+"[1,0,10], n1_"+tag+"[1,0,10], a2_"+tag+"[1,0,10], n2_"+tag+"[1,0,10])")
 
     w.pdf(tag).fitTo(events)
-
-    w.var("mean_"+tag).setConstant()
-    w.var("sigma_"+tag).setConstant()
-    w.var("a1_"+tag).setConstant()
-    w.var("a2_"+tag).setConstant()
-    w.var("n1_"+tag).setConstant()
-    w.var("n2_"+tag).setConstant()
 
     #rv_norm = RooRealVar("rv_norm_"+tag, "", norm)
     rv_norm = RooRealVar(tag+"_norm", "", norm)
@@ -154,12 +147,12 @@ def GetSigPdf(events, tag, savename, savepath, modelpath):
     frame = w.var("CMS_hgg_mass").frame()
     events.plotOn(frame)
     w.pdf(tag).plotOn(frame)
-    w.pdf(tag).paramOn(frame)
+    #w.pdf(tag).paramOn(frame)
     
     c1 = TCanvas("c1", "c1", 800, 800)
     dummy = TH1D("dummy","dummy",1,100,180)
     dummy.SetMinimum(0)
-    yMax = norm*0.2
+    yMax = maxInHist*1.2
     dummy.SetMaximum(yMax)
     dummy.SetLineColor(0)
     dummy.SetMarkerColor(0)
@@ -167,12 +160,34 @@ def GetSigPdf(events, tag, savename, savepath, modelpath):
     dummy.SetMarkerSize(0)
     dummy.GetYaxis().SetTitle("Events")
     dummy.GetYaxis().SetTitleOffset(1.3)
-    dummy.GetXaxis().SetTitle("m_{#gamma#gamma}")
-    #dummy.Draw()
+    dummy.GetXaxis().SetTitle("m_{#gamma#gamma} (GeV)")
+    dummy.Draw()
+
+    latex = TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.6*c1.GetTopMargin())
+    latex.SetTextFont(42)
+    latex.SetTextAlign(11)
+    latex.SetTextColor(1)
+
+    latex.DrawLatex(0.5, 0.85, (tag.split("_"))[-2] + "_" + (tag.split("_"))[-1])
+    latex.DrawLatex(0.5, 0.78, "mean = " + str(round(w.var("mean_"+tag).getVal(), 3) ) + " #pm " + str(round(w.var("mean_"+tag).getError(), 3) ))
+    latex.DrawLatex(0.5, 0.71, "sigma = " + str(round(w.var("sigma_"+tag).getVal(), 3) ) + " #pm " + str(round(w.var("sigma_"+tag).getError(), 3) ))
+    latex.DrawLatex(0.5, 0.64, "a1 = " + str(round(w.var("a1_"+tag).getVal(), 3) ) + " #pm " + str(round(w.var("a1_"+tag).getError(), 3) ))
+    latex.DrawLatex(0.5, 0.57, "a2 = " + str(round(w.var("a2_"+tag).getVal(), 3) ) + " #pm " + str(round(w.var("a2_"+tag).getError(), 3) ))
+    latex.DrawLatex(0.5, 0.50, "n1 = " + str(round(w.var("n1_"+tag).getVal(), 3) ) + " #pm " + str(round(w.var("n1_"+tag).getError(), 3) ))
+    latex.DrawLatex(0.5, 0.43, "n2 = " + str(round(w.var("n2_"+tag).getVal(), 3) ) + " #pm " + str(round(w.var("n2_"+tag).getError(), 3) ))
 
     frame.Draw("same")
     c1.SaveAs(savepath + "/fit_sig_" + savename + ".png")
     c1.SaveAs(savepath + "/fit_sig_" + savename + ".pdf")
+
+    w.var("mean_"+tag).setConstant()
+    w.var("sigma_"+tag).setConstant()
+    w.var("a1_"+tag).setConstant()
+    w.var("a2_"+tag).setConstant()
+    w.var("n1_"+tag).setConstant()
+    w.var("n2_"+tag).setConstant()
 
     w.writeToFile("models/" + modelpath + "/" + savename + ".root")
     
@@ -209,7 +224,7 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath, maxInHist):
     #w.pdf(tag).plotOn(frame)#,RooFit.Range(100,180))
     #w.pdf(tag).paramOn(frame)
     w.pdf(tag+"_ext").plotOn(frame)#,RooFit.Range(100,180))
-    w.pdf(tag+"_ext").paramOn(frame)
+    #w.pdf(tag+"_ext").paramOn(frame)
     
     c1 = TCanvas("c1", "c1", 800, 800)
     dummy = TH1D("dummy","dummy",1,100,180)
@@ -222,10 +237,22 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath, maxInHist):
     dummy.SetMarkerSize(0)
     dummy.GetYaxis().SetTitle("Events")
     dummy.GetYaxis().SetTitleOffset(1.3)
-    dummy.GetXaxis().SetTitle("m_{#gamma#gamma}")
+    dummy.GetXaxis().SetTitle("m_{#gamma#gamma} (GeV)")
     dummy.Draw()
 
     frame.Draw("same")
+
+    latex = TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.6*c1.GetTopMargin())
+    latex.SetTextFont(42)
+    latex.SetTextAlign(11)
+    latex.SetTextColor(1)
+
+    latex.DrawLatex(0.4, 0.85, (tag.split("_"))[-2] + "_" + (tag.split("_"))[-1])
+    latex.DrawLatex(0.4, 0.78, "nEvents = " + str(round(w.var("nevt").getVal(), 3) ) + " #pm " + str(round(w.var("nevt").getError(), 3) ))
+    latex.DrawLatex(0.4, 0.71, "#tau = " + str(round(w.var("tau").getVal(), 3) ) + " #pm " + str(round(w.var("tau").getError(), 3) ))
+
     c1.SaveAs(savepath + "/fit_bkg_" + savename + ".png")
     c1.SaveAs(savepath + "/fit_bkg_" + savename + ".pdf")
 
@@ -319,11 +346,17 @@ if args.doData:
 sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == " + str(processIDMap[process]) 
 #sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 && process_id == " + str(processIDMap[args.process]) 
 #sigCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 "  
+
 bkgCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) " 
 #bkgCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) " 
 
-d_mgg_sig, maxInHist = GetDataset(t, sigCut, tag, savepath, False, True) # mH125
-GetSigPdf(d_mgg_sig, "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath)
+d_mgg_sig, maxInHist = GetDataset(t, sigCut, tag, savepath, False, False) # mH125
+if process == "ggH_hgg":
+    sigCut2 = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == 0"
+    d_mgg_sig_2, maxInHist_2 = GetDataset(t, sigCut2, tag, savepath, False, False)
+    GetSigPdf(d_mgg_sig_2, d_mgg_sig.sumEntries(), "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist_2)
+else:    
+    GetSigPdf(d_mgg_sig, d_mgg_sig.sumEntries(), "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist)
 
 if not args.skipBkg:
     d_mgg_bkg, maxInHist = GetDataset(t, bkgCut, tag, savepath,False, False)
