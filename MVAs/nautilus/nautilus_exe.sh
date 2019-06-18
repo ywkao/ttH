@@ -1,10 +1,10 @@
 # This script gets you set up to train DNNs on kubernetes
 # 1. Make pod: kubectl create -f optimize_dnn_hyperparams.yaml 
 # 2. Connect to pod: kubectl exec -it mytensorflow-sam  -n cms -- /bin/bash
-apt-get install openssh-client
-apt-get install vim
-apt-get install git
-apt-get install python2.7
+apt-get install -y openssh-client
+apt-get install -y vim
+apt-get install -y git
+apt-get install -y python2.7
 wget https://bootstrap.pypa.io/get-pip.py
 python2.7 get-pip.py
 rm /usr/local/bin/python
