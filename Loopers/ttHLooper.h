@@ -548,6 +548,18 @@ const double diphoton_nTightLep0_prob = 0.4865;
 const double diphoton_nTightLep1_prob = 0.4791;
 const double diphoton_nTightLep2_prob = 0.0344;
 
+const double br_tToHq_assumed = 0.1441; // width(t->Hq|kappa_{Hqt}=1) / width^{SM}_{total} (values taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopFCNCxsection)
+const double br_tToHc_limit = 0.0011; // from p34 of https://arxiv.org/pdf/1812.11568.pdf
+const double br_tToHu_limit = 0.0012; // ""
+
+double scale_fcnc(TString currentFileTitle) {
+  if (currentFileTitle.Contains("eta_hut"))
+    return br_tToHu_limit / br_tToHq_assumed;
+  else if (currentFileTitle.Contains("eta_hct"))
+    return br_tToHc_limit / br_tToHq_assumed;
+  return 1.0; 
+}
+
 double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel) {
   if (bkg_options == "none")
     return 1.0;

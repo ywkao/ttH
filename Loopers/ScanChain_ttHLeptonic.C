@@ -339,15 +339,19 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Scale bkg weight
       evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Leptonic");
 
+      // Scale FCNC to current best observed limit (ATLAS 2016 combination)
+      if (currentFileTitle.Contains("FCNC"))
+        evt_weight *= scale_fcnc(currentFileTitle);
+
       // Blinded region 
       if (isData && processId != 18 && blind && mass() > 120 && mass() < 130)        continue;
 
       if (bkg_options == "old_vgamma") {
-	if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))	continue;
-	if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))		continue;
-	if (currentFileTitle.Contains("ZGTo2LG") || currentFileTitle.Contains("ZGToLLG"))	continue;
-	if (currentFileTitle.Contains("DYJetsToLL") && genPhotonId >= 1)
-	  processId = 7; 
+	  if (has_ttX_overlap(currentFileTitle, lead_Prompt(), sublead_Prompt()))	continue;
+	  if (has_simple_qcd_overlap(currentFileTitle, genPhotonId))		continue;
+	  if (currentFileTitle.Contains("ZGTo2LG") || currentFileTitle.Contains("ZGToLLG"))	continue;
+	  if (currentFileTitle.Contains("DYJetsToLL") && genPhotonId >= 1)
+	    processId = 7; 
       }	
       else
         if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;

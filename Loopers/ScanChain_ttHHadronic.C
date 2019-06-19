@@ -321,6 +321,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       // Scale bkg weight
       evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Hadronic");
+    
+      // Scale FCNC to current best observed limit (ATLAS 2016 combination)
+      if (currentFileTitle.Contains("FCNC"))
+        evt_weight *= scale_fcnc(currentFileTitle);
 
       double leadID_ = leadIDMVA() == maxIDMVA_ ? maxIDMVA_ : minIDMVA_;
       double subleadID_ = leadIDMVA() == maxIDMVA_ ? minIDMVA_ : maxIDMVA_; 
