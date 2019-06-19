@@ -176,7 +176,7 @@ def train_bdt(config, invert=False):
 	    'subsample': 1.0,
 	    'colsample_bytree': 1.0,
 	    'nthread' : 12,
-	    'min_child_weight' : (sum_neg_weights) / 100000., # min_child_weight depends on the absolute value of the weights
+	    'min_child_weight' : min(1, (sum_neg_weights) / 100000.), # min_child_weight depends on the absolute value of the weights
 	    }
   else:
     param = config["kparam"]
@@ -215,6 +215,15 @@ def train_bdt(config, invert=False):
   pred_test = bdt.predict(d_test, output_margin=args.multi)
   pred_data = bdt.predict(d_data, output_margin=args.multi)
   pred_final_fit = bdt.predict(d_final_fit, output_margin=args.multi)
+
+  if args.reference_mva != "none":
+    if ".xgb" in args.reference_mva:
+      ref_mva = xgboost.Booster()
+      ref_mva.load_model(args.reference_mva)
+      pred_ref_train = ref_mva.predict(d_train, output_margin=args.multi)
+      pred_ref_test = ref_mva.predict(d_test, output_margin=args.multi)
+      pred_ref_data = ref_mva.predict(d_data, output_margin=args.multi)
+      pred_ref_final_fit = ref_mva.predict(d_final_fit, output_margin=args.multi)
 
   print pred_test.shape
 
@@ -283,6 +292,12 @@ def train_bdt(config, invert=False):
   tree_global_features = tree_global_features.astype(numpy.float64)
 
   dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}
+
+  if args.reference_mva != "none":
+    tree_ref_mva_score = numpy.concatenate((pred_ref_train, pred_ref_test, pred_ref_data, pred_ref_final_fit))
+    tree_ref_mva_score = tree_ref_mva_score.astype(numpy.float64)
+    dict[args.reference_mva_name] = tree_ref_mva_score
+
   tree_utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
 
   #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label, tree_tth_2017_reference_mva], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label,tth_2017_reference_mva')
@@ -346,10 +361,10 @@ def train_bdt(config, invert=False):
 
     signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores, "njets" : signal_njets } 
     bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores , "njets" : bkg_njets, "process_id" : bkg_process_id} 
-    data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores , "njets" : njets_data, "process_id" : numpy.zeros_like(mass_data)} 
+    data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores , "njets" : njets_data, "process_id" : numpy.ones_like(mass_data)} 
 
-    za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False, args.njets_cut)
-    za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True, args.njets_cut, bkg_events)
+    za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False)
+    za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True, bkg_events)
     za = numpy.asarray(za)
 
     max_za = numpy.max(za)

@@ -31,6 +31,7 @@ parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str, defaul
 parser.add_argument("--no_global", help = "don't use global features", action="store_true")
 parser.add_argument("--no_lstm", help = "don't use object features (lstm)", action="store_true")
 parser.add_argument("--load", help = "give weights file to use as starting point", type=str)
+parser.add_argument("--no_bootstrap", help = "don't use bootstrapping to estimate unc. in AUC (to save time during hyperparameter opt)", action="store_true")
 args = parser.parse_args()
 
 import train_dnn_core
