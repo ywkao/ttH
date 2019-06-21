@@ -9,6 +9,8 @@ gSystem.AddIncludePath("-I$CMSSW_BASE/src/ ")
 gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc630/libHiggsAnalysisCombinedLimit.so")
 gSystem.AddIncludePath("-I$ROOFITSYS/include")
 gSystem.AddIncludePath("-Iinclude/")
+RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.DataHandling)
+RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.ObjectHandling)
 
 def GetMultiDataset(t, cuts, datanameTag, debug=False):
     w = RooWorkspace("wbkg_13TeV")
@@ -18,11 +20,11 @@ def GetMultiDataset(t, cuts, datanameTag, debug=False):
     rv_mva_score = RooRealVar("mva_score","",0,1)
     rv_sample_id = RooRealVar("sample_id","",0,2)
     rv_weight = RooRealVar("weight","",-999,999)
-    
+
     h_mgg_hists = []
     d_mgg_unbin = []
     d_mgg_unbin_rename = []
-    
+
     for i in range(len(cuts)):
 
         h_mgg_hists.append(TH1F("h_mgg_hist_" + str(i), "", 160, 100, 180))
@@ -35,9 +37,9 @@ def GetMultiDataset(t, cuts, datanameTag, debug=False):
         d_mgg_unbin.append(tmpdata)
         #getattr(w,'import')(d_mgg_bin[-1], datanameTag + '_' + str(i), RooCmdArg())
         getattr(w,'import')(d_mgg_unbin[-1], RooCmdArg())
-       
+
     w.writeToFile("allData.root")
-        
+
 def GetDataset(t, cut, tag, savepath, doUnbin, debug=False):
 
     w = RooWorkspace("w")
@@ -49,7 +51,7 @@ def GetDataset(t, cut, tag, savepath, doUnbin, debug=False):
     t.Project(h_mgg.GetName(), "mass", "weight*(" + cut + ")")
     #t.Project(h_mgg.GetName(), "mass", "1*(" + cut + ")")
     print "integral", h_mgg.Integral()
-    
+
     #d_mgg_bin = RooDataHist("roohist_data_mass_TTHHadronicTag", "", RooArgList(w.var("CMS_hgg_mass")), h_mgg, 1)
     d_mgg_bin = RooDataHist("roohist_data_mass_" + tag, "", RooArgList(w.var("CMS_hgg_mass")), h_mgg, 1)
     print "bin dataset", d_mgg_bin.sumEntries(), d_mgg_bin.numEntries()
@@ -61,20 +63,20 @@ def GetDataset(t, cut, tag, savepath, doUnbin, debug=False):
     rv_signal_mass_label = RooRealVar("signal_mass_label","",0,2)
     rv_process_id = RooRealVar("process_id","",0,100)
 
-    
+
     #d_mgg_unbin = RooDataSet("roo_data_mass_" + tag, "", t, RooArgSet(rv_mass, rv_sample_id, rv_weight, rv_mva_score, rv_signal_mass_label, rv_process_id), cut)
-    #d_mgg_unbin_w = RooDataSet(d_mgg_unbin.GetName(), "", d_mgg_unbin, d_mgg_unbin.get(), "1", "weight") 
+    #d_mgg_unbin_w = RooDataSet(d_mgg_unbin.GetName(), "", d_mgg_unbin, d_mgg_unbin.get(), "1", "weight")
     #print "unbin dataset", d_mgg_unbin_w.sumEntries(), d_mgg_unbin_w.numEntries()
 
     #rv_mass_hgg = RooRealVar("CMS_hgg_mass","",100,180)
     #d_mgg_unbin_w.addColumn(rv_mass_hgg)
     #d_mgg_unbin_w.Print()
     ##for i in range(d_mgg_unbin_w.numEntries()):
-    #    #print d_mgg_unbin_w.get(i).getRealValue("mass")#, d_mgg_unbin_w.get(i).getRealValue("CMS_hgg_mass") 
+    #    #print d_mgg_unbin_w.get(i).getRealValue("mass")#, d_mgg_unbin_w.get(i).getRealValue("CMS_hgg_mass")
     ##    rv_mass_hgg.setVal(d_mgg_unbin_w.get(i).getRealValue("mass"))
     ##    d_mgg_unbin_w.add(RooArgSet(rv_mass_hgg))
-    
-    
+
+
     if debug:
 
         h_mgg_sig = TH1F("h_mgg_sig", "h_mgg_sig", 160, 100, 180)
@@ -83,7 +85,7 @@ def GetDataset(t, cut, tag, savepath, doUnbin, debug=False):
         t.Project(h_mgg_sig.GetName(), "mass", "weight*( sample_id == 1 && mass > 100 && mass < 180 && signal_mass_label== 0)")
         t.Project(h_mgg_bkg.GetName(), "mass", "weight*( sample_id == 0 && ((mass > 100 && mass < 120) || ( mass > 130 &&mass < 180 )))")
         t.Project(h_mgg_data.GetName(), "mass", "weight*( sample_id == 2 && mass > 100 && mass < 180)")
-  
+
         c1 = TCanvas("c1", "c1", 800, 800)
         dummy = TH1D("dummy","dummy",1,100,180)
         dummy.SetMinimum(0)
@@ -110,7 +112,7 @@ def GetDataset(t, cut, tag, savepath, doUnbin, debug=False):
         h_mgg_data.Draw("same pe")
 
         h_mgg.Draw("same pe")
-        
+
         c1.SaveAs(savepath+"/" + process + "_" + tag + "_data_mc.png")
         c1.SaveAs(savepath+"/" + process + "_" + tag + "_data_mc.pdf")
 
@@ -124,18 +126,18 @@ def GetSigPdf(events, norm, tag, savename, savepath, modelpath, maxInHist):
     # input is a RooDataSet
     # tag is TTHHadronic_n
     call("mkdir -p models/" + modelpath, shell=True)
-    
+
     w = RooWorkspace("wsig_13TeV")
     w.factory("CMS_hgg_mass[100,180]")
     w.factory("MH[125]")
 
     #norm = events.sumEntries()
     print "sumEtries: ", norm
-    
+
     # change pdf name, parameters name
     w.factory("DoubleCB:"+tag+"(CMS_hgg_mass, mean_"+tag+"[125,120,130], sigma_"+tag+"[1,0,5], a1_"+tag+"[1,0,10], n1_"+tag+"[1,0,10], a2_"+tag+"[1,0,10], n2_"+tag+"[1,0,10])")
 
-    w.pdf(tag).fitTo(events)
+    w.pdf(tag).fitTo(events, RooFit.PrintLevel(-1))
 
     #rv_norm = RooRealVar("rv_norm_"+tag, "", norm)
     rv_norm = RooRealVar(tag+"_norm", "", norm)
@@ -143,12 +145,12 @@ def GetSigPdf(events, norm, tag, savename, savepath, modelpath, maxInHist):
     exPdf = RooExtendPdf("extend" + tag, "", w.pdf(tag), rv_norm)
     getattr(w,'import')(rv_norm)
     getattr(w,'import')(exPdf)
-    
+
     frame = w.var("CMS_hgg_mass").frame()
     events.plotOn(frame)
     w.pdf(tag).plotOn(frame)
     #w.pdf(tag).paramOn(frame)
-    
+
     c1 = TCanvas("c1", "c1", 800, 800)
     dummy = TH1D("dummy","dummy",1,100,180)
     dummy.SetMinimum(0)
@@ -190,20 +192,20 @@ def GetSigPdf(events, norm, tag, savename, savepath, modelpath, maxInHist):
     w.var("n2_"+tag).setConstant()
 
     w.writeToFile("models/" + modelpath + "/" + savename + ".root")
-    
+
 def GetBkgPdf(events, tag, savename, savepath, modelpath, maxInHist):
 
     call("mkdir -p models/" + modelpath, shell=True)
     nBins = 80
-    
+
     # input is a RooDataSet
     # tag is TTHHadronic_n or TTHLeptonic_n
     w = RooWorkspace("wbkg_13TeV")
     w.factory("CMS_hgg_mass[100,180]")
-    
+
     norm = events.sumEntries()
     print "norm: ", norm
-    
+
     w.var("CMS_hgg_mass").setRange("SL", 100.0, 120.0)
     w.var("CMS_hgg_mass").setRange("SU", 130.0, 180.0)
     w.var("CMS_hgg_mass").setRange("full", 100, 180)
@@ -213,19 +215,19 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath, maxInHist):
     w.factory("ExtendPdf:"+tag+"_ext("+tag+", nevt[100,0,10000000], 'full')")
 
     #w.pdf(tag).fitTo(events, RooFit.Range("SL,SU"), RooFit.Minos())
-    w.pdf(tag+"_ext").fitTo(events, RooFit.Range("SL,SU"),RooFit.Extended(True))
+    w.pdf(tag+"_ext").fitTo(events, RooFit.Range("SL,SU"),RooFit.Extended(True), RooFit.PrintLevel(-1))
 
     frame = w.var("CMS_hgg_mass").frame()
 
     #events.Print()
     #events.plotOn(frame, RooFit.Cut("mRegion==mRegion::Sideband"), RooFit.Binning(80))
     events.plotOn(frame, RooFit.Binning(nBins))
-    
+
     #w.pdf(tag).plotOn(frame)#,RooFit.Range(100,180))
     #w.pdf(tag).paramOn(frame)
     w.pdf(tag+"_ext").plotOn(frame)#,RooFit.Range(100,180))
     #w.pdf(tag+"_ext").paramOn(frame)
-    
+
     c1 = TCanvas("c1", "c1", 800, 800)
     dummy = TH1D("dummy","dummy",1,100,180)
     dummy.SetMinimum(0)
@@ -263,9 +265,9 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath, maxInHist):
     nEvt = w.var("nevt").getVal()
     w.factory(tag+"_norm["+str(nEvt)+",0,"+str(3*nEvt)+"]")
     print nEvt
-    
+
     #events.SetName(events.GetName() + "_" + args.nbin)
-    getattr(w,'import')(events, RooCmdArg()) 
+    getattr(w,'import')(events, RooCmdArg())
     w.writeToFile("models/" + modelpath + "/" + savename + ".root")
 
 #filename = "ttHHadronic_1617_FinalFitTree.root"
@@ -322,6 +324,14 @@ if "FCNCHadronicTag" in tag:
     filename = nameDict.namedict["FCNCHadronicTag"] #hadfilename_fcnc
 if "FCNCLeptonicTag" in tag:
     filename = nameDict.namedict["FCNCLeptonicTag"] #lepfilename_fcnc
+if "FCNCHUTHadronicTag" in tag:
+    filename = nameDict.namedict["FCNCHUTHadronicTag"] #hadfilename_fcnc
+if "FCNCHUTLeptonicTag" in tag:
+    filename = nameDict.namedict["FCNCHUTLeptonicTag"] #lepfilename_fcnc
+if "FCNCHCTHadronicTag" in tag:
+    filename = nameDict.namedict["FCNCHCTHadronicTag"] #hadfilename_fcnc
+if "FCNCHCTLeptonicTag" in tag:
+    filename = nameDict.namedict["FCNCHCTLeptonicTag"] #lepfilename_fcnc
 
 process = args.process
 savepath = args.savepath
@@ -329,33 +339,33 @@ savepath = args.savepath
 f = TFile.Open(filename)
 t = f.Get("t")
 
-processIDMap = {"ttH_hgg":0, "ggH_hgg":14, "VBF_hgg":15, "VH_hgg":16, 
+processIDMap = {"ttH_hgg":0, "ggH_hgg":14, "VBF_hgg":15, "VH_hgg":16,
                 "TT_FCNC_hut":22, "TT_FCNC_hct":23, "ST_FCNC_hut":24, "ST_FCNC_hct":25}
 
 modelpath = args.modelPath
 
-bkgSampleCut = "sample_id == 0"
+bkgSampleCut = "sample_id == 0 &&  process_id != 0 "
 if args.doData:
     bkgSampleCut = "sample_id == 2"
-    
+
 # ------------------------------------------------------------------------#
 ## This part is prepare inputs for binning scan
 ### sample_id: 0 bkg, 1 sig, 2 data
 ### signal_mass_label: 0 mH125
 
-sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == " + str(processIDMap[process]) 
-#sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 && process_id == " + str(processIDMap[args.process]) 
-#sigCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 "  
+sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == " + str(processIDMap[process])
+#sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 && process_id == " + str(processIDMap[args.process])
+#sigCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 "
 
-bkgCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) " 
-#bkgCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) " 
+bkgCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
+#bkgCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
 
 d_mgg_sig, maxInHist = GetDataset(t, sigCut, tag, savepath, False, False) # mH125
 if process == "ggH_hgg":
     sigCut2 = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == 0"
     d_mgg_sig_2, maxInHist_2 = GetDataset(t, sigCut2, tag, savepath, False, False)
     GetSigPdf(d_mgg_sig_2, d_mgg_sig.sumEntries(), "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist_2)
-else:    
+else:
     GetSigPdf(d_mgg_sig, d_mgg_sig.sumEntries(), "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist)
 
 if not args.skipBkg:
