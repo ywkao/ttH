@@ -84,6 +84,11 @@ def doScan_oneCore(lowIndex, highIndex, mva_score_n, lowCut, highCut, tag, model
 #    import sys
 #    sys.exit()
 
+    f_bkg0 = open("models/" + modelPath + "/CMS-HGG_bkg_" + tag + "_0_" + str(index) + ".txt")
+    f_bkg1 = open("models/" + modelPath + "/CMS-HGG_bkg_" + tag + "_1_" + str(index) + ".txt")
+    n_bkg0 = ( (f_bkg0.readline()).split('\n') )[0]
+    n_bkg1 = ( (f_bkg1.readline()).split('\n') )[0]
+
     # perform finalfit with combine
     cmdCombine = "cd /home/users/hmei/flashggFinalFit/CMSSW_7_4_7/src/; eval `scramv1 runtime -sh`; cd -;"
     cmdCombine += "cd models/" + modelPath + ";"
@@ -91,11 +96,11 @@ def doScan_oneCore(lowIndex, highIndex, mva_score_n, lowCut, highCut, tag, model
     if "ttH" in sig:
         cmdCombine += "combine -M ProfileLikelihood -n sig_" + str(index) + " --significance CMS-HGG_mva_13TeV_datacard_" + str(index) + ".txt -t -1 --expectSignal=1 > sig_" + str(index) + ".txt;"
         cmdCombine += "sig=`grep Significance sig_" + str(index) + ".txt`; "
-        cmdCombine += "echo " + str(index) + " ${sig} >> scan2Bin.txt; cd -;"
+        cmdCombine += "echo " + str(index) + " ${sig} " + str(n_bkg0) + " " + str(n_bkg1) + " >> scan2Bin.txt; cd -;"
     if "FCNC" in sig:
         cmdCombine += "combine -M Asymptotic -m 125 CMS-HGG_mva_13TeV_datacard_" + str(index) +  ".txt -t -1 --expectSignal=1 -n limit_" + str(index) + " > limit_" + str(index) + ".txt;"
         cmdCombine += "limit=`grep \"Expected 50\" limit_" + str(index) +".txt | awk -F \"<\" '{print $2}'`; "
-        cmdCombine += "echo " + str(index) + " ${limit} >> scan2Bin.txt; cd -;"
+        cmdCombine += "echo " + str(index) + " ${limit} " + str(n_bkg0) + " " + str(n_bkg1) + " >> scan2Bin.txt; cd -;"
 
     #print cmdCombine
     call(cmdCombine, shell=True)
@@ -120,10 +125,11 @@ def doScan_once(lowCut, highCut, tag, modelPath, savepath, sig):
   # perform finalfit with combine
   cmd1bin = "cd /home/users/hmei/flashggFinalFit/CMSSW_7_4_7/src/; eval `scramv1 runtime -sh`; cd -;"
   cmd1bin += "cd models/" + modelPath + ";"
+  cmd1bin += "echo 1 bin scan from " + str(lowCut) + " to " + str(highCut) + " > result_scan.txt;"
   if "ttH" in sig:
-    cmd1bin +=  "combine -M ProfileLikelihood --significance CMS-HGG_mva_13TeV_datacard_1bin.txt -t -1 --expectSignal=1 > sig_1bin.txt;"
+    cmd1bin +=  "combine -M ProfileLikelihood --significance CMS-HGG_mva_13TeV_datacard_1bin.txt -t -1 --expectSignal=1 >> result_scan.txt;"
   if "FCNC" in sig:
-    cmd1bin += "combine -M Asymptotic -m 125 CMS-HGG_mva_13TeV_datacard.txt -t -1 --expectSignal=1 > limit_1bin.txt;"
+    cmd1bin += "combine -M Asymptotic -m 125 CMS-HGG_mva_13TeV_datacard_1bin.txt -t -1 --expectSignal=1 >> result_scan.txt;"
   call(cmd1bin, shell=True)
 
 import argparse

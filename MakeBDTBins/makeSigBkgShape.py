@@ -270,6 +270,7 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath, maxInHist):
     getattr(w,'import')(events, RooCmdArg())
     w.writeToFile("models/" + modelpath + "/" + savename + ".root")
 
+    call("echo " + str(nEvt) + " > models/" + modelpath + "/" + savename + ".txt" , shell=True)
 #filename = "ttHHadronic_1617_FinalFitTree.root"
 #filename = "ttHHadronic_v05.08_FinalFitTree.root"
 #filename = "/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.5_8May2019_forHualin_2017_Presel_impute_FinalFitTree.root"
