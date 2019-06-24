@@ -24,7 +24,7 @@ parser.add_argument("--n_points", help = "how many points to probe", type=str, d
 args = parser.parse_args()
 
 
-def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_lstm, maxnorm, dropout_rate, learning_rate, start_batch):
+def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_lstm, maxnorm, dropout_rate, learning_rate, start_batch, batch_momentum):
     global idx, log, full_results
 
     config = {}
