@@ -20,7 +20,7 @@ parser.add_argument("--no_lstm", help = "don't use object features (lstm)", acti
 parser.add_argument("--load", help = "give weights file to use as starting point", type=str)
 parser.add_argument("--random", help = "do random exploration instead of bayesian exploration", action="store_true")
 parser.add_argument("--no_bootstrap", help = "don't use bootstrapping to estimate unc. in AUC (to save time during hyperparameter opt)", action="store_true")
-parser.add_argument("--n_points", help = "how many points to probe", type=str, default="1000")
+parser.add_argument("--n_points", help = "how many points to probe", type=str, default="200")
 args = parser.parse_args()
 
 
@@ -79,7 +79,7 @@ pbounds_light = {
     "n_lstm" : (3,3), 
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-6, -1), # 10**(learning_rate)
+    "learning_rate" : (-6, -2), # 10**(learning_rate)
     "start_batch" : (10, 10), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99)
 }
@@ -101,7 +101,7 @@ starting_point = {
 
 optimizer = BayesianOptimization(
     f=auc,
-    pbounds=pbounds,
+    pbounds=pbounds_light,
     verbose=2, # verbose = 1 prints only when a maximum is observed, verbose = 0 is silent
     random_state=1,
 )
