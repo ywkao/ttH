@@ -64,7 +64,7 @@ pbounds = {
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-6, -1), # 10**(learning_rate)
-    "start_batch" : (7, 13) # 2**(start_batch)
+    "start_batch" : (7, 13), # 2**(start_batch)
     "batch_momentum" : (0.0, 0.9999)
 }
 
@@ -78,8 +78,8 @@ pbounds_light = {
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-6, -1), # 10**(learning_rate)
-    "start_batch" : (10, 10) # 2**(start_batch)
-    "batch_momentum" : (0.0, 0.9999)
+    "start_batch" : (10, 10), # 2**(start_batch)
+    "batch_momentum" : (0.99, 0.99)
 }
 
 

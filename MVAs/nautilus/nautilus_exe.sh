@@ -21,4 +21,4 @@ apt-get install -y python-subprocess32
 pip install matplotlib
 pip install bayesian-optimization
 mkdir dnn_weights
-python optimize_dnn.py --input "ttHHadronic_v1.6_28May2019_RunII_MVA_Presel_impute_dnn_features_ttGG.hdf5" --tag "sam_test_7June2019" --channel "Hadronic" --no_bootstrap
+python optimize_dnn.py --input "ttHHadronic_v1.6_28May2019_RunII_MVA_Presel_impute_dnn_features_ttGG.hdf5" --tag "sam_test_7June2019" --channel "Hadronic" --no_bootstrap --n_points "50"
