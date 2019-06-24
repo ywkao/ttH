@@ -12,16 +12,22 @@ parser.add_argument("--tag", help = "tag to denote with", type=str)
 parser.add_argument("--baby_version", help = "which version of babies to use", type=str)
 args = parser.parse_args()
 
-bdt_lep = "../MVAs/Leptonic_4June2019_v1.7_FCNC_bdt.xml"
-bdt_had = "../MVAs/Hadronic_12June2019_v1.7_impute_FCNC_bdt.xml"
+#bdt_lep = "../MVAs/Leptonic_4June2019_v1.7_FCNC_bdt.xml"
+#bdt_had = "../MVAs/Hadronic_12June2019_v1.7_impute_FCNC_bdt.xml"
+bdt_lep_hut = "../MVAs/Leptonic_v1.7_19Jun2019_FCNC_SingleBDTBaseline_hut__bdt.xml"
+bdt_lep_hct = "../MVAs/Leptonic_v1.7_19Jun2019_FCNC_SingleBDTBaseline_hct__bdt.xml"
+bdt_had_hut = "../MVAs/Hadronic_v1.7_19Jun2019_FCNC_SingleBDTBaseline_impute_hut__bdt.xml"
+bdt_had_hct = "../MVAs/Hadronic_v1.7_19Jun2019_FCNC_SingleBDTBaseline_impute_hct__bdt.xml"
 
 os.chdir("../")
 
-do_looping = False
+do_looping = True
 if do_looping:
   # Loopers
-  parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag, bdt_lep))
-  parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_veryLoose" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute", bdt_had))
+  parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hut_BDT", bdt_lep_hut))
+  parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_veryLoose" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hut_BDT", bdt_had_hut))
+  parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hct_BDT", bdt_lep_hct))
+  parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_veryLoose" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hct_BDT", bdt_had_hct))
 
   # Data/MC Plots
   os.chdir("Plots")
@@ -34,7 +40,7 @@ if do_looping:
   #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --babymaker --fcnc' % (args.baby_version, args.tag))
   #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_veryLoose" --bkg_options "impute" --years "2017" --babymaker --fcnc' % (args.baby_version, args.tag + "_impute"))
 
-do_mvas = True
+do_mvas = False
 if do_mvas:
   os.chdir("../MVAs/")
   # MVA Prep

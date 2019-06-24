@@ -151,6 +151,7 @@ def tth_learner(max_objects, n_features, n_global_features, config):
   for i in range(n_lstm):
     lstm =  keras.layers.LSTM(n_nodes_lstm, implementation=2, activation='tanh', kernel_constraint = keras.constraints.maxnorm(maxnorm), go_backwards=False, return_sequences=(i != (n_lstm-1)), name='lstm_%d' % i)(lstm)
     if layer_norm: 
+      #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'lstm_batch_norm_%d' % i)(lstm)
       lstm = keras_layer_normalization.LayerNormalization()(lstm)
 
   # Merge LSTM output with high-level features in fully-connected layers

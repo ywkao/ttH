@@ -20,6 +20,7 @@ parser.add_argument("--no_lstm", help = "don't use object features (lstm)", acti
 parser.add_argument("--load", help = "give weights file to use as starting point", type=str)
 parser.add_argument("--random", help = "do random exploration instead of bayesian exploration", action="store_true")
 parser.add_argument("--no_bootstrap", help = "don't use bootstrapping to estimate unc. in AUC (to save time during hyperparameter opt)", action="store_true")
+parser.add_argument("--absolute_weights", help = "set negative weights to positive in *training* only (to improve stats)", action="store_true")
 parser.add_argument("--n_points", help = "how many points to probe", type=str, default="200")
 args = parser.parse_args()
 

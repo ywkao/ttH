@@ -62,6 +62,7 @@ class DNN_Helper:
     self.tag = kwargs.get('tag', '')
 
     self.n_bootstrap = kwargs.get('n_bootstrap', 25)
+    self.max_epochs = kwargs.get('max_epochs', 25)
 
     if 'tag' in kwargs:
       self.save_name = "dnn_weights/" + self.tag + "_weights_{epoch:02d}.hdf5"
@@ -144,7 +145,7 @@ class DNN_Helper:
 
       self.model.save_weights("dnn_weights/" + self.tag + "_weights_%d.hdf5" % i)
       with open("dnn_weights/" + self.tag + "_model_architecture_%d.json" % i, "w") as f_out:
-	f_out.write(self.model.to_json())
+	    f_out.write(self.model.to_json())
 
     return auc_train, auc
     
@@ -173,6 +174,9 @@ class DNN_Helper:
           best_auc = auc
       else:
           print "AUC did not improve and we can't increase batch size anymore. Stopping training."
+          keep_training = False
+      if self.n_epochs >= self.max_epochs:
+          print "Have already trained for 25 epochs. Stopping training."
           keep_training = False
 
     self.model.save_weights("dnn_weights/" + self.tag + "_weights.hdf5")

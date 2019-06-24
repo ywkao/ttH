@@ -25,7 +25,7 @@ import ks_test
 def train(args, config):
   f = h5py.File(args.input, "r")
   if len(config.keys()) == 0:
-    config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : True} 
+    config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False} 
 
 
   object_features, object_features_validation, object_features_data = f['object'], f['object_validation'], f['object_data']
@@ -36,6 +36,8 @@ def train(args, config):
   global_features, global_features_validation, global_features_data = f['global'], f['global_validation'], f['global_data']
   label, label_validation, label_data = f['label'], f['label_validation'], f['label_data']
   weights, weights_validation, weights_data = f['weights'], f['weights_validation'], f['weights_data']
+  if args.absolute_weights:
+    weights = numpy.absolute(numpy.array(weights))
   mass, mass_validation, mass_data = f['mass'], f['mass_validation'], f['mass_data']
   top_tag_score, top_tag_score_validation, top_tag_score_data = f['top_tag_score'], f['top_tag_score_validation'], f['top_tag_score_data']
   tth_ttPP_mva, tth_ttPP_mva_validation, tth_ttPP_mva_data = f['tth_ttPP_mva'], f['tth_ttPP_mva_validation'], f['tth_ttPP_mva_data']
@@ -62,6 +64,8 @@ def train(args, config):
 
   # DNN Helper
   dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data, mass_data = mass_data, config = config)
+  if args.no_bootstrap:
+    dnn.n_boostrap = 0
 
   if args.load:
     dnn.weights_file = args.load

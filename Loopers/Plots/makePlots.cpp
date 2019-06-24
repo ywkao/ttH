@@ -52,7 +52,8 @@ std::map<TString, int> mColors = {
 	{"QCD_GammaJets_imputed", kGray},
 	{"TTV", kPink},
 	{"tV", kPink-6},
-	{"VV", kPink+6}
+	{"VV", kPink+6},
+    {"ttH", kCyan-9}
 };
 
 std::map<TString, TString> mLatex = {
