@@ -95,7 +95,7 @@ starting_point = {
     "maxnorm" : 0.5, 
     "dropout_rate" : 0.25, 
     "learning_rate" : -3,
-    "start_batch" : 1024,
+    "start_batch" : 10,
     "batch_momentum" : 0.99
 }
 
