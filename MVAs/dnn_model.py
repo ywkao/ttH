@@ -1,5 +1,5 @@
 import keras
-import keras-layer-normalization
+import keras_layer_normalization
 
 def standard(max_objects, n_features):
   input_objects = keras.layers.Input(shape=(max_objects, n_features), name = 'input')
