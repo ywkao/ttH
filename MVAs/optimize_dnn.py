@@ -40,7 +40,7 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["learning_rate"] = 10**(learning_rate)
     config["start_batch"] = int(2**(start_batch))
     config["batch_norm"] = True
-    config["layer_norm"] = True
+    config["layer_norm"] = False
     config["batch_momentum"] = batch_momentum
 
     trained_dnn = train_dnn_core.train(args, config)
