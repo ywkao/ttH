@@ -133,6 +133,12 @@ def tth_learner(max_objects, n_features, n_global_features, config):
 
   learning_rate = config["learning_rate"]
 
+  if "batch_norm" in config.keys():
+    batch_norm = config["batch_norm"]
+    batch_momentum = config["batch_momentum"]
+  else:
+    batch_norm = False
+
   # LSTM
   lstm = input_objects
 
@@ -143,10 +149,14 @@ def tth_learner(max_objects, n_features, n_global_features, config):
   dense = keras.layers.concatenate([input_global, lstm])
   for i in range(n_dense_1):
     dense = keras.layers.Dense(n_nodes_dense_1, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense1_%d' % i)(dense)
+    if batch_norm:
+      dense = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm1_%d' % i)(dense)
     dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout1_%d' % i)(dense)
 
   for i in range(n_dense_2):
     dense = keras.layers.Dense(n_nodes_dense_2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense2_%d' % i)(dense)
+    if batch_norm:
+      dense = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm2_%d' % i)(dense) 
     if i < (n_dense_2 - 1):
       dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout2_%d' % i)(dense)
 

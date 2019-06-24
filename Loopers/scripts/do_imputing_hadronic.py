@@ -10,7 +10,9 @@ parser.add_argument("--tag", help = "tag to denote with", type=str)
 parser.add_argument("--baby_version", help = "which version of babies to use", type=str)
 args = parser.parse_args()
 
-bdt = "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute__bdt.xml"
+#bdt = "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute__bdt.xml"
+#bdt = "../MVAs/Hadronic__v1.7_19Jun2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_add_ttH_vs_tH_score__bdt.xml"
+bdt = "none"
 
 os.chdir("../")
 #parallel_utils.run('./ttHHadronicLooper "ttHHadronic_RunII_DiPhotonFits_Presel" "RunII" "%s" "%s" "none"' % (args.tag + "prefit", bdt))
@@ -37,9 +39,10 @@ dummy_input = raw_input("You probably want to update ttHLooper.h with results of
 
 os.chdir("../")
 command_list = []
-#command_list.append('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --bdt "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute__bdt.xml"' % (args.tag + "_impute"))
+#command_list.append('python looper_wrapper.py --channel "Hadronic" --baby_version "v2.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --bdt "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute__bdt.xml"' % (args.tag + "_impute"))
 #command_list.append('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_CutPtoM" --bkg_options "impute" --bdt "Hadronic__v1.5_1May2019_RunII_MVA_Presel_impute_cutPtoM__bdt.xml"' % (args.tag + "_impute"))
 
+parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --bdt "%s"' % (args.baby_version, args.tag + "_impute", bdt))
 #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_TagsInclusive" --bkg_options "impute"' % (args.tag + "_impute"))
 #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_Tag0" --bkg_options "impute"' % (args.tag + "_impute"))
 #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_2017_Tag1" --bkg_options "impute"' % (args.tag + "_impute"))
@@ -53,7 +56,7 @@ os.chdir("Plots")
 #workflow_utils.make_tables_and_plots("../ttHHadronic_RunII_MVA_Presel_CutPtoM_light%s_histogramsRunII.root" % (args.tag + "_impute"), "ttH Hadronic|Loose MVA Presel.|Cut on #gamma p_{T}/m_{#gamma#gamma}")
 #workflow_utils.make_tables_and_plots("../ttHHadronic_RunII_MVA_Presel_CutPtoM_%s_histogramsRunII.root" % (args.tag + "_impute"), "ttH Hadronic|Loose MVA Presel.|Cut on #gamma p_{T}/m_{#gamma#gamma}")
 
-do_mva = True
+do_mva = False
 if do_mva:
   os.chdir("../")
   #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "v1.5" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "scale_diphoton" --babymaker' % (args.tag + "_RunII_MVA_Presel_scale_diphoton"))

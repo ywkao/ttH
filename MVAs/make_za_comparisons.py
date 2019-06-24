@@ -4,6 +4,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--inputs", help = "csv list of which .npz files to consider", type=str)
 parser.add_argument("--labels", help = "csv list of labels for each .npz file", type=str)
+parser.add_argument("--ylim", help = "csv list of ylim", type=str)
 args = parser.parse_args()
 
 inputs = (args.inputs.replace(" ","")).split(",")
@@ -32,6 +33,11 @@ for i in range(len(files)):
   plt.gca().set_xlim(left=2)
   ax1.set_ylabel('Significance (Z_A)')
   ax1.legend(loc='lower left')
+  
+
+if args.ylim:
+  ylim = args.ylim.split(",")
+  plt.ylim([float(ylim[0]), float(ylim[1])])
 
 plt.savefig('za_comparison_mc.pdf')
 
@@ -48,6 +54,10 @@ for i in range(len(files)):
   plt.gca().set_xlim(left=2)
   ax1.set_ylabel('Significance (Z_A)')
   ax1.legend(loc='lower left')
+
+if args.ylim:
+  ylim = args.ylim.split(",")
+  plt.ylim([float(ylim[0]), float(ylim[1])])
 
 plt.savefig('za_comparison_data.pdf') 
 

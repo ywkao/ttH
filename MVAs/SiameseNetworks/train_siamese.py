@@ -28,6 +28,7 @@ f = h5py.File(args.input, "r")
 object_features, object_features_validation, object_features_data = f['object'], f['object_validation'], f['object_data']
 global_features, global_features_validation, global_features_data = f['global'], f['global_validation'], f['global_data']
 label, label_validation, label_data = f['label'], f['label_validation'], f['label_data']
+process_id, process_id_validation, process_id_data = f['process_id'], f['process_id_validation'], f['process_id_data']
 weights, weights_validation, weights_data = f['weights'], f['weights_validation'], f['weights_data']
 mass, mass_validation, mass_data = f['mass'], f['mass_validation'], f['mass_data']
 
@@ -39,8 +40,8 @@ object_features_validation = numpy.asarray(object_features_validation)
 label_validation = numpy.asarray(label_validation)
 
 
-pairs, labels = siamese_utils.create_pairs(label, 1000000)
-pairs_val, labels_val = siamese_utils.create_pairs(label_validation, 10000)
+pairs, labels = siamese_utils.create_pairs(process_id, 1000000)
+pairs_val, labels_val = siamese_utils.create_pairs(process_id_validation, 10000)
 print numpy.mean(labels)
 
 

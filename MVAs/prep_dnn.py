@@ -55,14 +55,15 @@ train_frac = args.train_frac
 if args.backgrounds == "all":
   selection = ""
 else:
-  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11}
+  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11, "ttG" : 6, "ttJets" : 9, "GJets_QCD" : 18 if args.channel == "Hadronic" else 3, "VGamma" : 7}
   selection = "&& ("
   procs = args.backgrounds.split(",") + args.signal.split(",")
   for i in range(len(procs)):
     selection += "((process_id_ == %d" % (process_dict[procs[i]])
-    if procs[i] == "ttGG":
-      selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
-    elif procs[i] == "tH":
+    
+    #if procs[i] == "ttGG":
+    #  selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
+    if procs[i] == "tH":
       selection += " || process_id_ == 12))"
     else:
       selection += "))"
@@ -192,6 +193,7 @@ if args.z_score:
 
 label = features["label_"]
 multi_label = features["multi_label_"]
+process_id = features["process_id_"]
 weights = features["evt_weight_"]
 mass = features["mass_"]
 lead_sigmaEtoE = features["lead_sigmaEtoE_"]
@@ -206,6 +208,7 @@ lumi = features["lumi_"]
 
 label_validation = features_validation["label_"]
 multi_label_validation = features_validation["multi_label_"]
+process_id_validation = features_validation["process_id_"]
 weights_validation = features_validation["evt_weight_"]
 mass_validation = features_validation["mass_"]
 top_tag_score_validation = features_validation["top_tag_score_"]
@@ -218,6 +221,7 @@ lumi_validation = features_validation["lumi_"]
 
 label_data = features_data["label_"]
 multi_label_data = features_data["multi_label_"]
+process_id_data = features_data["process_id_"]
 weights_data = features_data["evt_weight_"]
 mass_data = features_data["mass_"]
 top_tag_score_data = features_data["top_tag_score_"]
@@ -230,6 +234,7 @@ lumi_data = features_data["lumi_"]
 
 label_final_fit = features_final_fit["label_"]
 multi_label_final_fit = features_final_fit["multi_label_"]
+process_id_final_fit = features_final_fit["process_id_"]
 weights_final_fit = features_final_fit["evt_weight_"]
 mass_final_fit = features_final_fit["mass_"]
 top_tag_score_final_fit = features_final_fit["top_tag_score_"]
@@ -258,6 +263,7 @@ dset_object = f_out.create_dataset("object", data=object_features)
 dset_global = f_out.create_dataset("global", data=global_features)
 dset_label = f_out.create_dataset("label", data=label)
 dset_multi_label = f_out.create_dataset("multi_label", data=multi_label)
+dset_process_id = f_out.create_dataset("process_id", data=process_id)
 dset_weights = f_out.create_dataset("weights", data=weights)
 dset_mass = f_out.create_dataset("mass", data=mass)
 dset_tth_ttPP_mva = f_out.create_dataset("tth_ttPP_mva", data=tth_ttPP_mva)
@@ -274,6 +280,7 @@ dset_object_validation = f_out.create_dataset("object_validation", data=object_f
 dset_global_validation = f_out.create_dataset("global_validation", data=global_features_validation)
 dset_label_validation = f_out.create_dataset("label_validation", data=label_validation)
 dset_multi_label_validation = f_out.create_dataset("multi_label_validation", data=multi_label_validation)
+dset_process_id_validation = f_out.create_dataset("process_id_validation", data=process_id_validation)
 dset_weights_validation = f_out.create_dataset("weights_validation", data=weights_validation)
 dset_top_tag_score_validation = f_out.create_dataset("top_tag_score_validation", data=top_tag_score_validation)
 dset_mass_validation = f_out.create_dataset("mass_validation", data=mass_validation)
@@ -288,6 +295,7 @@ dset_object_data = f_out.create_dataset("object_data", data=object_features_data
 dset_global_data = f_out.create_dataset("global_data", data=global_features_data)
 dset_label_data = f_out.create_dataset("label_data", data=label_data)
 dset_multi_label_data = f_out.create_dataset("multi_label_data", data=multi_label_data)
+dset_process_id_data = f_out.create_dataset("process_id_data", data=process_id_data)
 dset_weights_data = f_out.create_dataset("weights_data", data=weights_data)
 dset_top_tag_score_data = f_out.create_dataset("top_tag_score_data", data=top_tag_score_data)
 dset_mass_data = f_out.create_dataset("mass_data", data=mass_data)
@@ -302,6 +310,7 @@ dset_object_final_fit = f_out.create_dataset("object_final_fit", data=object_fea
 dset_global_final_fit = f_out.create_dataset("global_final_fit", data=global_features_final_fit)
 dset_label_final_fit = f_out.create_dataset("label_final_fit", data=label_final_fit)
 dset_multi_label_final_fit = f_out.create_dataset("multi_label_final_fit", data=multi_label_final_fit)
+dset_process_id_final_fit = f_out.create_dataset("process_id_final_fit", data=process_id_final_fit)
 dset_weights_final_fit = f_out.create_dataset("weights_final_fit", data=weights_final_fit)
 dset_top_tag_score_final_fit = f_out.create_dataset("top_tag_score_final_fit", data=top_tag_score_final_fit)
 dset_mass_final_fit = f_out.create_dataset("mass_final_fit", data=mass_final_fit)

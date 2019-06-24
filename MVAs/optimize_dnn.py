@@ -18,6 +18,8 @@ parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str, defaul
 parser.add_argument("--no_global", help = "don't use global features", action="store_true")
 parser.add_argument("--no_lstm", help = "don't use object features (lstm)", action="store_true")
 parser.add_argument("--load", help = "give weights file to use as starting point", type=str)
+parser.add_argument("--random", help = "do random exploration instead of bayesian exploration", action="store_true")
+parser.add_argument("--n_points", help = "how many points to probe", type=str, default="1000")
 args = parser.parse_args()
 
 
@@ -31,10 +33,12 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["n_dense_2"] = int(n_dense_2)
     config["n_nodes_lstm"] = int(n_nodes_lstm)
     config["n_lstm"] = int(n_lstm)
-    config["maxnorm"] = maxnorm
+    config["maxnorm"] = 10**(maxnorm)
     config["dropout_rate"] = dropout_rate
-    config["learning_rate"] = learning_rate
-    config["start_batch"] = int(start_batch)
+    config["learning_rate"] = 10**(learning_rate)
+    config["start_batch"] = int(2**(start_batch))
+    config["batch_norm"] = True
+    config["batch_momentum"] = batch_momentum
 
     trained_dnn = train_dnn_core.train(args, config)
     full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
@@ -57,11 +61,27 @@ pbounds = {
     "n_dense_2" : (1,4), 
     "n_nodes_lstm" : (25, 150), 
     "n_lstm" : (1,5), 
-    "maxnorm" : (0.1, 100), 
+    "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (0.00001, 0.01),
-    "start_batch" : (256, 20000)
+    "learning_rate" : (-6, -1), # 10**(learning_rate)
+    "start_batch" : (7, 13) # 2**(start_batch)
+    "batch_momentum" : (0.0, 0.9999)
 }
+
+pbounds_light = {
+    "n_nodes_dense_1" : (300, 300), 
+    "n_nodes_dense_2" : (200, 200), 
+    "n_dense_1" : (1,1), 
+    "n_dense_2" : (4,4), 
+    "n_nodes_lstm" : (100, 100), 
+    "n_lstm" : (3,3), 
+    "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
+    "dropout_rate" : (0.0, 0.5), 
+    "learning_rate" : (-6, -1), # 10**(learning_rate)
+    "start_batch" : (10, 10) # 2**(start_batch)
+    "batch_momentum" : (0.0, 0.9999)
+}
+
 
 starting_point = {
     "n_nodes_dense_1" : 300, 
@@ -70,9 +90,9 @@ starting_point = {
     "n_dense_2" : 4, 
     "n_nodes_lstm" : 100, 
     "n_lstm" : 3, 
-    "maxnorm" : 3, 
+    "maxnorm" : 0.5, 
     "dropout_rate" : 0.25, 
-    "learning_rate" : 0.001,
+    "learning_rate" : -3,
     "start_batch" : 1024
 }
 
@@ -98,8 +118,8 @@ optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 optimizer.probe(params = starting_point, lazy = True)
 
 optimizer.maximize(
-        init_points = 1,
-        n_iter = 1,
+        init_points = int(args.n_points) if args.random else 0,
+        n_iter = 0 if args.random else int(args.n_points),
         acq = "ei",
         xi = 0.001,
 )

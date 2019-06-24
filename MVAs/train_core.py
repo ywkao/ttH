@@ -363,8 +363,10 @@ def train_bdt(config, invert=False):
     bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores , "njets" : bkg_njets, "process_id" : bkg_process_id} 
     data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores , "njets" : njets_data, "process_id" : numpy.ones_like(mass_data)} 
 
-    za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False)
-    za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True, bkg_events)
+    mass_shift = not("FCNC" in args.input) # if we're using FCNC as signal, all Higgs mass points should be 125
+                                           # but, if we're using ttH as signal, we use M127 sample for testing, so need to shift for proper comparison with other M125 samples
+    za, za_unc, s, b, sigma_eff = significance_utils.za_scores(n_quantiles, signal_events, bkg_events, False, {}, mass_shift)
+    za_data, za_unc_data, s_data, b_data, sigma_eff_data = significance_utils.za_scores(n_quantiles, signal_events, data_events, True, bkg_events, mass_shift)
     za = numpy.asarray(za)
 
     max_za = numpy.max(za)

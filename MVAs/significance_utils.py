@@ -41,7 +41,7 @@ def gaus(x, a, b, c):
 
 def constant_estimate(weights, sigma_eff, is_data):
   sideband_width = (180. - 130.) + (120. - 100.) if is_data else (180. - 100.)
-  est = numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
+  est = numpy.sum(weights) * ((2 * 1.645 * sigma_eff) / sideband_width)
   unc = math.sqrt(numpy.sum(weights**2)) * ((2 * 1.645 * sigma_eff) / (180. - 100.))
   if est > 0:
     return est, unc
@@ -90,7 +90,7 @@ def events_passing_cut(events, cut, choose_resonant = False):
       events_pass["mva_score"].append(events["mva_score"]["bdt_score"][i])
   return events_pass
 
-def scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events):
+def scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift):
   testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
 
   za_dict = []
@@ -138,8 +138,9 @@ def scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events
 
     # Now add resonant bkg contribution
     resonant_bkg_events_mass_window = []
+    shift = 2 if mass_shift else 0
     for i in range(len(resonant_bkg_events_passing_cut["mass"])):
-      if resonant_bkg_events_passing_cut["mass"][i] > (mean_eff-2) - (1.645 * sigma_eff) and resonant_bkg_events_passing_cut["mass"][i] < (mean_eff-2) + (1.645 * sigma_eff): # (mean_eff-2) because we use the M127 ttH sample but M125 for other processes
+      if resonant_bkg_events_passing_cut["mass"][i] > (mean_eff-shift) - (1.645 * sigma_eff) and resonant_bkg_events_passing_cut["mass"][i] < (mean_eff-shift) + (1.645 * sigma_eff): # (mean_eff-shift) because we use the M127 ttH sample but M125 for other processes
         resonant_bkg_events_mass_window.append(resonant_bkg_events_passing_cut["weights"][i])
     resonant_bkg_events_mass_window = numpy.asarray(resonant_bkg_events_mass_window)
     b_res = ( 1. / testing_frac) * numpy.sum(resonant_bkg_events_mass_window)
@@ -241,7 +242,7 @@ def extract_1d_curve(full_za_dict):
   #return n_sig_trimmed, za_trimmed
 
 
-def za_scores(n_quantiles, signal_events, background_events, is_data, mc_bkg_events = {}):
+def za_scores(n_quantiles, signal_events, background_events, is_data, mc_bkg_events = {}, mass_shift = True):
   # Calculate cuts corresponding to each quantile
   mva_cuts = {}
   for mva_name in signal_events["mva_score"].keys():
@@ -261,7 +262,7 @@ def za_scores(n_quantiles, signal_events, background_events, is_data, mc_bkg_eve
   print "Performing %d-D scan with %d points" % (len(signal_events["mva_score"].keys()), len(cut_combos))
 
   # Perform full N-d scan
-  full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events) # Full N-d scan
+  full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift) # Full N-d scan
 
   if len(mva_cuts.keys()) > 1:
     za_dict_1d = extract_1d_curve(full_za_dict)
