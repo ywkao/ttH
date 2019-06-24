@@ -1,4 +1,5 @@
 import keras
+import keras-layer-normalization
 
 def standard(max_objects, n_features):
   input_objects = keras.layers.Input(shape=(max_objects, n_features), name = 'input')
@@ -138,12 +139,19 @@ def tth_learner(max_objects, n_features, n_global_features, config):
     batch_momentum = config["batch_momentum"]
   else:
     batch_norm = False
+ if "layer_norm" in config.keys():
+    layer_norm = config["layer_norm"]
+    layer_momentum = config["layer_momentum"]
+  else:
+    layer_norm = False
 
   # LSTM
   lstm = input_objects
 
   for i in range(n_lstm):
     lstm =  keras.layers.LSTM(n_nodes_lstm, implementation=2, activation='tanh', kernel_constraint = keras.constraints.maxnorm(maxnorm), go_backwards=False, return_sequences=(i != (n_lstm-1)), name='lstm_%d' % i)(lstm)
+    if layer_norm: 
+      lstm = keras-layer-normalization.LayerNormalization()(lstm)
 
   # Merge LSTM output with high-level features in fully-connected layers
   dense = keras.layers.concatenate([input_global, lstm])
