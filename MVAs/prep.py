@@ -32,6 +32,7 @@ parser.add_argument("--cut_ptoM", help = "apply cuts on photon pT/mgg", action =
 parser.add_argument("--fcnc_hut", help = "use FCNC Hut as signal, other SM Higgs processes as bkg", action = "store_true")
 parser.add_argument("--fcnc_hct", help = "use FCNC Hct as signal, other SM Higgs processes as bkg", action = "store_true")
 parser.add_argument("--ttH_vs_tH", help = "use ttH as signal, tH as background", action = "store_true")
+parser.add_argument("--add_year", help = "add the year as a feature", action = "store_true")
 
 args = parser.parse_args()
 
@@ -51,6 +52,9 @@ feature_names = ["maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_de
 
 if args.do_top_tag:
   feature_names += ["top_tag_score_"]
+
+if args.add_year:
+  feature_names += ["year_"]
 
 if (args.fcnc_hut or args.fcnc_hct) and args.channel == "Hadronic":
   feature_names += ["m_ggj_", "m_jjj_"]
@@ -86,6 +90,8 @@ train_frac = args.train_frac
 rand_branch = "super_rand_" if args.randomize else "rand_"
 
 data_label = 2
+
+branches = list(set(branches))
 
 if args.fcnc_hut:
     selection_train      = '((label_ == 0%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")

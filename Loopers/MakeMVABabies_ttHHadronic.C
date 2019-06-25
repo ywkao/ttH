@@ -473,14 +473,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 	    if (process_id_ == 22 || process_id_ == 23 || process_id_ == 24 || process_id_ == 25)
           label_ = -1; // don't use FCNC as a bkg when ttH is signal
       }
-      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
+      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId, fcnc);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 
       tth_2017_reference_mva_ = tthMVA();
-
-      // Temporary!!! FIXME
-      //if (fcnc && process_id_ == 0)
-      //    evt_weight_ *= 100.;
 
       if (tag == "ttHHadronic_data_sideband_0b") {
 	if (nb_medium() == 0)

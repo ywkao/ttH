@@ -296,7 +296,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 	      label_ = -1; // don't use FCNC as a bkg when ttH is signal
       }
 
-      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
+      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId, fcnc);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 
       tth_2017_reference_mva_ = tthMVA();

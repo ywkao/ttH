@@ -385,7 +385,14 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
   }
 }
 
-int multiclassifier_label(TString currentFileTitle, int genPhotonId) {
+int multiclassifier_label(TString currentFileTitle, int genPhotonId, bool fcnc = false) {
+  if (fcnc) {
+    if (currentFileTitle.Contains("FCNC")) return 0; // signal
+    else if (currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG")) return 1; // resonant bkg
+    else if (currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma")) return -1;
+    else return 2; // non-resonant bkg
+  }
+
   if (currentFileTitle.Contains("ttHJet"))
     return 0;
   else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic")) {

@@ -65,7 +65,7 @@ def train(args, config):
   # DNN Helper
   dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data, mass_data = mass_data, config = config)
   if args.no_bootstrap:
-    dnn.n_boostrap = 0
+    dnn.n_bootstrap = 0
 
   if args.load:
     dnn.weights_file = args.load

@@ -163,15 +163,23 @@ def scan_za_parallel(cut_combos, signal_events, background_events, is_data, mc_b
 
   za_dict = []
   n_points = len(cut_combos)
-  cuts = numpy.empty(n_points)
-  za = numpy.empty(n_points) 
-  za_unc = numpy.empty(n_points)
-  n_sig = numpy.empty(n_points)
-  n_bkg = numpy.empty(n_points)
-  sigma_eff_ = numpy.empty(n_points)
+  cuts = [] 
+  za = []
+  za_unc = []
+  n_sig = []
+  n_bkg = []
+  sigma_eff_ = []
 
-  with poolcontext(processes=8) as pool:
-    cuts, za, za_unc, n_sig, n_bkg, sigma_eff_ = pool.map(partial(calc_za, signal_events = signal_events, background_events = background_events, is_data = is_data, mc_bkg_events = mc_bkg_events, mass_shift = mass_shift), cut_combos) 
+  with poolcontext(processes=10) as pool:
+    results = pool.map(partial(calc_za, signal_events = signal_events, background_events = background_events, is_data = is_data, mc_bkg_events = mc_bkg_events, mass_shift = mass_shift), cut_combos) 
+    for result in results:
+      print result
+      cuts.append(result[0])
+      za.append(result[1])
+      za_unc.append(result[2])
+      n_sig.append(result[3])
+      n_bkg.append(result[4])
+      sigma_eff_.append(result[5])
 
   return {"cuts" : cuts, "za" : za, "za_unc": za_unc, "n_sig" : n_sig, "n_bkg" : n_bkg, "sigma_eff" : sigma_eff_}
 

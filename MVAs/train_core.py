@@ -385,7 +385,12 @@ def train_bdt(config, invert=False):
 
     # Trim these dictionaries down
     #for evts_dict in [signal_events, bkg_events, data_events]:
-    #  bad_inc
+    #  good_indices = [index for index, value in enumerate(evts_dict["mass"]) if value < 180.]
+    #  print float(len(good_indices))/float(len(evts_dict["mass"]))
+    #  for key in evts_dict.iterkeys():
+    #    full_array = evts_dict[key]
+    #    trimmed_array = [full_array[i] for i in good_indices] 
+    #    evts_dict[key] = trimmed_array
 
     mass_shift = not("FCNC" in args.input) # if we're using FCNC as signal, all Higgs mass points should be 125
                                            # but, if we're using ttH as signal, we use M127 sample for testing, so need to shift for proper comparison with other M125 samples

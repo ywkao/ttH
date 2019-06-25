@@ -80,7 +80,7 @@ pbounds_light = {
     "n_lstm" : (3,3), 
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-6, -2), # 10**(learning_rate)
+    "learning_rate" : (-6, -1), # 10**(learning_rate)
     "start_batch" : (10, 10), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99)
 }

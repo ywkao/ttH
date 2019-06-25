@@ -108,18 +108,18 @@ while True:
       files = [f.name for f in sample.get_files()]
       print len(files)
       task = CondorTask(
-	sample = sample,
-	open_dataset = False,
-	flush = True,
-	files_per_output = info["fpo"],
-	output_name = "merged_ntuple.root",
-	tag = job_tag,
-	cmssw_version = cmssw_ver,
-	executable = exec_path,
-	tarfile = tar_path,
-	condor_submit_params = {"sites" : "T2_US_UCSD"},
+	    sample = sample,
+	    open_dataset = False,
+	    flush = True,
+	    files_per_output = info["fpo"],
+	    output_name = "merged_ntuple.root",
+	    tag = job_tag,
+	    cmssw_version = cmssw_ver,
+    	executable = exec_path,
+	    tarfile = tar_path,
+	    condor_submit_params = {"sites" : "T2_US_UCSD"},
         special_dir = hadoop_path,
-	arguments = info["meta_conditions"]
+	    arguments = info["meta_conditions"]
         )
       task.process()
       if not task.complete():
