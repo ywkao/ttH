@@ -4,6 +4,10 @@ import math
 from scipy.optimize import curve_fit
 import itertools
 
+import multiprocessing
+from functools import partial
+from contextlib import contextmanager
+
 def Z_A(s, b):
   if s <= 0:
     return 0
@@ -89,6 +93,87 @@ def events_passing_cut(events, cut, choose_resonant = False):
       events_pass["weights"].append(events["weights"][i])
       events_pass["mva_score"].append(events["mva_score"]["bdt_score"][i])
   return events_pass
+
+@contextmanager
+def poolcontext(*args, **kwargs):
+    pool = multiprocessing.Pool(*args, **kwargs)
+    yield pool
+    pool.terminate()
+
+def calc_za(cut_tuple, signal_events, background_events, is_data, mc_bkg_events, mass_shift):
+  testing_frac = 0.5
+  cut_list = dict((x,y) for x,y in cut_tuple)
+  print cut_list
+  # Get events passing cut
+  signal_events_passing_cut = events_passing_cut(signal_events, cut_list)
+  bkg_events_passing_cut = events_passing_cut(background_events, cut_list)
+  if is_data:
+    resonant_bkg_events_passing_cut = events_passing_cut(mc_bkg_events, cut_list, True)
+  else:
+    resonant_bkg_events_passing_cut = events_passing_cut(background_events, cut_list, True)
+
+  # Calculate sigma eff
+  mean_eff, sigma_eff = calc_sigma_eff(signal_events_passing_cut["mass"], signal_events_passing_cut["weights"])
+
+  # Calculate s
+  signal_events_mass_window = []
+  for i in range(len(signal_events_passing_cut["mass"])):
+    if signal_events_passing_cut["mass"][i] > mean_eff - (1.645 * sigma_eff) and signal_events_passing_cut["mass"][i] < mean_eff + (1.645 * sigma_eff):
+      signal_events_mass_window.append(signal_events_passing_cut["weights"][i])
+  signal_events_mass_window = numpy.asarray(signal_events_mass_window)
+  s = ( 1. / testing_frac) * numpy.sum(signal_events_mass_window)
+  s_unc = ( 1. / testing_frac) * math.sqrt(numpy.sum(signal_events_mass_window**2))
+
+  # Calculate b
+  bkg_events_mass_window = []
+  for i in range(len(bkg_events_passing_cut["mass"])):
+    if bkg_events_passing_cut["mass"][i] > 100 and bkg_events_passing_cut["mass"][i] < 180:
+      bkg_events_mass_window.append(bkg_events_passing_cut["weights"][i])
+  bkg_events_mass_window = numpy.asarray(bkg_events_mass_window)
+  #b = ( 1. / testing_frac) * constant_estimate(bkg_events_mass_window, sigma_eff)
+  b_non_res, b_non_res_unc = constant_estimate(bkg_events_mass_window, sigma_eff, is_data)
+  if not is_data:
+    b_non_res *= ( 1. / testing_frac)
+    b_non_res_unc *= ( 1. / testing_frac)
+  # Now add resonant bkg contribution
+  resonant_bkg_events_mass_window = []
+  shift = 2 if mass_shift else 0
+  for i in range(len(resonant_bkg_events_passing_cut["mass"])):
+    if resonant_bkg_events_passing_cut["mass"][i] > (mean_eff-shift) - (1.645 * sigma_eff) and resonant_bkg_events_passing_cut["mass"][i] < (mean_eff-shift) + (1.645 * sigma_eff): # (mean_eff-shift) because we use the M127 ttH sample but M125 for other processes
+      resonant_bkg_events_mass_window.append(resonant_bkg_events_passing_cut["weights"][i])
+  resonant_bkg_events_mass_window = numpy.asarray(resonant_bkg_events_mass_window)
+  b_res = ( 1. / testing_frac) * numpy.sum(resonant_bkg_events_mass_window)
+  b_res_unc = ( 1. / testing_frac) * math.sqrt(numpy.sum(resonant_bkg_events_mass_window**2))
+
+  b = b_non_res + b_res
+  b_unc = ((b_non_res_unc**2) + (b_res_unc**2))**(0.5)
+
+  # Calculate Z_A
+  z_mc = Z_A(s, b)
+  z_mc_unc = unc_ZA(s, b, s_unc, b_unc) if z_mc > 0 else 0
+  print "s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)
+  print "non-resonant background: %.3f +/- %.3f, resonant background: %.3f +/- %.3f" % (b_non_res, b_non_res_unc, b_res, b_res_unc)
+  print "za: %.3f +/- %.3f" % (z_mc, z_mc_unc)
+  return cut_list, z_mc, z_mc_unc, s, b, sigma_eff 
+
+  #za_dict.append({"z_mc": z_mc, "cut_list" : cut_list})
+
+def scan_za_parallel(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift):
+  testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
+
+  za_dict = []
+  n_points = len(cut_combos)
+  cuts = numpy.empty(n_points)
+  za = numpy.empty(n_points) 
+  za_unc = numpy.empty(n_points)
+  n_sig = numpy.empty(n_points)
+  n_bkg = numpy.empty(n_points)
+  sigma_eff_ = numpy.empty(n_points)
+
+  with poolcontext(processes=8) as pool:
+    cuts, za, za_unc, n_sig, n_bkg, sigma_eff_ = pool.map(partial(calc_za, signal_events = signal_events, background_events = background_events, is_data = is_data, mc_bkg_events = mc_bkg_events, mass_shift = mass_shift), cut_combos) 
+
+  return {"cuts" : cuts, "za" : za, "za_unc": za_unc, "n_sig" : n_sig, "n_bkg" : n_bkg, "sigma_eff" : sigma_eff_}
 
 def scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift):
   testing_frac = 0.5 # this assumes that we always use half the mc for testing and half for training
@@ -262,7 +347,8 @@ def za_scores(n_quantiles, signal_events, background_events, is_data, mc_bkg_eve
   print "Performing %d-D scan with %d points" % (len(signal_events["mva_score"].keys()), len(cut_combos))
 
   # Perform full N-d scan
-  full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift) # Full N-d scan
+  #full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift) # Full N-d scan
+  full_za_dict = scan_za_parallel(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift) # Full N-d scan
 
   if len(mva_cuts.keys()) > 1:
     za_dict_1d = extract_1d_curve(full_za_dict)

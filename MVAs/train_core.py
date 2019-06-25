@@ -102,6 +102,8 @@ def train_bdt(config, invert=False):
   process_id_final_fit = utils.load_array(f, 'process_id_final_fit')
   year_final_fit = utils.load_array(f, 'year_final_fit')
 
+  num_multi_class = len(numpy.unique(multi_label, return_index = True))
+
   train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
   nTrain = int(len(label)*train_frac)
 
@@ -182,7 +184,7 @@ def train_bdt(config, invert=False):
     param = config["kparam"]
 
   if args.multi:
-    param["num_class"] = 5
+    param["num_class"] = num_multi_class
     param["objective"] = "multi:softprob"
     param["scale_pos_weight"] = 1
 
@@ -227,11 +229,11 @@ def train_bdt(config, invert=False):
 
   print pred_test.shape
 
-  if args.multi:
-    pred_train = pred_train[:,0] 
-    pred_test = pred_test[:,0] 
-    pred_data = pred_data[:,0]
-    pred_final_fit = pred_final_fit[:,0]
+  #if args.multi:
+  #  pred_train = pred_train[:,0] 
+  #  pred_test = pred_test[:,0] 
+  #  pred_data = pred_data[:,0]
+  #  pred_final_fit = pred_final_fit[:,0]
 
   print pred_test.shape
 
@@ -267,7 +269,6 @@ def train_bdt(config, invert=False):
   tree_sample_id = numpy.concatenate((label, label_validation, label_data, numpy.ones(len(pred_final_fit))))
   tree_mass = numpy.concatenate((mass, mass_validation, mass_data, mass_final_fit))
   tree_weight = numpy.concatenate((weights, weights_validation, weights_data, weights_final_fit))
-  tree_bdt_score = numpy.concatenate((pred_train, pred_test, pred_data, pred_final_fit))
   tree_signal_mass_label = numpy.concatenate((signal_mass_label, signal_mass_label_validation, signal_mass_label_data, numpy.zeros(len(pred_final_fit))))
   tree_tth_2017_reference_mva = numpy.concatenate((tth_2017_reference_mva, tth_2017_reference_mva_validation, tth_2017_reference_mva_data, tth_2017_reference_mva_final_fit))
   tree_evt = numpy.concatenate((evt, evt_validation, evt_data, evt_final_fit))
@@ -281,7 +282,6 @@ def train_bdt(config, invert=False):
   tree_sample_id = tree_sample_id.astype(numpy.int64)
   tree_mass = tree_mass.astype(numpy.float64)
   tree_weight = tree_weight.astype(numpy.float64)
-  tree_bdt_score = tree_bdt_score.astype(numpy.float64)
   tree_signal_mass_label = tree_signal_mass_label.astype(numpy.int64)
   tree_tth_2017_reference_mva = tree_tth_2017_reference_mva.astype(numpy.float64)
   tree_evt = tree_evt.astype(numpy.uint64)
@@ -291,7 +291,19 @@ def train_bdt(config, invert=False):
   tree_year = tree_year.astype(numpy.int64)
   tree_global_features = tree_global_features.astype(numpy.float64)
 
-  dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "mva_score" : tree_bdt_score, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}
+  dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}
+
+  if args.multi:
+    tree_bdt_score = []
+    for i in range(num_multi_class):
+      tree_bdt_score.append(numpy.concatenate((pred_train[:,i], pred_test[:,i], pred_data[:,i], pred_final_fit[:,i]))) 
+      tree_bdt_score[i] = tree_bdt_score[i].astype(numpy.float64)
+      dict["mva_score_%d" % i] = tree_bdt_score[i]
+
+  else:
+    tree_bdt_score = numpy.concatenate((pred_train, pred_test, pred_data, pred_final_fit))
+    tree_bdt_score = tree_bdt_score.astype(numpy.float64)
+    dict["mva_score"] = tree_bdt_score
 
   if args.reference_mva != "none":
     tree_ref_mva_score = numpy.concatenate((pred_ref_train, pred_ref_test, pred_ref_data, pred_ref_final_fit))
@@ -338,9 +350,17 @@ def train_bdt(config, invert=False):
   estimate_za = True
   if estimate_za:
     n_quantiles = 50
-    signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
-    bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}
-    data_mva_scores = {"bdt_score" : pred_data}
+
+    if args.multi:
+      for i in range(n_multi_class-1): # optimize with each of the bkg probabilities (the signal probability is redunant, i.e. sum of probabilities = 1) 
+        signal_mva_scores = {"bdt_score_%d" % i : -1*ks_test.logical_vector(pred_test[:,i+1], y_test, 1)} # factor of -1 so that we cut *below* certain values, as these are background probabilities, not signal
+        bkg_mva_scores = {"bdt_score_%d" % i : -1*ks_test.logical_vector(pred_test[:,i+1], y_test, 0)}
+        data_mva_scores = {"bdt_score_%d" % i : pred_data[:,i+1]}
+    else:
+      signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
+      bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}
+      data_mva_scores = {"bdt_score" : pred_data}
+
 
     signal_mass = ks_test.logical_vector(mass_validation, y_test, 1)
     bkg_mass = ks_test.logical_vector(mass_validation, y_test, 0)
@@ -359,9 +379,13 @@ def train_bdt(config, invert=False):
       bkg_mva_scores[var]    = ks_test.logical_vector(utils.load_array(f, var + '_validation'), y_test, 0)
       data_mva_scores[var]   = utils.load_array(f, var + '_data')
 
-    signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores, "njets" : signal_njets } 
-    bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores , "njets" : bkg_njets, "process_id" : bkg_process_id} 
-    data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores , "njets" : njets_data, "process_id" : numpy.ones_like(mass_data)} 
+    signal_events = { "mass" : signal_mass, "weights" : signal_weights, "mva_score" : signal_mva_scores} 
+    bkg_events = { "mass" : bkg_mass, "weights" : bkg_weights, "mva_score" : bkg_mva_scores, "process_id" : bkg_process_id} 
+    data_events = { "mass" : mass_data, "weights" : weights_data, "mva_score" : data_mva_scores, "process_id" : numpy.ones_like(mass_data)} 
+
+    # Trim these dictionaries down
+    #for evts_dict in [signal_events, bkg_events, data_events]:
+    #  bad_inc
 
     mass_shift = not("FCNC" in args.input) # if we're using FCNC as signal, all Higgs mass points should be 125
                                            # but, if we're using ttH as signal, we use M127 sample for testing, so need to shift for proper comparison with other M125 samples
