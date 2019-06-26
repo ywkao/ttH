@@ -1,13 +1,3 @@
-#tag = "FCNCHadronicTag"
-#tag = "ttHLeptonic"
-#sigName = "ttH_hgg"
-#sigName = "TT_FCNC_hut"
-#modelPath = "TT_FCNC_hut_scan_lep"
-#modelPath = "TTHLep_Run2_step1"
-#plotPath = "/home/users/hmei/public_html/2019/20190605_scan_ttHLepRun2_step1/"
-#lowCut = 0
-#highCut = 1
-#fixBin2 = "n"
 #useNCores = 10
 #n_quantiles = 100
 
@@ -15,14 +5,18 @@
 #tag="TTHLeptonicTag"
 #tag="FCNCHadronicTag"
 tag="FCNCHUTLeptonicTag"
+#tag="FCNCHUTHadronicTag"
 #sigName="ttH_hgg"
 #for FCNC signal, only feed TT_FCNC, the doScan.py will take care of making signals for ST_FCNC and treat ST+TT as signals in datacard
 sigName="TT_FCNC_hut"
-modelPath="TTFCNC_hut_lep_20190623_step2_low"
-plotPath="/home/users/hmei/public_html/2019/20190621_TTFCNC_hut_lep_20190623_step2_low/"
+#modelPath="TTFCNC_hut_had_20190623_step3_1"
+modelPath="TTFCNC_hut_lep_20190626_step1"
+#modelPath="TTHHadronic_20190624_step2_high"
+plotPath="/home/users/hmei/public_html/2019/20190626_FCNCHUTLep_step1/"
 lowCut=0
-highCut=0.86647624
-fixBin2="y"
+highCut=1
+fixBin2="n"
+useNCores="50"
 
 mkdir -p ${plotPath}
 rm ${plotPath}/*
@@ -31,9 +25,9 @@ cp ~/public_html/tmpFile/index.php ${plotPath}
 rm models/${modelPath}/*txt
 
 if [ ${fixBin2} = "y" ]; then
-python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut} --fixBin2
+/bin/nice -n 10 python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut} --fixBin2 --useNCores ${useNCores}
 else
-python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut}
+/bin/nice -n 10 python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut} --useNCores ${useNCores}
 fi
 
 echo "tag: "${tag} > models/${modelPath}/command.log
@@ -46,15 +40,29 @@ echo "fixBin2: " ${fixBin2} >> models/${modelPath}/command.log
 
 chmod -R 755 ~/public_html/
 
-#bdtScoreIndex=`sort -nr -k 3 models/${modelPath}/scan2Bin.txt | head -1 | awk -F " " '{print $1}'`
-
+## get best sig according to scan boundary
 # if in any of the two bdt bins the number of bkg events is smaller than 10, do not use it
-bdtScoreIndex=`awk '{if ($4 >= 10 && $5 >= 10) {print} }' scan2Bin.txt | sort -n -k3 | head -1 | awk -F " " '{print $1}'`
+echo "Scan results: " >> models/${modelPath}/result_scan.txt
+bdtScoreIndex=""
+if [[ ${sigName} = *ttH* ]]; then
+    bdtScoreIndex=`awk '{if ($4 >= 10 && $5 >= 10) {print} }' models/${modelPath}/scan2Bin.txt | sort -nr -k3 | head -1 | awk -F " " '{print $1}'`
+    bestSig=`awk '{if ($4 >= 10 && $5 >= 10) {print} }' models/${modelPath}/scan2Bin.txt | sort -nr -k3 | head -1`
+    echo ${bestSig} >> models/${modelPath}/result_scan.txt
+fi
 if [[ ${sigName} = *FCNC*  ]]; then
-    bdtScoreIndex=`awk '{if ($3 >= 10 && $4 >= 10) {print} }' scan2Bin.txt | sort -nr -k2 | head -1 | awk -F " " '{print $1}'`
+    bdtScoreIndex=`awk '{if ($3 >= 10 && $4 >= 10) {print} }' models/${modelPath}/scan2Bin.txt | sort -n -k2 | head -1 | awk -F " " '{print $1}'`
+    bestLimit=`awk '{if ($3 >= 10 && $4 >= 10) {print} }' models/${modelPath}/scan2Bin.txt | sort -n -k2 | head -1`
+    echo ${bestLimit} >> models/${modelPath}/result_scan.txt
+
 fi
 
-echo "python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut} --noScan --scoreIndex ${bdtScoreIndex}" >> models/${modelPath}/result_scan.txt
+echo "####" >> models/${modelPath}/result_scan.txt
+
+# get the exact best cut on bdt score
+echo "python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut} --noScan --scoreIndex ${bdtScoreIndex}" >> models/${modelPath}/result_scan.txt;
 python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut} --noScan --scoreIndex ${bdtScoreIndex} >> models/${modelPath}/result_scan.txt
 
-
+# save short version of summary
+grep "Sig" result_scan.txt > models/${modelPath}/result_summary.txt;
+grep "python" result_scan.txt >>  models/${modelPath}/result_summary.txt;
+grep "bestCut" result_scan.txt >> models/${modelPath}/result_summary.txt;

@@ -140,6 +140,8 @@ def GetSigPdf(events, norm, tag, savename, savepath, modelpath, maxInHist):
     w.pdf(tag).fitTo(events, RooFit.PrintLevel(-1))
 
     #rv_norm = RooRealVar("rv_norm_"+tag, "", norm)
+    if ("FCNC" in tag) and ("Leptonic" in tag):
+        norm = norm*1/1.527
     rv_norm = RooRealVar(tag+"_norm", "", norm)
 
     exPdf = RooExtendPdf("extend" + tag, "", w.pdf(tag), rv_norm)

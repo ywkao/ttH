@@ -113,8 +113,8 @@ def doScan_once(lowCut, highCut, tag, modelPath, savepath, sig):
   call("python makeSigBkgShape.py -l " + str(lowCut) + " --hi " + str(highCut) + " --tag " + tag1 + " --modelPath " + modelPath + " --savepath " + savepath + " -p " + sig, shell=True)
   call("python makeSigBkgShape.py -l " + str(lowCut) + " --hi " + str(highCut) + " --tag " + tag1 + " --modelPath " + modelPath + " --savepath " + savepath + " -p ggH_hgg --skipBkg" , shell=True)
   if "FCNC" in sig:
-    call("python makeSigBkgShape.py -l " + str(lowCut) + " --hi " + str(highCut) + " --tag " + tag + " --modelPath " + modelPath + " --savepath " + savepath + " -p ttH_hgg --skipBkg" , shell=True)
-    call("python makeSigBkgShape.py -l " + str(lowCut) + " --hi " + str(highCut) + " --tag " + tag + " --modelPath " + modelPath + " --savepath " + savepath + " -p " + sig.replace("TT","ST") + " --skipBkg" , shell=True)
+    call("python makeSigBkgShape.py -l " + str(lowCut) + " --hi " + str(highCut) + " --tag " + tag1 + " --modelPath " + modelPath + " --savepath " + savepath + " -p ttH_hgg --skipBkg" , shell=True)
+    call("python makeSigBkgShape.py -l " + str(lowCut) + " --hi " + str(highCut) + " --tag " + tag1 + " --modelPath " + modelPath + " --savepath " + savepath + " -p " + sig.replace("TT","ST") + " --skipBkg" , shell=True)
 
   # make datacard
   cmdMakecard = "python cardMaker.py --postFix _1bin --savepath models/" + modelPath + " --tags " + tag
