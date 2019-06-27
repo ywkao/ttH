@@ -9,7 +9,7 @@ cp /etc/secret-volume/ssh-publickey ~/.ssh/id_rsa.pub
 cp /etc/secret-volume/ssh-privatekey ~/.ssh/id_rsa
 chmod 600 ~/.ssh/id_rsa
 echo "Blah blah blah" >> blah.txt
-scp blah.txt sjmay@uaf-10.t2.ucsd.edu:~/ttH/MVAs/nautilus/blah_test.txt
+scp -o StrictHostKeyChecking=no blah.txt sjmay@uaf-10.t2.ucsd.edu:~/ttH/MVAs/nautilus/blah_test.txt
 
 # Install needed libs
 apt-get install -y vim
