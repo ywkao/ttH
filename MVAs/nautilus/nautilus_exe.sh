@@ -21,7 +21,7 @@ rm /usr/local/bin/python
 ln -s /usr/bin/python2.7 /usr/local/bin/python
 mkdir work
 cd work
-git clone ssh://git@github.com/sam-may/ttH.git 
+git clone https://github.com/sam-may/ttH 
 cd ttH/MVAs
 wget http://uaf-8.t2.ucsd.edu/~sjmay/ttH/nautilus/ttHHadronic_v1.6_28May2019_RunII_MVA_Presel_impute_dnn_features_ttGG.hdf5
 pip install tensorflow-gpu
