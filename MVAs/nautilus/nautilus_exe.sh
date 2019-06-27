@@ -4,6 +4,7 @@
 
 # Set up ssh key
 apt-get install -y openssh-client
+mkdir ~/.ssh
 cp /etc/secret-volume/ssh-publickey ~/.ssh/id_rsa.pub
 cp /etc/secret-volume/ssh-privatekey ~/.ssh/id_rsa
 chmod 600 ~/.ssh/id_rsa
