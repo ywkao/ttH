@@ -1,4 +1,5 @@
 import keras
+import keras_layer_normalization
 
 import siamese_utils
 
@@ -44,6 +45,22 @@ def base_network(max_objects, n_features, n_global_features, config):
     n_nodes_dense_2 = config["n_nodes_dense_2"]
     n_dense_2 = config["n_dense_2"]
 
+    learning_rate = config["learning_rate"]
+
+    n_manifold = config["n_manifold"]
+
+    if "batch_norm" in config.keys():
+        batch_norm = config["batch_norm"]
+        batch_momentum = config["batch_momentum"]
+    else:
+        batch_norm = False
+
+    if "layer_norm" in config.keys():
+        layer_norm = config["layer_norm"]
+    else:
+        layer_norm = False
+ 
+
     input_objects = keras.layers.Input(shape=(max_objects, n_features), name = 'input_objects')
     input_global = keras.layers.Input(shape=(n_global_features,), name = 'input_global')
 
@@ -52,19 +69,26 @@ def base_network(max_objects, n_features, n_global_features, config):
 
     for i in range(n_lstm):
         lstm =  keras.layers.LSTM(n_nodes_lstm, implementation=2, activation='tanh', kernel_constraint = keras.constraints.maxnorm(maxnorm), go_backwards=False, return_sequences=(i != (n_lstm-1)), name='lstm_%d' % i)(lstm)
+        if layer_norm:
+            lstm = keras_layer_normalization.LayerNormalization()(lstm)
 
     # Merge LSTM output with high-level features in fully-connected layers
     dense = keras.layers.concatenate([input_global, lstm])
     for i in range(n_dense_1):
         dense = keras.layers.Dense(n_nodes_dense_1, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense1_%d' % i)(dense)
+        if batch_norm:
+            dense = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm1_%d' % i)(dense)
         dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout1_%d' % i)(dense)
+        
 
     for i in range(n_dense_2):
         dense = keras.layers.Dense(n_nodes_dense_2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense2_%d' % i)(dense)
+        if batch_norm:
+            dense = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm2_%d' % i)(dense)
         if i < (n_dense_2 - 1):
             dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout2_%d' % i)(dense)
 
-    dense = keras.layers.Dense(2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'manifold')(dense)
+    dense = keras.layers.Dense(n_manifold, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'manifold')(dense)
 
     model = keras.models.Model(inputs = [input_global, input_objects], outputs = [dense])
     print(model.summary())

@@ -75,7 +75,7 @@ def calc_sigma_eff(signal_data, weights):
 
 resonant_ids = [0, 11, 12, 14, 15, 16] # ttH, THQ, THW, ggH, VBF, VH
 def events_passing_cut(events, cut, choose_resonant = False):
-  events_pass = {"mass" : [], "weights" : [], "mva_score" : []}
+  events_pass = {"mass" : [], "weights" : []}#, "mva_score" : []}
   is_bkg = "process_id" in events.keys()
   for i in range(len(events["mass"])):
     pass_cut = True
@@ -91,7 +91,8 @@ def events_passing_cut(events, cut, choose_resonant = False):
     if pass_cut:
       events_pass["mass"].append(events["mass"][i])
       events_pass["weights"].append(events["weights"][i])
-      events_pass["mva_score"].append(events["mva_score"]["bdt_score"][i])
+    
+      #events_pass["mva_score"].append(events["mva_score"]["bdt_score"][i])
   return events_pass
 
 @contextmanager
@@ -170,7 +171,7 @@ def scan_za_parallel(cut_combos, signal_events, background_events, is_data, mc_b
   n_bkg = []
   sigma_eff_ = []
 
-  with poolcontext(processes=10) as pool:
+  with poolcontext(processes=20) as pool:
     results = pool.map(partial(calc_za, signal_events = signal_events, background_events = background_events, is_data = is_data, mc_bkg_events = mc_bkg_events, mass_shift = mass_shift), cut_combos) 
     for result in results:
       print result

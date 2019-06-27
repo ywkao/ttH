@@ -102,7 +102,7 @@ def train_bdt(config, invert=False):
   process_id_final_fit = utils.load_array(f, 'process_id_final_fit')
   year_final_fit = utils.load_array(f, 'year_final_fit')
 
-  num_multi_class = len(numpy.unique(multi_label, return_index = True))
+  num_multi_class = 3#len(numpy.unique(multi_label, return_index = True))
 
   train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
   nTrain = int(len(label)*train_frac)
@@ -147,9 +147,12 @@ def train_bdt(config, invert=False):
   print sum_pos_weights, sum_neg_weights
 
   if args.multi:
-    for i in range(len(weights_train)):
-      if label[i] == 1:
-	weights_train[i] *= (sum_neg_weights / sum_pos_weights)
+    for i in range(num_multi_class):
+      sum_class_weights = utils.sum_of_weights(weights_train, multi_label, i)
+      print "Normalizing class %d by %.6f" % (i, sum_class_weights)
+      for i in range(len(weights_train)):
+        if multi_label[i] == i:
+          weights_train[i] *= 1. / sum_class_weights
 
   if args.res:
     for i in range(len(weights_train)):
@@ -187,6 +190,7 @@ def train_bdt(config, invert=False):
     param["num_class"] = num_multi_class
     param["objective"] = "multi:softprob"
     param["scale_pos_weight"] = 1
+    param["min_child_weight"] = 0.000001
 
   print param
 
@@ -239,18 +243,26 @@ def train_bdt(config, invert=False):
 
   # analysis
   # ks test
-  d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(pred_train, pred_test, y_train, y_test)
+
+  if args.multi:
+    prediction_train = pred_train[:,0]
+    prediction_test = pred_test[:,0]
+  else:
+    prediction_train = pred_train
+    prediction_test = pred_test
+
+  d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(prediction_train, prediction_test, y_train, y_test)
   print "Results of ks-test (d-score) for signal: %.10f and background: %.10f" % (d_sig, d_bkg)
   print "Results of ks-test (p-value) for signal: %.10f and background: %.10f" % (p_value_sig, p_value_bkg)
 
   # roc curves
-  fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train, pos_label = 1, sample_weight = weights_train)
-  fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, pred_test, pos_label = 1, sample_weight = weights_test)
+  fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, prediction_train, pos_label = 1, sample_weight = weights_train)
+  fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, prediction_test, pos_label = 1, sample_weight = weights_test)
 
   auc_train = metrics.auc(fpr_train, tpr_train, reorder = True)
   auc_test  = metrics.auc(fpr_test , tpr_test , reorder = True)
 
-  auc, unc = utils.auc_and_unc(y_test, pred_test, weights_test, 100)
+  auc, unc = utils.auc_and_unc(y_test, prediction_test, weights_test, 100)
   
   results["auc_train"] = auc_train
   results["auc_test"]  = auc_test
@@ -296,7 +308,7 @@ def train_bdt(config, invert=False):
   if args.multi:
     tree_bdt_score = []
     for i in range(num_multi_class):
-      tree_bdt_score.append(numpy.concatenate((pred_train[:,i], pred_test[:,i], pred_data[:,i], pred_final_fit[:,i]))) 
+      tree_bdt_score.append(numpy.concatenate((pred_train[:,i], pred_test[:,i], pred_data[:,i], numpy.ones(len(pred_final_fit))))) 
       tree_bdt_score[i] = tree_bdt_score[i].astype(numpy.float64)
       dict["mva_score_%d" % i] = tree_bdt_score[i]
 
@@ -311,11 +323,6 @@ def train_bdt(config, invert=False):
     dict[args.reference_mva_name] = tree_ref_mva_score
 
   tree_utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
-
-  #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label, tree_tth_2017_reference_mva], names = 'train_id,sample_id,mass,weight,mva_score,signal_mass_label,tth_2017_reference_mva')
-  #out_array = numpy.core.records.fromarrays([tree_train_id, tree_sample_id, tree_mass, tree_weight, tree_bdt_score, tree_signal_mass_label], dtype = [('train_id','<u8'), ('sample_id','<u8'), ('mass','<f8'),('weight','<f8'), ('mva_score','<f8'),('signal_mass_label','<u8')])
-  #root_numpy.array2root(out_array, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag), treename = 't')
-
 
   ### Make diagnostic plots ###
   import matplotlib
@@ -349,13 +356,16 @@ def train_bdt(config, invert=False):
 
   estimate_za = True
   if estimate_za:
-    n_quantiles = 50
+    n_quantiles = 20
 
     if args.multi:
-      for i in range(n_multi_class-1): # optimize with each of the bkg probabilities (the signal probability is redunant, i.e. sum of probabilities = 1) 
-        signal_mva_scores = {"bdt_score_%d" % i : -1*ks_test.logical_vector(pred_test[:,i+1], y_test, 1)} # factor of -1 so that we cut *below* certain values, as these are background probabilities, not signal
-        bkg_mva_scores = {"bdt_score_%d" % i : -1*ks_test.logical_vector(pred_test[:,i+1], y_test, 0)}
-        data_mva_scores = {"bdt_score_%d" % i : pred_data[:,i+1]}
+      signal_mva_scores = {}
+      bkg_mva_scores = {}
+      data_mva_scores = {}
+      for i in range(num_multi_class-1): # optimize with each of the bkg probabilities (the signal probability is redunant, i.e. sum of probabilities = 1) 
+        signal_mva_scores["bdt_score_%d" % i] = -1*ks_test.logical_vector(pred_test[:,i+1], y_test, 1) # factor of -1 so that we cut *below* certain values, as these are background probabilities, not signal
+        bkg_mva_scores["bdt_score_%d" % i] = -1*ks_test.logical_vector(pred_test[:,i+1], y_test, 0)
+        data_mva_scores["bdt_score_%d" % i] = -1*pred_data[:,i+1]
     else:
       signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
       bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}

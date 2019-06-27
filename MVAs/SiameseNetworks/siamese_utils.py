@@ -39,3 +39,7 @@ def create_pairs(y, n):
 
     return numpy.asarray(pairs), numpy.asarray(labels)
 
+#def auc(scores, y, n):
+#    triplets = []
+
+#    while 

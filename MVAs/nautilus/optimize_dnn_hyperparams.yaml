@@ -8,10 +8,18 @@ metadata:
 spec:
   template:
     spec:
+      volumes:
+      - name: secret-volume
+        secret:
+            secretName: ssh-key-secret 
       containers:
       - name: optimizednnhyperparams
         image: tensorflow/tensorflow:latest-gpu-py3
         imagePullPolicy: Always
+        volumeMounts:
+        - name: secret-volume
+          readOnly: true
+          mountPath: "/etc/secret-volume"
         command: 
             - sh
             - -c

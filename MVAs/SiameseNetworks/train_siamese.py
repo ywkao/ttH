@@ -40,12 +40,12 @@ object_features_validation = numpy.asarray(object_features_validation)
 label_validation = numpy.asarray(label_validation)
 
 
-pairs, labels = siamese_utils.create_pairs(process_id, 1000000)
+pairs, labels = siamese_utils.create_pairs(process_id, 200000)
 pairs_val, labels_val = siamese_utils.create_pairs(process_id_validation, 10000)
 print numpy.mean(labels)
 
 
-config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 2, "n_dense_2" : 2, "n_nodes_lstm" : 150, "n_lstm" : 1, "maxnorm" : 10, "dropout_rate" : 0.2, "learning_rate" : 0.001, "start_batch" : 5000}
+config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 2, "n_dense_2" : 2, "n_nodes_lstm" : 150, "n_lstm" : 1, "maxnorm" : 10, "dropout_rate" : 0.2, "learning_rate" : 0.001, "start_batch" : 128, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False, "n_manifold" : 2}
 model, shared_network = siamese_model.siamese(len(object_features[0]), len(object_features[0][0]), len(global_features[0]), config)
 
 model.fit([global_features[pairs[:,0]], object_features[pairs[:,0]], global_features[pairs[:,1]], object_features[pairs[:,1]]], labels, epochs = 1, batch_size = config["start_batch"], validation_data = ([global_features_validation[pairs_val[:,0]], object_features_validation[pairs_val[:,0]], global_features_validation[pairs_val[:,1]], object_features_validation[pairs_val[:,1]]], labels_val))
