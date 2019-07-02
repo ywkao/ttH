@@ -119,6 +119,10 @@ class DNN_Helper:
 
   def train(self, n_epochs, n_batch):
     if not self.prepped:
+      sum_neg_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 0)
+      sum_pos_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 1)
+      print("Sum of weights before scaling: ", sum_pos_weights, sum_neg_weights)
+
       self.features_train.weights[numpy.where(self.features_train.label == 1)] *= sum_neg_weights / sum_pos_weights 
       self.prepped = True
 

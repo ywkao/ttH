@@ -22,7 +22,7 @@ parser.add_argument("--random", help = "do random exploration instead of bayesia
 parser.add_argument("--no_bootstrap", help = "don't use bootstrapping to estimate unc. in AUC (to save time during hyperparameter opt)", action="store_true")
 parser.add_argument("--absolute_weights", help = "set negative weights to positive in *training* only (to improve stats)", action="store_true")
 parser.add_argument("--n_points", help = "how many points to probe", type=str, default="200")
-parser.add_arugment("--pbounds", help = "which pbounds set to consider", type=str)
+parser.add_argument("--pbounds", help = "which pbounds set to consider", type=str)
 args = parser.parse_args()
 
 

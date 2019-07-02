@@ -7,6 +7,7 @@ parser.add_argument("--tag", help = "tag to identify this optimization", type=st
 args = parser.parse_args()
 
 template = "optimize_dnn_hyperparams"
+channel = "Hadronic" if "Hadronic" in args.input else "Leptonic"
 
 os.system("cp %s %s" % (args.input, "~/public_html/ttH/nautilus/"))
 os.system("chmod 755 %s" % ("~/public_html/ttH/nautilus/" + args.input.split("/")[-1]))
@@ -20,6 +21,8 @@ for i in range(len(lines)):
         lines[i] = lines[i].replace("INPUT", args.input.split("/")[-1])
     if "TAG" in lines[i]:
         lines[i] = lines[i].replace("TAG", args.tag)
+    if "CHANNEL" in lines[i]:
+        lines[i] = lines[i].replace("CHANNEL", channel)
 
 submit_script = "submit_scripts/" + template + "_" + args.tag + ".yaml"
 with open(submit_script, "w") as f_out:

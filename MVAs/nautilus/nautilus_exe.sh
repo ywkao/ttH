@@ -4,6 +4,7 @@
 
 INPUT=$1
 TAG=$2
+CHANNEL=$3
 
 # Set up ssh key
 apt-get install -y openssh-client
@@ -41,8 +42,8 @@ mkdir dnn_weights
 cp nautilus/copy_jsons.sh .
 ./copy_jsons.sh &
 
-python optimize_dnn.py --input "$INPUT" --tag "fixed_$TAG" --channel "Hadronic" --no_bootstrap --n_points "5" --pbounds "pbounds_fixed"
-python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "Hadronic" --no_bootstrap --n_points "5" --pbounds "pbounds_light"
-python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "Hadronic" --no_bootstrap --n_points "10" --pbounds "pbounds_full"
+python optimize_dnn.py --input "$INPUT" --tag "fixed_$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "5" --pbounds "pbounds_fixed"
+python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "5" --pbounds "pbounds_light"
+python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "10" --pbounds "pbounds_full"
 
 scp *.json sjmay@uaf-10.t2.ucsd.edu:~/ttH/MVAs/nautilus/results/
