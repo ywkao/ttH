@@ -142,6 +142,10 @@ def GetSigPdf(events, norm, tag, savename, savepath, modelpath, maxInHist):
     #rv_norm = RooRealVar("rv_norm_"+tag, "", norm)
     if ("FCNC" in tag) and ("Leptonic" in tag):
         norm = norm*1/1.527
+
+    if norm <= 0:
+        norm = 1e-09
+
     rv_norm = RooRealVar(tag+"_norm", "", norm)
 
     exPdf = RooExtendPdf("extend" + tag, "", w.pdf(tag), rv_norm)
@@ -342,7 +346,7 @@ savepath = args.savepath
 f = TFile.Open(filename)
 t = f.Get("t")
 
-processIDMap = {"ttH_hgg":0, "ggH_hgg":14, "VBF_hgg":15, "VH_hgg":16,
+processIDMap = {"ttH_hgg":0, "ggH_hgg":14, "VBF_hgg":15, "VH_hgg":16, "THQ_hgg":11, "THW_hgg":12,
                 "TT_FCNC_hut":22, "TT_FCNC_hct":23, "ST_FCNC_hut":24, "ST_FCNC_hct":25}
 
 modelpath = args.modelPath
@@ -357,15 +361,15 @@ if args.doData:
 ### signal_mass_label: 0 mH125
 
 sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == " + str(processIDMap[process])
-#sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 && process_id == " + str(processIDMap[args.process])
-#sigCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 1 && signal_mass_label == 0 "
+#sigCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && signal_mass_label == 0 && process_id == " + str(processIDMap[process])
 
 bkgCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
-#bkgCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && sample_id == 2 && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
+#bkgCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
 
 d_mgg_sig, maxInHist = GetDataset(t, sigCut, tag, savepath, False, False) # mH125
-if process == "ggH_hgg":
+if (process == "ggH_hgg") or (process == "VBF_hgg"):
     sigCut2 = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == 0"
+#    sigCut2 = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && signal_mass_label == 0 && process_id == 0"
     d_mgg_sig_2, maxInHist_2 = GetDataset(t, sigCut2, tag, savepath, False, False)
     GetSigPdf(d_mgg_sig_2, d_mgg_sig.sumEntries(), "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist_2)
 else:

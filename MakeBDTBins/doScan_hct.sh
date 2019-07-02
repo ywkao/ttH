@@ -4,17 +4,18 @@
 #tag="TTHHadronicTag"
 #tag="TTHLeptonicTag"
 #tag="FCNCHadronicTag"
-tag="FCNCHUTLeptonicTag"
-#tag="FCNCHUTHadronicTag"
+#tag="FCNCHUTLeptonicTag"
+tag="FCNCHCTLeptonicTag"
+#tag="FCNCHCTHadronicTag"
 #sigName="ttH_hgg"
 #for FCNC signal, only feed TT_FCNC, the doScan.py will take care of making signals for ST_FCNC and treat ST+TT as signals in datacard
-sigName="TT_FCNC_hut"
-#modelPath="TTFCNC_hut_had_20190623_step3_1"
-modelPath="TTFCNC_hut_lep_20190626_step3_1"
-#modelPath="TTHHadronic_20190624_step2_high"
-plotPath="/home/users/hmei/public_html/2019/20190626_FCNCHUTLep_step3_1/"
-highCut=0.86647624
-lowCut=0.72113216
+sigName="TT_FCNC_hct"
+#modelPath="TTFCNC_hct_had_20190623_step3_1"
+#modelPath="TTHLeptonic_20190624_step2_low"
+modelPath="TTFCNC_hct_lep_20190626_step3_1"
+plotPath="/home/users/hmei/public_html/2019/20190626_FCNCHCTLep_step3_1/"
+lowCut=0.5791701
+highCut=0.8422407
 fixBin2="n"
 useNCores="50"
 
@@ -40,7 +41,6 @@ echo "fixBin2: " ${fixBin2} >> models/${modelPath}/command.log
 
 chmod -R 755 ~/public_html/
 
-## get best sig according to scan boundary
 # if in any of the two bdt bins the number of bkg events is smaller than 10, do not use it
 echo "Scan results: " >> models/${modelPath}/result_scan.txt
 bdtScoreIndex=""
@@ -58,7 +58,6 @@ fi
 
 echo "####" >> models/${modelPath}/result_scan.txt
 
-# get the exact best cut on bdt score
 echo "python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut} --noScan --scoreIndex ${bdtScoreIndex}" >> models/${modelPath}/result_scan.txt;
 python doScan.py --sigName ${sigName} --plotpath ${plotPath} --modelPath ${modelPath} --tag ${tag} --lowCut ${lowCut} --highCut ${highCut} --noScan --scoreIndex ${bdtScoreIndex} >> models/${modelPath}/result_scan.txt
 

@@ -195,7 +195,7 @@ if "FCNCHCTHadronicTag" in tag:
 if "FCNCHCTLeptonicTag" in tag:
     filename = nameDict.namedict["FCNCHCTLeptonicTag"] #lepfilename_fcnc
 
-processIDMap = {"ttH_hgg":0, "ggH_hgg":14, "VBF_hgg":15, "VH_hgg":16,
+processIDMap = {"ttH_hgg":0, "ggH_hgg":14, "VBF_hgg":15, "VH_hgg":16, "THQ_hgg":11, "THW_hgg":12,
                 "TT_FCNC_hut":22, "TT_FCNC_hct":23, "ST_FCNC_hut":24, "ST_FCNC_hct":25}
 
 print filename
