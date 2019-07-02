@@ -356,11 +356,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       else
         if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
-      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_)) continue;
-
-      if (currentFileTitle.Contains("WGToLNuG"))
-        w_gamma_yield += evt_weight;
-
       max2_btag_ = btag_scores_sorted[1].second;
       max1_btag_ = btag_scores_sorted[0].second;
       dipho_delta_R = lead_photon.DeltaR(sublead_photon);
@@ -412,7 +407,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       }
 
       if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_, mva_value)) continue;
-
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
 
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId, recoLeptonId, yearId}; 

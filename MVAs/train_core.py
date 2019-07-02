@@ -173,7 +173,7 @@ def train_bdt(config, invert=False):
 
   # Define BDT parameters
   if "kparam" not in config.keys(): 
-    param = { 
+   param = { 
 	    'max_depth': 4,
 	    'eta': 0.2,
 	    'objective': 'binary:logistic',

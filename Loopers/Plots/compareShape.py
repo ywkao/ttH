@@ -2,8 +2,8 @@ from ROOT import *
 from tdrStyle import *
 setTDRStyle()
 
-savepath = "/home/users/hmei/public_html/2019/20190529_FCNC/"
-filename = "../ttHHadronic_RunII_MVA_Presel_veryLoose_testFCNC_20190529_v2_impute_histogramsRunII.root"
+savepath = "/home/users/sjmay/public_html/plot_dump/FCNC/2Jul2019/"
+filename = "../ttHHadronic_RunII_MVA_Presel_veryLoose_v1.7_24Jun2019_FCNC_SingleBDTBaseline_impute_hct_BDT_histogramsRunII.root"
 f = TFile.Open(filename)
 
 names = ["hMassTop1", "hMassTop2", "hMass", "hPhotonLeadPToM", "hPhotonSubleadPToM", "hPhotonLeadEta", "hPhotonSubleadEta", "hDiphotonCosPhi", "hNJets", "hNbTight"]
@@ -12,7 +12,7 @@ xmax = [500,500,180,3,3,3,3,1,10,5]
 ymax = [0.12,0.06,1,0.3,0.4,0.2,0.2,1,1,1]
 xTitle = ["m_{#gamma#gammaj} (GeV)", "m_{jjj} (GeV)", "m_{#gamma#gamma} (GeV)", "lead p_T/m_{#gamma#gamma}", "sublead p_T/m_{#gamma#gamma}", "lead #eta", "sublead #eta", "cos(#Delta#phi)", "nJets", "nTightBJets"]
 
-processes = ["ttH", "FCNC_hut", "FCNC_hct", "TTGG", "DiPhoton"]
+processes = ["TT_FCNC_hut", "TT_FCNC_hct", "ttH", "TTGG", "DiPhoton"]
 colors = [1,2,4,8,6]
 
 
