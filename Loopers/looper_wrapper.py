@@ -204,7 +204,7 @@ babies_2017 = [
 
 babies_2018 = [
 		# 2018
-		"EGamma_Run2018A-17Sep2018-v2_MINIAOD_RunII",
+		        "EGamma_Run2018A-17Sep2018-v2_MINIAOD_RunII",
                 "EGamma_Run2018B-17Sep2018-v1_MINIAOD_RunII",
                 "EGamma_Run2018C-17Sep2018-v1_MINIAOD_RunII",
                 "EGamma_Run2018D-22Jan2019-v2_MINIAOD_RunII",

@@ -33,6 +33,7 @@ parser.add_argument("--fcnc_hut", help = "use FCNC Hut as signal, other SM Higgs
 parser.add_argument("--fcnc_hct", help = "use FCNC Hct as signal, other SM Higgs processes as bkg", action = "store_true")
 parser.add_argument("--ttH_vs_tH", help = "use ttH as signal, tH as background", action = "store_true")
 parser.add_argument("--add_year", help = "add the year as a feature", action = "store_true")
+parser.add_argument("--no_mass_constraint", help = "don't use m_ggj, m_jjj", action = "store_true")
 
 args = parser.parse_args()
 
@@ -56,7 +57,7 @@ if args.do_top_tag:
 if args.add_year:
   feature_names += ["year_"]
 
-if (args.fcnc_hut or args.fcnc_hct) and args.channel == "Hadronic":
+if (args.fcnc_hut or args.fcnc_hct) and args.channel == "Hadronic" and not args.no_mass_constraint:
   feature_names += ["m_ggj_", "m_jjj_"]
 
 to_remove = []
@@ -168,12 +169,13 @@ if do_dnn:
   i = 0
   print dnn_features
   for model in dnn_models:
+    config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False}
     dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = [features_final_fit[feat] for feat in dnn_features], objects = features_final_fit["objects_"])
     dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = [features_data[feat] for feat in dnn_features], objects = features_data["objects_"])
     dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = [features[feat] for feat in dnn_features], objects = features["objects_"])
     dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = [features_validation[feat] for feat in dnn_features], objects = features_validation["objects_"])
     dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = [features_final_fit[feat] for feat in dnn_features], objects = features_final_fit["objects_"])
-    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, weights_file = model)
+    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, weights_file = model, config=config)
     #dnn.predict()
     #dnn_predictions.append([dnn.predictions["train"], dnn.predictions["validation"], dnn.predictions["data"]])
     dnn_predictions.append(dnn.predict())

@@ -514,7 +514,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       }
       else {
       */
-	top_tag_mass_ = -1;
+	    top_tag_mass_ = -1;
         top_tag_pt_ = -1;
         top_tag_eta_ = -1;
         top_tag_phi_ = -1;

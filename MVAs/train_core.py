@@ -258,12 +258,54 @@ def train_bdt(config, invert=False):
   # roc curves
   fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, prediction_train, pos_label = 1, sample_weight = weights_train)
   fpr_test, tpr_test, thresh_test = metrics.roc_curve(y_test, prediction_test, pos_label = 1, sample_weight = weights_test)
+  
+  y_train_2016 = ks_test.logical_vector(y_train, year, 2016)
+  y_test_2016 = ks_test.logical_vector(y_test, year_validation, 2016)
+  prediction_train_2016 = ks_test.logical_vector(prediction_train, year, 2016)
+  prediction_test_2016 = ks_test.logical_vector(prediction_test, year_validation, 2016)
+  weights_train_2016 = ks_test.logical_vector(weights_train, year, 2016)
+  weights_test_2016 = ks_test.logical_vector(weights_test, year_validation, 2016)
+
+  y_train_2017 = ks_test.logical_vector(y_train, year, 2017)
+  y_test_2017 = ks_test.logical_vector(y_test, year_validation, 2017)
+  prediction_train_2017 = ks_test.logical_vector(prediction_train, year, 2017)
+  prediction_test_2017 = ks_test.logical_vector(prediction_test, year_validation, 2017)
+  weights_train_2017 = ks_test.logical_vector(weights_train, year, 2017)
+  weights_test_2017 = ks_test.logical_vector(weights_test, year_validation, 2017)
+
+  y_train_2018 = ks_test.logical_vector(y_train, year, 2018)
+  y_test_2018 = ks_test.logical_vector(y_test, year_validation, 2018)
+  prediction_train_2018 = ks_test.logical_vector(prediction_train, year, 2018)
+  prediction_test_2018 = ks_test.logical_vector(prediction_test, year_validation, 2018)
+  weights_train_2018 = ks_test.logical_vector(weights_train, year, 2018)
+  weights_test_2018 = ks_test.logical_vector(weights_test, year_validation, 2018)
+
+  if len(y_train_2016) > 0:
+    fpr_train_2016, tpr_train_2016, thresh_train_2016 = metrics.roc_curve(y_train_2016, prediction_train_2016, pos_label = 1, sample_weight = weights_train_2016)
+    fpr_test_2016, tpr_test_2016, thresh_test_2016 = metrics.roc_curve(y_test_2016, prediction_test_2016, pos_label = 1, sample_weight = weights_test_2016)
+    auc_2016, unc_2016 = utils.auc_and_unc(y_test_2016, prediction_test_2016, weights_test_2016, 25)
+    print "Testing  AUC (2016): %.3f +/- %.4f" % (auc_2016, unc_2016)
+    numpy.savez("bdt_roc_2016_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2016, y_test = y_test_2016, prediction_train = prediction_train_2016, prediction_test = prediction_test_2016, fpr_train = fpr_train_2016, fpr_test = fpr_test_2016, tpr_train = tpr_train_2016, tpr_test = tpr_test_2016)
+
+  if len(y_train_2017) > 0:
+    fpr_train_2017, tpr_train_2017, thresh_train_2017 = metrics.roc_curve(y_train_2017, prediction_train_2017, pos_label = 1, sample_weight = weights_train_2017)
+    fpr_test_2017, tpr_test_2017, thresh_test_2017 = metrics.roc_curve(y_test_2017, prediction_test_2017, pos_label = 1, sample_weight = weights_test_2017)
+    auc_2017, unc_2017 = utils.auc_and_unc(y_test_2017, prediction_test_2017, weights_test_2017, 25)
+    print "Testing  AUC (2017): %.3f +/- %.4f" % (auc_2017, unc_2017)
+    numpy.savez("bdt_roc_2017_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2017, y_test = y_test_2017, prediction_train = prediction_train_2017, prediction_test = prediction_test_2017, fpr_train = fpr_train_2017, fpr_test = fpr_test_2017, tpr_train = tpr_train_2017, tpr_test = tpr_test_2017)
+
+  if len(y_train_2018) > 0:
+    fpr_train_2018, tpr_train_2018, thresh_train_2018 = metrics.roc_curve(y_train_2018, prediction_train_2018, pos_label = 1, sample_weight = weights_train_2018)
+    fpr_test_2018, tpr_test_2018, thresh_test_2018 = metrics.roc_curve(y_test_2018, prediction_test_2018, pos_label = 1, sample_weight = weights_test_2018)
+    auc_2018, unc_2018 = utils.auc_and_unc(y_test_2018, prediction_test_2018, weights_test_2018, 25)
+    print "Testing  AUC (2018): %.3f +/- %.4f" % (auc_2018, unc_2018)
+    numpy.savez("bdt_roc_2018_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2018, y_test = y_test_2018, prediction_train = prediction_train_2018, prediction_test = prediction_test_2018, fpr_train = fpr_train_2018, fpr_test = fpr_test_2018, tpr_train = tpr_train_2018, tpr_test = tpr_test_2018)
 
   auc_train = metrics.auc(fpr_train, tpr_train, reorder = True)
   auc_test  = metrics.auc(fpr_test , tpr_test , reorder = True)
 
-  auc, unc = utils.auc_and_unc(y_test, prediction_test, weights_test, 100)
-  
+  auc, unc = utils.auc_and_unc(y_test, prediction_test, weights_test, 25)
+
   results["auc_train"] = auc_train
   results["auc_test"]  = auc_test
   results["auc_test_unc"] = unc
@@ -274,7 +316,8 @@ def train_bdt(config, invert=False):
   print "Testing  AUC: %.3f" % auc_test
 
   print "Testing  AUC: %.3f +/- %.4f" % (auc, unc)
-  numpy.savez("bdt_roc_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train, y_test = y_test, pred_train = pred_train, pred_test = pred_test, fpr_train = fpr_train, fpr_test = fpr_test, tpr_train = tpr_train, tpr_test = tpr_test)
+  
+  numpy.savez("bdt_roc_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train, y_test = y_test, prediction_train = prediction_train, prediction_test = prediction_test, fpr_train = fpr_train, fpr_test = fpr_test, tpr_train = tpr_train, tpr_test = tpr_test)
 
   # Write output to TTree
   tree_train_id = numpy.concatenate((numpy.zeros(len(pred_train)), numpy.ones(len(pred_test)), numpy.ones(len(pred_data)), numpy.ones(len(pred_final_fit))))
@@ -289,6 +332,12 @@ def train_bdt(config, invert=False):
   tree_process_id = numpy.concatenate((process_id, process_id_validation, process_id_data, process_id_final_fit))
   tree_year = numpy.concatenate((year, year_validation, year_data, year_final_fit))
   tree_global_features = numpy.concatenate((global_features, global_features_validation, global_features_data, global_features_final_fit))
+  training_feature_names = [training_feature_names for i in range(len(label))]
+  training_feature_names_validation = [training_feature_names for i in range(len(label_validation))]
+  training_feature_names_data = [training_feature_names for i in range(len(label_data))]
+  training_feature_names_final_fit = [training_feature_names for i in range(len(label_final_fit))]
+  #tree_training_feature_names = numpy.concatenate((training_feature_names, training_feature_names_validation, training_feature_names_data, training_feature_names_final_fit))
+
 
   tree_train_id = tree_train_id.astype(numpy.int64)
   tree_sample_id = tree_sample_id.astype(numpy.int64)
@@ -302,8 +351,9 @@ def train_bdt(config, invert=False):
   tree_process_id = tree_process_id.astype(numpy.int64)
   tree_year = tree_year.astype(numpy.int64)
   tree_global_features = tree_global_features.astype(numpy.float64)
+  #tree_training_feature_names = tree_training_feature_names.astype(numpy.string_)
 
-  dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}
+  dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}#, "training_feature_names" : tree_training_feature_names}
 
   if args.multi:
     tree_bdt_score = []
@@ -379,6 +429,8 @@ def train_bdt(config, invert=False):
     bkg_njets = ks_test.logical_vector(njets_validation, y_test, 0)
 
     signal_weights = ks_test.logical_vector(weights_validation, y_test, 1)
+    if args.channel == "Leptonic" and "FCNC" in args.input:
+      signal_weights *= 1./1.53 # to account for bug in MC sample where W->lv decays don't include taus
     bkg_weights = ks_test.logical_vector(weights_validation, y_test, 0)
    
     bkg_process_id = ks_test.logical_vector(process_id_validation, y_test, 0)

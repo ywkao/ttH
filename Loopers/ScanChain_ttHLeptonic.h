@@ -51,7 +51,7 @@ bool pass_2017_mva_presel() {
   return true;
 }
 
-bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_medium, int n_lep_tight) {
+bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_medium, int n_lep_tight, float mva_value = -1) {
   // common to all selections
   if (!(leadPassEVeto() && subleadPassEVeto()))       return false; // always require e veto
   if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)    return false; // don't use photon ID below -0.9
@@ -60,10 +60,28 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_m
     if (mass() < 100)                                   return false;
     if (n_jets() < 1)                                   return false;
     if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
-    if (n_lep_medium < 1)				return false;
+    if (n_lep_medium < 1)				                return false;
     return true;
   }
 
+  else if (tag == "FCNC_Leptonic_Hut_RunII_SR_Inclusive") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 1)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)                               return false;
+    if (mva_value < 0.72113216)                         return false;
+    return true;
+  }
+
+  else if (tag == "FCNC_Leptonic_Hct_RunII_SR_Inclusive") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 1)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)                               return false;
+    if (mva_value < 0.5791701)                          return false;
+    return true;
+  }
+   
   else if (tag == "ttHLeptonic_RunII_SR_Inclusive") {
     if (mass() < 100)                                   return false;
     if (n_jets() < 1)                                   return false;

@@ -433,7 +433,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
 
       if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
-      if (!passes_selection(tag, minIDMVA_, maxIDMVA_))	continue;
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, mva_value))	continue;
 
       // Fill histograms //
       vProcess[processId]->fill_histogram("hGJet_BDT", gjet_mva_value, evt_weight, vId);

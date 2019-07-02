@@ -2,6 +2,9 @@ import numpy
 import random
 from sklearn import metrics
 
+def oversample(array, indices):
+  return numpy.array([array[i] for i in indices])
+
 def auc_and_unc(label, pred, sample_weight, n_bootstraps):
   fpr, tpr, thresh = metrics.roc_curve(label, pred, pos_label = 1, sample_weight = sample_weight)
   auc = metrics.auc(fpr, tpr, reorder=True)

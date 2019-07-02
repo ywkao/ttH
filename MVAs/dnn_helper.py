@@ -96,6 +96,17 @@ class DNN_Helper:
 
     self.prepped = False
 
+  #def oversample(self):
+  #  n_sig = len(self.features_train.label[numpy.where(self.features_train.label == 1]))
+  #  n_bkg = len(self.features_train.label[numpy.where(self.features_train.label == 1]))
+
+  #  if n_sig > n_bkg:
+  #    oversample_indices = numpy.random.randint(0, n_bkg, n_sig)
+  #    self.features_train.label = utils.oversample(self.features_train.label, oversample_indices)
+  #    self.features_train.weights = utils.oversample(self.features_train.weights, oversample_indices)
+  #    self.features_train.global_features = utils.oversample(self.features_train.global_features, oversample_indices)
+  #    self.features_train.objects = utils.oversample(self.features_train.objects, oversample_indices)
+
   def predict(self):
     self.predictions["train"] = self.model.predict(self.features_train.features, self.batch_size).flatten()
     self.predictions["validation"] = self.model.predict(self.features_validation.features, self.batch_size).flatten()
@@ -108,16 +119,12 @@ class DNN_Helper:
 
   def train(self, n_epochs, n_batch):
     if not self.prepped:
-      sum_neg_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 0)
-      sum_pos_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 1)
-      print("Sum of weights before scaling: ", sum_pos_weights, sum_neg_weights)
-
       self.features_train.weights[numpy.where(self.features_train.label == 1)] *= sum_neg_weights / sum_pos_weights 
       self.prepped = True
 
       sum_neg_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 0)
       sum_pos_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 1)
-      print("Sum of weights before scaling: ", sum_pos_weights, sum_neg_weights)
+      print("Sum of weights after scaling: ", sum_pos_weights, sum_neg_weights)
 
     for i in range(n_epochs):
       self.model.fit(self.features_train.features, self.features_train.label, epochs = 1, batch_size = self.batch_size_train, sample_weight = self.features_train.weights, callbacks = self.callbacks)
@@ -178,6 +185,11 @@ class DNN_Helper:
       if self.n_epochs >= self.max_epochs:
           print "Have already trained for 25 epochs. Stopping training."
           keep_training = False
+
+    auc, auc_unc = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 50)
+    auc_train, auc_unc_train = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, 50)
+    self.auc_unc["validation"] = auc_unc
+    self.auc_unc["train"] = auc_unc_train
 
     self.model.save_weights("dnn_weights/" + self.tag + "_weights.hdf5")
     with open("dnn_weights/" + self.tag + "_model_architecture.json", "w") as f_out:

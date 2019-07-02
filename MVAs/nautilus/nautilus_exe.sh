@@ -2,6 +2,9 @@
 # 1. Make pod: kubectl create -f optimize_dnn_hyperparams.yaml 
 # 2. Connect to pod: kubectl exec -it mytensorflow-sam  -n cms -- /bin/bash
 
+INPUT=$1
+TAG=$2
+
 # Set up ssh key
 apt-get install -y openssh-client
 mkdir ~/.ssh
@@ -23,7 +26,7 @@ mkdir work
 cd work
 git clone https://github.com/sam-may/ttH 
 cd ttH/MVAs
-wget http://uaf-8.t2.ucsd.edu/~sjmay/ttH/nautilus/ttHHadronic_v1.6_28May2019_RunII_MVA_Presel_impute_dnn_features_ttGG.hdf5
+wget "http://uaf-8.t2.ucsd.edu/~sjmay/ttH/nautilus/$INPUT"
 pip install tensorflow-gpu
 pip install keras
 pip install sklearn
@@ -34,6 +37,11 @@ pip install keras-layer-normalization
 
 # Optimize DNN
 mkdir dnn_weights
-python optimize_dnn.py --input "ttHHadronic_v1.6_28May2019_RunII_MVA_Presel_impute_dnn_features_ttGG.hdf5" --tag "sam_test_7June2019" --channel "Hadronic" --no_bootstrap --n_points "50"
+
+./copy_jsons.sh &
+
+python optimize_dnn.py --input "$INPUT" --tag "fixed_$TAG" --channel "Hadronic" --no_bootstrap --n_points "25" --pbounds "pbounds_fixed"
+python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "Hadronic" --no_bootstrap --n_points "100" --pbounds "pbounds_light"
+python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "Hadronic" --no_bootstrap --n_points "1000" --pbounds "pbounds_full"
 
 scp *.json sjmay@uaf-10.t2.ucsd.edu:~/ttH/MVAs/nautilus/results/

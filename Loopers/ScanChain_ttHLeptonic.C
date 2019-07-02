@@ -411,7 +411,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       }
 
-      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_)) continue;
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_, mva_value)) continue;
 
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
 

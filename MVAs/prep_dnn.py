@@ -61,9 +61,9 @@ else:
   for i in range(len(procs)):
     selection += "((process_id_ == %d" % (process_dict[procs[i]])
     
-    #if procs[i] == "ttGG":
-    #  selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
-    if procs[i] == "tH":
+    if procs[i] == "ttGG":
+      selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
+    elif procs[i] == "tH":
       selection += " || process_id_ == 12))"
     else:
       selection += "))"
