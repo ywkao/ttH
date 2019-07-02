@@ -67,9 +67,9 @@ pbounds = {
     "n_lstm" : (1,5), 
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-6, -1), # 10**(learning_rate)
+    "learning_rate" : (-5, -2), # 10**(learning_rate)
     "start_batch" : (7, 13), # 2**(start_batch)
-    "batch_momentum" : (0.0, 0.9999)
+    "batch_momentum" : (0.99, 0.99)
 }
 
 pbounds_light = {
@@ -80,9 +80,9 @@ pbounds_light = {
     "n_nodes_lstm" : (100, 100), 
     "n_lstm" : (3,3), 
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
-    "dropout_rate" : (0.0, 0.5), 
+    "dropout_rate" : (0.25, 0.25), 
     "learning_rate" : (-6, -1), # 10**(learning_rate)
-    "start_batch" : (13, 13), # 2**(start_batch)
+    "start_batch" : (12, 12), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99)
 }
 
@@ -96,7 +96,7 @@ pbounds_fixed = {
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.25, 0.25),
     "learning_rate" : (-3, -3), # 10**(learning_rate)
-    "start_batch" : (10, 10), # 2**(start_batch)
+    "start_batch" : (10, 10.00001), # 2**(start_batch) # dumb hacky way to make sure the points aren't all considered the same
     "batch_momentum" : (0.99, 0.99)
 }
 
