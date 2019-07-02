@@ -9,6 +9,7 @@ args = parser.parse_args()
 template = "optimize_dnn_hyperparams"
 
 os.system("cp %s %s" % (args.input, "~/public_html/ttH/nautilus/"))
+os.system("chmod 755 %s" % ("~/public_html/ttH/nautilus/" + args.input.split("/")[-1]))
 
 lines = []
 with open(template + ".yaml", "r") as f_in:
@@ -25,4 +26,4 @@ with open(submit_script, "w") as f_out:
     for line in lines:
         f_out.write(line)
 
-#os.system("kubectl create -f %s" % submit_script) 
+os.system("kubectl create -f %s" % submit_script) 

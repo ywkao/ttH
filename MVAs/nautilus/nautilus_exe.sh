@@ -38,6 +38,7 @@ pip install keras-layer-normalization
 # Optimize DNN
 mkdir dnn_weights
 
+cp nautilus/copy_jsons.sh .
 ./copy_jsons.sh &
 
 python optimize_dnn.py --input "$INPUT" --tag "fixed_$TAG" --channel "Hadronic" --no_bootstrap --n_points "5" --pbounds "pbounds_fixed"
