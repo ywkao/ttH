@@ -175,6 +175,7 @@ def tth_learner(max_objects, n_features, n_global_features, config):
   model = keras.models.Model(inputs = [input_global, input_objects], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')
   print(model.summary())
+  print "DNN Config:", config
 
   return model
 

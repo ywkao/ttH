@@ -188,7 +188,7 @@ def train_bdt(config, invert=False):
 
   if args.multi:
     param["num_class"] = num_multi_class
-    param["objective"] = "multi:softmax"
+    param["objective"] = "multi:softprob"
     param["scale_pos_weight"] = 1
     param["min_child_weight"] = 0.000001
 
@@ -197,7 +197,7 @@ def train_bdt(config, invert=False):
   if "n_round" not in config.keys(): 
     n_round = 300 if args.channel == "Hadronic" else 150
     if "FCNC" in args.input:
-      n_round = 300
+      n_round = 150
       if args.multi:
         n_round = 1000
   else:
@@ -219,10 +219,11 @@ def train_bdt(config, invert=False):
   tmva_utils.convert_model(model, input_variables = input_variables, output_xml = args.channel + "_" + args.tag + "_" + args.ext + '_bdt.xml')
 
   # predict
-  pred_train = bdt.predict(d_train, output_margin=args.multi)
-  pred_test = bdt.predict(d_test, output_margin=args.multi)
-  pred_data = bdt.predict(d_data, output_margin=args.multi)
-  pred_final_fit = bdt.predict(d_final_fit, output_margin=args.multi)
+  pred_train = bdt.predict(d_train) 
+  pred_test = bdt.predict(d_test) 
+  pred_data = bdt.predict(d_data) 
+  pred_final_fit = bdt.predict(d_final_fit) 
+
 
   if args.reference_mva != "none":
     if ".xgb" in args.reference_mva:
@@ -414,10 +415,11 @@ def train_bdt(config, invert=False):
       signal_mva_scores = {}
       bkg_mva_scores = {}
       data_mva_scores = {}
-      for i in range(num_multi_class-1): # optimize with each of the bkg probabilities (the signal probability is redunant, i.e. sum of probabilities = 1) 
-        signal_mva_scores["bdt_score_%d" % i] = -1*ks_test.logical_vector(pred_test[:,i+1], y_test, 1) # factor of -1 so that we cut *below* certain values, as these are background probabilities, not signal
-        bkg_mva_scores["bdt_score_%d" % i] = -1*ks_test.logical_vector(pred_test[:,i+1], y_test, 0)
-        data_mva_scores["bdt_score_%d" % i] = -1*pred_data[:,i+1]
+      for i in range(num_multi_class): # optimize with each of the bkg probabilities (the signal probability is redundant, i.e. sum of probabilities = 1) 
+        reverse = 1 if i == 0 else -1
+        signal_mva_scores["bdt_score_%d" % i] = reverse*ks_test.logical_vector(pred_test[:,i], y_test, 1) # factor of -1 so that we cut *below* certain values, as these are background probabilities, not signal
+        bkg_mva_scores["bdt_score_%d" % i] = reverse*ks_test.logical_vector(pred_test[:,i], y_test, 0)
+        data_mva_scores["bdt_score_%d" % i] = reverse*pred_data[:,i]
     else:
       signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
       bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}
