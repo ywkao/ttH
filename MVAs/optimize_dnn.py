@@ -71,7 +71,7 @@ pbounds = {
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-5, -2), # 10**(learning_rate)
-    "start_batch" : (7, 13), # 2**(start_batch)
+    "start_batch" : (10, 13), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99)
 }
 
