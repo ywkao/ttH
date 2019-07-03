@@ -44,6 +44,9 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["layer_norm"] = False
     config["batch_momentum"] = batch_momentum
 
+    print "Index: ", idx
+    print "Config: " , config
+
     trained_dnn = train_dnn_core.train(args, config)
     full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
     target = trained_dnn.auc["validation"][-1]

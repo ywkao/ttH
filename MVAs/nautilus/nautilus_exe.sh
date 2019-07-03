@@ -42,8 +42,10 @@ mkdir dnn_weights
 cp nautilus/copy_jsons.sh .
 ./copy_jsons.sh &
 
-python optimize_dnn.py --input "$INPUT" --tag "fixed_$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "5" --pbounds "pbounds_fixed"
-python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "5" --pbounds "pbounds_light"
-python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "10" --pbounds "pbounds_full"
+python optimize_dnn.py --input "$INPUT" --tag "fixed_$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "20" --pbounds "pbounds_fixed"
+python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "50" --pbounds "pbounds_light"
+python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "1000" --pbounds "pbounds_full"
+
+python optimize_dnn.py --input "$INPUT" --tag "random_$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "1000" --pbounds "pbounds_full" --random
 
 scp *.json sjmay@uaf-10.t2.ucsd.edu:~/ttH/MVAs/nautilus/results/

@@ -150,16 +150,16 @@ def train_bdt(config, invert=False):
     for i in range(num_multi_class):
       sum_class_weights = utils.sum_of_weights(weights_train, multi_label, i)
       print "Normalizing class %d by %.6f" % (i, sum_class_weights)
-      for i in range(len(weights_train)):
-        if multi_label[i] == i:
-          weights_train[i] *= 1. / sum_class_weights
+      for j in range(len(weights_train)):
+        if multi_label[j] == i:
+          weights_train[j] *= 1. / sum_class_weights
 
   if args.res:
     for i in range(len(weights_train)):
       if label[i] == 1:
-	print weights_train[i], 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2)
-	weights_train[i] *= 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2) 
-	print weights_train[i]
+	    print weights_train[i], 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2)
+	    weights_train[i] *= 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2) 
+	    print weights_train[i]
 
   sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
   sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
@@ -188,7 +188,7 @@ def train_bdt(config, invert=False):
 
   if args.multi:
     param["num_class"] = num_multi_class
-    param["objective"] = "multi:softprob"
+    param["objective"] = "multi:softmax"
     param["scale_pos_weight"] = 1
     param["min_child_weight"] = 0.000001
 
@@ -197,7 +197,9 @@ def train_bdt(config, invert=False):
   if "n_round" not in config.keys(): 
     n_round = 300 if args.channel == "Hadronic" else 150
     if "FCNC" in args.input:
-      n_round = 50
+      n_round = 300
+      if args.multi:
+        n_round = 1000
   else:
     n_round = config["n_round"]
   evallist = [(d_train, 'train'), (d_test, 'test')]

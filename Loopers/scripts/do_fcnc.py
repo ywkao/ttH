@@ -30,9 +30,9 @@ if do_looping:
   #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_veryLoose" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hct_BDT", bdt_had_hct))
 
   # Loopers, signal regions
-  parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "FCNC_Leptonic_Hut_RunII_SR_Inclusive" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hut_BDT", bdt_lep_hut))
+  #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "FCNC_Leptonic_Hut_RunII_SR_Inclusive" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hut_BDT", bdt_lep_hut))
   #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "FCNC_Hadronic_Hut_RunII_SR_Inclusive" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hut_BDT", bdt_had_hut))
-  parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "FCNC_Leptonic_Hct_RunII_SR_Inclusive" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hct_BDT", bdt_lep_hct))
+  #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "FCNC_Leptonic_Hct_RunII_SR_Inclusive" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hct_BDT", bdt_lep_hct))
   #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "FCNC_Hadronic_Hct_RunII_SR_Inclusive" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hct_BDT", bdt_had_hct))
 
   # Data/MC Plots
@@ -46,17 +46,19 @@ if do_looping:
   #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --babymaker --fcnc' % (args.baby_version, args.tag))
   #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_veryLoose" --bkg_options "impute" --years "2017" --babymaker --fcnc' % (args.baby_version, args.tag + "_impute"))
 
-do_mvas = False
+do_mvas = True
 if do_mvas:
   os.chdir("../MVAs/")
   # MVA Prep
-  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_hut"' % (args.tag))
-  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_hut"' % (args.tag + "_impute")) 
-  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hct --tag "_hct"' % (args.tag))
-  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_hct"' % (args.tag + "_impute"))
+  command_list = []
+  #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_hut"' % (args.tag))
+  #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_hut"' % (args.tag + "_impute")) 
+  #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hct --tag "_hct"' % (args.tag))
+  #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_hct"' % (args.tag + "_impute"))
+  parallel_utils.submit_jobs(command_list, 4)
 
   # MVA Prep, no mass constraints
-  parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_hut_no_mass_constraint" --no_mass_constraint' % (args.tag + "_impute"))
+  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_hut_no_mass_constraint" --no_mass_constraint' % (args.tag + "_impute"))
   #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_hct_no_mass_constraint" --no_mass_constraint' % (args.tag + "_impute"))
 
   # MVA Training
@@ -66,11 +68,11 @@ if do_mvas:
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hct.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hct")) 
 
   # MVA Training, no mass constraint
-  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hut_no_mass_constraint.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hut_no_mass_constraint"))
+  #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hut_no_mass_constraint.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hut_no_mass_constraint"))
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hct_no_mass_constraint.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hct_no_mass_constraint")) 
 
   # MVA Training (multi)
-  #parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_hut.hdf5" --channel "Leptonic" --tag "%s" --ext "" --multi' % (args.tag, args.tag + "_multi" + "_hut"))
+  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_hut.hdf5" --channel "Leptonic" --tag "%s" --ext "" --multi' % (args.tag, args.tag + "_multi" + "_hut"))
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hut.hdf5" --channel "Hadronic" --tag "%s" --ext "" --multi' % (args.tag + "_multi" + "_impute", args.tag + "_multi" + "_impute_hut"))
   #parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_hct.hdf5" --channel "Leptonic" --tag "%s" --ext "" --multi' % (args.tag, args.tag + "_multi" + "_hct"))
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hct.hdf5" --channel "Hadronic" --tag "%s" --ext "" --multi' % (args.tag + "_multi" + "_impute", args.tag + "_multi" + "_impute_hct"))
