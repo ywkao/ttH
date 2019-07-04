@@ -568,7 +568,7 @@ double scale_fcnc(TString currentFileTitle) {
 }
 
 double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel, bool fcnc = false) {
-  if (fcnc && currentFileTitle.Contains("ttH"))
+  if (fcnc && currentFileTitle.Contains("ttHJet"))
     return (1.0/7.0); // we use 6 ttH mass points in training, so scale by a factor of 1/6
   
   if (bkg_options == "none")
