@@ -280,7 +280,7 @@ def extract_1d_curve(full_za_dict):
   # Now pick max Z_A for each successive group of points
   good_indices = []
   n_points_total = len(full_za_dict["n_sig"])
-  n_groups = 20
+  n_groups = 50
   n_points_per_group = int(n_points_total / n_groups)
 
   za_group = []

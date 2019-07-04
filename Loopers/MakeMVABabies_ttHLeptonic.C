@@ -230,7 +230,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       } 
 
       // Scale bkg weight
-      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Leptonic");
+      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Leptonic", fcnc);
 
       // Scale FCNC to current best observed limit (ATLAS 2016 combination)
       if (currentFileTitle.Contains("FCNC"))

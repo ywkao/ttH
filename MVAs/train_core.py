@@ -146,27 +146,41 @@ def train_bdt(config, invert=False):
 
   print sum_pos_weights, sum_neg_weights
 
+
+  scale_tth = False
+  if scale_tth:
+    for i in range(len(weights_train)):
+      if multi_label[i] == 1:
+        weights_train[i] *= 6.
+  weights_train_modified = weights_train
+
+  equal_weights = False
   if args.multi:
-    for i in range(num_multi_class):
-      sum_class_weights = utils.sum_of_weights(weights_train, multi_label, i)
-      print "Normalizing class %d by %.6f" % (i, sum_class_weights)
-      for j in range(len(weights_train)):
-        if multi_label[j] == i:
-          weights_train[j] *= 1. / sum_class_weights
+    if not equal_weights:
+      for j in range(len(weights_train_modified)):
+        if multi_label[j] == 0:
+          weights_train_modified[j] *= sum_neg_weights / sum_pos_weights
+    else:
+      for i in range(num_multi_class):
+        sum_class_weights = utils.sum_of_weights(weights_train_modified, multi_label, i)
+        print "Normalizing class %d by %.6f" % (i, sum_class_weights)
+        for j in range(len(weights_train_modified)):
+          if multi_label[j] == i:
+            weights_train_modified[j] *= 1. / sum_class_weights
 
   if args.res:
-    for i in range(len(weights_train)):
+    for i in range(len(weights_train_modified)):
       if label[i] == 1:
-	    print weights_train[i], 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2)
-	    weights_train[i] *= 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2) 
-	    print weights_train[i]
+	    print weights_train_modified[i], 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2)
+	    weights_train_modified[i] *= 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2) 
+	    print weights_train_modified[i]
 
-  sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
-  sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
+  sum_neg_weights = utils.sum_of_weights(weights_train_modified, label, 0)
+  sum_pos_weights = utils.sum_of_weights(weights_train_modified, label, 1)
 
   print sum_pos_weights, sum_neg_weights
 
-  d_train = xgboost.DMatrix(X_train, label = Y_train, weight = weights_train)
+  d_train = xgboost.DMatrix(X_train, label = Y_train, weight = weights_train_modified)
   d_test = xgboost.DMatrix(X_test, label = Y_test)
   d_data = xgboost.DMatrix(X_data)
   d_final_fit = xgboost.DMatrix(X_final_fit)
@@ -199,7 +213,7 @@ def train_bdt(config, invert=False):
     if "FCNC" in args.input:
       n_round = 150
       if args.multi:
-        n_round = 1000
+        n_round = 150
   else:
     n_round = config["n_round"]
   evallist = [(d_train, 'train'), (d_test, 'test')]
@@ -409,13 +423,13 @@ def train_bdt(config, invert=False):
 
   estimate_za = True
   if estimate_za:
-    n_quantiles = 20
+    n_quantiles = 30
 
     if args.multi:
       signal_mva_scores = {}
       bkg_mva_scores = {}
       data_mva_scores = {}
-      for i in range(num_multi_class): # optimize with each of the bkg probabilities (the signal probability is redundant, i.e. sum of probabilities = 1) 
+      for i in range(0,num_multi_class-1): # optimize with each of the bkg probabilities (the signal probability is redundant, i.e. sum of probabilities = 1) 
         reverse = 1 if i == 0 else -1
         signal_mva_scores["bdt_score_%d" % i] = reverse*ks_test.logical_vector(pred_test[:,i], y_test, 1) # factor of -1 so that we cut *below* certain values, as these are background probabilities, not signal
         bkg_mva_scores["bdt_score_%d" % i] = reverse*ks_test.logical_vector(pred_test[:,i], y_test, 0)

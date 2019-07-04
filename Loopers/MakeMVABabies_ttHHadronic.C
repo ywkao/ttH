@@ -453,7 +453,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       double subleadID_ = leadIDMVA() == maxIDMVA_ ? minIDMVA_ : maxIDMVA_;
 
       // Scale bkg weight
-      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Hadronic");
+      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Hadronic", fcnc);
  
       // Scale FCNC to current best observed limit (ATLAS 2016 combination)
       if (currentFileTitle.Contains("FCNC"))
