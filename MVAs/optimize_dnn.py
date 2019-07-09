@@ -204,7 +204,7 @@ starting_point = {
 
 optimizer = BayesianOptimization(
     f=auc,
-    pbounds=pbounds_light
+    pbounds=pbounds_light,
     verbose=2, # verbose = 1 prints only when a maximum is observed, verbose = 0 is silent
     random_state=1,
 )
