@@ -26,6 +26,8 @@ def create_array(features_list, names, dict_, z_score = True):
             feat = numpy.array(features_list[name])
             if z_score and dict_ != "none":
                 preprocessed_feat = preprocess(feat, dict_[name]["mean"], dict_[name]["std_dev"])
+            else:
+                preprocessed_feat = feat
             arr.append(preprocessed_feat)
     return numpy.transpose(numpy.array(arr))
 

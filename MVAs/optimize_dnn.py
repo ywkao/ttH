@@ -135,7 +135,7 @@ pbounds_light = {
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.25, 0.25), 
     "learning_rate" : (-4, -1), # 10**(learning_rate)
-    "start_batch" : (10, 10), # 2**(start_batch)
+    "start_batch" : (9, 9), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99)
 }
 
@@ -149,7 +149,7 @@ pbounds_medium = {
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-4, -1), # 10**(learning_rate)
-    "start_batch" : (10, 10), # 2**(start_batch)
+    "start_batch" : (9, 9), # 2**(start_batch)
     "batch_momentum" : (0.5, 0.999)
 }
 
@@ -163,7 +163,7 @@ pbounds_full = {
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-4, -1), # 10**(learning_rate)
-    "start_batch" : (10, 13), # 2**(start_batch)
+    "start_batch" : (9, 13), # 2**(start_batch)
     "batch_momentum" : (0.5, 0.999)
 }
 
@@ -177,7 +177,7 @@ pbounds_fixed = {
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.25, 0.25),
     "learning_rate" : (-3, -3), # 10**(learning_rate)
-    "start_batch" : (10, 10.00001), # 2**(start_batch) # dumb hacky way to make sure the points aren't all considered the same
+    "start_batch" : (9, 9.00001), # 2**(start_batch) # dumb hacky way to make sure the points aren't all considered the same
     "batch_momentum" : (0.99, 0.99)
 }
 
