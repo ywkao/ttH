@@ -9,6 +9,11 @@ parser.add_argument("--random", help = "do random exploration instead of BayesOp
 parser.add_argument("--fixed", help = "sample a fixed pbound set", action = "store_true")
 args = parser.parse_args()
 
+if args.random:
+    args.tag += "_random" if "random" not in args.tag else ""
+if args.fixed:
+    args.tag += "_fixed" if "fixed" not in args.tag else ""
+
 template = "optimize_dnn_hyperparams"
 channel = "Hadronic" if "Hadronic" in args.input else "Leptonic"
 
