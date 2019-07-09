@@ -31,7 +31,7 @@ cd work
 git clone https://github.com/sam-may/ttH 
 cd ttH/MVAs
 wget "http://uaf-8.t2.ucsd.edu/~sjmay/ttH/nautilus/$INPUT"
-pip install tensorflow-gpu
+pip install tensorflow-gpu==1.3.0
 pip install keras
 pip install sklearn
 apt-get install -y python-subprocess32

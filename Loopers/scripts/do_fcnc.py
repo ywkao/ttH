@@ -90,7 +90,7 @@ if do_mvas:
   #command_list.append('python prep_dnn.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc --z_score --signal "FCNC_hut" --backgrounds "ttH,tH,ggH" --tag "hut_FCNC_vs_SMHiggs"' % (args.tag + "_impute"))
  # command_list.append('python prep_dnn.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc --z_score --signal "FCNC_hut" --backgrounds "ttH,tH,ggH" --tag "hut_FCNC_vs_SMHiggs_dontTrainWithGGH" --ggH_treatment "dont_train"' % (args.tag + "_impute"))
  # command_list.append('python prep_dnn.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc --z_score --signal "FCNC_hut" --backgrounds "ttH,tH,ggH" --tag "hut_FCNC_vs_SMHiggs_scaleGGH" --ggH_treatment "scale"' % (args.tag + "_impute"))
-  command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --FCNC_vs_SMHiggs --tag "_hut_FCNC_vs_SMHiggs"' % (args.tag + "_impute"))
+  #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --FCNC_vs_SMHiggs --tag "_hut_FCNC_vs_SMHiggs"' % (args.tag + "_impute"))
   #command_list.append('python prep_dnn.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc --z_score --signal "FCNC_hct" --backgrounds "ttH,tH,ggH" --tag "hct_FCNC_vs_SMHiggs"' % (args.tag + "_impute"))
   #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --FCNC_vs_SMHiggs --tag "_hct_FCNC_vs_SMHiggs"' % (args.tag + "_impute"))
   parallel_utils.submit_jobs(command_list, 8)
@@ -101,11 +101,11 @@ if do_mvas:
   #parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_hct_FCNC_vs_SMHiggs.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag, args.tag + "_hct_FCNC_vs_SMHiggs"))
   #parallel_utils.run('python train_dnn.py --input "ttHLeptonic_%s_FCNC_dnn_features_hct_FCNC_vs_SMHiggs.hdf5" --channel "Leptonic" --tag "%s"' % (args.tag, args.tag + "_hct_FCNC_vs_SMHiggs"))
 
-  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hut_FCNC_vs_SMHiggs.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag, args.tag + "_hut_FCNC_vs_SMHiggs"))
-  parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_FCNC_dnn_features_hut_FCNC_vs_SMHiggs.hdf5" --channel "Hadronic" --tag "%s"' % (args.tag, args.tag + "_hut_FCNC_vs_SMHiggs"))
-  parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_FCNC_dnn_features_hut_FCNC_vs_SMHiggs_dontTrainWithGGH.hdf5" --channel "Hadronic" --tag "%s"' % (args.tag, args.tag + "_hut_FCNC_vs_SMHiggs_dontTrainWithGGH"))
-  parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_FCNC_dnn_features_hut_FCNC_vs_SMHiggs_scaleGGH.hdf5" --channel "Hadronic" --tag "%s"' % (args.tag, args.tag + "_hut_FCNC_vs_SMHiggs"))
+  #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hut_FCNC_vs_SMHiggs.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hut_FCNC_vs_SMHiggs"))
+  parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_FCNC_dnn_features_hut_FCNC_vs_SMHiggs.hdf5" --channel "Hadronic" --tag "%s"' % (args.tag + "_impute", args.tag + "_impute_hut_FCNC_vs_SMHiggs"))
+  parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_FCNC_dnn_features_hut_FCNC_vs_SMHiggs_dontTrainWithGGH.hdf5" --channel "Hadronic" --tag "%s"' % (args.tag + "_impute", args.tag + "_impute_hut_FCNC_vs_SMHiggs_dontTrainWithGGH"))
+  parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_FCNC_dnn_features_hut_FCNC_vs_SMHiggs_scaleGGH.hdf5" --channel "Hadronic" --tag "%s"' % (args.tag + "_impute", args.tag + "_impute_hut_FCNC_vs_SMHiggs"))
 
-  #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hct_FCNC_vs_SMHiggs.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag, args.tag + "_hct_FCNC_vs_SMHiggs"))
-  #parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_FCNC_dnn_features_hct_FCNC_vs_SMHiggs.hdf5" --channel "Hadronic" --tag "%s"' % (args.tag, args.tag + "_hct_FCNC_vs_SMHiggs"))
+  #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hct_FCNC_vs_SMHiggs.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hct_FCNC_vs_SMHiggs"))
+  #parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_FCNC_dnn_features_hct_FCNC_vs_SMHiggs.hdf5" --channel "Hadronic" --tag "%s"' % (args.tag + "_impute", args.tag + "_impute_hct_FCNC_vs_SMHiggs"))
   # End FCNC vs SM Higgs BDT/DNN

@@ -337,6 +337,8 @@ lumi_final_fit = features_final_fit["lumi_"]
 process_id_final_fit = features_final_fit["process_id_"]
 year_final_fit = features_final_fit["year_"]
 objects_final_fit = utils.preprocess_array(utils.pad_array(features_final_fit["objects_"]), preprocess_scheme)
+if len(objects_final_fit) == 0:
+    objects_final_fit = objects_data[0:1]
 tth_runII_mva_final_fit = features_final_fit["tth_runII_mva_"]
 
 
