@@ -222,7 +222,7 @@ if args.no_buildup or args.fixed:
     optimizer.maximize(
         init_points = 3*args.n_points if args.random else 0,
         n_iter = 0 if args.random else 3*args.n_points,
-        acq = "ucb", kappa = 5,
+        acq = "ei", xi = 0.05,
         alpha=0.000001,
     )
 
@@ -231,7 +231,7 @@ print "Probing %d points per pbounds set" % (args.n_points)
 optimizer.maximize(
         init_points = args.n_points if args.random else 0,
         n_iter = 0 if args.random else args.n_points,
-        acq = "ucb", kappa = 5,
+        acq = "ei", xi = 0.05,
         alpha=0.000001,
 )
 
@@ -243,7 +243,7 @@ optimizer.set_bounds(new_bounds = pbounds_medium)
 optimizer.maximize(
         init_points = args.n_points if args.random else 0,
         n_iter = 0 if args.random else args.n_points,
-        acq = "ucb", kappa = 5,
+        acq = "ei", xi = 0.05,
         alpha=0.000001,
 )
 
@@ -252,7 +252,7 @@ optimizer.set_bounds(new_bounds = pbounds_full)
 optimizer.maximize(
         init_points = args.n_points if args.random else 0,
         n_iter = 0 if args.random else args.n_points,
-        acq = "ucb", kappa = 5,
+        acq = "ei", xi = 0.05,
         alpha=0.000001,
 )
 
