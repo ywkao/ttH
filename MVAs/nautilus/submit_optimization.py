@@ -20,6 +20,8 @@ with open(template + ".yaml", "r") as f_in:
     lines = f_in.readlines()
 
 for i in range(len(lines)):
+    if "optimizednnhyperparams" in lines[i]:
+        lines[i] = lines[i].replace("optimizednnhyperparams", "optimizednnhyperparams" + args.tag).replace("_","-").lower()
     if "INPUT" in lines[i]:
         lines[i] = lines[i].replace("INPUT", args.input.split("/")[-1])
     if "TAG" in lines[i]:
@@ -27,13 +29,13 @@ for i in range(len(lines)):
     if "CHANNEL" in lines[i]:
         lines[i] = lines[i].replace("CHANNEL", channel)
     if "NPOINTS" in lines[i]:
-        lines[i] = lines[i].replace("CHANNEL", int(args.n_points)/3)
+        lines[i] = lines[i].replace("NPOINTS", str(int(args.n_points)/3))
     if "RANDOM" in lines[i]:
         if not args.random:
-            lines[i] = lines[i].replace(" RANDOM", "")
+            lines[i] = lines[i].replace(" RANDOM", "not_random")
     if "FIXED" in lines[i]:
         if not args.fixed:
-            lines[i] = lines[i].replace(" FIXED", "")
+            lines[i] = lines[i].replace(" FIXED", "not_fixed")
 
 submit_script = "submit_scripts/" + template + "_" + args.tag + ".yaml"
 with open(submit_script, "w") as f_out:

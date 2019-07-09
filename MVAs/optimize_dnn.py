@@ -134,7 +134,7 @@ pbounds_light = {
     "n_lstm" : (1,1), 
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.25, 0.25), 
-    "learning_rate" : (-4, -1.5), # 10**(learning_rate)
+    "learning_rate" : (-4, -1), # 10**(learning_rate)
     "start_batch" : (10, 10), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99)
 }
@@ -148,7 +148,7 @@ pbounds_medium = {
     "n_lstm" : (1,4), 
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-4, -1.5), # 10**(learning_rate)
+    "learning_rate" : (-4, -1), # 10**(learning_rate)
     "start_batch" : (10, 10), # 2**(start_batch)
     "batch_momentum" : (0.5, 0.999)
 }
@@ -162,7 +162,7 @@ pbounds_full = {
     "n_lstm" : (1,5), 
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-5, -2), # 10**(learning_rate)
+    "learning_rate" : (-4, -1), # 10**(learning_rate)
     "start_batch" : (10, 13), # 2**(start_batch)
     "batch_momentum" : (0.5, 0.999)
 }
@@ -173,7 +173,7 @@ pbounds_fixed = {
     "n_dense_1" : (1,1),
     "n_dense_2" : (4,4),
     "n_nodes_lstm" : (100, 100),
-    "n_lstm" : (1,1),
+    "n_lstm" : (3,3),
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.25, 0.25),
     "learning_rate" : (-3, -3), # 10**(learning_rate)
@@ -231,7 +231,7 @@ print "Probing %d points per pbounds set" % (args.n_points)
 optimizer.maximize(
         init_points = args.n_points if args.random else 0,
         n_iter = 0 if args.random else args.n_points,
-        kappa = 7,
+        kappa = 5,
         alpha=0.000001,
 )
 
