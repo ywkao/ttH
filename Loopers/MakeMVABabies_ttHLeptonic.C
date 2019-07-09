@@ -317,6 +317,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
 
       // Variable definitions
+      tth_runII_mva_ = tthMVA_RunII();
+
       year_ = mYear == "2016" ? 2016 : (mYear == "2017" ? 2017 : (mYear == "2018" ? 2018 : -1));
 
       evt_ = cms3.event();

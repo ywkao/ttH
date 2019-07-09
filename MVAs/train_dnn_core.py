@@ -63,7 +63,8 @@ def train(args, config):
     dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = global_features_data, objects = jet_features_data, leptons = lepton_features_data, label = label_data, weights = weights_data, references = { "Top Tag Score" : top_tag_score_data, "ttPP BDT" : tth_ttPP_mva_data, "Dipho BDT" : tth_dipho_mva_data, "Baseline BDT" : tth_std_mva_data}, no_prep = True)
 
   # DNN Helper
-  dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data, mass_data = mass_data, config = config)
+  metadata = { "input" : args.input, "config" : config, "preprocess_scheme" : args.preprocess_scheme if args.preprocess_scheme else "none"}
+  dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data, mass_data = mass_data, metadata = metadata)
   if args.no_bootstrap:
     dnn.n_bootstrap = 0
 

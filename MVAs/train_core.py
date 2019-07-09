@@ -36,6 +36,7 @@ def train_bdt(config, invert=False):
   print training_feature_names
 
   global_features = utils.load_array(f, 'global')
+  global_dnn_features = utils.load_array(f, 'global_dnn')
   label = utils.load_array(f, 'label')
   multi_label = utils.load_array(f, 'multi_label')
   weights = utils.load_array(f, 'weights')
@@ -50,6 +51,8 @@ def train_bdt(config, invert=False):
   lumi = utils.load_array(f, 'lumi')
   process_id = utils.load_array(f, 'process_id')
   year = utils.load_array(f, 'year')
+  objects = utils.load_array(f, 'objects')
+  tth_runII_mva = utils.load_array(f, 'tth_runII_mva')
 
   if args.sideband:
     global_features = utils.load_array(f, 'global_data_sideband')
@@ -61,6 +64,7 @@ def train_bdt(config, invert=False):
     #sublead_sigmaEtoE = utils.load_array(f, 'sublead_sigmaEtoE_data_sideband')
 
   global_features_validation = utils.load_array(f, 'global_validation')
+  global_dnn_features_validation = utils.load_array(f, 'global_dnn_validation')
   label_validation = utils.load_array(f, 'label_validation')
   multi_label_validation = utils.load_array(f, 'multi_label_validation')
   weights_validation = utils.load_array(f, 'weights_validation')
@@ -73,8 +77,11 @@ def train_bdt(config, invert=False):
   lumi_validation = utils.load_array(f, 'lumi_validation')
   process_id_validation = utils.load_array(f, 'process_id_validation')
   year_validation = utils.load_array(f, 'year_validation')
+  objects_validation = utils.load_array(f, 'objects_validation')
+  tth_runII_mva_validation = utils.load_array(f, 'tth_runII_mva_validation')
 
   global_features_data = utils.load_array(f, 'global_data')
+  global_dnn_features_data = utils.load_array(f, 'global_dnn_data')
   label_data = utils.load_array(f, 'label_data')
   multi_label_data = utils.load_array(f, 'multi_label_data')
   weights_data = utils.load_array(f, 'weights_data')
@@ -87,8 +94,11 @@ def train_bdt(config, invert=False):
   lumi_data = utils.load_array(f, 'lumi_data')
   process_id_data = utils.load_array(f, 'process_id_data')
   year_data = utils.load_array(f, 'year_data')
+  objects_data = utils.load_array(f, 'objects_data')
+  tth_runII_mva_data = utils.load_array(f, 'tth_runII_mva_data')
 
   global_features_final_fit = utils.load_array(f, 'global_final_fit')
+  global_dnn_features_final_fit = utils.load_array(f, 'global_dnn_final_fit')
   label_final_fit = utils.load_array(f, 'label_final_fit')
   multi_label_final_fit = utils.load_array(f, 'multi_label_final_fit')
   weights_final_fit = utils.load_array(f, 'weights_final_fit')
@@ -101,6 +111,8 @@ def train_bdt(config, invert=False):
   lumi_final_fit = utils.load_array(f, 'lumi_final_fit')
   process_id_final_fit = utils.load_array(f, 'process_id_final_fit')
   year_final_fit = utils.load_array(f, 'year_final_fit')
+  objects_final_fit = utils.load_array(f, 'objects_final_fit')
+  tth_runII_mva_final_fit = utils.load_array(f, 'tth_runII_mva_final_fit')
 
   num_multi_class = 3#len(numpy.unique(multi_label, return_index = True))
 
@@ -247,6 +259,20 @@ def train_bdt(config, invert=False):
       pred_ref_test = ref_mva.predict(d_test, output_margin=args.multi)
       pred_ref_data = ref_mva.predict(d_data, output_margin=args.multi)
       pred_ref_final_fit = ref_mva.predict(d_final_fit, output_margin=args.multi)
+    elif ".json" in args.reference_mva:
+      import dnn_helper
+      dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = global_dnn_features, objects = objects)
+      dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = global_dnn_features_validation, objects = objects_validation)
+      dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = global_dnn_features_data, objects = objects_data)
+      dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = global_dnn_features_final_fit, objects = objects_final_fit)
+      with open(args.reference_mva, "r") as f_in:
+        metadata = json.load(f_in)
+      dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, metadata = metadata, weights_file = "dnn_weights/" + metadata["weights"])
+      dnn.predict()
+      pred_ref_train = dnn.predictions["train"]
+      pred_ref_test = dnn.predictions["validation"]
+      pred_ref_data = dnn.predictions["data"]
+      pred_ref_final_fit = dnn.predictions["final_fit"]
 
   print pred_test.shape
 
@@ -344,6 +370,7 @@ def train_bdt(config, invert=False):
   tree_signal_mass_label = numpy.concatenate((signal_mass_label, signal_mass_label_validation, signal_mass_label_data, numpy.zeros(len(pred_final_fit))))
   tree_tth_2017_reference_mva = numpy.concatenate((tth_2017_reference_mva, tth_2017_reference_mva_validation, tth_2017_reference_mva_data, tth_2017_reference_mva_final_fit))
   tree_evt = numpy.concatenate((evt, evt_validation, evt_data, evt_final_fit))
+  tree_tth_runII_mva = numpy.concatenate((tth_runII_mva, tth_runII_mva_validation, tth_runII_mva_data, tth_runII_mva_final_fit))
   tree_run = numpy.concatenate((run, run_validation, run_data, run_final_fit))
   tree_lumi = numpy.concatenate((lumi, lumi_validation, lumi_data, lumi_final_fit))
   tree_process_id = numpy.concatenate((process_id, process_id_validation, process_id_data, process_id_final_fit))
@@ -363,6 +390,7 @@ def train_bdt(config, invert=False):
   tree_signal_mass_label = tree_signal_mass_label.astype(numpy.int64)
   tree_tth_2017_reference_mva = tree_tth_2017_reference_mva.astype(numpy.float64)
   tree_evt = tree_evt.astype(numpy.uint64)
+  tree_tth_runII_mva = tree_tth_runII_mva.astype(numpy.float64)
   tree_run = tree_run.astype(numpy.uint64)
   tree_lumi = tree_lumi.astype(numpy.uint64)
   tree_process_id = tree_process_id.astype(numpy.int64)
@@ -370,7 +398,7 @@ def train_bdt(config, invert=False):
   tree_global_features = tree_global_features.astype(numpy.float64)
   #tree_training_feature_names = tree_training_feature_names.astype(numpy.string_)
 
-  dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}#, "training_feature_names" : tree_training_feature_names}
+  dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features, "tth_runII_mva" : tree_tth_runII_mva}#, "training_feature_names" : tree_training_feature_names}
 
   if args.multi:
     tree_bdt_score = []

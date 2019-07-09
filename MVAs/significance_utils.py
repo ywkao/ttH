@@ -171,7 +171,7 @@ def scan_za_parallel(cut_combos, signal_events, background_events, is_data, mc_b
   n_bkg = []
   sigma_eff_ = []
 
-  with poolcontext(processes=20) as pool:
+  with poolcontext(processes=8) as pool:
     results = pool.map(partial(calc_za, signal_events = signal_events, background_events = background_events, is_data = is_data, mc_bkg_events = mc_bkg_events, mass_shift = mass_shift), cut_combos) 
     for result in results:
       print result

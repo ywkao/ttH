@@ -389,7 +389,6 @@ int multiclassifier_label(TString currentFileTitle, int genPhotonId, bool fcnc =
   if (fcnc) {
     if (currentFileTitle.Contains("FCNC")) return 0; // signal
     else if (currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG")) return 1; // resonant bkg
-    else if (currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma")) return -1;
     else return 2; // non-resonant bkg
   }
 
@@ -568,8 +567,9 @@ double scale_fcnc(TString currentFileTitle) {
 }
 
 double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel, bool fcnc = false) {
-  if (fcnc && currentFileTitle.Contains("ttHJet"))
-    return (1.0/7.0); // we use 6 ttH mass points in training, so scale by a factor of 1/6
+  // Better to scale mass points in prep.py
+  //if (fcnc && currentFileTitle.Contains("ttHJet"))
+  //  return (1.0/7.0); // we use 6 ttH mass points in training, so scale by a factor of 1/6
   
   if (bkg_options == "none")
     return 1.0;

@@ -23,7 +23,7 @@ spec:
         command: 
             - sh
             - -c
-            - "apt-get install wget && wget https://raw.githubusercontent.com/sam-may/ttH/master/MVAs/nautilus/nautilus_exe.sh && ls -althr && chmod 755 nautilus_exe.sh && ./nautilus_exe.sh INPUT TAG CHANNEL" 
+            - "apt-get install wget && wget https://raw.githubusercontent.com/sam-may/ttH/master/MVAs/nautilus/nautilus_exe.sh && ls -althr && chmod 755 nautilus_exe.sh && ./nautilus_exe.sh INPUT TAG CHANNEL NPOINTS RANDOM FIXED" 
         resources:
           limits:
             memory: 48Gi

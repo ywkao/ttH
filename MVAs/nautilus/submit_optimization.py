@@ -4,6 +4,9 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input .hdf5 file", type=str)
 parser.add_argument("--tag", help = "tag to identify this optimization", type=str)
+parser.add_argument("--n_points", help = "number of points to probe", type=str)
+parser.add_argument("--random", help = "do random exploration instead of BayesOpt", action = "store_true")
+parser.add_argument("--fixed", help = "sample a fixed pbound set", action = "store_true")
 args = parser.parse_args()
 
 template = "optimize_dnn_hyperparams"
@@ -23,6 +26,14 @@ for i in range(len(lines)):
         lines[i] = lines[i].replace("TAG", args.tag)
     if "CHANNEL" in lines[i]:
         lines[i] = lines[i].replace("CHANNEL", channel)
+    if "NPOINTS" in lines[i]:
+        lines[i] = lines[i].replace("CHANNEL", int(args.n_points)/3)
+    if "RANDOM" in lines[i]:
+        if not args.random:
+            lines[i] = lines[i].replace(" RANDOM", "")
+    if "FIXED" in lines[i]:
+        if not args.fixed:
+            lines[i] = lines[i].replace(" FIXED", "")
 
 submit_script = "submit_scripts/" + template + "_" + args.tag + ".yaml"
 with open(submit_script, "w") as f_out:

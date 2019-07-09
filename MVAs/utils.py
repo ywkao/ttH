@@ -2,6 +2,54 @@ import numpy
 import random
 from sklearn import metrics
 
+def preprocess(array, mean, std):
+  array[array != pad_value] += -mean
+  array[array != pad_value] *= 1./std
+  return array
+
+def get_mean_and_std(array):
+  array_trimmed = array[array != pad_value]
+  if (len(array_trimmed) <= 1):
+    return 0, 1
+  mean = numpy.mean(array_trimmed)
+  std = numpy.std(array_trimmed)
+  if std == 0:
+    std = 1
+  return mean, std
+
+def create_array(features_list, names, dict_, z_score = True):
+    arr = []
+    for name in names:
+        if "leptons_" == name or "jets_" == name or "objects_" in name:
+            continue
+        else:
+            feat = numpy.array(features_list[name])
+            if z_score and dict_ != "none":
+                preprocessed_feat = preprocess(feat, dict_[name]["mean"], dict_[name]["std_dev"])
+            arr.append(preprocessed_feat)
+    return numpy.transpose(numpy.array(arr))
+
+n_max_objects = 8
+pad_value = -9
+def pad_array(array):
+  max_objects = n_max_objects
+  nData = len(array)
+  nFeatures = len(array[0][0])
+  y = numpy.ones((nData, max_objects, nFeatures))
+  y *= pad_value
+  for i in range(nData):
+    for j in range(min(max_objects, len(array[i]))):
+      for k in range(nFeatures):
+        y[i][j][k] = array[i][j][k]
+  return y
+
+def preprocess_array(y, dict_):
+  if dict_ == "none":
+    return y
+  for i in range(len(y[0][0])):
+    y[:,:,i] = preprocess(y[:,:,i], dict_["objects_" + str(i)]["mean"], dict_["objects_" + str(i)]["std_dev"])
+  return y
+
 def oversample(array, indices):
   return numpy.array([array[i] for i in indices])
 

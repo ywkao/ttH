@@ -35,6 +35,10 @@ parallel_utils.submit_jobs(command_list, 4)
 #parallel_utils.run('python train.py --input "ttHHadronic_%s_features.hdf5" --channel "Hadronic" --tag "ttH_vs_tH_%s" --ext ""' % (args.tag, args.tag))
 #parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_dnn_features_.hdf5" --tag "ttHHadronic_ttH_vs_tH_%s" --channel "Hadronic"' % (args.tag, args.tag))
 
-parallel_utils.run('python train.py --input "ttHLeptonic_%s_features.hdf5" --channel "Leptonic" --tag "ttH_vs_tH_%s" --ext ""' % (args.tag, args.tag))
-parallel_utils.run('python train_dnn.py --input "ttHLeptonic_%s_dnn_features_.hdf5" --tag "ttHLeptonic_ttH_vs_tH_%s" --channel "Leptonic"' % (args.tag, args.tag))
+#parallel_utils.run('python train.py --input "ttHLeptonic_%s_features.hdf5" --channel "Leptonic" --tag "ttH_vs_tH_%s" --ext ""' % (args.tag, args.tag))
+parallel_utils.run('python train_dnn.py --input "ttHLeptonic_%s_dnn_features_.hdf5" --tag "ttHLeptonic_ttH_vs_tH_%s" --channel "Leptonic" --preprocess_scheme "preprocess_scheme_%s_%s.json"' % (args.tag, args.tag, "Leptonic", args.tag))
+
+
+# Zip BDT/DNN score into final fit ntuple
+command_list = []
 

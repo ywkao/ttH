@@ -3,8 +3,10 @@ import h5py
 import ROOT
 import numpy
 import root_numpy
+import json
 
 import dnn_helper
+import utils
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -13,6 +15,7 @@ parser.add_argument("--channel", help = "Hadronic or Leptonic", type=str, defaul
 parser.add_argument("--tag", help = "name to append to filename", type=str, default = "")
 
 parser.add_argument("--dnn_models", help = "csv list of dnn models to add as inputs", type=str, default = "")
+parser.add_argument("--dont_train_with_dnn", help = "don't add DNN scores as input features (one might include a dnn_model but not include it in training if one wanted to use it as a reference MVA in train.py", action = "store_true")
 parser.add_argument("--do_top_tag", help = "add top tag score", action = "store_true")
 
 parser.add_argument("-r", "--randomize", help = "use a random test/train split", action="store_true")
@@ -32,6 +35,7 @@ parser.add_argument("--cut_ptoM", help = "apply cuts on photon pT/mgg", action =
 parser.add_argument("--fcnc_hut", help = "use FCNC Hut as signal, other SM Higgs processes as bkg", action = "store_true")
 parser.add_argument("--fcnc_hct", help = "use FCNC Hct as signal, other SM Higgs processes as bkg", action = "store_true")
 parser.add_argument("--ttH_vs_tH", help = "use ttH as signal, tH as background", action = "store_true")
+parser.add_argument("--FCNC_vs_SMHiggs", help = "use FCNC as signal, SM Higgs as background", action="store_true")
 parser.add_argument("--add_year", help = "add the year as a feature", action = "store_true")
 parser.add_argument("--no_mass_constraint", help = "don't use m_ggj, m_jjj", action = "store_true")
 
@@ -82,9 +86,9 @@ if args.no_psv:
   to_remove += ["leadPSV_", "subleadPSV_"]
 
 if args.channel == "Hadronic":
-  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_", "evt_", "run_", "lumi_", "year_"]))
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "tth_ttX_mva_", "tth_qcdX_mva_", "tth_ttPP_mva_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_", "evt_", "run_", "lumi_", "year_", "tth_runII_mva_"]))
 elif args.channel == "Leptonic":
-  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_", "evt_", "run_", "lumi_", "year_"]))
+  branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "objects_", "lead_phi_", "sublead_phi_", "log_met_", "met_phi_", "signal_mass_label_", "tth_2017_reference_mva_", "evt_", "run_", "lumi_", "year_", "tth_runII_mva_"]))
 
 # grab features
 train_frac = args.train_frac
@@ -95,14 +99,14 @@ data_label = 2
 branches = list(set(branches))
 
 if args.fcnc_hut:
-    selection_train      = '((label_ == 0%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-    selection_validation = '((label_ == 0%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (" && (process_id_ == 0 || process_id_ == 11 || process_id_ == 12)" if args.FCNC_vs_SMHiggs else "", " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (" && (process_id_ == 0 || process_id_ == 11 || process_id_ == 12)" if args.FCNC_vs_SMHiggs else "", " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
     selection_final_fit      = '((process_id_ == -1 && signal_mass_label_ == 0))' # dummy selection, should not select any events
 
 elif args.fcnc_hct:
-    selection_train      = '((label_ == 0%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-    selection_validation = '((label_ == 0%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (" && (process_id_ == 0 || process_id_ == 11 || process_id_ == 12)" if args.FCNC_vs_SMHiggs else "", "&& process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (" && (process_id_ == 0 || process_id_ == 11 || process_id_ == 12)" if args.FCNC_vs_SMHiggs else "", " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
     selection_final_fit      = '((process_id_ == -1 && signal_mass_label_ == 0))' # dummy selection, should not select any events
 
@@ -141,6 +145,13 @@ features = root_numpy.tree2array(tree, branches = branches, selection = selectio
 features_validation = root_numpy.tree2array(tree, branches = branches, selection = selection_validation) 
 features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = selection_final_fit) 
 
+
+# Scale ttH training weights
+if args.fcnc_hut or args.fcnc_hct:
+    for i in range(len(features["process_id_"])):
+        if features["process_id_"][i] == 0: # scale ttH by 1/7 bc we use 7 mass points in training
+            features["evt_weight_"][i] *= 1.0/7.0
+
 if args.sideband:
   handicap = ""
   if args.handicap:
@@ -153,13 +164,13 @@ features_data = root_numpy.tree2array(tree, branches = branches, selection = 'la
 
 # Calculate DNN scores
 dnn_models = args.dnn_models.split(",")
-do_dnn = len(args.dnn_models) > 0
+do_dnn = len(args.dnn_models) > 0 and (not args.dont_train_with_dnn)
 
 dnn_predictions = []
+dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
 
 if do_dnn:
   print "Calculating dnn scores"
-  dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
   print len(dnn_features)
   print [feat for feat in dnn_features]
   if args.channel == "Leptonic":
@@ -168,14 +179,15 @@ if do_dnn:
       dnn_features += ["top_tag_score_"]
   i = 0
   print dnn_features
-  for model in dnn_models:
-    config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False}
-    dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = [features_final_fit[feat] for feat in dnn_features], objects = features_final_fit["objects_"])
-    dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = [features_data[feat] for feat in dnn_features], objects = features_data["objects_"])
-    dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = [features[feat] for feat in dnn_features], objects = features["objects_"])
-    dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = [features_validation[feat] for feat in dnn_features], objects = features_validation["objects_"])
-    dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = [features_final_fit[feat] for feat in dnn_features], objects = features_final_fit["objects_"])
-    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, weights_file = model, config=config)
+  for dnn_model in dnn_models:
+    with open(dnn_model, "r") as f_in:
+      model = json.load(f_in)
+    dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = utils.create_array(features_data, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features_data["objects_"]), model["preprocess_scheme"]))
+    dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = utils.create_array(features_validation, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features_validation["objects_"]), model["preprocess_scheme"]))
+    dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = utils.create_array(features_final_fit, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features_final_fit["objects_"]), model["preprocess_scheme"]))
+    dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = utils.create_array(features, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features["objects_"]), model["preprocess_scheme"]))
+
+    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, metadata = model, weights_file = "dnn_weights/" + model["weights"])
     #dnn.predict()
     #dnn_predictions.append([dnn.predictions["train"], dnn.predictions["validation"], dnn.predictions["data"]])
     dnn_predictions.append(dnn.predict())
@@ -232,6 +244,17 @@ global_features_validation = numpy.asarray(global_features_validation)
 global_features_data = numpy.asarray(global_features_data)
 global_features_final_fit = numpy.asarray(global_features_final_fit)
 
+if len(dnn_models) > 0:
+    with open(dnn_models[0], "r") as f_in:
+        preprocess_scheme = json.load(f_in)["preprocess_scheme"]
+else:
+    preprocess_scheme = "none"
+
+global_features_dnn = utils.create_array(features, dnn_features, preprocess_scheme) 
+global_features_dnn_validation = utils.create_array(features_validation, dnn_features, preprocess_scheme) 
+global_features_dnn_data = utils.create_array(features_data, dnn_features, preprocess_scheme) 
+global_features_dnn_final_fit = utils.create_array(features_final_fit, dnn_features, preprocess_scheme) 
+
 if args.sideband:
   global_features_data_sideband = numpy.asarray(global_features_data_sideband)
   global_features_data_sideband_mc = numpy.asarray(global_features_data_sideband_mc)
@@ -255,6 +278,8 @@ run = features["run_"]
 lumi = features["lumi_"]
 process_id = features["process_id_"]
 year = features["year_"]
+objects = utils.preprocess_array(utils.pad_array(features["objects_"]), preprocess_scheme)
+tth_runII_mva = features["tth_runII_mva_"]
 
 mvas = {}
 for name in mva_names:
@@ -272,6 +297,8 @@ run_validation = features_validation["run_"]
 lumi_validation = features_validation["lumi_"]
 process_id_validation = features_validation["process_id_"]
 year_validation = features_validation["year_"]
+objects_validation = utils.preprocess_array(utils.pad_array(features_validation["objects_"]), preprocess_scheme)
+tth_runII_mva_validation = features_validation["tth_runII_mva_"]
 
 
 mvas_validation = {}
@@ -290,6 +317,8 @@ run_data = features_data["run_"]
 lumi_data = features_data["lumi_"]
 process_id_data = features_data["process_id_"]
 year_data = features_data["year_"]
+objects_data = utils.preprocess_array(utils.pad_array(features_data["objects_"]), preprocess_scheme)
+tth_runII_mva_data = features_data["tth_runII_mva_"]
 
 mvas_data = {}
 for name in mva_names:
@@ -307,6 +336,8 @@ run_final_fit = features_final_fit["run_"]
 lumi_final_fit = features_final_fit["lumi_"]
 process_id_final_fit = features_final_fit["process_id_"]
 year_final_fit = features_final_fit["year_"]
+objects_final_fit = utils.preprocess_array(utils.pad_array(features_final_fit["objects_"]), preprocess_scheme)
+tth_runII_mva_final_fit = features_final_fit["tth_runII_mva_"]
 
 
 mvas_final_fit = {}
@@ -348,6 +379,7 @@ dset_feature_names = f_out.create_dataset("feature_names", data=feature_names)
 dset_training_feature_names = f_out.create_dataset("training_feature_names", data=training_feature_names)
 
 dset_global = f_out.create_dataset("global", data=global_features)
+dset_global_dnn = f_out.create_dataset("global_dnn", data=global_features_dnn)
 dset_label = f_out.create_dataset("label", data=label)
 dset_multi_label = f_out.create_dataset("multi_label", data=multi_label)
 dset_weights = f_out.create_dataset("weights", data=weights)
@@ -362,11 +394,14 @@ dset_run = f_out.create_dataset("run", data=run)
 dset_lumi = f_out.create_dataset("lumi", data=lumi)
 dset_process_id = f_out.create_dataset("process_id", data=process_id)
 dset_year = f_out.create_dataset("year", data=year)
+dset_objects = f_out.create_dataset("objects", data=objects)
+dset_tth_runII_mva = f_out.create_dataset("tth_runII_mva", data=tth_runII_mva)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name, data=mvas[name])
 
 dset_global_validation = f_out.create_dataset("global_validation", data=global_features_validation)
+dset_global_dnn_validation = f_out.create_dataset("global_dnn_validation", data=global_features_dnn_validation)
 dset_label_validation = f_out.create_dataset("label_validation", data=label_validation)
 dset_multi_label_validation = f_out.create_dataset("multi_label_validation", data=multi_label_validation)
 dset_weights_validation = f_out.create_dataset("weights_validation", data=weights_validation)
@@ -379,12 +414,15 @@ dset_run_validation = f_out.create_dataset("run_validation", data=run_validation
 dset_lumi_validation = f_out.create_dataset("lumi_validation", data=lumi_validation)
 dset_process_id_validation = f_out.create_dataset("process_id_validation", data=process_id_validation)
 dset_year_validation = f_out.create_dataset("year_validation", data=year_validation)
+dset_objects_validation = f_out.create_dataset("objects_validation", data=objects_validation)
+dset_tth_runII_mva_validation = f_out.create_dataset("tth_runII_mva_validation", data=tth_runII_mva_validation)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_validation", data=mvas_validation[name])
 
 
 dset_global_data = f_out.create_dataset("global_data", data=global_features_data)
+dset_global_dnn_data = f_out.create_dataset("global_dnn_data", data=global_features_dnn_data)
 dset_label_data = f_out.create_dataset("label_data", data=label_data)
 dset_multi_label_data = f_out.create_dataset("multi_label_data", data=multi_label_data)
 dset_weights_data = f_out.create_dataset("weights_data", data=weights_data)
@@ -397,11 +435,14 @@ dset_run_data = f_out.create_dataset("run_data", data=run_data)
 dset_lumi_data = f_out.create_dataset("lumi_data", data=lumi_data)
 dset_process_id_data = f_out.create_dataset("process_id_data", data=process_id_data)
 dset_year_data = f_out.create_dataset("year_data", data=year_data)
+dset_objects_data = f_out.create_dataset("objects_data", data=objects_data)
+dset_tth_runII_mva_data = f_out.create_dataset("tth_runII_mva_data", data=tth_runII_mva_data)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_data", data=mvas_data[name])
 
 dset_global_final_fit = f_out.create_dataset("global_final_fit", data=global_features_final_fit)
+dset_global_dnn_final_fit = f_out.create_dataset("global_dnn_final_fit", data=global_features_dnn_final_fit)
 dset_label_final_fit = f_out.create_dataset("label_final_fit", data=label_final_fit)
 dset_multi_label_final_fit = f_out.create_dataset("multi_label_final_fit", data=multi_label_final_fit)
 dset_weights_final_fit = f_out.create_dataset("weights_final_fit", data=weights_final_fit)
@@ -414,6 +455,8 @@ dset_run_final_fit = f_out.create_dataset("run_final_fit", data=run_final_fit)
 dset_lumi_final_fit = f_out.create_dataset("lumi_final_fit", data=lumi_final_fit)
 dset_process_id_final_fit = f_out.create_dataset("process_id_final_fit", data=process_id_final_fit)
 dset_year_final_fit = f_out.create_dataset("year_final_fit", data=year_final_fit)
+dset_objects_final_fit = f_out.create_dataset("objects_final_fit", data=objects_final_fit)
+dset_tth_runII_mva_final_fit = f_out.create_dataset("tth_runII_mva_final_fit", data=tth_runII_mva_final_fit)
 
 for name in mva_names:
   dset_mva = f_out.create_dataset(name+"_final_fit", data=mvas_final_fit[name])

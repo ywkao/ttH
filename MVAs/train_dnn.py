@@ -33,6 +33,7 @@ parser.add_argument("--no_lstm", help = "don't use object features (lstm)", acti
 parser.add_argument("--load", help = "give weights file to use as starting point", type=str)
 parser.add_argument("--no_bootstrap", help = "don't use bootstrapping to estimate unc. in AUC (to save time during hyperparameter opt)", action="store_true")
 parser.add_argument("--absolute_weights", help = "set negative weights to positive in *training* only (to improve stats)", action="store_true")
+parser.add_argument("--preprocess_scheme", help = "json file used for preprocessing dnn. for bookkeeping purposes", type=str)
 args = parser.parse_args()
 
 import train_dnn_core

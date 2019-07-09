@@ -1,6 +1,7 @@
 import numpy
 from sklearn import metrics
 import keras
+import json
 
 import matplotlib
 matplotlib.use('Agg')
@@ -9,11 +10,11 @@ import matplotlib.pyplot as plt
 import utils
 import dnn_model
 
-
 class DNN_Features:
   def __init__(self, **kwargs):
     self.name = kwargs.get('name', 'validation')
-    if not kwargs.get('no_prep'):
+    self.no_prep = kwargs.get('no_prep', True)
+    if not self.no_prep:
       self.global_features = numpy.transpose(numpy.array(kwargs.get('global_features')))
       self.objects = utils.pad_array(kwargs.get('objects'))
     else:
@@ -24,7 +25,7 @@ class DNN_Features:
       if not kwargs.get('no_prep'):
         self.leptons = utils.pad_array(kwargs.get('leptons', []))
       else:
-	self.leptons = numpy.array(kwargs.get('leptons'))
+	    self.leptons = numpy.array(kwargs.get('leptons'))
       self.features = [self.global_features, self.objects, self.leptons]
       self.channel = "Leptonic"
     else:
@@ -40,7 +41,9 @@ class DNN_Helper:
   def __init__(self, **kwargs):
     self.kwargs = kwargs
 
-    self.config = kwargs.get('config', {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512})
+
+    self.metadata = kwargs.get('metadata')
+    self.config = self.metadata["config"]
 
     self.features_validation = kwargs.get('features_validation', [])
     self.features_train = kwargs.get('features_train', [])
@@ -69,6 +72,13 @@ class DNN_Helper:
       self.callbacks = [keras.callbacks.ModelCheckpoint(self.save_name)]
     else:
       self.callbacks = []
+
+    self.metadata["weights"] = self.tag + "_weights.hdf5"
+    if self.metadata["preprocess_scheme"] != "none":
+      with open(self.metadata["preprocess_scheme"], "r") as f_in:
+        self.metadata["preprocess_scheme"] = json.load(f_in)
+    with open("dnn_weights/metadata_" + self.tag + ".json", "w") as f_out:
+      json.dump(self.metadata, f_out, indent=4, sort_keys=True)
 
     self.n_objects = len(self.features_validation.objects[0])
     self.n_object_features = len(self.features_validation.objects[0][0])

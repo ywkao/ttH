@@ -114,15 +114,17 @@ if do_mva:
   os.chdir("../MVAs")
 
   #parallel_utils.run('python prep_dnn.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --signal "ttH" --background "dipho" --tag "dipho" --z_score' % (args.tag + "_2017_only"))
+  #parallel_utils.run('python prep_dnn.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --signal "ttH" --background "dipho" --tag "dipho"' % (args.tag + "_2017_only"))
   #parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_dnn_features_dipho.hdf5" --tag "ttHHadronic_ttH_vs_dipho_%s" --channel "Hadronic"' % (args.tag + "_2017_only", args.tag + "_2017_only"))
 
   #parallel_utils.run('python prep_dnn.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --signal "ttH" --background "ttGG" --tag "ttGG" --z_score' % (args.tag + "_2017_only"))
+  #parallel_utils.run('python prep_dnn.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --signal "ttH" --background "ttGG" --tag "ttGG"' % (args.tag + "_2017_only"))
   #parallel_utils.run('python train_dnn.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_dnn_features_ttGG.hdf5" --tag "ttHHadronic_ttH_vs_ttGG_%s" --channel "Hadronic"' % (args.tag + "_2017_only", args.tag + "_2017_only"))
 
   #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic"' % (args.tag + "_2017_only"))
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_features.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_impute" --ext ""' % (args.tag + "_2017_only", args.tag + "_2017_only"))
 
-  #parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --dnn_models "dnn_weights/ttHHadronic_ttH_vs_dipho_%s_2017_only_weights_00.hdf5,dnn_weights/ttHHadronic_ttH_vs_ttGG_%s_2017_only_weights_00.hdf5" --tag "addDNNs_addTopTag" --do_top_tag' % (args.tag + "_2017_only", args.tag, args.tag))
+  parallel_utils.run('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_RunII_MVA_Presel_impute.root" --channel "Hadronic" --dnn_models "dnn_weights/ttHHadronic_ttH_vs_dipho_%s_2017_only_weights_00.hdf5,dnn_weights/ttHHadronic_ttH_vs_ttGG_%s_2017_only_weights_00.hdf5" --tag "addDNNs_addTopTag" --do_top_tag' % (args.tag + "_2017_only", args.tag, args.tag))
   parallel_utils.run('python train.py --input "ttHHadronic_%s_RunII_MVA_Presel_impute_featuresaddDNNs_addTopTag.hdf5" --channel "Hadronic" --tag "_%s_RunII_MVA_Presel_impute_addDNNs_addTopTag" --ext ""' % (args.tag + "_2017_only", args.tag + "_2017_only"))
   # End Baseline 2017 only
 

@@ -6,6 +6,8 @@ import root_numpy
 import math
 import json
 
+import utils
+
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help = "input root file", type=str)
@@ -18,15 +20,16 @@ parser.add_argument("--invert", help = "invert test/train split", action="store_
 parser.add_argument("--train_frac", help = "what fraction of data to use for training", type = float, default = 0.5)
 parser.add_argument("--tag", help = "name to add to hdf5 file name", type=str, default="")
 parser.add_argument("--z_score", help = "preprocess features to express them as z-score (subtract mean, divide by std.)", action="store_true")
+parser.add_argument("--fcnc", help = "use fcnc as signal, sm as bkg", action="store_true")
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
 output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_dnn_features_" + args.tag + ".hdf5"
+print output_file
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
 
-pad_value = -9
 
 # load tree to array
 #feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R"]
@@ -55,7 +58,7 @@ train_frac = args.train_frac
 if args.backgrounds == "all":
   selection = ""
 else:
-  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11, "ttG" : 6, "ttJets" : 9, "GJets_QCD" : 18 if args.channel == "Hadronic" else 3, "VGamma" : 7}
+  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11, "ttG" : 6, "ttJets" : 9, "GJets_QCD" : 18 if args.channel == "Hadronic" else 3, "VGamma" : 7, "FCNC_hut" : 22, "FCNC_hct" : 23}
   selection = "&& ("
   procs = args.backgrounds.split(",") + args.signal.split(",")
   for i in range(len(procs)):
@@ -65,6 +68,10 @@ else:
       selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
     elif procs[i] == "tH":
       selection += " || process_id_ == 12))"
+    elif procs[i] == "FCNC_hut":
+      selection += " || process_id_ == 24))"
+    elif procs[i] == "FCNC_hct":
+      selection += " || process_id_ == 25))"
     else:
       selection += "))"
     if i != len(procs) - 1:
@@ -74,9 +81,19 @@ else:
 
 print selection
 
-features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
-features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
-features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))')
+if args.fcnc:
+    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+    features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+    features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && signal_mass_label_ == 0 && rand_ < 0.01))') # dummy selection
+
+    for i in range(len(features["process_id_"])):
+        if features["process_id_"][i] == 0: # scale ttH by 1/7 bc we use 7 mass points in training
+            features["evt_weight_"][i] *= 1.0/7.0 
+
+else:
+    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+    features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
+    features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))')
 
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d' % (data_label))
 
@@ -119,77 +136,37 @@ def preprocess_sigmoid(array):
   return (1 - numpy.exp(-alpha))/(1 + numpy.exp(-alpha))
 
 
-def preprocess(array, mean, std):
-  array[array != pad_value] += -mean
-  array[array != pad_value] *= 1./std
-  return array
-
-def get_mean_and_std(array):
-  array_trimmed = array[array != pad_value]
-  if (len(array_trimmed) <= 1):
-    return 0, 1
-  mean = numpy.mean(array_trimmed)
-  std = numpy.std(array_trimmed)
-  if std == 0:
-    std = 1
-  return mean, std
-
 if args.z_score:
     preprocess_dict = {}
     for feature in feature_names:
         if ("objects_" not in feature and "leptons_" != feature and "jets_" != feature):
-            mean, stddev = get_mean_and_std(features[feature])
+            mean, stddev = utils.get_mean_and_std(features[feature])
             preprocess_dict[feature] = { "mean" : float(mean), "std_dev" : float(stddev)}
 
  
-def create_array(features_list, names, dict_):
-    arr = []
-    for name in names:
-        if "leptons_" == name or "jets_" == name or "objects_" in name:
-            continue
-        else:
-            feat = numpy.array(features_list[name])
-            if args.z_score:
-                preprocessed_feat = preprocess(feat, dict_[name]["mean"], dict_[name]["std_dev"])
-            arr.append(preprocessed_feat)
-    return numpy.transpose(numpy.array(arr))
+global_features = utils.create_array(features, feature_names, preprocess_dict, args.z_score)
+global_features_validation = utils.create_array(features_validation, feature_names, preprocess_dict, args.z_score)
+global_features_data = utils.create_array(features_data, feature_names, preprocess_dict, args.z_score)
+global_features_final_fit = utils.create_array(features_final_fit, feature_names, preprocess_dict, args.z_score)
 
-global_features = create_array(features, feature_names, preprocess_dict)
-global_features_validation = create_array(features_validation, feature_names, preprocess_dict)
-global_features_data = create_array(features_data, feature_names, preprocess_dict)
-global_features_final_fit = create_array(features_final_fit, feature_names, preprocess_dict)
-
-def pad_array(array, n_objects, dict_):
-  max_objects = n_objects
-  nData = len(array)
-  nFeatures = len(array[0][0])
-  y = numpy.ones((nData, max_objects, nFeatures))
-  y *= pad_value
-  for i in range(nData):
-    for j in range(min(max_objects, len(array[i]))):
-      for k in range(nFeatures):
-        y[i][j][k] = array[i][j][k]
-
-  return y
-
-n_max_objects = 8
-object_features = pad_array(object_features, n_max_objects, preprocess_dict)
-object_features_validation = pad_array(object_features_validation, n_max_objects, preprocess_dict)
-object_features_data = pad_array(object_features_data, n_max_objects, preprocess_dict)
-object_features_final_fit = pad_array(object_features_final_fit, n_max_objects, preprocess_dict)
+object_features = utils.pad_array(object_features)
+object_features_validation = utils.pad_array(object_features_validation)
+object_features_data = utils.pad_array(object_features_data)
+object_features_final_fit = utils.pad_array(object_features_final_fit)
 
 if args.z_score:
     n_object_features = len(object_features[0][0])
     for i in range(n_object_features):
-        mean, stddev = get_mean_and_std(object_features[:,:,i])
+        mean, stddev = utils.get_mean_and_std(object_features[:,:,i])
         preprocess_dict["objects_" + str(i)] = { "mean" : mean, "std_dev" : stddev }
 
-    with open("preprocess_scheme_%s_%s.json" % (args.channel, args.tag), "w") as f_out:
-                json.dump(preprocess_dict, f_out, indent=4, sort_keys=True)
+    with open("preprocess_scheme_%s.json" % (args.input.replace(".root", "").replace("../Loopers/MVABaby_ttH","")), "w") as f_out:
+        json.dump(preprocess_dict, f_out, indent=4, sort_keys=True)
 
     for object_set in [object_features, object_features_validation, object_features_data, object_features_final_fit]:
-        for i in range(n_object_features):
-            object_set[:,:,i] = preprocess(object_set[:,:,i], preprocess_dict["objects_" + str(i)]["mean"], preprocess_dict["objects_" + str(i)]["std_dev"])
+        object_set = utils.preprocess_array(object_set, preprocess_dict)
+        #for i in range(n_object_features):
+        #    object_set[:,:,i] = preprocess(object_set[:,:,i], preprocess_dict["objects_" + str(i)]["mean"], preprocess_dict["objects_" + str(i)]["std_dev"])
 
 label = features["label_"]
 multi_label = features["multi_label_"]
