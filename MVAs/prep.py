@@ -244,7 +244,7 @@ global_features_validation = numpy.asarray(global_features_validation)
 global_features_data = numpy.asarray(global_features_data)
 global_features_final_fit = numpy.asarray(global_features_final_fit)
 
-if len(dnn_models) > 0:
+if len(args.dnn_models) > 0:
     with open(dnn_models[0], "r") as f_in:
         preprocess_scheme = json.load(f_in)["preprocess_scheme"]
 else:
