@@ -160,14 +160,14 @@ def tth_learner(max_objects, n_features, n_global_features, config):
     dense = keras.layers.Dense(n_nodes_dense_1, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense1_%d' % i)(dense)
     if batch_norm:
       dense = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm1_%d' % i)(dense)
-    dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout1_%d' % i)(dense)
+    dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout1_%d' % i)(dense)
 
   for i in range(n_dense_2):
     dense = keras.layers.Dense(n_nodes_dense_2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense2_%d' % i)(dense)
     if batch_norm:
       dense = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm2_%d' % i)(dense) 
     if i < (n_dense_2 - 1):
-      dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout2_%d' % i)(dense)
+      dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout2_%d' % i)(dense)
 
   output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'output')(dense)
   optimizer = keras.optimizers.Adam(lr = learning_rate)
