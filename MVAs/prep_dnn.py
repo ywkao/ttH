@@ -21,6 +21,7 @@ parser.add_argument("--train_frac", help = "what fraction of data to use for tra
 parser.add_argument("--tag", help = "name to add to hdf5 file name", type=str, default="")
 parser.add_argument("--z_score", help = "preprocess features to express them as z-score (subtract mean, divide by std.)", action="store_true")
 parser.add_argument("--fcnc", help = "use fcnc as signal, sm as bkg", action="store_true")
+parser.add_argument("--ggH_treatment", help = "how to deal with large ggH weights in fcnc vs SM higgs training", type=str, default="none")
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
@@ -58,7 +59,7 @@ train_frac = args.train_frac
 if args.backgrounds == "all":
   selection = ""
 else:
-  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11, "ttG" : 6, "ttJets" : 9, "GJets_QCD" : 18 if args.channel == "Hadronic" else 3, "VGamma" : 7, "FCNC_hut" : 22, "FCNC_hct" : 23}
+  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11, "ttG" : 6, "ttJets" : 9, "GJets_QCD" : 18 if args.channel == "Hadronic" else 3, "VGamma" : 7, "FCNC_hut" : 22, "FCNC_hct" : 23, "ggH" : 14}
   selection = "&& ("
   procs = args.backgrounds.split(",") + args.signal.split(",")
   for i in range(len(procs)):
@@ -79,16 +80,24 @@ else:
 
   selection += ")"
 
-print selection
+if args.ggH_treatment == "dont_train":
+    selection_train = selection.replace(" || ((process_id_ == 14))", "") # don't train with ggH because it has high weights
+else:
+    selection_train = selection
+print selection_train
 
 if args.fcnc:
-    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection_train))
     features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
     features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && signal_mass_label_ == 0 && rand_ < 0.01))') # dummy selection
 
     for i in range(len(features["process_id_"])):
         if features["process_id_"][i] == 0: # scale ttH by 1/7 bc we use 7 mass points in training
             features["evt_weight_"][i] *= 1.0/7.0 
+        if args.ggH_treatment == "scale":
+            if features["process_id_"][i] == 14: # scale ggH by 50 to see if it helps
+                features["evt_weight_"][i] *= 1.0/50.0
+
 
 else:
     features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
