@@ -226,6 +226,8 @@ def train_bdt(config, invert=False):
       n_round = 150
       if args.multi:
         n_round = 150
+      if "SMHiggs" in args.input and args.channel == "Hadronic":
+        n_round = 500
   else:
     n_round = config["n_round"]
   evallist = [(d_train, 'train'), (d_test, 'test')]

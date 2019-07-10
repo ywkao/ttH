@@ -1,6 +1,10 @@
 import os
 import tensorflow as tf
 print(tf.__version__)
+#if tf.__version__ == "1.14.0":
+#    print "Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0"
+#    import tensorflow.compat.v1 as tf
+#    tf.disable_v2_behavior()
 config = tf.ConfigProto(log_device_placement=True)
 config.gpu_options.allow_growth = True
 session = tf.Session(config=config)
@@ -64,7 +68,7 @@ def train(args, config):
 
   # DNN Helper
   metadata = { "input" : args.input, "config" : config, "preprocess_scheme" : args.preprocess_scheme if args.preprocess_scheme else "none"}
-  dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data, mass_data = mass_data, metadata = metadata)
+  dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.channel + "_" + args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data, mass_data = mass_data, metadata = metadata)
   if args.no_bootstrap:
     dnn.n_bootstrap = 0
 

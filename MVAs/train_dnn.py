@@ -1,6 +1,12 @@
+from __future__ import print_function
+
 import os
 import tensorflow as tf
 print(tf.__version__)
+if tf.__version__ == "1.14.0":
+    print "Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0"
+    import tensorflow.compat.v1 as tf
+    tf.disable_v2_behavior()
 config = tf.ConfigProto(log_device_placement=True)
 config.gpu_options.allow_growth = True
 session = tf.Session(config=config)
@@ -19,7 +25,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import dnn_helper
-import significance_utils
+#import significance_utils
 import utils
 import ks_test
 

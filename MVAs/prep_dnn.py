@@ -22,6 +22,7 @@ parser.add_argument("--tag", help = "name to add to hdf5 file name", type=str, d
 parser.add_argument("--z_score", help = "preprocess features to express them as z-score (subtract mean, divide by std.)", action="store_true")
 parser.add_argument("--fcnc", help = "use fcnc as signal, sm as bkg", action="store_true")
 parser.add_argument("--ggH_treatment", help = "how to deal with large ggH weights in fcnc vs SM higgs training", type=str, default="none")
+parser.add_argument("--add_mass_constraints", help = "add mjjj and mggj as global features", action = "store_true")
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
@@ -46,7 +47,10 @@ if args.do_top_tag:
 else:
   top_tag_features = []
 
-feature_names = numpy.concatenate((feature_names, top_tag_features))
+feature_names += top_tag_features 
+
+if args.add_mass_constraints:
+    feature_names += ["m_ggj_", "m_jjj_"]
 
 branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_", "evt_", "run_", "lumi_"]))
 branches = numpy.unique(branches)
