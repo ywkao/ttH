@@ -20,10 +20,10 @@ param_ranges = {
 }
 
 def product_dict(**kwargs):
-  keys = kwargs.keys()
-  vals = kwargs.values()
+  keys = list(kwargs.keys())
+  vals = list(kwargs.values())
   for instance in itertools.product(*vals):
-        yield dict(zip(keys, instance))
+        yield dict(list(zip(keys, instance)))
 
 hyperparameter_points = list(product_dict(**param_ranges))
 

@@ -7,13 +7,13 @@ def numpy_to_tree(dict, file_name, tree_name = "t"): # dict should contain {"bra
   f = ROOT.TFile(file_name, "recreate")
   t = ROOT.TTree(tree_name, "tree")
 
-  for branch in dict.iterkeys():
+  for branch in list(dict.keys()):
     branch_name = branch
 
   n_events = len(dict[branch_name])
 
   branches = {}
-  for branch in dict.iterkeys():
+  for branch in list(dict.keys()):
     if branch == "global_features":
       b = numpy.empty((1, len(dict[branch][0])), dtype = "float32")
       branches[branch] = b
@@ -24,7 +24,7 @@ def numpy_to_tree(dict, file_name, tree_name = "t"): # dict should contain {"bra
       t.Branch(branch, branches[branch], branch + "/F")
 
   for i in range(n_events):
-    for branch in dict.iterkeys():
+    for branch in list(dict.keys()):
       if branch == "global_features":
         for j in range(len(dict[branch][i])):
           branches[branch][0][j] = dict[branch][i][j]

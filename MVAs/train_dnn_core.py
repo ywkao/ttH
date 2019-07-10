@@ -1,8 +1,9 @@
+import dnn_helper
 import os
 import tensorflow as tf
-print(tf.__version__)
+#print((tf.__version__))
 #if tf.__version__ == "1.14.0":
-#    print "Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0"
+#    print("Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0")
 #    import tensorflow.compat.v1 as tf
 #    tf.disable_v2_behavior()
 config = tf.ConfigProto(log_device_placement=True)
@@ -11,7 +12,6 @@ session = tf.Session(config=config)
 
 print(session)
 
-import keras
 import numpy
 import sys
 from sklearn import metrics
@@ -22,13 +22,12 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-import dnn_helper
 import utils
 import ks_test
 
 def train(args, config):
   f = h5py.File(args.input, "r")
-  if len(config.keys()) == 0:
+  if len(list(config.keys())) == 0:
     config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False} 
 
 

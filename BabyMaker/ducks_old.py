@@ -98,9 +98,9 @@ for sample in samples:
   if args.data_only and not ("DoubleEG" in name or "EGamma" in name):
     continue
   if not args.do_all and not important_sample(name):
-    print "Skipping %s" % name
+    print("Skipping %s" % name)
     continue
-  if name in subdir_map.keys():
+  if name in list(subdir_map.keys()):
     subdir = subdir_map[name]
   else:
     subdir = default_subdir
@@ -130,11 +130,11 @@ for sample in samples:
     else:
       dslocs.append(["/" + name + "/", base_path + "/" + name + "/*", nFilesPerOutput])    
   else:
-    print "here"
+    print("here")
     dslocs.append(["/" + name + "/", base_path + "/" + name + "/", nFilesPerOutput]) 
 
 
-print dslocs
+print(dslocs)
 #time.sleep(300)
 
 
@@ -142,7 +142,7 @@ total_summary = {}
 while True:
     allcomplete = True
     for ds,loc,fpo in dslocs:
-	print loc
+	print(loc)
         sample = DirectorySample( dataset=ds, location=loc )
         files = [f.name for f in sample.get_files()]
         sample.set_files([f.name for f in sample.get_files() if "/cms/store/user/bemarsh/flashgg/MicroAOD/forHualin_2017/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_forHualin_2017/test_skim_630.root" not in f.name])
@@ -169,10 +169,10 @@ while True:
     #StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
     os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker")
     if allcomplete:
-        print ""
-        print "Job={} finished".format(job_tag)
-        print ""
+        print("")
+        print("Job={} finished".format(job_tag))
+        print("")
         break
     #os.system("python delete_bad_files.py %s" % args.tag)
-    print "Sleeping 300 seconds ..."
+    print("Sleeping 300 seconds ...")
     time.sleep(300)

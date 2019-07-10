@@ -44,7 +44,7 @@ args = parser.parse_args()
 baby_file = args.input.replace(".root", "") + ".root"
 output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_features" + args.tag + "%s%s%s%s.hdf5" % ("_invert" if args.invert else "", "_remove_new_vars" if args.old_vars else "", "_noPSV" if args.no_psv else "", "noLepID" if args.no_lepton_id else "")
 
-print output_file
+print(output_file)
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
@@ -141,9 +141,9 @@ if args.cut_ptoM:
   selection_validation += ptoM_cut
   selection_final_fit += ptoM_cut
 
-print "Selection for training events: %s" % selection_train
-print "Selection for validation events: %s" % selection_validation
-print "Selection for final fit events: %s" % selection_final_fit
+print(("Selection for training events: %s" % selection_train))
+print(("Selection for validation events: %s" % selection_validation))
+print(("Selection for final fit events: %s" % selection_final_fit))
 
 features = root_numpy.tree2array(tree, branches = branches, selection = selection_train) 
 features_validation = root_numpy.tree2array(tree, branches = branches, selection = selection_validation) 
@@ -174,15 +174,15 @@ dnn_predictions = []
 dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
 
 if do_dnn:
-  print "Calculating dnn scores"
-  print len(dnn_features)
-  print [feat for feat in dnn_features]
+  print("Calculating dnn scores")
+  print((len(dnn_features)))
+  print([feat for feat in dnn_features])
   if args.channel == "Leptonic":
     dnn_features += ["n_lep_tight_"]
     if args.do_top_tag:
       dnn_features += ["top_tag_score_"]
   i = 0
-  print dnn_features
+  print(dnn_features)
   for dnn_model in dnn_models:
     with open(dnn_model, "r") as f_in:
       model = json.load(f_in)
@@ -198,7 +198,7 @@ if do_dnn:
     feature_names.append("dnn_score_%d" % i)
     i += 1 
 
-print dnn_predictions
+print(dnn_predictions)
 
 #if do_dnn:
 #  i = 0
@@ -215,7 +215,7 @@ print dnn_predictions
 
 training_feature_names = [feature for feature in feature_names if feature not in to_remove]
 
-print training_feature_names
+print(training_feature_names)
 
 # organize features
 global_features = []

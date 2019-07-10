@@ -59,7 +59,7 @@ def plot_gp(optimizer, x):
     
     mu, sigma = posterior(optimizer, x_obs, y_obs, x)
     #axis.plot(x, y, linewidth=3, label='Target')
-    axis.plot(x_obs.flatten(), y_obs, 'D', markersize=8, label=u'Observations', color='r')
+    axis.plot(x_obs.flatten(), y_obs, 'D', markersize=8, label='Observations', color='r')
     axis.plot(x, mu, '--', color='k', label='Prediction')
 
     axis.fill(numpy.concatenate([x, x[::-1]]), 
@@ -104,8 +104,8 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["layer_norm"] = False
     config["batch_momentum"] = batch_momentum
 
-    print "Index: ", idx
-    print "Config: " , config
+    print(("Index: ", idx))
+    print(("Config: " , config))
 
     #if idx in full_results.keys():
     #    target = full_results[idx]["auc_test"][-1]
@@ -215,7 +215,7 @@ logger = JSONLogger(path=official_log)
 optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 
 if args.no_buildup or args.fixed:
-    print "Probing %d points per pbounds set" % (3*args.n_points)
+    print(("Probing %d points per pbounds set" % (3*args.n_points)))
     optimizer.set_bounds(new_bounds = pbounds_full)
     if args.fixed:
         optimizer.set_bounds(new_bounds = pbounds_fixed)
@@ -226,7 +226,7 @@ if args.no_buildup or args.fixed:
         alpha=0.000001,
     )
 
-print "Probing %d points per pbounds set" % (args.n_points)
+print(("Probing %d points per pbounds set" % (args.n_points)))
 
 optimizer.maximize(
         init_points = args.n_points if args.random else 0,
@@ -258,4 +258,4 @@ optimizer.maximize(
 
 
 for i, res in enumerate(optimizer.res):
-    print("Iteration {}: \n\t{}".format(i, res))
+    print(("Iteration {}: \n\t{}".format(i, res)))

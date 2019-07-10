@@ -1,6 +1,6 @@
+import dnn_model
 import numpy
 from sklearn import metrics
-import keras
 import json
 
 import matplotlib
@@ -8,7 +8,13 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import utils
-import dnn_model
+#import keras
+import tensorflow as tf
+#if tf.__version__ == "1.14.0":
+#    print("Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0")
+#    import tensorflow.compat.v1 as tf
+#    tf.disable_v2_behavior()
+import tensorflow.keras as keras
 
 class DNN_Features:
   def __init__(self, **kwargs):
@@ -25,7 +31,7 @@ class DNN_Features:
       if not kwargs.get('no_prep'):
         self.leptons = utils.pad_array(kwargs.get('leptons', []))
       else:
-	    self.leptons = numpy.array(kwargs.get('leptons'))
+        self.leptons = numpy.array(kwargs.get('leptons'))
       self.features = [self.global_features, self.objects, self.leptons]
       self.channel = "Leptonic"
     else:
@@ -131,14 +137,14 @@ class DNN_Helper:
     if not self.prepped:
       sum_neg_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 0)
       sum_pos_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 1)
-      print("Sum of weights before scaling: ", sum_pos_weights, sum_neg_weights)
+      print(("Sum of weights before scaling: ", sum_pos_weights, sum_neg_weights))
 
       self.features_train.weights[numpy.where(self.features_train.label == 1)] *= sum_neg_weights / sum_pos_weights 
       self.prepped = True
 
       sum_neg_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 0)
       sum_pos_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 1)
-      print("Sum of weights after scaling: ", sum_pos_weights, sum_neg_weights)
+      print(("Sum of weights after scaling: ", sum_pos_weights, sum_neg_weights))
 
     for i in range(n_epochs):
       self.model.fit(self.features_train.features, self.features_train.label, epochs = 1, batch_size = self.batch_size_train, sample_weight = self.features_train.weights, callbacks = self.callbacks)
@@ -151,8 +157,8 @@ class DNN_Helper:
       auc, auc_unc = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, self.n_bootstrap)
       auc_train, auc_unc_train = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, self.n_bootstrap)
 
-      print("Test   AUC: %.4f +/- %.4f" % (auc, auc_unc))
-      print("Train  AUC: %.4f +/- %.4f" % (auc_train, auc_unc_train))
+      print(("Test   AUC: %.4f +/- %.4f" % (auc, auc_unc)))
+      print(("Train  AUC: %.4f +/- %.4f" % (auc_train, auc_unc_train)))
 
       self.tpr["validation"].append(tpr_validation)
       self.tpr["train"].append(tpr_train)
@@ -166,7 +172,7 @@ class DNN_Helper:
 
       self.model.save_weights("dnn_weights/" + self.tag + "_weights_%d.hdf5" % i)
       with open("dnn_weights/" + self.tag + "_model_architecture_%d.json" % i, "w") as f_out:
-	    f_out.write(self.model.to_json())
+          f_out.write(self.model.to_json())
 
     return auc_train, auc
     
@@ -180,24 +186,24 @@ class DNN_Helper:
       auc_train, auc = self.train(epochs, self.batch_size_train)
       improvement = ((1-best_auc)-(1-auc))/(1-best_auc)
       if improvement > 0.01:
-          print "Improvement in (1-AUC) of %.3f percent! Keeping batch size the same" % (improvement*100.)
+          print(("Improvement in (1-AUC) of %.3f percent! Keeping batch size the same" % (improvement*100.)))
           best_auc = auc
           bad_epochs = 0
       elif self.batch_size_train * 4 < 50000:
-          print "Improvement in (1-AUC) of %.3f percent. Increasing batch size" % (improvement*100.)
+          print(("Improvement in (1-AUC) of %.3f percent. Increasing batch size" % (improvement*100.)))
           self.batch_size_train *= 4
           bad_epochs = 0
           if auc > best_auc:
               best_auc = auc
       elif improvement > 0:
-          print "Improvement in (1-AUC) of %.3f percent. Can't increase batch size anymore" % (improvement*100.) 
+          print(("Improvement in (1-AUC) of %.3f percent. Can't increase batch size anymore" % (improvement*100.))) 
           bad_epochs = 0
           best_auc = auc
       else:
-          print "AUC did not improve and we can't increase batch size anymore. Stopping training."
+          print("AUC did not improve and we can't increase batch size anymore. Stopping training.")
           keep_training = False
       if self.n_epochs >= self.max_epochs:
-          print "Have already trained for 25 epochs. Stopping training."
+          print("Have already trained for 25 epochs. Stopping training.")
           keep_training = False
 
     auc, auc_unc = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 50)
@@ -215,14 +221,14 @@ class DNN_Helper:
     self.model.load_weights(self.weights_file)    
     self.predictions["data"] = self.model.predict(self.features_data.features, self.batch_size).flatten()
     for i in range(len(self.predictions["data"])):
-      print "Event", self.run_data[i], self.lumi_data[i], self.evt_data[i]
-      print "Mass", self.mass_data[i]
-      print "Global features"
-      print self.features_data.global_features[i]
-      print "Object features"
-      print self.features_data.objects[i]
-      print "DNN Score"
-      print self.predictions["data"][i]
+      print(("Event", self.run_data[i], self.lumi_data[i], self.evt_data[i]))
+      print(("Mass", self.mass_data[i]))
+      print("Global features")
+      print((self.features_data.global_features[i]))
+      print("Object features")
+      print((self.features_data.objects[i]))
+      print("DNN Score")
+      print((self.predictions["data"][i]))
 
   def initialize_plot(self):
     fig = plt.figure()
@@ -259,6 +265,6 @@ class DNN_Helper:
   def do_diagnostics(self):
     numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"], scores_final_fit = self.predictions["final_fit"], evt_data = self.evt_data, run_data = self.run_data, lumi_data = self.lumi_data, mass_data = self.mass_data)
     self.make_learning_curve()
-    for ref in self.features_validation.references.iterkeys():
+    for ref in list(self.features_validation.references.keys()):
       self.make_comparison(ref)
 

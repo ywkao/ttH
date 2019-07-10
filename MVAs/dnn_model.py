@@ -1,5 +1,13 @@
-import keras
+#import keras
 import keras_layer_normalization
+
+import tensorflow as tf
+print((tf.__version__))
+#if tf.__version__ == "1.14.0":
+#    print("Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0")
+#    import tensorflow.compat.v1 as tf
+#    tf.disable_v2_behavior()
+import tensorflow.keras as keras
 
 def standard(max_objects, n_features):
   input_objects = keras.layers.Input(shape=(max_objects, n_features), name = 'input')
@@ -40,7 +48,7 @@ def standard(max_objects, n_features):
 
   model = keras.models.Model(inputs = [input_objects], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')
-  print(model.summary())
+  print((model.summary()))
 
   return model
 
@@ -55,64 +63,64 @@ def baseline_leptonic_v1(max_objects, n_features, max_leptons, n_lepton_features
   batch_momentum = 0.6
   recurrent_dropout = 0.0
   nonrecurrent_dropout = 0.0
-  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_1', go_backwards=False, return_sequences=True)(input_objects)
-  #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_1")(lstm)
+  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_1', go_backwards=False, return_sequences=True)(input_objects)
+  #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_1")(lstm)
   #lstm = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_dropout_1')(lstm)
-  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_2', go_backwards=False, return_sequences=True)(lstm)
-  #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_2")(lstm)
+  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_2', go_backwards=False, return_sequences=True)(lstm)
+  #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_2")(lstm)
   #lstm = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_dropout_2')(lstm)
-  #lstm = keras.layers.LSTM(n_lstm, dropout = 0.0, recurrent_dropout = 0.0, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_3', go_backwards=False, return_sequences=True)(lstm)
-  #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_3")(lstm)
+  #lstm = keras.layers.LSTM(n_lstm, dropout = 0.0, recurrent_dropout = 0.0, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_3', go_backwards=False, return_sequences=True)(lstm)
+  #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_3")(lstm)
   #lstm = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_dropout_3')(lstm)
-  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_4', go_backwards=False)(lstm)
-  #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_4")(lstm)
+  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_4', go_backwards=False)(lstm)
+  #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_4")(lstm)
   #lstm = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_dropout_4')(lstm)
 
   # lepton lstm
-  lstm_lepton = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_lepton_1', go_backwards=False, return_sequences=True)(input_leptons)
-  #lstm_lepton = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_lepton_batchnorm_1")(lstm)
+  lstm_lepton = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_lepton_1', go_backwards=False, return_sequences=True)(input_leptons)
+  #lstm_lepton = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_lepton_batchnorm_1")(lstm)
   #lstm_lepton = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_lepton_dropout_1')(lstm)
-  lstm_lepton = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_lepton_2', go_backwards=False, return_sequences=True)(lstm_lepton)
-  #lstm_lepton = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_lepton_batchnorm_2")(lstm)
+  lstm_lepton = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_lepton_2', go_backwards=False, return_sequences=True)(lstm_lepton)
+  #lstm_lepton = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_lepton_batchnorm_2")(lstm)
   #lstm_lepton = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_lepton_dropout_2')(lstm)
-  #lstm_lepton = keras.layers.LSTM(n_lstm, dropout = 0.0, recurrent_dropout = 0.0, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_lepton_3', go_backwards=False, return_sequences=True)(lstm)
-  #lstm_lepton = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_lepton_batchnorm_3")(lstm)
+  #lstm_lepton = keras.layers.LSTM(n_lstm, dropout = 0.0, recurrent_dropout = 0.0, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_lepton_3', go_backwards=False, return_sequences=True)(lstm)
+  #lstm_lepton = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_lepton_batchnorm_3")(lstm)
   #lstm_lepton = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_lepton_dropout_3')(lstm)
-  lstm_lepton = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_lepton_4', go_backwards=False)(lstm_lepton)
+  lstm_lepton = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_lepton_4', go_backwards=False)(lstm_lepton)
 
 
 
   if no_global:
-    print "Using LSTM only"
+    print("Using LSTM only")
     merged_features = lstm
   elif no_lstm:
-    print "Using global only"
+    print("Using global only")
     merged_features = input_global
   else:
-    print "Using LSTM + global"
+    print("Using LSTM + global")
     merged_features = keras.layers.concatenate([input_global, lstm, lstm_lepton])
 
   # fully-connected layers
   maxnorm = 3
   dropout_rate = 0.1
-  dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_1')(merged_features)
+  dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_1')(merged_features)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_1')(dense)
-  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_2')(dense)
+  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_2')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_2')(dense)
-  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_3')(dense)
+  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_3')(dense)
   #dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_3')(dense)
-  #dense = keras.layers.Dense(32, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_4')(dense)
+  #dense = keras.layers.Dense(32, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_4')(dense)
   #dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_4')(dense)
-  #dense = keras.layers.Dense(32, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_5')(dense)
+  #dense = keras.layers.Dense(32, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_5')(dense)
   #dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_5')(dense)
 
   # output
-  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'output')(dense)
+  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'output')(dense)
   optimizer = keras.optimizers.Adam()
 
   model = keras.models.Model(inputs = [input_global, input_objects, input_leptons], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')
-  print(model.summary())
+  print((model.summary()))
 
   return model
 
@@ -134,13 +142,13 @@ def tth_learner(max_objects, n_features, n_global_features, config):
 
   learning_rate = config["learning_rate"]
 
-  if "batch_norm" in config.keys():
+  if "batch_norm" in list(config.keys()):
     batch_norm = config["batch_norm"]
     batch_momentum = config["batch_momentum"]
   else:
     batch_norm = False
   
-  if "layer_norm" in config.keys():
+  if "layer_norm" in list(config.keys()):
     layer_norm = config["layer_norm"]
   else:
     layer_norm = False
@@ -149,33 +157,34 @@ def tth_learner(max_objects, n_features, n_global_features, config):
   lstm = input_objects
 
   for i in range(n_lstm):
-    lstm =  keras.layers.LSTM(n_nodes_lstm, implementation=2, activation='tanh', kernel_constraint = keras.constraints.maxnorm(maxnorm), go_backwards=False, return_sequences=(i != (n_lstm-1)), name='lstm_%d' % i)(lstm)
+    lstm =  keras.layers.LSTM(n_nodes_lstm, implementation=2, activation='tanh', kernel_constraint = keras.constraints.max_norm(maxnorm), go_backwards=False, return_sequences=(i != (n_lstm-1)), name='lstm_%d' % i)(lstm)
     if layer_norm: 
-      #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'lstm_batch_norm_%d' % i)(lstm)
+      #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'lstm_batch_norm_%d' % i)(lstm)
       lstm = keras_layer_normalization.LayerNormalization()(lstm)
 
   # Merge LSTM output with high-level features in fully-connected layers
   dense = keras.layers.concatenate([input_global, lstm])
   for i in range(n_dense_1):
-    dense = keras.layers.Dense(n_nodes_dense_1, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense1_%d' % i)(dense)
+    dense = keras.layers.Dense(n_nodes_dense_1, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense1_%d' % i)(dense)
     if batch_norm:
-      dense = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm1_%d' % i)(dense)
+      dense = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm1_%d' % i)(dense)
     dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout1_%d' % i)(dense)
 
   for i in range(n_dense_2):
-    dense = keras.layers.Dense(n_nodes_dense_2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense2_%d' % i)(dense)
+    dense = keras.layers.Dense(n_nodes_dense_2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense2_%d' % i)(dense)
     if batch_norm:
-      dense = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm2_%d' % i)(dense) 
+      dense = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm2_%d' % i)(dense) 
     if i < (n_dense_2 - 1):
       dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout2_%d' % i)(dense)
 
-  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'output')(dense)
-  optimizer = keras.optimizers.Adam(lr = learning_rate)
+  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'output')(dense)
+  optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate)
+  #optimizer = keras.optimizers.Adam(lr = learning_rate)
 
   model = keras.models.Model(inputs = [input_global, input_objects], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')
-  print(model.summary())
-  print "DNN Config:", config
+  print((model.summary()))
+  print(("DNN Config:", config))
 
   return model
 
@@ -189,13 +198,13 @@ def baseline_v1(max_objects, n_features, n_global_features, no_global, no_lstm, 
   dropout_rate = 0.10
   do_conv = False
   if do_conv:
-    conv = keras.layers.Convolution1D(64, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_1')(input_objects)
+    conv = keras.layers.Convolution1D(64, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_1')(input_objects)
     conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_1')(conv)
-    conv = keras.layers.Convolution1D(64, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_2')(conv)
+    conv = keras.layers.Convolution1D(64, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_2')(conv)
     conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_2')(conv)
-    conv = keras.layers.Convolution1D(32, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_3')(conv)
+    conv = keras.layers.Convolution1D(32, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_3')(conv)
     #conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_3')(conv)
-    conv = keras.layers.Convolution1D(5, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_4')(conv)
+    conv = keras.layers.Convolution1D(5, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_4')(conv)
     #conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_4')(conv)
 
   else:
@@ -205,50 +214,50 @@ def baseline_v1(max_objects, n_features, n_global_features, no_global, no_lstm, 
   batch_momentum = 0.6
   recurrent_dropout = 0.0
   nonrecurrent_dropout = 0.0
-  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_1', go_backwards=False, return_sequences=True)(conv)
-  #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_1")(lstm)
+  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_1', go_backwards=False, return_sequences=True)(conv)
+  #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_1")(lstm)
   #lstm = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_dropout_1')(lstm)
-  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_2', go_backwards=False, return_sequences=True)(lstm)
-  #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_2")(lstm)
+  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_2', go_backwards=False, return_sequences=True)(lstm)
+  #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_2")(lstm)
   #lstm = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_dropout_2')(lstm)
-  #lstm = keras.layers.LSTM(n_lstm, dropout = 0.0, recurrent_dropout = 0.0, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_3', go_backwards=False, return_sequences=True)(lstm)
-  #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_3")(lstm)
+  #lstm = keras.layers.LSTM(n_lstm, dropout = 0.0, recurrent_dropout = 0.0, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_3', go_backwards=False, return_sequences=True)(lstm)
+  #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_3")(lstm)
   #lstm = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_dropout_3')(lstm)
-  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.maxnorm(maxnorm), recurrent_constraint = keras.constraints.maxnorm(maxnorm), name='lstm_4', go_backwards=False)(lstm)
-  #lstm = keras.layers.normalization.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_4")(lstm)
+  lstm = keras.layers.LSTM(n_lstm, dropout = nonrecurrent_dropout, recurrent_dropout = recurrent_dropout, implementation=2, activation = 'tanh',  kernel_constraint = keras.constraints.max_norm(maxnorm), recurrent_constraint = keras.constraints.max_norm(maxnorm), name='lstm_4', go_backwards=False)(lstm)
+  #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = "lstm_batchnorm_4")(lstm)
   #lstm = keras.layers.Dropout(rate = dropout_rate, name = 'lstm_dropout_4')(lstm)
 
   if no_global:
-    print "Using LSTM only"
+    print("Using LSTM only")
     merged_features = lstm
   elif no_lstm:
-    print "Using global only"
+    print("Using global only")
     merged_features = input_global
   else:
-    print "Using LSTM + global"
+    print("Using LSTM + global")
     merged_features = keras.layers.concatenate([input_global, lstm])
 
   # fully-connected layers
   maxnorm = 3
   dropout_rate = 0.25
-  dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_1')(merged_features)
+  dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_1')(merged_features)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_1')(dense)
-  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_2')(dense)
+  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_2')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_2')(dense)
-  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_3')(dense)
+  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_3')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_3')(dense)
-  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_4')(dense)
+  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_4')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_4')(dense)
-  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_5')(dense)
+  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_5')(dense)
   #dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_5')(dense)
 
   # output
-  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'output')(dense)
+  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'output')(dense)
   optimizer = keras.optimizers.Adam()
 
   model = keras.models.Model(inputs = [input_global, input_objects], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')
-  print(model.summary())
+  print((model.summary()))
 
   return model
 
@@ -259,44 +268,44 @@ def cnn_v1(max_objects, n_features, n_global_features, no_global, no_lstm):
   maxnorm = 2
   # 1x1 convolutional layers
   dropout_rate = 0.15
-  conv = keras.layers.Convolution1D(128, 2, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_1')(input_objects)
+  conv = keras.layers.Convolution1D(128, 2, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_1')(input_objects)
   conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_1')(conv)
-  conv = keras.layers.Convolution1D(128, 2, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_2')(conv)
+  conv = keras.layers.Convolution1D(128, 2, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_2')(conv)
   conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_2')(conv)
-  conv = keras.layers.Convolution1D(128, 2, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_3')(conv)
+  conv = keras.layers.Convolution1D(128, 2, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_3')(conv)
   conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_3')(conv)
-  conv = keras.layers.Convolution1D(128, 2, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_4')(conv)
+  conv = keras.layers.Convolution1D(128, 2, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_4')(conv)
   conv = keras.layers.Flatten()(conv)
 
   if no_global:
-    print "Using LSTM only"
+    print("Using LSTM only")
     merged_features = conv
   elif no_lstm:
-    print "Using global only"
+    print("Using global only")
     merged_features = input_global
   else:
-    print "Using LSTM + global"
+    print("Using LSTM + global")
     merged_features = keras.layers.concatenate([input_global, conv])
   # fully-connected layers
   dropout_rate = 0.1
-  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_1')(merged_features)
+  dense = keras.layers.Dense(200, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_1')(merged_features)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_1')(dense)
-  dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_2')(dense)
+  dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_2')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_2')(dense)
-  dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_3')(dense)
+  dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_3')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_3')(dense)
-  dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_4')(dense)
+  dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_4')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_4')(dense)
-  dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_5')(dense)
+  dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_5')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_5')(dense)
 
   # output
-  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'output')(dense)
+  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'output')(dense)
   optimizer = keras.optimizers.Adam()
 
   model = keras.models.Model(inputs = [input_global, input_objects], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')
-  print(model.summary())
+  print((model.summary()))
 
   return model
 
@@ -308,13 +317,13 @@ def gru_v1(max_objects, n_features, n_global_features, no_global, no_lstm, n_lst
   maxnorm = 2
   # 1x1 convolutional layers
   dropout_rate = 0.15
-  #conv = keras.layers.Convolution1D(64, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_1')(input_objects)
+  #conv = keras.layers.Convolution1D(64, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_1')(input_objects)
   #conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_1')(conv)
-  #conv = keras.layers.Convolution1D(64, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_2')(conv)
+  #conv = keras.layers.Convolution1D(64, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_2')(conv)
   #conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_2')(conv)
-  #conv = keras.layers.Convolution1D(32, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_3')(conv)
+  #conv = keras.layers.Convolution1D(32, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_3')(conv)
   #conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_3')(conv)
-  #conv = keras.layers.Convolution1D(6, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'conv_4')(conv)
+  #conv = keras.layers.Convolution1D(6, 1, kernel_initializer = 'lecun_uniform', activation = 'relu', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'conv_4')(conv)
   #conv = keras.layers.Dropout(rate = dropout_rate, name = 'conv_dropout_4')(conv)
 
   conv = input_objects
@@ -329,35 +338,35 @@ def gru_v1(max_objects, n_features, n_global_features, no_global, no_lstm, n_lst
   gru = keras.layers.Dropout(rate = dropout_rate, name = 'gru_dropout_2')(gru)
 
   if no_global:
-    print "Using LSTM only"
+    print("Using LSTM only")
     merged_features = gru
   elif no_lstm:
-    print "Using global only"
+    print("Using global only")
     merged_features = input_global
   else:
-    print "Using LSTM + global"
+    print("Using LSTM + global")
     merged_features = keras.layers.concatenate([input_global, gru])
 
   # fully-connected layers
   dropout_rate = 0.2
-  dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_1')(merged_features)
+  dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_1')(merged_features)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_1')(dense)
-  dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_2')(dense)
+  dense = keras.layers.Dense(300, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_2')(dense)
   dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_2')(dense)
-  #dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_3')(dense)
+  #dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_3')(dense)
   #dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_3')(dense)
-  #dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_4')(dense)
+  #dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_4')(dense)
   #dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_4')(dense)
-  #dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'dense_5')(dense)
+  #dense = keras.layers.Dense(100, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense_5')(dense)
   #dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout_5')(dense)
 
   # output
-  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.maxnorm(maxnorm), name = 'output')(dense)
+  output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'output')(dense)
   optimizer = keras.optimizers.Adam()
 
   model = keras.models.Model(inputs = [input_global, input_objects], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')
-  print(model.summary())
+  print((model.summary()))
 
   return model
 

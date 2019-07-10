@@ -1,4 +1,4 @@
-import keras
+import tensorflow.keras as keras
 keras.backend.set_learning_phase(0) # you *NEED* this line, otherwise your DNN will crash in CMSSW/tensorflow C++ API
 				    # this line tells tensorflow to save the graph in "prediction" mode rather than "learning" mode
 import tensorflow as tf

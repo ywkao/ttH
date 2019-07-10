@@ -76,10 +76,10 @@ def calc_sigma_eff(signal_data, weights):
 resonant_ids = [0, 11, 12, 14, 15, 16] # ttH, THQ, THW, ggH, VBF, VH
 def events_passing_cut(events, cut, choose_resonant = False):
   events_pass = {"mass" : [], "weights" : []}#, "mva_score" : []}
-  is_bkg = "process_id" in events.keys()
+  is_bkg = "process_id" in list(events.keys())
   for i in range(len(events["mass"])):
     pass_cut = True
-    for mva_name in events["mva_score"].keys():
+    for mva_name in list(events["mva_score"].keys()):
       if not events["mva_score"][mva_name][i] > cut[mva_name]:
         pass_cut = False
     if is_bkg and not choose_resonant: # only do non-resonant bkgs here
@@ -104,7 +104,7 @@ def poolcontext(*args, **kwargs):
 def calc_za(cut_tuple, signal_events, background_events, is_data, mc_bkg_events, mass_shift):
   testing_frac = 0.5
   cut_list = dict((x,y) for x,y in cut_tuple)
-  print cut_list
+  print(cut_list)
   # Get events passing cut
   signal_events_passing_cut = events_passing_cut(signal_events, cut_list)
   bkg_events_passing_cut = events_passing_cut(background_events, cut_list)
@@ -152,9 +152,9 @@ def calc_za(cut_tuple, signal_events, background_events, is_data, mc_bkg_events,
   # Calculate Z_A
   z_mc = Z_A(s, b)
   z_mc_unc = unc_ZA(s, b, s_unc, b_unc) if z_mc > 0 else 0
-  print "s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)
-  print "non-resonant background: %.3f +/- %.3f, resonant background: %.3f +/- %.3f" % (b_non_res, b_non_res_unc, b_res, b_res_unc)
-  print "za: %.3f +/- %.3f" % (z_mc, z_mc_unc)
+  print(("s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)))
+  print(("non-resonant background: %.3f +/- %.3f, resonant background: %.3f +/- %.3f" % (b_non_res, b_non_res_unc, b_res, b_res_unc)))
+  print(("za: %.3f +/- %.3f" % (z_mc, z_mc_unc)))
   return cut_list, z_mc, z_mc_unc, s, b, sigma_eff 
 
   #za_dict.append({"z_mc": z_mc, "cut_list" : cut_list})
@@ -174,7 +174,7 @@ def scan_za_parallel(cut_combos, signal_events, background_events, is_data, mc_b
   with poolcontext(processes=8) as pool:
     results = pool.map(partial(calc_za, signal_events = signal_events, background_events = background_events, is_data = is_data, mc_bkg_events = mc_bkg_events, mass_shift = mass_shift), cut_combos) 
     for result in results:
-      print result
+      print(result)
       cuts.append(result[0])
       za.append(result[1])
       za_unc.append(result[2])
@@ -197,7 +197,7 @@ def scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events
 
   for cut_tuple in cut_combos:
     cut_list = dict((x,y) for x,y in cut_tuple)
-    print cut_list
+    print(cut_list)
     # Get events passing cut
     signal_events_passing_cut = events_passing_cut(signal_events, cut_list)
     bkg_events_passing_cut = events_passing_cut(background_events, cut_list)
@@ -246,9 +246,9 @@ def scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events
     # Calculate Z_A
     z_mc = Z_A(s, b)
     z_mc_unc = unc_ZA(s, b, s_unc, b_unc) if z_mc > 0 else 0
-    print "s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)
-    print "non-resonant background: %.3f +/- %.3f, resonant background: %.3f +/- %.3f" % (b_non_res, b_non_res_unc, b_res, b_res_unc)
-    print "za: %.3f +/- %.3f" % (z_mc, z_mc_unc)
+    print(("s: %.3f +/- %.3f, b: %.3f +/- %.3f, mean_eff: %.3f, sigma_eff: %.3f" % (s, s_unc, b, b_unc, mean_eff, sigma_eff)))
+    print(("non-resonant background: %.3f +/- %.3f, resonant background: %.3f +/- %.3f" % (b_non_res, b_non_res_unc, b_res, b_res_unc)))
+    print(("za: %.3f +/- %.3f" % (z_mc, z_mc_unc)))
     za_dict.append({"z_mc": z_mc, "cut_list" : cut_list}) 
     cuts.append(cut_list)
     za.append(z_mc)
@@ -272,7 +272,7 @@ def extract_1d_curve(full_za_dict):
   # First sort za_dict by n_sig
   sort_indices = numpy.argsort(full_za_dict["n_sig"])
   #print sort_indices
-  for key in full_za_dict.keys():
+  for key in list(full_za_dict.keys()):
     array = numpy.asarray(full_za_dict[key])
     #print array
     full_za_dict[key] = array[sort_indices]
@@ -296,10 +296,10 @@ def extract_1d_curve(full_za_dict):
       good_indices.append(best_index_global)
       za_group = []
 
-  print good_indices
+  print(good_indices)
 
   za_dict_trimmed = {}
-  for key in full_za_dict.keys():
+  for key in list(full_za_dict.keys()):
     za_dict_trimmed[key] = full_za_dict[key][good_indices]
 
   return za_dict_trimmed
@@ -339,10 +339,10 @@ def extract_1d_curve(full_za_dict):
 def za_scores(n_quantiles, signal_events, background_events, is_data, mc_bkg_events = {}, mass_shift = True):
   # Calculate cuts corresponding to each quantile
   mva_cuts = {}
-  for mva_name in signal_events["mva_score"].keys():
+  for mva_name in list(signal_events["mva_score"].keys()):
     quantiles, mva_cut = quantiles_to_mva_score(n_quantiles, signal_events["mva_score"][mva_name])
-    print "Evenly spaced signal efficiency cuts:" 
-    print mva_name, mva_cut
+    print("Evenly spaced signal efficiency cuts:") 
+    print((mva_name, mva_cut))
     mva_cut_tuples = []
     for cut in mva_cut:
       mva_cut_tuples.append((mva_name, cut))
@@ -350,16 +350,16 @@ def za_scores(n_quantiles, signal_events, background_events, is_data, mc_bkg_eve
 
   # Make list of all cut combinations (N-d)
   mva_cut_list = []
-  for mva_name in mva_cuts.keys():
+  for mva_name in list(mva_cuts.keys()):
     mva_cut_list.append(mva_cuts[mva_name]["cut_tuples"])
   cut_combos = list(itertools.product(*mva_cut_list)) # all unique combinations of cuts from each of the N MVAs
-  print "Performing %d-D scan with %d points" % (len(signal_events["mva_score"].keys()), len(cut_combos))
+  print(("Performing %d-D scan with %d points" % (len(list(signal_events["mva_score"].keys())), len(cut_combos))))
 
   # Perform full N-d scan
   #full_za_dict = scan_za(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift) # Full N-d scan
   full_za_dict = scan_za_parallel(cut_combos, signal_events, background_events, is_data, mc_bkg_events, mass_shift) # Full N-d scan
 
-  if len(mva_cuts.keys()) > 1:
+  if len(list(mva_cuts.keys())) > 1:
     za_dict_1d = extract_1d_curve(full_za_dict)
 
     # Now fix all other MVA scores except BDT at the value for which we get max Z_A, and perform 1-d scan on BDT score

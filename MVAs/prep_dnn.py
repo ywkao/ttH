@@ -27,7 +27,7 @@ args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
 output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_dnn_features_" + args.tag + ".hdf5"
-print output_file
+print(output_file)
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
@@ -88,7 +88,7 @@ if args.ggH_treatment == "dont_train":
     selection_train = selection.replace(" || ((process_id_ == 14))", "") # don't train with ggH because it has high weights
 else:
     selection_train = selection
-print selection_train
+print(selection_train)
 
 if args.fcnc:
     features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection_train))

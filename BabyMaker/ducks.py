@@ -77,7 +77,7 @@ for sample in samples:
     elif "Run2018" in sample:
       datasets[name]["meta_conditions"] = conds_dict["2018"]
     else:
-      print "ERROR: could not match data sample to a year"
+      print("ERROR: could not match data sample to a year")
   else:
     if "RunIISummer16" in sample:
       datasets[name]["meta_conditions"] = conds_dict["2016"]
@@ -86,7 +86,7 @@ for sample in samples:
     elif "RunIIAutumn18" in sample:
       datasets[name]["meta_conditions"] = conds_dict["2018"]
     else:
-      print "ERROR: could not match MC sample to a year"
+      print("ERROR: could not match MC sample to a year")
 
 
 
@@ -95,7 +95,7 @@ for sample in samples:
 total_summary = {}
 while True:
     allcomplete = True
-    for dataset, info in datasets.iteritems():
+    for dataset, info in datasets.items():
       if args.data_only and not info["isData"]:
         continue
       #if "VHToGG" in dataset:
@@ -103,10 +103,10 @@ while True:
       #  continue
       #if not ("Run2016" in dataset or "Run2017" in dataset or "Run2018" in dataset): 
       #  continue
-      print "Submitting jobs for: ", dataset
+      print("Submitting jobs for: ", dataset)
       sample = DirectorySample( dataset = dataset, location = info["input_loc"])
       files = [f.name for f in sample.get_files()]
-      print len(files)
+      print(len(files))
       task = CondorTask(
 	    sample = sample,
 	    open_dataset = False,
@@ -130,9 +130,9 @@ while True:
     StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
     os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker")
     if allcomplete:
-        print ""
-        print "Job={} finished".format(job_tag)
-        print ""
+        print("")
+        print("Job={} finished".format(job_tag))
+        print("")
         break
-    print "Sleeping 300 seconds ..."
+    print("Sleeping 300 seconds ...")
     time.sleep(300)

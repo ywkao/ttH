@@ -39,12 +39,12 @@ def find_files_in_subdirs(base_dir, magic_string):
 def make_all_subdirs(base_dir, magic_string, target_dir):
   l1_dirs = glob.glob(base_dir + magic_string)
   for l1_dir in l1_dirs:
-    print l1_dir
+    print(l1_dir)
     subdirs = [x[0] for x in os.walk(l1_dir)]
     for dir in subdirs:
-      print dir
+      print(dir)
       if not os.path.isdir(dir.replace(base_dir, target_dir)):
-	print("mkdir %s" % dir.replace(base_dir, target_dir))
+	print(("mkdir %s" % dir.replace(base_dir, target_dir)))
 	os.system("mkdir %s" % dir.replace(base_dir, target_dir))
 
 # Make any needed directories and subdirectories
@@ -78,7 +78,7 @@ remaining_space = free_space - size_of_backup
 if remaining_space > breathing_room: # backup these files!
   did_backup = True
   for file in files_to_backup:
-    print("cp %s %s" % (file, file.replace(hadoop_dir, nfs_dir))) 
+    print(("cp %s %s" % (file, file.replace(hadoop_dir, nfs_dir)))) 
     os.system("cp %s %s" % (file, file.replace(hadoop_dir, nfs_dir)))    
 
 else:

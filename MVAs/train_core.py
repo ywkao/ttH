@@ -33,7 +33,7 @@ def train_bdt(config, invert=False):
   feature_names = utils.load_array(f, 'feature_names')
   training_feature_names = utils.load_array(f, 'training_feature_names')
 
-  print training_feature_names
+  print(training_feature_names)
 
   global_features = utils.load_array(f, 'global')
   global_dnn_features = utils.load_array(f, 'global_dnn')
@@ -119,17 +119,17 @@ def train_bdt(config, invert=False):
   train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
   nTrain = int(len(label)*train_frac)
 
-  print global_features.shape
-  print label.shape
-  print weights.shape
+  print((global_features.shape))
+  print((label.shape))
+  print((weights.shape))
 
-  print global_features_validation.shape
-  print label_validation.shape
-  print weights_validation.shape
+  print((global_features_validation.shape))
+  print((label_validation.shape))
+  print((weights_validation.shape))
 
-  print global_features_data.shape
-  print label_data.shape
-  print weights_data.shape
+  print((global_features_data.shape))
+  print((label_data.shape))
+  print((weights_data.shape))
 
   x_train, y_train, y_train_multi, weights_train = global_features, label, multi_label, weights
   x_test, y_test, y_test_multi, weights_test  = global_features_validation, label_validation, multi_label_validation, weights_validation
@@ -156,7 +156,7 @@ def train_bdt(config, invert=False):
   sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
   sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
 
-  print sum_pos_weights, sum_neg_weights
+  print((sum_pos_weights, sum_neg_weights))
 
 
   scale_tth = False
@@ -175,7 +175,7 @@ def train_bdt(config, invert=False):
     else:
       for i in range(num_multi_class):
         sum_class_weights = utils.sum_of_weights(weights_train_modified, multi_label, i)
-        print "Normalizing class %d by %.6f" % (i, sum_class_weights)
+        print(("Normalizing class %d by %.6f" % (i, sum_class_weights)))
         for j in range(len(weights_train_modified)):
           if multi_label[j] == i:
             weights_train_modified[j] *= 1. / sum_class_weights
@@ -183,14 +183,14 @@ def train_bdt(config, invert=False):
   if args.res:
     for i in range(len(weights_train_modified)):
       if label[i] == 1:
-	    print weights_train_modified[i], 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2)
+	    print((weights_train_modified[i], 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2)))
 	    weights_train_modified[i] *= 1/math.sqrt(lead_sigmaEtoE[i] ** 2 + sublead_sigmaEtoE[i] ** 2) 
-	    print weights_train_modified[i]
+	    print((weights_train_modified[i]))
 
   sum_neg_weights = utils.sum_of_weights(weights_train_modified, label, 0)
   sum_pos_weights = utils.sum_of_weights(weights_train_modified, label, 1)
 
-  print sum_pos_weights, sum_neg_weights
+  print((sum_pos_weights, sum_neg_weights))
 
   d_train = xgboost.DMatrix(X_train, label = Y_train, weight = weights_train_modified)
   d_test = xgboost.DMatrix(X_test, label = Y_test)
@@ -198,7 +198,7 @@ def train_bdt(config, invert=False):
   d_final_fit = xgboost.DMatrix(X_final_fit)
 
   # Define BDT parameters
-  if "kparam" not in config.keys(): 
+  if "kparam" not in list(config.keys()): 
    param = { 
 	    'max_depth': 4,
 	    'eta': 0.2,
@@ -218,9 +218,9 @@ def train_bdt(config, invert=False):
     param["scale_pos_weight"] = 1
     param["min_child_weight"] = 0.000001
 
-  print param
+  print(param)
 
-  if "n_round" not in config.keys(): 
+  if "n_round" not in list(config.keys()): 
     n_round = 300 if args.channel == "Hadronic" else 150
     if "FCNC" in args.input:
       n_round = 150
@@ -233,7 +233,7 @@ def train_bdt(config, invert=False):
   evallist = [(d_train, 'train'), (d_test, 'test')]
   progress = {}
 
-  print param, n_round
+  print((param, n_round))
 
   # train
   bdt = xgboost.train(param, d_train, n_round, evallist, evals_result = progress)	
@@ -276,7 +276,7 @@ def train_bdt(config, invert=False):
       pred_ref_data = dnn.predictions["data"]
       pred_ref_final_fit = dnn.predictions["final_fit"]
 
-  print pred_test.shape
+  print((pred_test.shape))
 
   #if args.multi:
   #  pred_train = pred_train[:,0] 
@@ -284,7 +284,7 @@ def train_bdt(config, invert=False):
   #  pred_data = pred_data[:,0]
   #  pred_final_fit = pred_final_fit[:,0]
 
-  print pred_test.shape
+  print((pred_test.shape))
 
   # analysis
   # ks test
@@ -297,8 +297,8 @@ def train_bdt(config, invert=False):
     prediction_test = pred_test
 
   d_sig, p_value_sig, d_bkg, p_value_bkg = ks_test.ks_test(prediction_train, prediction_test, y_train, y_test)
-  print "Results of ks-test (d-score) for signal: %.10f and background: %.10f" % (d_sig, d_bkg)
-  print "Results of ks-test (p-value) for signal: %.10f and background: %.10f" % (p_value_sig, p_value_bkg)
+  print(("Results of ks-test (d-score) for signal: %.10f and background: %.10f" % (d_sig, d_bkg)))
+  print(("Results of ks-test (p-value) for signal: %.10f and background: %.10f" % (p_value_sig, p_value_bkg)))
 
   # roc curves
   fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, prediction_train, pos_label = 1, sample_weight = weights_train)
@@ -329,21 +329,21 @@ def train_bdt(config, invert=False):
     fpr_train_2016, tpr_train_2016, thresh_train_2016 = metrics.roc_curve(y_train_2016, prediction_train_2016, pos_label = 1, sample_weight = weights_train_2016)
     fpr_test_2016, tpr_test_2016, thresh_test_2016 = metrics.roc_curve(y_test_2016, prediction_test_2016, pos_label = 1, sample_weight = weights_test_2016)
     auc_2016, unc_2016 = utils.auc_and_unc(y_test_2016, prediction_test_2016, weights_test_2016, 25)
-    print "Testing  AUC (2016): %.3f +/- %.4f" % (auc_2016, unc_2016)
+    print(("Testing  AUC (2016): %.3f +/- %.4f" % (auc_2016, unc_2016)))
     numpy.savez("bdt_roc_2016_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2016, y_test = y_test_2016, prediction_train = prediction_train_2016, prediction_test = prediction_test_2016, fpr_train = fpr_train_2016, fpr_test = fpr_test_2016, tpr_train = tpr_train_2016, tpr_test = tpr_test_2016)
 
   if len(y_train_2017) > 0:
     fpr_train_2017, tpr_train_2017, thresh_train_2017 = metrics.roc_curve(y_train_2017, prediction_train_2017, pos_label = 1, sample_weight = weights_train_2017)
     fpr_test_2017, tpr_test_2017, thresh_test_2017 = metrics.roc_curve(y_test_2017, prediction_test_2017, pos_label = 1, sample_weight = weights_test_2017)
     auc_2017, unc_2017 = utils.auc_and_unc(y_test_2017, prediction_test_2017, weights_test_2017, 25)
-    print "Testing  AUC (2017): %.3f +/- %.4f" % (auc_2017, unc_2017)
+    print(("Testing  AUC (2017): %.3f +/- %.4f" % (auc_2017, unc_2017)))
     numpy.savez("bdt_roc_2017_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2017, y_test = y_test_2017, prediction_train = prediction_train_2017, prediction_test = prediction_test_2017, fpr_train = fpr_train_2017, fpr_test = fpr_test_2017, tpr_train = tpr_train_2017, tpr_test = tpr_test_2017)
 
   if len(y_train_2018) > 0:
     fpr_train_2018, tpr_train_2018, thresh_train_2018 = metrics.roc_curve(y_train_2018, prediction_train_2018, pos_label = 1, sample_weight = weights_train_2018)
     fpr_test_2018, tpr_test_2018, thresh_test_2018 = metrics.roc_curve(y_test_2018, prediction_test_2018, pos_label = 1, sample_weight = weights_test_2018)
     auc_2018, unc_2018 = utils.auc_and_unc(y_test_2018, prediction_test_2018, weights_test_2018, 25)
-    print "Testing  AUC (2018): %.3f +/- %.4f" % (auc_2018, unc_2018)
+    print(("Testing  AUC (2018): %.3f +/- %.4f" % (auc_2018, unc_2018)))
     numpy.savez("bdt_roc_2018_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2018, y_test = y_test_2018, prediction_train = prediction_train_2018, prediction_test = prediction_test_2018, fpr_train = fpr_train_2018, fpr_test = fpr_test_2018, tpr_train = tpr_train_2018, tpr_test = tpr_test_2018)
 
   auc_train = metrics.auc(fpr_train, tpr_train, reorder = True)
@@ -354,13 +354,13 @@ def train_bdt(config, invert=False):
   results["auc_train"] = auc_train
   results["auc_test"]  = auc_test
   results["auc_test_unc"] = unc
-  if "skip_tree" in config.keys(): 
+  if "skip_tree" in list(config.keys()): 
     return results
 
-  print "Training AUC: %.3f" % auc_train
-  print "Testing  AUC: %.3f" % auc_test
+  print(("Training AUC: %.3f" % auc_train))
+  print(("Testing  AUC: %.3f" % auc_test))
 
-  print "Testing  AUC: %.3f +/- %.4f" % (auc, unc)
+  print(("Testing  AUC: %.3f +/- %.4f" % (auc, unc)))
   
   numpy.savez("bdt_roc_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train, y_test = y_test, prediction_train = prediction_train, prediction_test = prediction_test, fpr_train = fpr_train, fpr_test = fpr_test, tpr_train = tpr_train, tpr_test = tpr_test)
 
@@ -510,7 +510,7 @@ def train_bdt(config, invert=False):
 
     max_za = numpy.max(za)
     max_za_unc = za_unc[numpy.argmax(za)]
-    print max_za, max_za_unc
+    print((max_za, max_za_unc))
 
     numpy.savez("za_%s.npz" % (args.channel + "_" + args.ext + "_" + args.tag), za = za, za_unc = za_unc, signal = s, bkg = b, sigma_eff = sigma_eff, za_data = za_data, za_unc_data = za_unc_data, signal_data = s_data, bkg_data = b_data, sigma_eff_data = sigma_eff_data)
     numpy.savez("sigma_eff.npz", sigma_eff = sigma_eff, n_sig = s)

@@ -23,9 +23,9 @@ if args.year == "RunII":
   dirs = glob.glob(("/hadoop/cms/store/user/%s/ttH/*ttH_Babies_" % hadoop_name) + args.year + args.tag)
 else:
   dirs = glob.glob(("/hadoop/cms/store/user/%s/ttH/*ttH_Babies_" % hadoop_name) + args.tag + "_" + args.year)
-print "Adding ntuples from the following directories:"
+print("Adding ntuples from the following directories:")
 for dir in dirs:
-  print dir
+  print(dir)
 
 destination = (os.popen("pwd").read()).rstrip() + "/../Loopers/merged_babies/"
 
@@ -53,7 +53,7 @@ for dir in dirs:
     os.system("mkdir %s" % destination + name)
   
   command = "addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar)
-  print command
+  print(command)
   command_list.append(command)
 
   #print("addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar))

@@ -11,7 +11,7 @@ def build_tree(xgtree, base_xml_element, var_indices):
             #leaf node
             result = re.match(r'(\t*)(\d+):leaf=({0})$'.format(regex_float_pattern), line)
             if not result:
-                print line
+                print(line)
             depth = result.group(1).count('\t')
             inode = result.group(2)
             res = result.group(3)
@@ -21,7 +21,7 @@ def build_tree(xgtree, base_xml_element, var_indices):
             #\t\t3:[var_topcand_mass<138.19] yes=7,no=8,missing=7
             result = re.match(r'(\t*)([0-9]+):\[(?P<var>.+)<(?P<cut>{0})\]\syes=(?P<yes>\d+),no=(?P<no>\d+)'.format(regex_float_pattern),line)
             if not result:
-                print line
+                print(line)
             depth = result.group(1).count('\t')
             inode = result.group(2)
             var = result.group('var')

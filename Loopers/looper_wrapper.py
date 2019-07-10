@@ -326,9 +326,9 @@ for hist in histos:
   size = os.stat(hist).st_size * (1./(1024))
   if size >= 1.:
     good_histos.append(hist)
-    print "good hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024)))
+    print("good hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024))))
   else:
-    print "bad  hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024)))
+    print("bad  hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024))))
 
 target = " "
 for hist in good_histos:

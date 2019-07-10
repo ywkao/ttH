@@ -24,9 +24,9 @@ fig = plt.figure()
 ax1 = fig.add_subplot(111)
 
 for i in range(len(files)):
-  print "MC"
-  print "Max ZA", numpy.max(files[i]["za"]), " +/- ", files[i]["za_unc"][numpy.argmax(files[i]["za"])]
-  print "50 sig eff ZA", files[i]["za"][len(files[i]["za"])/2], " +/- ", files[i]["za_unc"][len(files[i]["za"])/2]
+  print("MC")
+  print(("Max ZA", numpy.max(files[i]["za"]), " +/- ", files[i]["za_unc"][numpy.argmax(files[i]["za"])]))
+  print(("50 sig eff ZA", files[i]["za"][len(files[i]["za"])/2], " +/- ", files[i]["za_unc"][len(files[i]["za"])/2]))
   ax1.plot(files[i]["signal"], files[i]["za"], label = labels[i], color = colors[i])
   ax1.fill_between(files[i]["signal"], files[i]["za"] - files[i]["za_unc"], files[i]["za"] + files[i]["za_unc"], color = colors[i], alpha = 0.25)
   plt.xlabel('# Signal Events')
@@ -45,9 +45,9 @@ fig = plt.figure()
 ax1 = fig.add_subplot(111)
 
 for i in range(len(files)):
-  print "Data"
-  print numpy.max(files[i]["za_data"]), " +/- ", files[i]["za_unc_data"][numpy.argmax(files[i]["za_data"])]
-  print files[i]["za_data"][len(files[i]["za_data"])/2], " +/- ", files[i]["za_unc_data"][len(files[i]["za_data"])/2]
+  print("Data")
+  print((numpy.max(files[i]["za_data"]), " +/- ", files[i]["za_unc_data"][numpy.argmax(files[i]["za_data"])]))
+  print((files[i]["za_data"][len(files[i]["za_data"])/2], " +/- ", files[i]["za_unc_data"][len(files[i]["za_data"])/2]))
   ax1.plot(files[i]["signal_data"], files[i]["za_data"], label = labels[i], color = colors[i])
   ax1.fill_between(files[i]["signal_data"], files[i]["za_data"] - files[i]["za_unc_data"], files[i]["za_data"] + files[i]["za_unc_data"], color = colors[i], alpha = 0.25)
   plt.xlabel('# Signal Events')

@@ -31,7 +31,7 @@ for i in range(len(label)):
   elif label[i] == 17: # Madgraph sample is signal
     label[i] = 1
   else:
-     print "Sample other than GJets, shouldn't be here"
+     print("Sample other than GJets, shouldn't be here")
 
 
 

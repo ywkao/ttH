@@ -1,19 +1,17 @@
-from __future__ import print_function
-
+import train_dnn_core
 import os
-import tensorflow as tf
-print(tf.__version__)
-if tf.__version__ == "1.14.0":
-    print "Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0"
-    import tensorflow.compat.v1 as tf
-    tf.disable_v2_behavior()
-config = tf.ConfigProto(log_device_placement=True)
-config.gpu_options.allow_growth = True
-session = tf.Session(config=config)
+#import tensorflow as tf
+#print((tf.__version__))
+#if tf.__version__ == "1.14.0":
+#    print("Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0")
+#    import tensorflow.compat.v1 as tf
+#    tf.disable_v2_behavior()
+#config = tf.ConfigProto(log_device_placement=True)
+#config.gpu_options.allow_growth = True
+#session = tf.Session(config=config)
 
-print(session)
-
-import keras
+#print(session)
+#import keras
 import numpy
 import sys
 from sklearn import metrics
@@ -42,6 +40,5 @@ parser.add_argument("--absolute_weights", help = "set negative weights to positi
 parser.add_argument("--preprocess_scheme", help = "json file used for preprocessing dnn. for bookkeeping purposes", type=str)
 args = parser.parse_args()
 
-import train_dnn_core
 
 train_dnn_core.train(args, {})
