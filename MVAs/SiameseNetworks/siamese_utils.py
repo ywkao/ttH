@@ -1,5 +1,5 @@
 import tensorflow as tf
-import keras
+import tensorflow.keras as keras
 import numpy
 import random
 
@@ -19,7 +19,7 @@ def contrastive_loss(y_true, y_pred):
     http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
     '''
     margin = 1
-    similar_term = (1 - y_true) * keras.backend.square(y_pred)
+    similar_term = (1 - y_true) * keras.backend.square(keras.backend.maximum(y_pred - margin, 0))
     dissimilar_term = y_true * keras.backend.square(keras.backend.maximum(margin - y_pred, 0))
     return keras.backend.mean(similar_term + dissimilar_term)
 

@@ -2,12 +2,10 @@
 import keras_layer_normalization
 
 import tensorflow as tf
-print((tf.__version__))
-#if tf.__version__ == "1.14.0":
-#    print("Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0")
-#    import tensorflow.compat.v1 as tf
-#    tf.disable_v2_behavior()
-import tensorflow.keras as keras
+try:
+    import tensorflow.keras as keras
+except:
+    import keras
 
 def standard(max_objects, n_features):
   input_objects = keras.layers.Input(shape=(max_objects, n_features), name = 'input')

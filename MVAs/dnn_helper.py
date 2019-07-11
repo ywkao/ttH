@@ -8,13 +8,11 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import utils
-#import keras
 import tensorflow as tf
-#if tf.__version__ == "1.14.0":
-#    print("Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0")
-#    import tensorflow.compat.v1 as tf
-#    tf.disable_v2_behavior()
-import tensorflow.keras as keras
+try:
+    import tensorflow.keras as keras
+except:
+    import keras
 
 class DNN_Features:
   def __init__(self, **kwargs):

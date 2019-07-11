@@ -44,7 +44,7 @@ pairs_val, labels_val = siamese_utils.create_pairs(process_id_validation, 10000)
 print(numpy.mean(labels))
 
 
-config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 2, "n_dense_2" : 2, "n_nodes_lstm" : 150, "n_lstm" : 1, "maxnorm" : 10, "dropout_rate" : 0.2, "learning_rate" : 0.001, "start_batch" : 1024, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False, "n_manifold" : 2}
+config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 30, "n_dense_1" : 2, "n_dense_2" : 2, "n_nodes_lstm" : 150, "n_lstm" : 1, "maxnorm" : 10, "dropout_rate" : 0.2, "learning_rate" : 0.001, "start_batch" : 10000, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False, "n_manifold" : 2}
 model, shared_network = siamese_model.siamese(len(object_features[0]), len(object_features[0][0]), len(global_features[0]), config)
 
 model.fit([global_features[pairs[:,0]], object_features[pairs[:,0]], global_features[pairs[:,1]], object_features[pairs[:,1]]], labels, epochs = 50, batch_size = config["start_batch"], validation_data = ([global_features_validation[pairs_val[:,0]], object_features_validation[pairs_val[:,0]], global_features_validation[pairs_val[:,1]], object_features_validation[pairs_val[:,1]]], labels_val))
@@ -67,7 +67,7 @@ prediction = predictor.predict([global_features_validation, object_features_vali
 print(prediction)
 
 fig = plt.figure()
-ax = fig.add_subplot(1, 1, 1, axisbg="1.0")
+ax = fig.add_subplot(1, 1, 1)
 
 x, y = prediction[:,0], prediction[:,1]
 ax.scatter(x, y , c=label_validation, edgecolors='none', s=3)
