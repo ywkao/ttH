@@ -9,6 +9,7 @@ NPOINTS=$4
 RANDOM=$5
 FIXED=$6
 BUILDUP=$7
+XI=$8
 
 # Set up ssh key
 apt-get install -y openssh-client
@@ -49,16 +50,16 @@ cp nautilus/copy_jsons.sh .
 
 if [ "$BUILDUP" == "NO_BUILDUP" ]; then
     if [ "$RANDOM" == "RANDOM" ]; then
-        python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --random --no_buildup
+        python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --random --no_buildup --xi "$XI"
     else
-        python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --no_buildup
+        python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --no_buildup --xi "$XI"
     fi
 elif [ "$RANDOM" == "RANDOM" ]; then
-    python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --random
+    python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --random --xi "$XI"
 elif [ "$FIXED" == "FIXED" ]; then
-    python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --fixed
+    python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --fixed --xi "$XI"
 else
-    python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS"
+    python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --xi "$XI"
 fi
 
 scp *.json sjmay@uaf-10.t2.ucsd.edu:~/ttH/MVAs/nautilus/results/

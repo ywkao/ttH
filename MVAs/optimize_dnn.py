@@ -27,7 +27,7 @@ parser.add_argument("--n_points", help = "how many points to probe", type=str, d
 parser.add_argument("--preprocess_scheme", help = "json used for preprocessing features", type=str)
 parser.add_argument("--no_buildup", help = "don't build up with light, medium, full pbounds", action = "store_true")
 parser.add_argument("--fixed", help = "used a fixed set of pbounds (for calculating systematics unc.)", action = "store_true")
-parser.add_argument("--xi", help = "exploitation vs exploration parameter for hyperparam opt", type=float, default=0.0005)
+parser.add_argument("--xi", help = "exploitation vs exploration parameter for hyperparam opt", type=str, default="0.0005")
 
 args = parser.parse_args()
 args.n_points = int(args.n_points)
@@ -215,7 +215,7 @@ official_log = "log_%s_%s.json" % (args.channel, args.tag)
 logger = JSONLogger(path=official_log)
 optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 
-xi = args.xi
+xi = float(args.xi)
 
 if args.no_buildup or args.fixed:
     optimizer.set_bounds(new_bounds = pbounds_full)

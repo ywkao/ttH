@@ -7,6 +7,8 @@ parser.add_argument("--tag", help = "tag to identify this optimization", type=st
 parser.add_argument("--n_points", help = "number of points to probe", type=str)
 parser.add_argument("--random", help = "do random exploration instead of BayesOpt", action = "store_true")
 parser.add_argument("--fixed", help = "sample a fixed pbound set", action = "store_true")
+parser.add_argument("--no_buildup", help = "explore all hyperparameters at once", action = "store_true")
+parser.add_argument("--xi", help = "exploitation vs. exploration parameter", type=float, default = 0.0005)
 args = parser.parse_args()
 
 if args.random:
@@ -42,8 +44,10 @@ for i in range(len(lines)):
         if not args.fixed:
             lines[i] = lines[i].replace("FIXED", "not_fixed")
     if "NO_BUILDUP" in lines[i]:
-        if not args.random:
+        if not args.no_buildup:
             lines[i] = lines[i].replace("NO_BUILDUP", "not_no_buildup")
+    if "XI" in lines[i]:
+        lines[i] = lines[i].replace("XI", str(args.xi))
 
 submit_script = "submit_scripts/" + template + "_" + args.tag + ".yaml"
 with open(submit_script, "w") as f_out:
