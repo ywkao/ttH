@@ -38,6 +38,7 @@ parser.add_argument("--ttH_vs_tH", help = "use ttH as signal, tH as background",
 parser.add_argument("--FCNC_vs_SMHiggs", help = "use FCNC as signal, SM Higgs as background", action="store_true")
 parser.add_argument("--add_year", help = "add the year as a feature", action = "store_true")
 parser.add_argument("--no_mass_constraint", help = "don't use m_ggj, m_jjj", action = "store_true")
+parser.add_argument("--non_resonant_bkg", help = "for FCNC, only train with non-resonant bkgs", action = "store_true")
 
 args = parser.parse_args()
 
@@ -98,21 +99,30 @@ data_label = 2
 
 branches = list(set(branches))
 
-if args.channel == "Leptonic":
-    fcnc_sm_higgs_bkg_selection = " && (process_id_ == 0 || process_id_ == 11 || process_id_ == 12)"
-elif args.channel == "Hadronic":
-    fcnc_sm_higgs_bkg_selection = " && (process_id_ == 0 || process_id_ == 11 || process_id_ == 14)"
+if args.FCNC_vs_SMHiggs:
+    if args.channel == "Leptonic":
+        fcnc_sm_higgs_bkg_selection = " && (process_id_ == 0 || process_id_ == 11 || process_id_ == 12)"
+    elif args.channel == "Hadronic":
+        fcnc_sm_higgs_bkg_selection = " && (process_id_ == 0 || process_id_ == 11 || process_id_ == 14)"
+else:
+    fcnc_sm_higgs_bkg_selection =  ""
+
+if args.non_resonant_bkg:
+    non_resonant_train_selection = " && !(process_id_ == 0 || (process_id_ >= 11 && process_id_ <= 16))"
+else:
+    non_resonant_train_selection = ""
+
 if args.fcnc_hut:
-    selection_train      = '((label_ == 0%s%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, non_resonant_train_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
     selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
-    selection_final_fit      = '((process_id_ == -1 && signal_mass_label_ == 0))' # dummy selection, should not select any events
+    selection_final_fit      = '((process_id_ == 2 && rand_ < 0.01))' # dummy selection
 
 elif args.fcnc_hct:
-    selection_train      = '((label_ == 0%s%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, "&& process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, non_resonant_train_selection, "&& process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
     selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
-    selection_final_fit      = '((process_id_ == -1 && signal_mass_label_ == 0))' # dummy selection, should not select any events
+    selection_final_fit      = '((process_id_ == 2 && rand_ < 0.01))' # dummy selection
 
 elif args.ttH_vs_tH:
   selection_train      = '((label_ == 0%s%s && (process_id_ == 11 || process_id_ == 12)) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
@@ -172,15 +182,15 @@ do_dnn = len(args.dnn_models) > 0 and (not args.dont_train_with_dnn)
 
 dnn_predictions = []
 dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
+if args.channel == "Leptonic":
+    dnn_features += ["n_lep_tight_"]
+if args.do_top_tag:
+    dnn_features += ["top_tag_score_"]
 
 if do_dnn:
   print("Calculating dnn scores")
   print((len(dnn_features)))
   print([feat for feat in dnn_features])
-  if args.channel == "Leptonic":
-    dnn_features += ["n_lep_tight_"]
-    if args.do_top_tag:
-      dnn_features += ["top_tag_score_"]
   i = 0
   print(dnn_features)
   for dnn_model in dnn_models:
@@ -253,6 +263,13 @@ if len(args.dnn_models) > 0:
         preprocess_scheme = json.load(f_in)["preprocess_scheme"]
 else:
     preprocess_scheme = "none"
+
+# Check if we got a json file or the actual scheme
+if ".json" in preprocess_scheme:
+    with open(preprocess_scheme) as f_in:
+        preprocess_scheme = json.load(f_in)
+
+print("Preprocessing scheme: ", preprocess_scheme)
 
 global_features_dnn = utils.create_array(features, dnn_features, preprocess_scheme) 
 global_features_dnn_validation = utils.create_array(features_validation, dnn_features, preprocess_scheme) 

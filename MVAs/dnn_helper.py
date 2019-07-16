@@ -152,8 +152,8 @@ class DNN_Helper:
       fpr_train, tpr_train, thresh_train = metrics.roc_curve(self.features_train.label, self.predictions["train"], pos_label = 1, sample_weight = self.features_train.weights)
       fpr_validation, tpr_validation, thresh_validation = metrics.roc_curve(self.features_validation.label, self.predictions["validation"], pos_label = 1, sample_weight = self.features_validation.weights)
 
-      auc, auc_unc = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, self.n_bootstrap)
-      auc_train, auc_unc_train = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, self.n_bootstrap)
+      auc, auc_unc, blah, blah, blah = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, self.n_bootstrap)
+      auc_train, auc_unc_train, blah, blah, blah = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, self.n_bootstrap)
 
       print(("Test   AUC: %.4f +/- %.4f" % (auc, auc_unc)))
       print(("Train  AUC: %.4f +/- %.4f" % (auc_train, auc_unc_train)))
@@ -178,6 +178,7 @@ class DNN_Helper:
     best_auc = 0.5
     keep_training = True
 
+    max_batch_size = 25000
     epochs = 1
     bad_epochs = 0
     while keep_training:
@@ -187,12 +188,18 @@ class DNN_Helper:
           print(("Improvement in (1-AUC) of %.3f percent! Keeping batch size the same" % (improvement*100.)))
           best_auc = auc
           bad_epochs = 0
-      elif self.batch_size_train * 4 < 50000:
+      elif self.batch_size_train * 4 < max_batch_size:
           print(("Improvement in (1-AUC) of %.3f percent. Increasing batch size" % (improvement*100.)))
           self.batch_size_train *= 4
           bad_epochs = 0
           if auc > best_auc:
               best_auc = auc
+      elif self.batch_size_train < max_batch_size:
+          print(("Improvement in (1-AUC) of %.3f percent. Increasing batch size" % (improvement*100.)))
+          self.batch_size_train = max_batch_size
+          bad_epochs = 0
+          if auc > best_auc:
+              best_auc = auc 
       elif improvement > 0:
           print(("Improvement in (1-AUC) of %.3f percent. Can't increase batch size anymore" % (improvement*100.))) 
           bad_epochs = 0
@@ -204,8 +211,8 @@ class DNN_Helper:
           print("Have already trained for 25 epochs. Stopping training.")
           keep_training = False
 
-    auc, auc_unc = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 50)
-    auc_train, auc_unc_train = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, 50)
+    auc, auc_unc, blah, blah, blah = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 50)
+    auc_train, auc_unc_train, blah, blah, blah = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, 50)
     self.auc_unc["validation"] = auc_unc
     self.auc_unc["train"] = auc_unc_train
 

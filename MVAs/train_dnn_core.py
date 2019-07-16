@@ -1,5 +1,6 @@
 import dnn_helper
 import os
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 import tensorflow as tf
 #print((tf.__version__))
 #if tf.__version__ == "1.14.0":

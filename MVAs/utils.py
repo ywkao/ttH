@@ -78,7 +78,7 @@ def auc_and_unc(label, pred, sample_weight, n_bootstraps):
 
   unc = numpy.std(bootstrap_aucs)
   #print bootstrap_aucs
-  return auc, unc
+  return auc, unc, fpr, tpr, thresh
 
 def sum_of_weights(weights, label, label_index):
   sum = 0

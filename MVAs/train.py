@@ -30,6 +30,7 @@ parser.add_argument("-m", "--multi", help = "run a multiclassifier based BDT", a
 parser.add_argument("-r", "--res", help = "weight signal events by relative mass resolution", action = "store_true")
 parser.add_argument("-s", "--sideband", help = "use data sideband for training", action = "store_true")
 parser.add_argument("--optimization_vars", help = "csv list of additional variables to perform N-d Z_A optimization scan in (along with BDT score)", type=str)
+parser.add_argument("--equal_weights", help = "set all class weights equal for multiclassification", action="store_true")
 args = parser.parse_args()
 
 config = {}

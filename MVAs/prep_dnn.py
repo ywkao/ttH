@@ -173,7 +173,7 @@ if args.z_score:
         mean, stddev = utils.get_mean_and_std(object_features[:,:,i])
         preprocess_dict["objects_" + str(i)] = { "mean" : mean, "std_dev" : stddev }
 
-    with open("preprocess_scheme_%s.json" % (args.input.replace(".root", "").replace("../Loopers/MVABaby_ttH","")), "w") as f_out:
+    with open("preprocess_scheme_%s_%s.json" % (args.channel, args.tag), "w") as f_out:
         json.dump(preprocess_dict, f_out, indent=4, sort_keys=True)
 
     for object_set in [object_features, object_features_validation, object_features_data, object_features_final_fit]:

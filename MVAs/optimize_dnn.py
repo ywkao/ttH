@@ -112,7 +112,7 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
 
     #else:
     trained_dnn = train_dnn_core.train(args, config)
-    full_results[idx] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
+    full_results[str(idx)] = {"config" : config, "results" : {"auc_train" : trained_dnn.auc["train"], "auc_train_unc" : trained_dnn.auc_unc["train"], "auc_test" : trained_dnn.auc["validation"], "auc_test_unc" : trained_dnn.auc_unc["validation"]}}
     target = trained_dnn.auc["validation"][-1]
 
     with open(log, "w") as f_out:
@@ -123,7 +123,7 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
 
 idx = 0
 log = "bayes_dnn_hyperparam_scan_%s_%s.json" % (args.channel, args.tag)
-full_results = {}
+full_results = { "input" : args.input }
 
 pbounds_light = {
     "n_nodes_dense_1" : (300, 300), 
@@ -163,7 +163,7 @@ pbounds_full = {
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-4, -1), # 10**(learning_rate)
-    "start_batch" : (9, 13), # 2**(start_batch)
+    "start_batch" : (7, 13), # 2**(start_batch)
     "batch_momentum" : (0.5, 0.999)
 }
 
@@ -177,7 +177,7 @@ pbounds_fixed = {
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.25, 0.25),
     "learning_rate" : (-3, -3), # 10**(learning_rate)
-    "start_batch" : (10, 10.00001), # 2**(start_batch) # dumb hacky way to make sure the points aren't all considered the same
+    "start_batch" : (9, 9.00001), # 2**(start_batch) # dumb hacky way to make sure the points aren't all considered the same
     "batch_momentum" : (0.99, 0.99)
 }
 
@@ -215,46 +215,49 @@ logger = JSONLogger(path=official_log)
 optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 
 if args.no_buildup or args.fixed:
-    print(("Probing %d points per pbounds set" % (3*args.n_points)))
     optimizer.set_bounds(new_bounds = pbounds_full)
     if args.fixed:
         optimizer.set_bounds(new_bounds = pbounds_fixed)
+    if args.no_buildup:
+        args.n_points *= 3
+    print(("Probing %d points per pbounds set" % (args.n_points)))
     optimizer.maximize(
-        init_points = 3*args.n_points if args.random else 0,
-        n_iter = 0 if args.random else 3*args.n_points,
+        init_points = args.n_points if args.random else 0,
+        n_iter = 0 if args.random else args.n_points,
         acq = "ei", xi = 0.05,
         alpha=0.000001,
     )
 
-print(("Probing %d points per pbounds set" % (args.n_points)))
+else:
+    print(("Probing %d points per pbounds set" % (args.n_points)))
 
-optimizer.maximize(
-        init_points = args.n_points if args.random else 0,
-        n_iter = 0 if args.random else args.n_points,
-        acq = "ei", xi = 0.05,
-        alpha=0.000001,
-)
+    optimizer.maximize(
+            init_points = args.n_points if args.random else 0,
+            n_iter = 0 if args.random else args.n_points,
+            acq = "ei", xi = 0.05,
+            alpha=0.000001,
+    )
 
-x = numpy.linspace(pbounds_light["learning_rate"][0], pbounds_light["learning_rate"][1], 1000).reshape(-1,1)
-plot_gp(optimizer,x)
+    x = numpy.linspace(pbounds_light["learning_rate"][0], pbounds_light["learning_rate"][1], 1000).reshape(-1,1)
+    plot_gp(optimizer,x)
 
-optimizer.set_bounds(new_bounds = pbounds_medium)
+    optimizer.set_bounds(new_bounds = pbounds_medium)
 
-optimizer.maximize(
-        init_points = args.n_points if args.random else 0,
-        n_iter = 0 if args.random else args.n_points,
-        acq = "ei", xi = 0.05,
-        alpha=0.000001,
-)
+    optimizer.maximize(
+            init_points = args.n_points if args.random else 0,
+            n_iter = 0 if args.random else args.n_points,
+            acq = "ei", xi = 0.0005,
+            alpha=0.000001,
+    )
 
-optimizer.set_bounds(new_bounds = pbounds_full)
+    optimizer.set_bounds(new_bounds = pbounds_full)
 
-optimizer.maximize(
-        init_points = args.n_points if args.random else 0,
-        n_iter = 0 if args.random else args.n_points,
-        acq = "ei", xi = 0.05,
-        alpha=0.000001,
-)
+    optimizer.maximize(
+            init_points = args.n_points if args.random else 0,
+            n_iter = 0 if args.random else args.n_points,
+            acq = "ei", xi = 0.0005,
+            alpha=0.000001,
+    )
 
 
 for i, res in enumerate(optimizer.res):

@@ -158,7 +158,6 @@ def train_bdt(config, invert=False):
 
   print((sum_pos_weights, sum_neg_weights))
 
-
   scale_tth = False
   if scale_tth:
     for i in range(len(weights_train)):
@@ -166,7 +165,7 @@ def train_bdt(config, invert=False):
         weights_train[i] *= 6.
   weights_train_modified = weights_train
 
-  equal_weights = False
+  equal_weights = args.equal_weights 
   if args.multi:
     if not equal_weights:
       for j in range(len(weights_train_modified)):
@@ -328,28 +327,28 @@ def train_bdt(config, invert=False):
   if len(y_train_2016) > 0:
     fpr_train_2016, tpr_train_2016, thresh_train_2016 = metrics.roc_curve(y_train_2016, prediction_train_2016, pos_label = 1, sample_weight = weights_train_2016)
     fpr_test_2016, tpr_test_2016, thresh_test_2016 = metrics.roc_curve(y_test_2016, prediction_test_2016, pos_label = 1, sample_weight = weights_test_2016)
-    auc_2016, unc_2016 = utils.auc_and_unc(y_test_2016, prediction_test_2016, weights_test_2016, 25)
+    auc_2016, unc_2016, blah, blah, blah = utils.auc_and_unc(y_test_2016, prediction_test_2016, weights_test_2016, 25)
     print(("Testing  AUC (2016): %.3f +/- %.4f" % (auc_2016, unc_2016)))
     numpy.savez("bdt_roc_2016_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2016, y_test = y_test_2016, prediction_train = prediction_train_2016, prediction_test = prediction_test_2016, fpr_train = fpr_train_2016, fpr_test = fpr_test_2016, tpr_train = tpr_train_2016, tpr_test = tpr_test_2016)
 
   if len(y_train_2017) > 0:
     fpr_train_2017, tpr_train_2017, thresh_train_2017 = metrics.roc_curve(y_train_2017, prediction_train_2017, pos_label = 1, sample_weight = weights_train_2017)
     fpr_test_2017, tpr_test_2017, thresh_test_2017 = metrics.roc_curve(y_test_2017, prediction_test_2017, pos_label = 1, sample_weight = weights_test_2017)
-    auc_2017, unc_2017 = utils.auc_and_unc(y_test_2017, prediction_test_2017, weights_test_2017, 25)
+    auc_2017, unc_2017, blah, blah, blah = utils.auc_and_unc(y_test_2017, prediction_test_2017, weights_test_2017, 25)
     print(("Testing  AUC (2017): %.3f +/- %.4f" % (auc_2017, unc_2017)))
     numpy.savez("bdt_roc_2017_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2017, y_test = y_test_2017, prediction_train = prediction_train_2017, prediction_test = prediction_test_2017, fpr_train = fpr_train_2017, fpr_test = fpr_test_2017, tpr_train = tpr_train_2017, tpr_test = tpr_test_2017)
 
   if len(y_train_2018) > 0:
     fpr_train_2018, tpr_train_2018, thresh_train_2018 = metrics.roc_curve(y_train_2018, prediction_train_2018, pos_label = 1, sample_weight = weights_train_2018)
     fpr_test_2018, tpr_test_2018, thresh_test_2018 = metrics.roc_curve(y_test_2018, prediction_test_2018, pos_label = 1, sample_weight = weights_test_2018)
-    auc_2018, unc_2018 = utils.auc_and_unc(y_test_2018, prediction_test_2018, weights_test_2018, 25)
+    auc_2018, unc_2018, blah, blah, blah = utils.auc_and_unc(y_test_2018, prediction_test_2018, weights_test_2018, 25)
     print(("Testing  AUC (2018): %.3f +/- %.4f" % (auc_2018, unc_2018)))
     numpy.savez("bdt_roc_2018_%s.npz" % (args.channel + "_" + args.tag), y_train = y_train_2018, y_test = y_test_2018, prediction_train = prediction_train_2018, prediction_test = prediction_test_2018, fpr_train = fpr_train_2018, fpr_test = fpr_test_2018, tpr_train = tpr_train_2018, tpr_test = tpr_test_2018)
 
   auc_train = metrics.auc(fpr_train, tpr_train, reorder = True)
   auc_test  = metrics.auc(fpr_test , tpr_test , reorder = True)
 
-  auc, unc = utils.auc_and_unc(y_test, prediction_test, weights_test, 25)
+  auc, unc, blah, blah, blah = utils.auc_and_unc(y_test, prediction_test, weights_test, 25)
 
   results["auc_train"] = auc_train
   results["auc_test"]  = auc_test
