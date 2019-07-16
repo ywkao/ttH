@@ -8,6 +8,7 @@ CHANNEL=$3
 NPOINTS=$4
 RANDOM=$5
 FIXED=$6
+BUILDUP=$7
 
 # Set up ssh key
 apt-get install -y openssh-client
@@ -46,7 +47,13 @@ mkdir dnn_weights
 cp nautilus/copy_jsons.sh .
 ./copy_jsons.sh &
 
-if [ "$RANDOM" == "RANDOM" ]; then
+if [ "$BUILDUP" == "NO_BUILDUP" ]; then
+    if [ "$RANDOM" == "RANDOM" ]; then
+        python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --random --no_buildup
+    else
+        python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --no_buildup
+    fi
+elif [ "$RANDOM" == "RANDOM" ]; then
     python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --random
 elif [ "$FIXED" == "FIXED" ]; then
     python optimize_dnn.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS" --fixed

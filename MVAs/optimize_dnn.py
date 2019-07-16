@@ -27,6 +27,7 @@ parser.add_argument("--n_points", help = "how many points to probe", type=str, d
 parser.add_argument("--preprocess_scheme", help = "json used for preprocessing features", type=str)
 parser.add_argument("--no_buildup", help = "don't build up with light, medium, full pbounds", action = "store_true")
 parser.add_argument("--fixed", help = "used a fixed set of pbounds (for calculating systematics unc.)", action = "store_true")
+parser.add_argument("--xi", help = "exploitation vs exploration parameter for hyperparam opt", type=float, default=0.0005)
 
 args = parser.parse_args()
 args.n_points = int(args.n_points)
@@ -84,7 +85,7 @@ def plot_gp(optimizer, x):
     axis.legend(loc='upper left')
     #acq.legend(loc=2, bbox_to_anchor=(1.01, 1), borderaxespad=0.)
     plt.savefig('optimization_step_%d.pdf' % (steps), bbox_inches='tight')
-    
+    plt.clf() 
 
 def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_lstm, maxnorm, dropout_rate, learning_rate, start_batch, batch_momentum):
     global idx, log, full_results
@@ -214,6 +215,8 @@ official_log = "log_%s_%s.json" % (args.channel, args.tag)
 logger = JSONLogger(path=official_log)
 optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 
+xi = args.xi
+
 if args.no_buildup or args.fixed:
     optimizer.set_bounds(new_bounds = pbounds_full)
     if args.fixed:
@@ -224,7 +227,7 @@ if args.no_buildup or args.fixed:
     optimizer.maximize(
         init_points = args.n_points if args.random else 0,
         n_iter = 0 if args.random else args.n_points,
-        acq = "ei", xi = 0.05,
+        acq = "ei", xi = xi,
         alpha=0.000001,
     )
 
@@ -234,7 +237,7 @@ else:
     optimizer.maximize(
             init_points = args.n_points if args.random else 0,
             n_iter = 0 if args.random else args.n_points,
-            acq = "ei", xi = 0.05,
+            acq = "ei", xi = xi,
             alpha=0.000001,
     )
 
@@ -246,7 +249,7 @@ else:
     optimizer.maximize(
             init_points = args.n_points if args.random else 0,
             n_iter = 0 if args.random else args.n_points,
-            acq = "ei", xi = 0.0005,
+            acq = "ei", xi = xi,
             alpha=0.000001,
     )
 
@@ -255,7 +258,7 @@ else:
     optimizer.maximize(
             init_points = args.n_points if args.random else 0,
             n_iter = 0 if args.random else args.n_points,
-            acq = "ei", xi = 0.0005,
+            acq = "ei", xi = xi,
             alpha=0.000001,
     )
 

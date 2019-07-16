@@ -41,6 +41,9 @@ for i in range(len(lines)):
     if "FIXED" in lines[i]:
         if not args.fixed:
             lines[i] = lines[i].replace("FIXED", "not_fixed")
+    if "NO_BUILDUP" in lines[i]:
+        if not args.random:
+            lines[i] = lines[i].replace("NO_BUILDUP", "not_no_buildup")
 
 submit_script = "submit_scripts/" + template + "_" + args.tag + ".yaml"
 with open(submit_script, "w") as f_out:
