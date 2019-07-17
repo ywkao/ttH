@@ -4,6 +4,7 @@ import processIDMap as processIDMap
 import root_numpy
 import subprocess
 
+
 gSystem.AddIncludePath("-I$CMSSW_BASE/src/ ")
 #gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc481/libHiggsAnalysisCombinedLimit.so")
 gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc630/libHiggsAnalysisCombinedLimit.so")
@@ -28,6 +29,7 @@ class scanClass():
 
         self.treename = "t"
 
+        self.config = config
 
     def getTree(self):
 
@@ -45,11 +47,11 @@ class scanClass():
         pathCmd += "cp ~/public_html/tmpFile/index.php " + self.plotpath
 
 
-    def quantiles_to_mva_score(self, n_quantiles, selection, mvaName):
+    def quantiles_to_mva_score(self, n_quantiles, mvaName):
         # for given selection, return mva_scores corresponding to each quantile in n_quantiles
 
         # get a numpy array from tree
-        mva_scores = (root_numpy.tree2array(self.tree, branches = [mvaName], selection = selection))
+        mva_scores = (root_numpy.tree2array(self.tree, branches = [mvaName], selection = self.selection))
 
         sorted_mva = numpy.flip(numpy.sort(mva_scores), 0)
         quantiles = []

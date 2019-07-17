@@ -5,7 +5,7 @@ import sys
 #ROOT.RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.DataHandling)
 #ROOT.RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.ObjectHandling)
 
-class MakeCards():
+class makeCards():
 
     def __init__(self, savepath, cardname, config=0):
 

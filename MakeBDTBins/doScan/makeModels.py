@@ -14,7 +14,7 @@ gSystem.AddIncludePath("-Iinclude/")
 RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.DataHandling)
 RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.ObjectHandling)
 
-class scanClass():
+class makeModel():
 
     def __init__(self, config):
 
@@ -25,15 +25,32 @@ class scanClass():
         self.plotpath = config["plotpath"]
         self.modelpath = config["modelpath"]
         self.var = config["var"] #mass
-        self.weightVar = config["weight"] #weight
+        self.weightVar = config["weightVar"] #weight
 
         self.treename = "t"
+
+
+    def getTree(self, t):
+
+        self.tree = t
+
+
+    def getTreeFromFile(self):
 
         self.filename = filenameDict.namedict[self.tag]
         self.file = ROOT.TFile.Open(self.filename)
         self.tree = self.file.Get(self.treename)
 
-    def MakeSignalModel(workspaceName = "wsig_13TeV", config):
+
+    def cleanDir(self):
+
+        pathCmd =  "mkdir -p " + self.modelpath + ";"
+        pathCmd += "rm " + self.modelpath+ "*;"
+        pathCmd += "mkdir -p " + self.plotpath + ";"
+        pathCmd += "rm " + self.plotpath+ "*;"
+        pathCmd += "cp ~/public_html/tmpFile/index.php " + self.plotpath
+
+    def makeSignalModel(workspaceName = "wsig_13TeV", config):
 
         rooVar = "CMS_hgg_mass"
 
@@ -119,7 +136,7 @@ class scanClass():
 
         w.writeToFile(self.modelpath + "/" + self.savename + ".root")
 
-    def MakeBackgroundModel(workspaceName="wbkg_13TeV"):
+    def makeBackgroundModel(workspaceName="wbkg_13TeV"):
 
         rooVar = "CMS_hgg_mass"
 
