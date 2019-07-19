@@ -19,8 +19,8 @@ def contrastive_loss(y_true, y_pred):
     http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
     '''
     margin = 1
-    similar_term = (1 - y_true) * keras.backend.square(keras.backend.maximum(y_pred - margin, 0))
-    dissimilar_term = y_true * keras.backend.square(keras.backend.maximum(margin - y_pred, 0))
+    similar_term = y_true * keras.backend.square(keras.backend.maximum(y_pred - margin, 0))
+    dissimilar_term = (1 - y_true) * keras.backend.square(keras.backend.maximum(margin - y_pred, 0))
     return keras.backend.mean(similar_term + dissimilar_term)
 
 
@@ -30,7 +30,7 @@ def create_pairs(y, n):
 
     while len(labels) < n:
         pair = numpy.random.randint(0, len(y), 2)
-        label = 0 if y[pair[0]] == y[pair[1]] else 1 # 0 = similar, 1 = dissimilar
+        label = 1 if y[pair[0]] == y[pair[1]] else 0 # 1 = similar, 0 = dissimilar
         #if label == 0:
         #    if random.random() < 0.75:
         #        continue

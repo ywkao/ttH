@@ -186,6 +186,8 @@ if args.channel == "Leptonic":
     dnn_features += ["n_lep_tight_"]
 if args.do_top_tag:
     dnn_features += ["top_tag_score_"]
+if (args.fcnc_hut or args.fcnc_hct) and args.channel == "Hadronic" and not args.no_mass_constraint:
+    dnn_features += ["m_ggj_", "m_jjj_"] 
 
 if do_dnn:
   print("Calculating dnn scores")

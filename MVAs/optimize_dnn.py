@@ -60,7 +60,8 @@ def plot_gp(optimizer, x):
     
     mu, sigma = posterior(optimizer, x_obs, y_obs, x)
     #axis.plot(x, y, linewidth=3, label='Target')
-    axis.plot(x_obs.flatten(), y_obs, 'D', markersize=8, label='Observations', color='r')
+    unc = 0.0033 # calculated for Leptonic ttH vs ttGG
+    axis.errorbar(x_obs.flatten(), y_obs, yerr = numpy.ones(len(y_obs)) * unc, label='Observations', color='r', marker='o', markersize=8, ls="none")
     axis.plot(x, mu, '--', color='k', label='Prediction')
 
     axis.fill(numpy.concatenate([x, x[::-1]]), 
@@ -68,11 +69,12 @@ def plot_gp(optimizer, x):
         alpha=.6, fc='c', ec='None', label='95% confidence interval')
     
     axis.set_xlim((-5, -1))
-    axis.set_ylim((None, None))
-    axis.set_ylabel('f(x)', fontdict={'size':20})
-    axis.set_xlabel('x', fontdict={'size':20})
+    axis.set_ylim((0.7, 0.82))
+    axis.set_ylabel('AUC', fontdict={'size':20})
+    axis.set_xlabel('Learning Rate', fontdict={'size':20})
     
     utility_function = UtilityFunction(kind="ucb", kappa=5, xi=0)
+    #utility_function = UtilityFunction(kind="ei", xi=float(args.xi))
     utility = utility_function.utility(x, optimizer._gp, 0)
     #acq.plot(x, utility, label='Utility Function', color='purple')
     #acq.plot(x[numpy.argmax(utility)], numpy.max(utility), '*', markersize=15, 
@@ -135,23 +137,23 @@ pbounds_light = {
     "n_lstm" : (1,1), 
     "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.25, 0.25), 
-    "learning_rate" : (-4, -1), # 10**(learning_rate)
-    "start_batch" : (9, 9), # 2**(start_batch)
+    "learning_rate" : (-5, -1), # 10**(learning_rate)
+    "start_batch" : (11, 11), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99)
 }
 
 pbounds_medium = {
     "n_nodes_dense_1" : (300, 300),
     "n_nodes_dense_2" : (200, 200),
-    "n_dense_1" : (1,1),
+    "n_dense_1" : (1,3),
     "n_dense_2" : (2,2), 
-    "n_nodes_lstm" : (25, 150),
+    "n_nodes_lstm" : (100, 100),
     "n_lstm" : (1,4), 
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-4, -1), # 10**(learning_rate)
-    "start_batch" : (9, 9), # 2**(start_batch)
-    "batch_momentum" : (0.5, 0.999)
+    "learning_rate" : (-5, -1), # 10**(learning_rate)
+    "start_batch" : (11, 11), # 2**(start_batch)
+    "batch_momentum" : (0.99, 0.99)
 }
 
 pbounds_full = {
@@ -163,7 +165,7 @@ pbounds_full = {
     "n_lstm" : (1,5), 
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
-    "learning_rate" : (-4, -1), # 10**(learning_rate)
+    "learning_rate" : (-5, -1), # 10**(learning_rate)
     "start_batch" : (7, 13), # 2**(start_batch)
     "batch_momentum" : (0.5, 0.999)
 }
@@ -210,13 +212,36 @@ optimizer = BayesianOptimization(
     random_state=1,
 )
 
-official_log = "log_%s_%s.json" % (args.channel, args.tag)
+#official_log = "log_%s_%s.json" % (args.channel, args.tag)
 
-logger = JSONLogger(path=official_log)
-optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
+#logger = JSONLogger(path=official_log)
+#optimizer.subscribe(Events.OPTMIZATION_STEP, logger)
 
 xi = float(args.xi)
 
+x = numpy.linspace(pbounds_light["learning_rate"][0], pbounds_light["learning_rate"][1], 1000).reshape(-1,1)
+
+optimizer.maximize(init_points=3, n_iter=0)
+
+def maximize(optimizer, pbounds, n_probe, n_points, random, do_plot = False):
+    optimizer.set_bounds(new_bounds = pbounds)
+    utility_function = UtilityFunction(kind="ucb", kappa=5, xi=0)
+    for i in range(n_points):
+        if i % 3 == 0 or random:
+            optimizer.maximize(init_points=1, n_iter=0)
+        else:
+            next_point = optimizer.suggest(utility_function)
+            print("Probing this point next: ", next_point)
+            target = auc(**next_point)
+            print("Found AUC to be: ", target)
+            optimizer.register(params = next_point, target = target)
+        plot_gp(optimizer,x)
+
+maximize(optimizer, pbounds_light, 0, 20, args.random, True)
+maximize(optimizer, pbounds_medium, 0, args.n_points, args.random)
+maximize(optimizer, pbounds_full, 0, args.n_points, args.random)
+
+"""
 if args.no_buildup or args.fixed:
     optimizer.set_bounds(new_bounds = pbounds_full)
     if args.fixed:
@@ -227,18 +252,16 @@ if args.no_buildup or args.fixed:
     optimizer.maximize(
         init_points = args.n_points if args.random else 0,
         n_iter = 0 if args.random else args.n_points,
-        acq = "ei", xi = xi,
-        alpha=0.000001,
+        acq = "ucb", xi  = 0, kappa = 5,
     )
 
 else:
     print(("Probing %d points per pbounds set" % (args.n_points)))
 
     optimizer.maximize(
-            init_points = args.n_points if args.random else 0,
+            init_points = 3,#args.n_points if args.random else 0,
             n_iter = 0 if args.random else args.n_points,
-            acq = "ei", xi = xi,
-            alpha=0.000001,
+            acq = "ucb", xi  = 0, kappa = 5,
     )
 
     x = numpy.linspace(pbounds_light["learning_rate"][0], pbounds_light["learning_rate"][1], 1000).reshape(-1,1)
@@ -249,8 +272,7 @@ else:
     optimizer.maximize(
             init_points = args.n_points if args.random else 0,
             n_iter = 0 if args.random else args.n_points,
-            acq = "ei", xi = xi,
-            alpha=0.000001,
+            acq = "ucb", xi  = 0, kappa = 5,
     )
 
     optimizer.set_bounds(new_bounds = pbounds_full)
@@ -258,10 +280,10 @@ else:
     optimizer.maximize(
             init_points = args.n_points if args.random else 0,
             n_iter = 0 if args.random else args.n_points,
-            acq = "ei", xi = xi,
-            alpha=0.000001,
+            acq = "ucb", xi  = 0, kappa = 5,
     )
 
 
 for i, res in enumerate(optimizer.res):
     print(("Iteration {}: \n\t{}".format(i, res)))
+"""

@@ -23,6 +23,7 @@ parser.add_argument("--z_score", help = "preprocess features to express them as 
 parser.add_argument("--fcnc", help = "use fcnc as signal, sm as bkg", action="store_true")
 parser.add_argument("--ggH_treatment", help = "how to deal with large ggH weights in fcnc vs SM higgs training", type=str, default="none")
 parser.add_argument("--add_mass_constraints", help = "add mjjj and mggj as global features", action = "store_true")
+parser.add_argument("--add_ext_mass_constraints", help = "add full extended set of mass constraints", action = "store_true")
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
@@ -51,6 +52,10 @@ feature_names += top_tag_features
 
 if args.add_mass_constraints:
     feature_names += ["m_ggj_", "m_jjj_"]
+
+if args.add_ext_mass_constraints:
+    top_cand_names = ["top_candidates_" + str(i) + "_" for i in range(1,13)]
+    feature_names += top_cand_names
 
 branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_", "evt_", "run_", "lumi_"]))
 branches = numpy.unique(branches)
@@ -101,7 +106,12 @@ if args.fcnc:
         if args.ggH_treatment == "scale":
             if features["process_id_"][i] == 14: # scale ggH by 50 to see if it helps
                 features["evt_weight_"][i] *= 1.0/50.0
-
+        #if args.ggH_treatment == "oversample":
+        #    oversample_factor = 50.
+        #    oversample_array = numpy.empty()
+        #    if features["process_id_"][i] == 14:
+        #        features["evt_weight_"][i] *= 
+        #        for j in range(oversample_factor):
 
 else:
     features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
@@ -109,7 +119,6 @@ else:
     features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))')
 
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d' % (data_label))
-
 
 if args.boosted_objects:
   object_features = features["objects_boosted_"]
@@ -149,13 +158,18 @@ def preprocess_sigmoid(array):
   return (1 - numpy.exp(-alpha))/(1 + numpy.exp(-alpha))
 
 
+for name in feature_names:
+    if "leptons_" == name or "jets_" == name or "objects_" in name:
+        feature_names.remove(name)
+
+print("Here are the ordered global features:", feature_names)
+
 if args.z_score:
     preprocess_dict = {}
     for feature in feature_names:
-        if ("objects_" not in feature and "leptons_" != feature and "jets_" != feature):
+        if ("objects_" not in feature and "leptons_" != feature and "jets_" != feature): 
             mean, stddev = utils.get_mean_and_std(features[feature])
             preprocess_dict[feature] = { "mean" : float(mean), "std_dev" : float(stddev)}
-
  
 global_features = utils.create_array(features, feature_names, preprocess_dict, args.z_score)
 global_features_validation = utils.create_array(features_validation, feature_names, preprocess_dict, args.z_score)

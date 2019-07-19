@@ -68,6 +68,8 @@ class BabyMaker {
     vector<vector<float>>  objects_;
     vector<vector<float>>  objects_boosted_;
 
+    vector<float> top_candidates_;
+
     // Variable declarations
     float       maxIDMVA_;
     float       minIDMVA_;
@@ -128,6 +130,19 @@ class BabyMaker {
     float       helicity_angle_;
     float	    m_ggj_;
     float	    m_jjj_;
+
+    float       top_candidates_1_;
+    float       top_candidates_2_;
+    float       top_candidates_3_;
+    float       top_candidates_4_;
+    float       top_candidates_5_;
+    float       top_candidates_6_;
+    float       top_candidates_7_;
+    float       top_candidates_8_;
+    float       top_candidates_9_;
+    float       top_candidates_10_;
+    float       top_candidates_11_;
+    float       top_candidates_12_;
 };
 
 inline
@@ -166,6 +181,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("objects_"             , &objects_        );
   BabyTree_->Branch("objects_boosted_"             , &objects_boosted_        );
+  BabyTree_->Branch("top_candidates_"             , &top_candidates_        );
 
   // Variable branches
   BabyTree_->Branch("maxIDMVA_" ,&maxIDMVA_);
@@ -226,6 +242,19 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("helicity_angle_"           , &helicity_angle_      );
   BabyTree_->Branch("m_ggj_"           , &m_ggj_      );
   BabyTree_->Branch("m_jjj_"           , &m_jjj_      );
+
+  BabyTree_->Branch("top_candidates_1_"             , &top_candidates_1_        );
+  BabyTree_->Branch("top_candidates_2_"             , &top_candidates_2_       );
+  BabyTree_->Branch("top_candidates_3_"             , &top_candidates_3_        );
+  BabyTree_->Branch("top_candidates_4_"             , &top_candidates_4_        );
+  BabyTree_->Branch("top_candidates_5_"             , &top_candidates_5_       );
+  BabyTree_->Branch("top_candidates_6_"             , &top_candidates_6_        );
+  BabyTree_->Branch("top_candidates_7_"             , &top_candidates_7_        );
+  BabyTree_->Branch("top_candidates_8_"             , &top_candidates_8_        );
+  BabyTree_->Branch("top_candidates_9_"             , &top_candidates_9_        );
+  BabyTree_->Branch("top_candidates_10_"             , &top_candidates_10_        );
+  BabyTree_->Branch("top_candidates_11_"             , &top_candidates_11_        );
+  BabyTree_->Branch("top_candidates_12_"             , &top_candidates_12_        );
 
   return;
 }

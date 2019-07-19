@@ -1,12 +1,10 @@
+import utils
 import dnn_helper
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+print("GPU with lowest memory %s" % str(utils.pick_gpu_lowest_memory()))
+#os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["CUDA_VISIBLE_DEVICES"] = str(utils.pick_gpu_lowest_memory())
 import tensorflow as tf
-#print((tf.__version__))
-#if tf.__version__ == "1.14.0":
-#    print("Disabling new tf behaviors, because Sam wrote this DNN in tf 1.3.0")
-#    import tensorflow.compat.v1 as tf
-#    tf.disable_v2_behavior()
 config = tf.ConfigProto(log_device_placement=True)
 config.gpu_options.allow_growth = True
 session = tf.Session(config=config)
@@ -22,8 +20,6 @@ import glob
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
-import utils
 import ks_test
 
 def train(args, config):
@@ -32,16 +28,21 @@ def train(args, config):
     config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False} 
 
 
+  #if args.channel == "Hadronic" and "FCNC" in args.input: # convergence issues in FCNC Hadronic DNN
+      #config["epsilon"] = 10e-7 # increasing from 10e-8 seems to slow down training but make it more stable
+
   object_features, object_features_validation, object_features_data = f['object'], f['object_validation'], f['object_data']
   #if args.channel == "Leptonic":
   #  jet_features, jet_features_validation, jet_features_data = f['jet'], f['jet_validation'], f['jet_data']
   #  lepton_features, lepton_features_validation, lepton_features_data = f['lepton'], f['lepton_validation'], f['lepton_data']
+
 
   global_features, global_features_validation, global_features_data = f['global'], f['global_validation'], f['global_data']
   label, label_validation, label_data = f['label'], f['label_validation'], f['label_data']
   weights, weights_validation, weights_data = f['weights'], f['weights_validation'], f['weights_data']
   if args.absolute_weights:
     weights = numpy.absolute(numpy.array(weights))
+  #weights = numpy.ones_like(weights)
   mass, mass_validation, mass_data = f['mass'], f['mass_validation'], f['mass_data']
   top_tag_score, top_tag_score_validation, top_tag_score_data = f['top_tag_score'], f['top_tag_score_validation'], f['top_tag_score_data']
   tth_ttPP_mva, tth_ttPP_mva_validation, tth_ttPP_mva_data = f['tth_ttPP_mva'], f['tth_ttPP_mva_validation'], f['tth_ttPP_mva_data']
@@ -51,6 +52,13 @@ def train(args, config):
   run_data = f['run_data']
   lumi_data = f['lumi_data']
 
+  #global_features = numpy.array(global_features)
+  #global_features[:,-1] *= 0.
+  #global_features[:,-2] *= 0.
+
+  #global_features_validation = numpy.array(global_features_validation)
+  #global_features_validation[:,-1] *= 0.
+  #global_features_validation[:,-2] *= 0.
 
   # Features
   leptonic_single_lstm = True
@@ -81,5 +89,5 @@ def train(args, config):
     dnn.train_with_early_stopping()
 
     # Diagnostics
-    dnn.do_diagnostics()
+    #dnn.do_diagnostics()
   return dnn

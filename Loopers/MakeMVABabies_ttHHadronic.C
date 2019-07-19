@@ -579,6 +579,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       helicity_angle_ = helicity(lead_photon, sublead_photon);
 
       calculate_masses(diphoton, jets, m_ggj_, m_jjj_);
+      m_ggj_ = m_ggj_ > 0 ? log(m_ggj_) : -9;
+      m_jjj_ = m_jjj_ > 0 ? log(m_jjj_) : -9;
 
       rand_ = cms3.rand();
       super_rand_ = -1; //rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
@@ -617,7 +619,32 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       objects_ = sort_objects(jet_objects);
       objects_boosted_ = sort_objects(jet_objects_boosted);
 
-      FillBabyNtuple();
+      top_candidates_ = calculate_top_candidates(diphoton, jets, btag_scores, max1_btag_);
+
+      // Do this a dumb hacky way because it is easier to deal with down the line in DNN/BDT prep+training
+      top_candidates_1_ = top_candidates_[0] > 0 ? log(top_candidates_[0]) : -9;
+      top_candidates_2_ = top_candidates_[1] > 0 ? log(top_candidates_[1]) : -9;
+      top_candidates_3_ = top_candidates_[2] > 0 ? log(top_candidates_[2]) : -9;
+      top_candidates_4_ = top_candidates_[3] > 0 ? log(top_candidates_[3]) : -9;
+      top_candidates_5_ = top_candidates_[4] > 0 ? log(top_candidates_[4]) : -9;
+      top_candidates_6_ = top_candidates_[5] > 0 ? log(top_candidates_[5]) : -9;
+      top_candidates_7_ = top_candidates_[6] > 0 ? log(top_candidates_[6]) : -9;
+      top_candidates_8_ = top_candidates_[7] > 0 ? log(top_candidates_[7]) : -9;
+      top_candidates_9_ = top_candidates_[8] > 0 ? log(top_candidates_[8]) : -9;
+      top_candidates_10_ = top_candidates_[9] > 0 ? log(top_candidates_[9]) : -9;
+      top_candidates_11_ = top_candidates_[10] > 0 ? log(top_candidates_[10]) : -9;
+      top_candidates_12_ = top_candidates_[11] > 0 ? log(top_candidates_[11]) : -9;
+
+      const float oversample = 10.;
+      if (fcnc && process_id_ == 14) { // oversample ggH
+        evt_weight_ *= 1./oversample;
+        for (int i = 0; i < int(oversample); i++)
+          FillBabyNtuple();
+      }
+
+      else
+        FillBabyNtuple();
+       
 
       /*
       if (deriving_gjet_weights) {

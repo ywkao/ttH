@@ -199,30 +199,6 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, float mva_v
 
 }
 
-void calculate_masses(TLorentzVector diphoton, vector<TLorentzVector> jets, float &m1, float &m2) {
-  if (jets.size() < 4) {
-    m1 = 0.;
-    m2 = 0.;
-    return;
-  }
-  float min_mass_diff = 999999;
-  for (int i = 0; i < 4; i++) { 
-    TLorentzVector t1 = diphoton + jets[i];
-    TLorentzVector t2;
-    for (int j = 0; j < 4; j++) {
-      if (j == i) continue;
-      t2 += jets[j];
-    }
-    float mass_diff = abs(t1.M() - m_top) + abs(t2.M() - m_top);
-    if (mass_diff < min_mass_diff) {
-      min_mass_diff = mass_diff;
-      m1 = t1.M();
-      m2 = t2.M();
-    }
-  }
-  return; 
-}
-
 vector<float> make_object(TLorentzVector p4, vector<float> b_disc, const TLorentzVector diphoton, bool boost) { 
 // 0: pT, 1: eta, 2: phi, 3: E, 4: b disc, 5: bb disc, 6: c disc, 7: udsg disc,
   vector<float> object;

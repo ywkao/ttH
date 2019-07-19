@@ -151,6 +151,11 @@ def tth_learner(max_objects, n_features, n_global_features, config):
   else:
     layer_norm = False
 
+  if "epsilon" in list(config.keys()):
+    epsilon = config["epsilon"]
+  else:
+    epsilon = 10e-8
+
   # LSTM
   lstm = input_objects
 
@@ -170,13 +175,13 @@ def tth_learner(max_objects, n_features, n_global_features, config):
 
   for i in range(n_dense_2):
     dense = keras.layers.Dense(n_nodes_dense_2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense2_%d' % i)(dense)
-    if batch_norm:
+    if batch_norm and i < (n_dense_2 - 1):
       dense = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm2_%d' % i)(dense) 
     if i < (n_dense_2 - 1):
       dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout2_%d' % i)(dense)
 
   output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'output')(dense)
-  optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate)
+  optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate, epsilon = epsilon)
   #optimizer = keras.optimizers.Adam(lr = learning_rate)
 
   model = keras.models.Model(inputs = [input_global, input_objects], outputs = [output])

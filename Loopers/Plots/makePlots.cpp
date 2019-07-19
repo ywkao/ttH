@@ -857,6 +857,15 @@ int main(int argc, char* argv[])
 
     vInfo[vInfo.size()-1] = "";
 
+    make_plot(c1, vFiles[i], vNames[i], "hMassTop_Hq_1", "m_{#gamma#gammaq,1} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hMassTop_Hq_2", "m_{#gamma#gammaq,2} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hMassTop_Hq_3", "m_{#gamma#gammaq,3} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+
+    make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_1", "m_{bqq,1} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_2", "m_{bqq,2} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_3", "m_{bqq,3} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+ 
+
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, vSigs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
   }
 }

@@ -68,8 +68,8 @@ class DNN_Helper:
     self.weights_file = kwargs.get('weights_file', '')
     self.tag = kwargs.get('tag', '')
 
-    self.n_bootstrap = kwargs.get('n_bootstrap', 25)
-    self.max_epochs = kwargs.get('max_epochs', 25)
+    self.n_bootstrap = kwargs.get('n_bootstrap', 0)
+    self.max_epochs = kwargs.get('max_epochs', 50)
 
     if 'tag' in kwargs:
       self.save_name = "dnn_weights/" + self.tag + "_weights_{epoch:02d}.hdf5"
@@ -138,6 +138,7 @@ class DNN_Helper:
       print(("Sum of weights before scaling: ", sum_pos_weights, sum_neg_weights))
 
       self.features_train.weights[numpy.where(self.features_train.label == 1)] *= sum_neg_weights / sum_pos_weights 
+      #self.features_train.weights[numpy.where(self.features_train.label == 1)] *= 10
       self.prepped = True
 
       sum_neg_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 0)
@@ -178,12 +179,13 @@ class DNN_Helper:
     best_auc = 0.5
     keep_training = True
 
-    max_batch_size = 25000
+    max_batch_size = 50000
     epochs = 1
     bad_epochs = 0
     while keep_training:
       auc_train, auc = self.train(epochs, self.batch_size_train)
       improvement = ((1-best_auc)-(1-auc))/(1-best_auc)
+      overfit = (auc_train - auc) / auc_train
       if improvement > 0.01:
           print(("Improvement in (1-AUC) of %.3f percent! Keeping batch size the same" % (improvement*100.)))
           best_auc = auc
@@ -204,6 +206,9 @@ class DNN_Helper:
           print(("Improvement in (1-AUC) of %.3f percent. Can't increase batch size anymore" % (improvement*100.))) 
           bad_epochs = 0
           best_auc = auc
+      elif improvement < 0 and overfit < 0.01 and bad_epochs < 3:
+          print (("Overfitting by less than 1%, continue training"))
+          bad_epochs += 1
       else:
           print("AUC did not improve and we can't increase batch size anymore. Stopping training.")
           keep_training = False
@@ -266,6 +271,7 @@ class DNN_Helper:
     plt.ylabel("True Positive Rate (sig. eff.)")
     plt.legend(loc = 'lower right')
     plt.savefig('dnn_roc_%s_%s.pdf' % (reference.replace(" ", "_"), self.tag))
+    plt.clf()
 
   def do_diagnostics(self):
     numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"], scores_final_fit = self.predictions["final_fit"], evt_data = self.evt_data, run_data = self.run_data, lumi_data = self.lumi_data, mass_data = self.mass_data)
