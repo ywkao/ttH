@@ -28,6 +28,7 @@ parser.add_argument("--preprocess_scheme", help = "json used for preprocessing f
 parser.add_argument("--no_buildup", help = "don't build up with light, medium, full pbounds", action = "store_true")
 parser.add_argument("--fixed", help = "used a fixed set of pbounds (for calculating systematics unc.)", action = "store_true")
 parser.add_argument("--xi", help = "exploitation vs exploration parameter for hyperparam opt", type=str, default="0.0005")
+parser.add_argument("--alpha", help = "noise parameter for BO", type=str, default="1e-05")
 
 args = parser.parse_args()
 args.n_points = int(args.n_points)
@@ -140,7 +141,8 @@ pbounds_light = {
     "dropout_rate" : (0.25, 0.25), 
     "learning_rate" : (-5, -1), # 10**(learning_rate)
     "start_batch" : (11, 11), # 2**(start_batch)
-    "batch_momentum" : (0.99, 0.99)
+    "batch_momentum" : (0.99, 0.99),
+    "epsilon" : (-8, -8)
 }
 
 pbounds_medium = {
@@ -155,7 +157,7 @@ pbounds_medium = {
     "learning_rate" : (-5, -1), # 10**(learning_rate)
     "start_batch" : (11, 11), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99),
-    "epsilon" : (-10, -6),
+    "epsilon" : (-10, -6)
 }
 
 pbounds_full = {
@@ -169,7 +171,8 @@ pbounds_full = {
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-5, -1), # 10**(learning_rate)
     "start_batch" : (7, 13), # 2**(start_batch)
-    "batch_momentum" : (0.5, 0.999)
+    "batch_momentum" : (0.5, 0.999),
+    "epsilon" : (-10, -6)
 }
 
 pbounds_fixed = {
@@ -183,7 +186,8 @@ pbounds_fixed = {
     "dropout_rate" : (0.25, 0.25),
     "learning_rate" : (-3, -3), # 10**(learning_rate)
     "start_batch" : (9, 9.00001), # 2**(start_batch) # dumb hacky way to make sure the points aren't all considered the same
-    "batch_momentum" : (0.99, 0.99)
+    "batch_momentum" : (0.99, 0.99),
+    "epsilon" : (-8, -8)
 }
 
 pbounds_dict = {
@@ -230,7 +234,7 @@ def maximize(optimizer, pbounds, n_probe, n_points, random, do_plot = False):
     utility_function = UtilityFunction(kind="ucb", kappa=5, xi=0)
     for i in range(n_points):
         if i % 3 == 0 or random:
-            optimizer.maximize(init_points=1, n_iter=0)
+            optimizer.maximize(init_points=1, n_iter=0, alpha=float(args.alpha))
         else:
             next_point = optimizer.suggest(utility_function)
             print("Probing this point next: ", next_point)

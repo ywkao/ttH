@@ -154,7 +154,7 @@ def tth_learner(max_objects, n_features, n_global_features, config):
   if "epsilon" in list(config.keys()):
     epsilon = config["epsilon"]
   else:
-    epsilon = 10e-8
+    epsilon = 1e-08
 
   # LSTM
   lstm = input_objects

@@ -25,11 +25,11 @@ import ks_test
 def train(args, config):
   f = h5py.File(args.input, "r")
   if len(list(config.keys())) == 0:
-    config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False} 
+      config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False, "epsilon" : 1e-08} 
 
 
   #if args.channel == "Hadronic" and "FCNC" in args.input: # convergence issues in FCNC Hadronic DNN
-      #config["epsilon"] = 10e-7 # increasing from 10e-8 seems to slow down training but make it more stable
+      #config["epsilon"] = 1e-07 # increasing from 1e-08 seems to slow down training but make it more stable
 
   object_features, object_features_validation, object_features_data = f['object'], f['object_validation'], f['object_data']
   #if args.channel == "Leptonic":
