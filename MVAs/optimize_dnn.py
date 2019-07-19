@@ -89,7 +89,7 @@ def plot_gp(optimizer, x):
     plt.savefig('optimization_step_%d.pdf' % (steps), bbox_inches='tight')
     plt.clf() 
 
-def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_lstm, maxnorm, dropout_rate, learning_rate, start_batch, batch_momentum):
+def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_lstm, maxnorm, dropout_rate, learning_rate, start_batch, batch_momentum, epsilon):
     global idx, log, full_results
 
     config = {}
@@ -100,6 +100,7 @@ def auc(n_nodes_dense_1, n_nodes_dense_2, n_dense_1, n_dense_2, n_nodes_lstm, n_
     config["n_nodes_lstm"] = int(n_nodes_lstm)
     config["n_lstm"] = int(n_lstm)
     config["maxnorm"] = 10**(maxnorm)
+    config["epsilon"] = 10**(epsilon)
     config["dropout_rate"] = dropout_rate
     config["learning_rate"] = 10**(learning_rate)
     config["start_batch"] = int(2**(start_batch))
@@ -145,15 +146,16 @@ pbounds_light = {
 pbounds_medium = {
     "n_nodes_dense_1" : (300, 300),
     "n_nodes_dense_2" : (200, 200),
-    "n_dense_1" : (1,3),
+    "n_dense_1" : (1,1),
     "n_dense_2" : (2,2), 
     "n_nodes_lstm" : (100, 100),
-    "n_lstm" : (1,4), 
+    "n_lstm" : (1,1), 
     "maxnorm" : (-1, 2), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-5, -1), # 10**(learning_rate)
     "start_batch" : (11, 11), # 2**(start_batch)
-    "batch_momentum" : (0.99, 0.99)
+    "batch_momentum" : (0.99, 0.99),
+    "epsilon" : (-10, -6),
 }
 
 pbounds_full = {
@@ -235,11 +237,12 @@ def maximize(optimizer, pbounds, n_probe, n_points, random, do_plot = False):
             target = auc(**next_point)
             print("Found AUC to be: ", target)
             optimizer.register(params = next_point, target = target)
-        plot_gp(optimizer,x)
+        if do_plot:
+            plot_gp(optimizer,x)
 
 maximize(optimizer, pbounds_light, 0, 20, args.random, True)
 maximize(optimizer, pbounds_medium, 0, args.n_points, args.random)
-maximize(optimizer, pbounds_full, 0, args.n_points, args.random)
+#maximize(optimizer, pbounds_full, 0, args.n_points, args.random)
 
 """
 if args.no_buildup or args.fixed:

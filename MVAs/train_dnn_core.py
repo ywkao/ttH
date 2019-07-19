@@ -53,6 +53,15 @@ def train(args, config):
   lumi_data = f['lumi_data']
 
   #global_features = numpy.array(global_features)
+  #global_features = numpy.array(global_features[:,0:-2])
+
+  #global_features_validation = numpy.array(global_features_validation)
+  #global_features_validation = numpy.array(global_features_validation[:,0:-2])
+
+  #global_features_data = numpy.array(global_features_data)
+  #global_features_data = numpy.array(global_features_data[:,0:-2])
+
+  #global_features = numpy.array(global_features)
   #global_features[:,-1] *= 0.
   #global_features[:,-2] *= 0.
 
