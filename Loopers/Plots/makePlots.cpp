@@ -673,6 +673,10 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hMassTop2", "m_{jjj} [GeV]", vBkgs, vSigs, 0,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
 
     make_plot(c1, vFiles[i], vNames[i], "hNJets", "N_{jets}", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hNJets_bdtBin1", "N_{jets}^{Bin1}", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hNJets_bdtBin2", "N_{jets}^{Bin2}", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hNJets_bdtBin3", "N_{jets}^{Bin3}", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    make_plot(c1, vFiles[i], vNames[i], "hNJets_bdtBin4", "N_{jets}^{Bin4}", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hNbLoose", "N_{b-jets} (Loose)", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hNbMedium", "N_{b-jets} (Medium)", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);   
     make_plot(c1, vFiles[i], vNames[i], "hNbTight", "N_{b-jets} (Tight)", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);

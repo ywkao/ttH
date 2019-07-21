@@ -50,6 +50,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   unique_ptr<TMVA::Reader> mva;
   unique_ptr<TMVA::Reader> gjet_mva;
 
+  // BDT bins
+  int nBins = 4;
+  float binBounds[5] = {0.9675,0.9937,0.9971,0.9991,1};
+  
   // Declare BDT vars
   float top_tag_score_;
 
@@ -507,6 +511,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hHT", get_ht(jets), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, vId);
+      if (nBins >=1 && tthMVA_RunII() > binBounds[0] && tthMVA_RunII() <= binBounds[1])
+	vProcess[processId]->fill_histogram("hNJets_bdtBin1", n_jets(), evt_weight, vId);
+      if (nBins >=2 && tthMVA_RunII() > binBounds[1] && tthMVA_RunII() <= binBounds[2])
+	vProcess[processId]->fill_histogram("hNJets_bdtBin2", n_jets(), evt_weight, vId);
+      if (nBins >=3 && tthMVA_RunII() > binBounds[2] && tthMVA_RunII() <= binBounds[3])
+	vProcess[processId]->fill_histogram("hNJets_bdtBin3", n_jets(), evt_weight, vId);
+      if (nBins >=4 && tthMVA_RunII() > binBounds[3] && tthMVA_RunII() <= binBounds[4])
+	vProcess[processId]->fill_histogram("hNJets_bdtBin4", n_jets(), evt_weight, vId);
+
+
       vProcess[processId]->fill_histogram("hNbLoose", nb_loose(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hNbMedium", nb_medium(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hNbTight", nb_tight(), evt_weight, vId); 

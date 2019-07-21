@@ -68,6 +68,10 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hGJet_BDT", 100, 0, 1);
 
     v[i]->add_histogram("hNJets", 16, -0.5, 15.5);
+    v[i]->add_histogram("hNJets_bdtBin1", 16, -0.5, 15.5);
+    v[i]->add_histogram("hNJets_bdtBin2", 16, -0.5, 15.5);
+    v[i]->add_histogram("hNJets_bdtBin3", 16, -0.5, 15.5);
+    v[i]->add_histogram("hNJets_bdtBin4", 16, -0.5, 15.5);
     v[i]->add_histogram("hNbLoose", 16, -0.5, 15.5);
     v[i]->add_histogram("hNbMedium", 16, -0.5, 15.5);
     v[i]->add_histogram("hNbTight", 16, -0.5, 15.5);

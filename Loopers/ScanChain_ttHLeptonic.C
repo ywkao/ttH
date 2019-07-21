@@ -44,6 +44,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   // MVA Business
   unique_ptr<TMVA::Reader> mva;
 
+  // BDT bins
+  int nBins = 4;
+  float binBounds[5] = {0.8435,0.9346,0.9625,0.9890,1};
+
   // Declare BDT vars
   float lep_pt_;
   float lep_eta_;
