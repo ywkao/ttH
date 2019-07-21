@@ -31,7 +31,7 @@ if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "*")
   os.system("rm package.tar.gz")
 
-  os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' -f package.tar.gz %s" % cmssw_ver) 
+  os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' -f package.tar.gz %s" % cmssw_ver)
   os.system("for task in `ls -1 -d tasks/*%s*/`; do echo cp package.tar.gz $task/package.tar.gz; cp package.tar.gz $task/package.tar.gz; done" % args.tag) # make sure we overwrite any previously existing tar files
 
   with open("versions.txt", "a") as fout:
@@ -101,7 +101,7 @@ while True:
       #if "VHToGG" in dataset:
       #  print "Skipping VH for now"
       #  continue
-      #if not ("Run2016" in dataset or "Run2017" in dataset or "Run2018" in dataset): 
+      #if not ("Run2016" in dataset or "Run2017" in dataset or "Run2018" in dataset):
       #  continue
       print "Submitting jobs for: ", dataset
       sample = DirectorySample( dataset = dataset, location = info["input_loc"])
@@ -127,8 +127,8 @@ while True:
       # save some information for the dashboard
       total_summary[dataset] = task.get_task_summary()
     # parse the total summary and write out the dashboard
-    StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker/").do()
-    os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker")
+    StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker2/").do()
+    os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker2")
     if allcomplete:
         print ""
         print "Job={} finished".format(job_tag)
