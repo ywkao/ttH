@@ -4,17 +4,17 @@
 #tag="TTHHadronicTag"
 #tag="TTHLeptonicTag"
 #tag="FCNCHadronicTag"
-tag="FCNCHUTLeptonicTag"
-#tag="FCNCHUTHadronicTag"
+#tag="FCNCHUTLeptonicTag"
+tag="FCNCHUTHadronicTag"
 #sigName="ttH_hgg"
 #for FCNC signal, only feed TT_FCNC, the doScan.py will take care of making signals for ST_FCNC and treat ST+TT as signals in datacard
 sigName="TT_FCNC_hut"
-#modelPath="TTFCNC_hut_had_20190623_step3_1"
-modelPath="TTFCNC_hut_lep_20190626_step3_1"
+modelPath="TTFCNC_hut_had_20190715_step2_testBinning"
+#modelPath="TTFCNC_hut_lep_20190626_step3_1"
 #modelPath="TTHHadronic_20190624_step2_high"
-plotPath="/home/users/hmei/public_html/2019/20190626_FCNCHUTLep_step3_1/"
-highCut=0.86647624
-lowCut=0.72113216
+plotPath="/home/users/hmei/public_html/2019/20190715_FCNCHUTHad_step2_testBinning/"
+highCut=1
+lowCut=0.98359156
 fixBin2="n"
 useNCores="50"
 

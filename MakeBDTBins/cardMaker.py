@@ -99,6 +99,7 @@ class MakeCards():
         rate_l4 = ""
 
         lumi_l5 = ""
+        ttH_l6 = ""
 
         for tag in tagList:
             for i in range(len(processes)):
@@ -107,10 +108,16 @@ class MakeCards():
                 process_l2 += processes[i] + " "
                 process_l3 += str( i+1-len(sigList) ) + " "
                 rate_l4 += "1.0 "
+
                 if processes[i] == "bkg_mass":
                     lumi_l5 += "- "
                 else:
                     lumi_l5 += "1.025 "
+
+                if processes[i] == "ttH_hgg":
+                    ttH_l6 += "0.8/1.2 "
+                else:
+                    ttH_l6 += "- "
 
         bin_l1 = "bin " + bin_l1 + "\n"
         process_l2 = "process " + process_l2 + "\n"
@@ -118,6 +125,7 @@ class MakeCards():
         rate_l4 = "rate " + rate_l4 + "\n"
 
         lumi_l5 = "lumi_13TeV lnN " + lumi_l5 + "\n"
+        ttH_l6 = "ttH_xs lnN " + ttH_l6 + "\n"
 
         self.txtfile.write(bin_l1)
         self.txtfile.write(process_l2)
@@ -125,6 +133,7 @@ class MakeCards():
         self.txtfile.write(rate_l4)
         self.txtfile.write("------------\n")
         self.txtfile.write(lumi_l5)
+        self.txtfile.write(ttH_l6)
 
     def WriteCard(self, sigList, bkgList, tagList, postFix):
 
@@ -156,8 +165,9 @@ args=ParseOption()
 
 sigList = ["ttH_hgg"]
 
-bkgList = ["ggH_hgg", "VBF_hgg", "THQ_hgg", "THW_hgg", "bkg_mass"]
+#bkgList = ["ggH_hgg", "VBF_hgg", "THQ_hgg", "THW_hgg", "bkg_mass"]
 #bkgList = ["bkg_mass"]
+bkgList = ["ggH_hgg",  "bkg_mass"]
 
 if args.doFCNC:
     if args.doMultiSig and ("hut" in args.FCNCSig):

@@ -1,18 +1,17 @@
 import ROOT
 import filenameDict as filenameDict
-import processIDMap as processIDMap
+#import processIDMap as processIDMap
 import root_numpy
 
 from tdrStyle import *
 setTDRStyle()
 
-gSystem.AddIncludePath("-I$CMSSW_BASE/src/ ")
-#gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc481/libHiggsAnalysisCombinedLimit.so")
-gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc630/libHiggsAnalysisCombinedLimit.so")
-gSystem.AddIncludePath("-I$ROOFITSYS/include")
-gSystem.AddIncludePath("-Iinclude/")
-RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.DataHandling)
-RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.ObjectHandling)
+ROOT.gSystem.AddIncludePath("-I$CMSSW_BASE/src/ ")
+ROOT.gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc630/libHiggsAnalysisCombinedLimit.so")
+ROOT.gSystem.AddIncludePath("-I$ROOFITSYS/include")
+ROOT.gSystem.AddIncludePath("-Iinclude/")
+ROOT.RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.DataHandling)
+ROOT.RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.ObjectHandling)
 
 class makeModel():
 
@@ -24,6 +23,7 @@ class makeModel():
         self.selection = config["selection"]
         self.plotpath = config["plotpath"]
         self.modelpath = config["modelpath"]
+        self.savename = config["savename"]
         self.var = config["var"] #mass
         self.weightVar = config["weightVar"] #weight
 
@@ -50,7 +50,7 @@ class makeModel():
         pathCmd += "rm " + self.plotpath+ "*;"
         pathCmd += "cp ~/public_html/tmpFile/index.php " + self.plotpath
 
-    def makeSignalModel(workspaceName = "wsig_13TeV", config):
+    def makeSignalModel(self, workspaceName, config):
 
         rooVar = "CMS_hgg_mass"
 
@@ -58,15 +58,16 @@ class makeModel():
         norm_in = config["norm_in"]
         fixParameters = config["fixParameters"]
 
-        w = RooWorkspace(workspaceName)
+        w = ROOT.RooWorkspace(workspaceName)
         w.factory(rooVar + "[100,180]")
         w.factory("MH[125]")
 
-        h_mgg = TH1F("h_mgg", "h_mgg", 320, 100, 180)
+        h_mgg = ROOT.TH1F("h_mgg", "h_mgg", 320, 100, 180)
         h_mgg.Sumw2()
         self.tree.Project(h_mgg.GetName(), self.var, self.weightVar + "*(" + self.selection + ")")
-        d_mgg = RooDataHist("roohist_data_mass_" + self.tag, "", RooArgList(w.var(rooVar)), h_mgg, 1)
-        #print "bin dataset", h_gg.Integral(), d_mgg_bin.sumEntries(), d_mgg_bin.numEntries()
+        d_mgg = ROOT.RooDataHist("roohist_data_mass_" + self.tag, "", ROOT.RooArgList(w.var(rooVar)), h_mgg, 1)
+        print "bin dataset", h_mgg.Integral(), d_mgg.sumEntries(), d_mgg.numEntries()
+        #return 1
 
         # normalization
         norm = d_mgg.sumEntries()
@@ -76,28 +77,28 @@ class makeModel():
             norm = norm*1/1.527
         if norm <= 0:
             norm = 1e-09
-        rv_norm = RooRealVar(self.tag+"_norm", "", norm)
+        rv_norm = ROOT.RooRealVar(self.tag+"_norm", "", norm)
 
         # pdf
         w.factory("DoubleCB:"+self.tag+"(" + rooVar + ", mean_"+self.tag+"[125,120,130], sigma_"+self.tag+"[1,0,5], a1_"+self.tag+"[1,0,10], n1_"+self.tag+"[1,0,10], a2_"+self.tag+"[1,0,10], n2_"+self.tag+"[1,0,10])")
-        exPdf = RooExtendPdf("extend" + self.tag, "", w.pdf(self.tag), rv_norm)
+        exPdf = ROOT.RooExtendPdf("extend" + self.tag, "", w.pdf(self.tag), rv_norm)
 
         # fit
-        w.pdf(self.tag).fitTo(events, RooFit.PrintLevel(-1))
+        w.pdf(self.tag).fitTo(d_mgg, ROOT.RooFit.PrintLevel(-1))
 
         getattr(w,'import')(rv_norm)
         getattr(w,'import')(exPdf)
 
         # frame
         frame = w.var("CMS_hgg_mass").frame()
-        events.plotOn(frame)
+        d_mgg.plotOn(frame)
         w.pdf(self.tag).plotOn(frame)
 
         # plot
-        c1 = TCanvas("c1", "c1", 800, 800)
-        dummy = TH1D("dummy","dummy",1,100,180)
+        c1 = ROOT.TCanvas("c1", "c1", 800, 800)
+        dummy = ROOT.TH1D("dummy","dummy",1,100,180)
         dummy.SetMinimum(0)
-        dummy.SetMaximum(h_mgg*1.2)
+        dummy.SetMaximum(h_mgg.GetMaximum()*1.2)
         dummy.SetLineColor(0)
         dummy.SetMarkerColor(0)
         dummy.SetLineWidth(0)
@@ -107,7 +108,7 @@ class makeModel():
         dummy.GetXaxis().SetTitle("m_{#gamma#gamma} (GeV)")
         dummy.Draw()
 
-        latex = TLatex()
+        latex = ROOT.TLatex()
         latex.SetNDC()
         latex.SetTextSize(0.6*c1.GetTopMargin())
         latex.SetTextFont(42)
@@ -136,18 +137,18 @@ class makeModel():
 
         w.writeToFile(self.modelpath + "/" + self.savename + ".root")
 
-    def makeBackgroundModel(workspaceName="wbkg_13TeV"):
+    def makeBackgroundModel(self, workspaceName, datasetTag):
 
         rooVar = "CMS_hgg_mass"
 
-        w = RooWorkspace(workspaceName)
+        w = ROOT.RooWorkspace(workspaceName)
         w.factory(rooVar + "[100,180]")
         w.factory("MH[125]")
 
-        h_mgg = TH1F("h_mgg", "h_mgg", 320, 100, 180)
+        h_mgg = ROOT.TH1F("h_mgg", "h_mgg", 320, 100, 180)
         h_mgg.Sumw2()
         self.tree.Project(h_mgg.GetName(), self.var, self.weightVar + "*(" + self.selection + ")")
-        d_mgg = RooDataHist("roohist_data_mass_" + self.tag, "", RooArgList(w.var(rooVar)), h_mgg, 1)
+        d_mgg = ROOT.RooDataHist("roohist_data_mass_" + datasetTag, "", ROOT.RooArgList(w.var(rooVar)), h_mgg, 1)
         #print "bin dataset", h_gg.Integral(), d_mgg_bin.sumEntries(), d_mgg_bin.numEntries()
 
         # normalization
@@ -164,16 +165,16 @@ class makeModel():
         w.factory("ExtendPdf:"+self.tag+"_ext("+self.tag+", nevt[100,0,10000000], 'full')")
 
         # fit
-        w.pdf(self.tag+"_ext").fitTo(d_mgg, RooFit.Range("SL,SU"), RooFit.Extended(True), RooFit.PrintLevel(-1))
+        w.pdf(self.tag+"_ext").fitTo(d_mgg, ROOT.RooFit.Range("SL,SU"), ROOT.RooFit.Extended(True), ROOT.RooFit.PrintLevel(-1))
 
         frame = w.var(rooVar).frame()
-        events.plotOn(frame, RooFit.Binning(nBins))
+        d_mgg.plotOn(frame, ROOT.RooFit.Binning(80))
         w.pdf(self.tag+"_ext").plotOn(frame)
 
-        c1 = TCanvas("c1", "c1", 800, 800)
-        dummy = TH1D("dummy","dummy",1,100,180)
+        c1 = ROOT.TCanvas("c1", "c1", 800, 800)
+        dummy = ROOT.TH1D("dummy","dummy",1,100,180)
         dummy.SetMinimum(0)
-        dummy.SetMaximum(h_mgg*1.2)
+        dummy.SetMaximum(h_mgg.GetMaximum()*1.2*4)
         dummy.SetLineColor(0)
         dummy.SetMarkerColor(0)
         dummy.SetLineWidth(0)
@@ -185,7 +186,7 @@ class makeModel():
 
         frame.Draw("same")
 
-        latex = TLatex()
+        latex = ROOT.TLatex()
         latex.SetNDC()
         latex.SetTextSize(0.6*c1.GetTopMargin())
         latex.SetTextFont(42)
@@ -207,7 +208,7 @@ class makeModel():
         w.factory(self.tag+"_norm["+str(nEvt)+",0,"+str(3*nEvt)+"]")
         #print nEvt
 
-        getattr(w,'import')(d_mgg, RooCmdArg())
+        getattr(w,'import')(d_mgg, ROOT.RooCmdArg())
         w.writeToFile(self.modelpath + "/" + self.savename + ".root")
 
         #call("echo " + str(nEvt) + " > models/" + modelpath + "/" + savename + ".txt" , shell=True)

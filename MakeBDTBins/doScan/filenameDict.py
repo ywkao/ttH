@@ -33,10 +33,11 @@ namedict = \
         #ttHHadronic_v1.7_4Jul2019_scaleByXs_multi_impute_hut_FinalFitTree.root
         #ttHLeptonic_v1.7_4Jul2019_scaleByXs_multi_hct_FinalFitTree.root
         #ttHLeptonic_v1.7_4Jul2019_scaleByXs_multi_hut_FinalFitTree.root
+        #"FCNCHCTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_multi_impute_hct_EqualClassWeights_FinalFitTree.root",
         #
         #Binary:
-        #ttHHadronic_v1.7_4Jul2019_scaleByXs_impute_hct_FinalFitTree.root
-        "FCNCHUTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_impute_hut_FinalFitTree.root"
+        "FCNCHCTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_impute_hct_FinalFitTree.root"
+        #"FCNCHUTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_impute_hut_FinalFitTree.root"
         #ttHLeptonic_v1.7_4Jul2019_scaleByXs_hct_FinalFitTree.root
         #ttHLeptonic_v1.7_4Jul2019_scaleByXs_hut_FinalFitTree.root
 }

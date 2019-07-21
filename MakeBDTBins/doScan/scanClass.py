@@ -1,17 +1,18 @@
 import ROOT
 import filenameDict as filenameDict
-import processIDMap as processIDMap
+#import processIDMap as processIDMap
+import numpy
 import root_numpy
 import subprocess
 
 
-gSystem.AddIncludePath("-I$CMSSW_BASE/src/ ")
+ROOT.gSystem.AddIncludePath("-I$CMSSW_BASE/src/ ")
 #gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc481/libHiggsAnalysisCombinedLimit.so")
-gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc630/libHiggsAnalysisCombinedLimit.so")
-gSystem.AddIncludePath("-I$ROOFITSYS/include")
-gSystem.AddIncludePath("-Iinclude/")
-RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.DataHandling)
-RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.ObjectHandling)
+ROOT.gSystem.Load("$CMSSW_BASE/lib/slc6_amd64_gcc630/libHiggsAnalysisCombinedLimit.so")
+ROOT.gSystem.AddIncludePath("-I$ROOFITSYS/include")
+ROOT.gSystem.AddIncludePath("-Iinclude/")
+ROOT.RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.DataHandling)
+ROOT.RooMsgService.instance().getStream(1).removeTopic(ROOT.RooFit.ObjectHandling)
 
 class scanClass():
 
@@ -21,10 +22,9 @@ class scanClass():
 
         self.tag = config["tag"]
         self.selection= config["selection"]
-        self.sigName = config["sigName"]
         self.modelpath = config["modelpath"]
         self.plotpath = config["plotpath"]
-        self.combineEnv = config["combinEnv"]
+        self.combineEnv = config["combineEnv"]
         #/home/users/hmei/flashggFinalFit/CMSSW_7_4_7/src/
 
         self.treename = "t"
@@ -46,11 +46,13 @@ class scanClass():
         pathCmd += "rm " + self.plotpath+ "*;"
         pathCmd += "cp ~/public_html/tmpFile/index.php " + self.plotpath
 
+        subprocess.call(pathCmd, shell=True)
 
     def quantiles_to_mva_score(self, n_quantiles, mvaName):
         # for given selection, return mva_scores corresponding to each quantile in n_quantiles
 
         # get a numpy array from tree
+        print self.selection
         mva_scores = (root_numpy.tree2array(self.tree, branches = [mvaName], selection = self.selection))
 
         sorted_mva = numpy.flip(numpy.sort(mva_scores), 0)
@@ -70,31 +72,28 @@ class scanClass():
         combineOption = config["combineOption"]
         #ProfileLikelihood --significance -m 125 -t -1 --expectSignal=1
         #Asymptotic -m 125 -t -1 --expectSignal=1
-        combineOutName = config["combineOutname"]
+        combineOutName = config["combineOutName"]
         cardName = config["cardName"]
         outtxtName = config["outtxtName"]
         grepContent = config["grepContent"]
 
         cmdCombine = "cd " + self.combineEnv + "; eval `scramv1 runtime -sh`; cd -;"
-        cmdCombine += "cd " + self.modelPath + ";"
-
-        cmdCombine += "combine -M " + combineOption + " -n " + combineOutName + " " + cardName " > " outtxtName + ";"
-
-        #if "ttH" in sig:
-        #    cmdCombine += "combine -M ProfileLikelihood -n sig_" + str(index) + " --significance CMS-HGG_mva_13TeV_datacard_" + str(index) + ".txt -t -1 --expectSignal=1 > sig_" + str(index) + ".txt;"
-        #    cmdCombine += "sig=`grep Significance sig_" + str(index) + ".txt`; "
-        #    cmdCombine += "echo " + str(index) + " ${sig} " + str(n_bkg0) + " " + str(n_bkg1) + " >> scan2Bin.txt; cd -;"
-        #if "FCNC" in sig:
-        #    cmdCombine += "combine -M Asymptotic -m 125 CMS-HGG_mva_13TeV_datacard_" + str(index) +  ".txt -t -1 --expectSignal=1 -n limit_" + str(index) + " > limit_" + str(index) + ".txt;"
-        #    cmdCombine += "limit=`grep \"Expected 50\" limit_" + str(index) +".txt | awk -F \"<\" '{print $2}'`; "
-        #    cmdCombine += "echo " + str(index) + " ${limit} " + str(n_bkg0) + " " + str(n_bkg1) + " >> scan2Bin.txt; cd -;"
+        cmdCombine += "cd " + self.modelpath + ";"
+        cmdCombine += "ls;"
+        cmdCombine += "combine -M " + combineOption + " -n " + combineOutName + " " + cardName + " -t -1 --expectSignal=1 > " + outtxtName + ";"
 
         #print cmdCombine
-        subprocess.call(cmdCombine, shell=True)
+        #subprocess.call(cmdCombine, shell=True)
+        print "echo \"" + cmdCombine + "\" > " + self.modelpath + "combineCmd_" + combineOutName + ".sh"
+        combineCmdFile = open(self.modelpath + "combineCmd_" + combineOutName + ".sh","w")
+        combineCmdFile.write(cmdCombine)
+        combineCmdFile.close() #to change file access modes
 
-        hosts_process = subprocess.Popen(['grep', grepContent, outtxtName], stdout= subprocess.PIPE)
-        hosts_out, hosts_err = hosts_process.communicate()
+        #subprocess.call("echo " + cmdCombine + " > " + self.modelpath + "combineCmd_" + combineOutName + ".sh")
+        #subprocess.call("source " + self.modelpath + "combineCmd_" + combineOutName + ".sh", shell=True)#
+        #hosts_process = subprocess.Popen(['grep', grepContent, outtxtName], stdout= subprocess.PIPE)
+        #hosts_out, hosts_err = hosts_process.communicate()
 
-        output = ( hosts_out.strip("\n").split() )[-1]
+        #output = ( hosts_out.strip("\n").split() )[-1]
 
-        return float(output)
+        #return float(output)
