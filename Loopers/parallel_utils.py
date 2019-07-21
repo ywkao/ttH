@@ -3,7 +3,7 @@ import sys, os
 from multiprocessing import Process
 
 def run(command, nice=True):
-  print "Command is ", command
+  print("Command is ", command)
   if nice:
     os.system("/bin/nice -n 19 " + command)
   else:
@@ -30,4 +30,4 @@ def submit_jobs(command_list, n_par, nice=True):
         if not running_procs[i].is_alive():
           running_procs.pop(i)
       except:
-	continue
+        continue

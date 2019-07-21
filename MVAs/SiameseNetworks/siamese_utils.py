@@ -1,5 +1,5 @@
 import tensorflow as tf
-import keras
+import tensorflow.keras as keras
 import numpy
 import random
 
@@ -18,24 +18,54 @@ def contrastive_loss(y_true, y_pred):
     '''Contrastive loss from Hadsell-et-al.'06
     http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
     '''
-    margin = 1
-    similar_term = (1 - y_true) * keras.backend.square(y_pred)
-    dissimilar_term = y_true * keras.backend.square(keras.backend.maximum(margin - y_pred, 0))
+    margin_s = 0.1
+    margin_d = 1
+    similar_term = y_true * keras.backend.square(keras.backend.maximum(y_pred - margin_s, 0))
+    dissimilar_term = (1 - y_true) * keras.backend.square(keras.backend.maximum(margin_d - y_pred, 0))
     return keras.backend.mean(similar_term + dissimilar_term)
 
 
 def create_pairs(y, n):
+    y = numpy.array(y)
     pairs = []
     labels = []
 
+    values = numpy.unique(y)
+    index_dict = {}
+    for value in values:
+        index_dict[value] = numpy.where(y == value)
+        print(index_dict[value])
+
+    # Get similar pairs 
+    # Need to generalize to N classes
+    for value in values:
+        for i in range(int(n/4)):
+            pair = numpy.random.randint(0, len(index_dict[value]), 2)
+            pairs.append([y[index_dict[value][pair[0]]], y[index_dict[value][pair[1]]]])
+            labels.append(1)
+    
+    # Get dissimilar pairs
+    # Need to generalize to N classes with option to sample unevenly (i.e. according to cross section)
+    for i in range(int(n/2)):
+        idx1 = numpy.random.randint(0, len(index_dict[values[0]]))
+        idx2 = numpy.random.randint(0, len(index_dict[values[1]]))
+        pairs.append([y[index_dict[values[0]][idx1]], y[index_dict[values[1]][idx2]]])
+        labels.append(0)
+
+    """
     while len(labels) < n:
         pair = numpy.random.randint(0, len(y), 2)
-        label = 0 if y[pair[0]] == y[pair[1]] else 1 # 0 = similar, 1 = dissimilar
+        label = 1 if y[pair[0]] == y[pair[1]] else 0 # 1 = similar, 0 = dissimilar
         #if label == 0:
         #    if random.random() < 0.75:
         #        continue
         pairs.append(pair)
         labels.append(label)
+    """
 
     return numpy.asarray(pairs), numpy.asarray(labels)
 
+#def auc(scores, y, n):
+#    triplets = []
+
+#    while 

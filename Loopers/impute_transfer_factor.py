@@ -15,10 +15,10 @@ def qcd_gjets_yield(f):
   qcd_yield = qcd_hist.Integral()
   gjets_hist = f.Get("hNJets_GammaJets")
   gjets_yield = gjets_hist.Integral()
-  print qcd_yield, gjets_yield
+  print(qcd_yield, gjets_yield)
   return qcd_yield + gjets_yield
 
 yield_fail = qcd_gjets_yield(f_fail)
 yield_pass = qcd_gjets_yield(f_pass)
 
-print "Transfer factor is: %.3f" % (yield_pass / yield_fail)
+print("Transfer factor is: %.3f" % (yield_pass / yield_fail))

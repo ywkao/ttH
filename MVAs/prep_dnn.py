@@ -4,6 +4,9 @@ import ROOT
 import numpy
 import root_numpy
 import math
+import json
+
+import utils
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -17,15 +20,19 @@ parser.add_argument("--invert", help = "invert test/train split", action="store_
 parser.add_argument("--train_frac", help = "what fraction of data to use for training", type = float, default = 0.5)
 parser.add_argument("--tag", help = "name to add to hdf5 file name", type=str, default="")
 parser.add_argument("--z_score", help = "preprocess features to express them as z-score (subtract mean, divide by std.)", action="store_true")
+parser.add_argument("--fcnc", help = "use fcnc as signal, sm as bkg", action="store_true")
+parser.add_argument("--ggH_treatment", help = "how to deal with large ggH weights in fcnc vs SM higgs training", type=str, default="none")
+parser.add_argument("--add_mass_constraints", help = "add mjjj and mggj as global features", action = "store_true")
+parser.add_argument("--add_ext_mass_constraints", help = "add full extended set of mass constraints", action = "store_true")
 args = parser.parse_args()
 
 baby_file = args.input.replace(".root", "") + ".root"
 output_file = args.input.replace(".root", "").replace("../Loopers/MVABaby_","") + "_dnn_features_" + args.tag + ".hdf5"
+print(output_file)
 
 f = ROOT.TFile(baby_file)
 tree = f.Get("t")
 
-pad_value = -9
 
 # load tree to array
 #feature_names = ["objects_", "objects_boosted_", "lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R"]
@@ -41,7 +48,14 @@ if args.do_top_tag:
 else:
   top_tag_features = []
 
-feature_names = numpy.concatenate((feature_names, top_tag_features))
+feature_names += top_tag_features 
+
+if args.add_mass_constraints:
+    feature_names += ["m_ggj_", "m_jjj_"]
+
+if args.add_ext_mass_constraints:
+    top_cand_names = ["top_candidates_" + str(i) + "_" for i in range(1,13)]
+    feature_names += top_cand_names
 
 branches = numpy.concatenate((feature_names, ["evt_weight_", "label_", "multi_label_", "process_id_", "mass_", "lead_sigmaEtoE_", "sublead_sigmaEtoE_", "top_tag_score_", "tth_ttPP_mva_", "tth_std_mva_", "tth_dipho_mva_", "evt_", "run_", "lumi_"]))
 branches = numpy.unique(branches)
@@ -54,15 +68,20 @@ train_frac = args.train_frac
 if args.backgrounds == "all":
   selection = ""
 else:
-  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11}
+  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11, "ttG" : 6, "ttJets" : 9, "GJets_QCD" : 18 if args.channel == "Hadronic" else 3, "VGamma" : 7, "FCNC_hut" : 22, "FCNC_hct" : 23, "ggH" : 14}
   selection = "&& ("
   procs = args.backgrounds.split(",") + args.signal.split(",")
   for i in range(len(procs)):
     selection += "((process_id_ == %d" % (process_dict[procs[i]])
-    if procs[i] == "ttGG":
-      selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
-    elif procs[i] == "tH":
+    
+    #if procs[i] == "ttGG":
+    #  selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
+    if procs[i] == "tH":
       selection += " || process_id_ == 12))"
+    elif procs[i] == "FCNC_hut":
+      selection += " || process_id_ == 24))"
+    elif procs[i] == "FCNC_hct":
+      selection += " || process_id_ == 25))"
     else:
       selection += "))"
     if i != len(procs) - 1:
@@ -70,16 +89,36 @@ else:
 
   selection += ")"
 
-print selection
+if args.ggH_treatment == "dont_train":
+    selection_train = selection.replace(" || ((process_id_ == 14))", "") # don't train with ggH because it has high weights
+else:
+    selection_train = selection
+print(selection_train)
 
-features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
-features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
-features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))')
+if args.fcnc:
+    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection_train))
+    features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+    features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && signal_mass_label_ == 0 && rand_ < 0.01))') # dummy selection
 
-#features = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s < %.6f %s' % (data_label, rand_branch, train_frac, selection))
-#features_validation = root_numpy.tree2array(tree, branches = branches, selection = 'label_ != %d && %s > %.6f %s' % (data_label, rand_branch, train_frac, selection))
+    for i in range(len(features["process_id_"])):
+        if features["process_id_"][i] == 0: # scale ttH by 1/7 bc we use 7 mass points in training
+            features["evt_weight_"][i] *= 1.0/7.0 
+        if args.ggH_treatment == "scale":
+            if features["process_id_"][i] == 14: # scale ggH by 50 to see if it helps
+                features["evt_weight_"][i] *= 1.0/50.0
+        #if args.ggH_treatment == "oversample":
+        #    oversample_factor = 50.
+        #    oversample_array = numpy.empty()
+        #    if features["process_id_"][i] == 14:
+        #        features["evt_weight_"][i] *= 
+        #        for j in range(oversample_factor):
+
+else:
+    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+    features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
+    features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))')
+
 features_data = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == %d' % (data_label))
-
 
 if args.boosted_objects:
   object_features = features["objects_boosted_"]
@@ -118,92 +157,47 @@ def preprocess_sigmoid(array):
   alpha = (array - mean)*(1./std)
   return (1 - numpy.exp(-alpha))/(1 + numpy.exp(-alpha))
 
-def create_array(features_list, names):
-  print [feat for feat in names if ("objects_" not in feat and "leptons_" != feat and "jets_" != feat)]
-  arr = [features_list[feat] for feat in names if ("objects_" not in feat and "leptons_" != feat and "jets_" != feat)]
-  if args.z_score:
-    for feat in arr:
-      feat = preprocess(feat)
-  return numpy.transpose(numpy.array(arr))
 
-global_features = create_array(features, feature_names)
-global_features_validation = create_array(features_validation, feature_names)
-global_features_data = create_array(features_data, feature_names)
-global_features_final_fit = create_array(features_final_fit, feature_names)
+for name in feature_names:
+    if "leptons_" == name or "jets_" == name or "objects_" in name:
+        feature_names.remove(name)
 
-def get_mean_and_std(array):
-  array_trimmed = array[array != pad_value]
-  if (len(array_trimmed) <= 1):
-    return 0, 1
-  mean = numpy.mean(array_trimmed)
-  std = numpy.std(array_trimmed)
-  if std == 0:
-    std = 1
-  return mean, std
+print("Here are the ordered global features:", feature_names)
 
-def preprocess(array, mean, std):
-  array[array != pad_value] += -mean
-  array[array != pad_value] *= 1./std
-  return array
+if args.z_score:
+    preprocess_dict = {}
+    for feature in feature_names:
+        if ("objects_" not in feature and "leptons_" != feature and "jets_" != feature): 
+            mean, stddev = utils.get_mean_and_std(features[feature])
+            preprocess_dict[feature] = { "mean" : float(mean), "std_dev" : float(stddev)}
+ 
+global_features = utils.create_array(features, feature_names, preprocess_dict, args.z_score)
+global_features_validation = utils.create_array(features_validation, feature_names, preprocess_dict, args.z_score)
+global_features_data = utils.create_array(features_data, feature_names, preprocess_dict, args.z_score)
+global_features_final_fit = utils.create_array(features_final_fit, feature_names, preprocess_dict, args.z_score)
 
-def pad_array(array, n_objects):
-  max_objects = n_objects
-  nData = len(array)
-  nFeatures = len(array[0][0])
-  y = numpy.ones((nData, max_objects, nFeatures))
-  y *= pad_value
-  for i in range(nData):
-    for j in range(min(max_objects, len(array[i]))):
-      for k in range(nFeatures):
-        y[i][j][k] = array[i][j][k]
+object_features = utils.pad_array(object_features)
+object_features_validation = utils.pad_array(object_features_validation)
+object_features_data = utils.pad_array(object_features_data)
+object_features_final_fit = utils.pad_array(object_features_final_fit)
 
-  return y
+if args.z_score:
+    n_object_features = len(object_features[0][0])
+    for i in range(n_object_features):
+        mean, stddev = utils.get_mean_and_std(object_features[:,:,i])
+        preprocess_dict["objects_" + str(i)] = { "mean" : mean, "std_dev" : stddev }
 
+    with open("preprocess_scheme_%s_%s.json" % (args.channel, args.tag), "w") as f_out:
+        json.dump(preprocess_dict, f_out, indent=4, sort_keys=True)
 
-n_max_objects = 8
-object_features = pad_array(object_features, n_max_objects)
-object_features_validation = pad_array(object_features_validation, n_max_objects)
-object_features_data = pad_array(object_features_data, n_max_objects)
-object_features_final_fit = pad_array(object_features_final_fit, n_max_objects)
-
-if args.channel == "Leptonic":
-  n_max_jets = 6
-  jet_features = pad_array(jet_features, n_max_jets)
-  jet_features_validation = pad_array(jet_features_validation, n_max_jets)
-  jet_features_data = pad_array(jet_features_data, n_max_jets)
-  jet_features_final_fit = pad_array(jet_features_final_fit, n_max_jets)
-
-  n_max_leptons = 2
-  lepton_features = pad_array(lepton_features, n_max_leptons)
-  lepton_features_validation = pad_array(lepton_features_validation, n_max_leptons)
-  lepton_features_data = pad_array(lepton_features_data, n_max_leptons)
-  lepton_features_final_fit = pad_array(lepton_features_final_fit, n_max_leptons)
-
-
-# use set of all signal events to get mean and std dev for preprocessing purposes
-#object_features_signal = root_numpy.tree2array(tree, branches = branches, selection = 'label_ == 1')["objects_"]
-#object_features_signal = pad_array(object_features_signal)
-
-#for i in range(n_objects):
-#  for j in range(n_features):
-#    for k in range(5):
-#      print object_features[k][i][j]
-
-#for i in range(n_objects):
-#  for j in range(n_features):
-#    mean, std = get_mean_and_std(object_features_signal[:,i,j])
-#    print "Mean, std dev of object %d, feature %d: %.5f, %.5f" % (i, j, mean, std)
-#    object_features[:,i,j] = preprocess(object_features[:,i,j], mean, std)
-#    object_features_validation[:,i,j] = preprocess(object_features_validation[:,i,j], mean, std)
-#    object_features_data[:,i,j] = preprocess(object_features_data[:,i,j], mean, std)
-
-#for i in range(n_objects):
-#  for j in range(n_features):
-#    for k in range(5):
-#      print object_features[k][i][j]
+    for object_set in [object_features, object_features_validation, object_features_data, object_features_final_fit]:
+        object_set = utils.preprocess_array(object_set, preprocess_dict)
+        #for i in range(n_object_features):
+        #    object_set[:,:,i] = preprocess(object_set[:,:,i], preprocess_dict["objects_" + str(i)]["mean"], preprocess_dict["objects_" + str(i)]["std_dev"])
 
 label = features["label_"]
 multi_label = features["multi_label_"]
+process_id = features["process_id_"]
 weights = features["evt_weight_"]
 mass = features["mass_"]
 lead_sigmaEtoE = features["lead_sigmaEtoE_"]
@@ -218,6 +212,7 @@ lumi = features["lumi_"]
 
 label_validation = features_validation["label_"]
 multi_label_validation = features_validation["multi_label_"]
+process_id_validation = features_validation["process_id_"]
 weights_validation = features_validation["evt_weight_"]
 mass_validation = features_validation["mass_"]
 top_tag_score_validation = features_validation["top_tag_score_"]
@@ -230,6 +225,7 @@ lumi_validation = features_validation["lumi_"]
 
 label_data = features_data["label_"]
 multi_label_data = features_data["multi_label_"]
+process_id_data = features_data["process_id_"]
 weights_data = features_data["evt_weight_"]
 mass_data = features_data["mass_"]
 top_tag_score_data = features_data["top_tag_score_"]
@@ -242,6 +238,7 @@ lumi_data = features_data["lumi_"]
 
 label_final_fit = features_final_fit["label_"]
 multi_label_final_fit = features_final_fit["multi_label_"]
+process_id_final_fit = features_final_fit["process_id_"]
 weights_final_fit = features_final_fit["evt_weight_"]
 mass_final_fit = features_final_fit["mass_"]
 top_tag_score_final_fit = features_final_fit["top_tag_score_"]
@@ -251,11 +248,6 @@ tth_std_mva_final_fit = features_final_fit["tth_std_mva_"]
 evt_final_fit = features_final_fit["evt_"]
 run_final_fit = features_final_fit["run_"]
 lumi_final_fit = features_final_fit["lumi_"]
-
-# reorganize features
-#object_features = numpy.transpose(object_features)
-#object_features_validation = numpy.transpose(object_features_validation)
-#object_features_data = numpy.transpose(object_features_data)
 
 # relabel labels
 if args.backgrounds != "all":
@@ -275,6 +267,7 @@ dset_object = f_out.create_dataset("object", data=object_features)
 dset_global = f_out.create_dataset("global", data=global_features)
 dset_label = f_out.create_dataset("label", data=label)
 dset_multi_label = f_out.create_dataset("multi_label", data=multi_label)
+dset_process_id = f_out.create_dataset("process_id", data=process_id)
 dset_weights = f_out.create_dataset("weights", data=weights)
 dset_mass = f_out.create_dataset("mass", data=mass)
 dset_tth_ttPP_mva = f_out.create_dataset("tth_ttPP_mva", data=tth_ttPP_mva)
@@ -291,6 +284,7 @@ dset_object_validation = f_out.create_dataset("object_validation", data=object_f
 dset_global_validation = f_out.create_dataset("global_validation", data=global_features_validation)
 dset_label_validation = f_out.create_dataset("label_validation", data=label_validation)
 dset_multi_label_validation = f_out.create_dataset("multi_label_validation", data=multi_label_validation)
+dset_process_id_validation = f_out.create_dataset("process_id_validation", data=process_id_validation)
 dset_weights_validation = f_out.create_dataset("weights_validation", data=weights_validation)
 dset_top_tag_score_validation = f_out.create_dataset("top_tag_score_validation", data=top_tag_score_validation)
 dset_mass_validation = f_out.create_dataset("mass_validation", data=mass_validation)
@@ -305,6 +299,7 @@ dset_object_data = f_out.create_dataset("object_data", data=object_features_data
 dset_global_data = f_out.create_dataset("global_data", data=global_features_data)
 dset_label_data = f_out.create_dataset("label_data", data=label_data)
 dset_multi_label_data = f_out.create_dataset("multi_label_data", data=multi_label_data)
+dset_process_id_data = f_out.create_dataset("process_id_data", data=process_id_data)
 dset_weights_data = f_out.create_dataset("weights_data", data=weights_data)
 dset_top_tag_score_data = f_out.create_dataset("top_tag_score_data", data=top_tag_score_data)
 dset_mass_data = f_out.create_dataset("mass_data", data=mass_data)
@@ -319,6 +314,7 @@ dset_object_final_fit = f_out.create_dataset("object_final_fit", data=object_fea
 dset_global_final_fit = f_out.create_dataset("global_final_fit", data=global_features_final_fit)
 dset_label_final_fit = f_out.create_dataset("label_final_fit", data=label_final_fit)
 dset_multi_label_final_fit = f_out.create_dataset("multi_label_final_fit", data=multi_label_final_fit)
+dset_process_id_final_fit = f_out.create_dataset("process_id_final_fit", data=process_id_final_fit)
 dset_weights_final_fit = f_out.create_dataset("weights_final_fit", data=weights_final_fit)
 dset_top_tag_score_final_fit = f_out.create_dataset("top_tag_score_final_fit", data=top_tag_score_final_fit)
 dset_mass_final_fit = f_out.create_dataset("mass_final_fit", data=mass_final_fit)
@@ -328,16 +324,5 @@ dset_tth_std_mva_final_fit = f_out.create_dataset("tth_std_mva_final_fit", data=
 dset_evt_final_fit = f_out.create_dataset("evt_final_fit", data=evt_final_fit)
 dset_run_final_fit = f_out.create_dataset("run_final_fit", data=run_final_fit)
 dset_lumi_final_fit = f_out.create_dataset("lumi_final_fit", data=lumi_final_fit)
-
-if args.channel == "Leptonic":
-  dset_jet = f_out.create_dataset("jet", data=jet_features)
-  dset_jet_validation = f_out.create_dataset("jet_validation", data=jet_features_validation)
-  dset_jet_data = f_out.create_dataset("jet_data", data=jet_features_data)
-  dset_jet_final_fit = f_out.create_dataset("jet_final_fit", data=jet_features_final_fit)
-
-  dset_lepton = f_out.create_dataset("lepton", data=lepton_features)
-  dset_lepton_validation = f_out.create_dataset("lepton_validation", data=lepton_features_validation)
-  dset_lepton_data = f_out.create_dataset("lepton_data", data=lepton_features_data)
-  dset_lepton_final_fit = f_out.create_dataset("lepton_final_fit", data=lepton_features_final_fit)
 
 f_out.close()

@@ -21,7 +21,7 @@ def calculate_prob_ratios(scores, label):
   bins = bins[::-1]
   bins.insert(0,0) 
 
-  print bins
+  print(bins)
 
   hSig = ROOT.TH1D("hSig", "", len(bins) - 1, array('d',bins))
   for evt in scores_signal:
@@ -36,12 +36,12 @@ def calculate_prob_ratios(scores, label):
   hBkg.Scale(1./hBkg.GetSumOfWeights())
 
   for i in range(len(bins) - 1):
-    print hSig.GetBinContent(i+1), hBkg.GetBinContent(i+1)
+    print((hSig.GetBinContent(i+1), hBkg.GetBinContent(i+1)))
 
   hSig.Divide(hBkg) # divide Madgraph probabilities by Pythia probabilities
 
   for i in range(len(bins) - 1):
-    print hSig.GetBinContent(i+1)
+    print((hSig.GetBinContent(i+1)))
 
   prob_ratios = []
   for i in range(len(bins) - 1):

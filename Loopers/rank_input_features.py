@@ -60,7 +60,7 @@ def calc_za_and_unc(file_pattern):
 
   fig = plt.figure()
   bins = numpy.linspace(2, 4, 40)
-  for var, info in vars_of_interest.iteritems():
+  for var, info in vars_of_interest.items():
     dist_to_plot = info[0]
     plt.hist(dist_to_plot, label = info[1], bins = bins)
     plt.ylabel("# of MVA Trainings")
@@ -138,26 +138,26 @@ do_table = True
 # First, remove all variables and then add them all back in so we know we are starting with all variables
 
 baseline_results = {}
-for var, info in vars.iteritems():
-    print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
+for var, info in vars.items():
+    print("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
     os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
 
-for var, info in vars.iteritems():
-    print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+for var, info in vars.items():
+    print("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
     os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 
 if not (do_baseline or do_individual_vars or do_categories or do_build_up):
-  print "Done" 
+  print("Done") 
 else:
   # First, remove all variables and then add them all back in so we know we are starting with all variables
 
   baseline_results = {}
-  for var, info in vars.iteritems():
-      print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
+  for var, info in vars.items():
+      print("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
       os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
 
-  for var, info in vars.iteritems():
-    print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+  for var, info in vars.items():
+    print("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
     os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 
   n_baseline = 1000
@@ -165,12 +165,12 @@ else:
   if do_baseline:
     build_success = os.system("make")
     if build_success != 0:
-      print "Errors building, will not run rest of workflow"
+      print("Errors building, will not run rest of workflow")
       os.system("exit(1)")
 
     if not args.dry_run:
       # Train BDT
-      print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline)
+      print("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline))
       os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "baseline_%s" % tag, n_baseline))
 
       baseline_results = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_baseline_%s_*_bdt.npz" % (args.channel, tag))
@@ -183,96 +183,96 @@ else:
     fout.write(json.dumps(baseline_results))   
 
   if do_categories:
-    for cat, list in cats.iteritems():
+    for cat, list in cats.items():
       # First, remove all variables from bdt
       for info in list["features"]:
-	print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
+	print("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
 	os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
       # Then, make
       build_success = os.system("make")
       if build_success != 0:
-	print "Errors building, will not run rest of workflow"
+	print("Errors building, will not run rest of workflow")
 	os.system("exit(1)")
 
       if not args.dry_run:
 	# Then, train the bdt
-	print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % cat, args.n_trainings)
+	print("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % cat, args.n_trainings))
 	os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % cat, args.n_trainings))
 	# Then, calculate <Max Z_A>_N and estimated uncertainty 
 	list["results"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, cat))
 
       # Now, add all the variables back into the BDT
       for info in list["features"]:
-	print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+	print("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 	os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 
   if do_individual_vars:
-    for var, info in vars.iteritems():
+    for var, info in vars.items():
       # First, remove the variable from the bdt
-      print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
+      print("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
       os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
       # Then, make
       build_success = os.system("make")
       if build_success != 0:
-	print "Errors building, will not run rest of workflow"
+	print("Errors building, will not run rest of workflow")
 	os.system("exit(1)")
 
       if not args.dry_run:
 	# Then, train the bdt
-	print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % info["name"], args.n_trainings)
+	print("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % info["name"], args.n_trainings))
 	os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "remove_'%s'" % info["name"], args.n_trainings))
 	# Then, calculate <Max Z_A>_N and estimated uncertainty 
 	info["results"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, info["name"])) 
 
       # Now, add the variable back into the bdt
-      print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+      print("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
       os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 
   if do_build_up:
-    for cat, list in cats.iteritems():
+    for cat, list in cats.items():
       # Remove all variables
-      for var, info in vars.iteritems():
-	print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
+      for var, info in vars.items():
+	print("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
 	os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
       # Add back only the variables from our category
       for info in list["features"]:
-	print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+	print("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 	os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
    
       # Then, make
       build_success = os.system("make")
       if build_success != 0:
-	print "Errors building, will not run rest of workflow"
+	print("Errors building, will not run rest of workflow")
 	os.system("exit(1)")  
 
       if not args.dry_run:
 	# Then, train the bdt
-	print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "only_'%s'" % cat, args.n_trainings)
+	print("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "only_'%s'" % cat, args.n_trainings))
 	os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "only_'%s'" % cat, args.n_trainings))
 	# Then, calculate <Max Z_A>_N and estimated uncertainty 
 	list["results_build_up"] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_only_%s_*_bdt.npz" % (args.channel, cat))
 
 
 if do_table:
-  print "\\begin{center} \\Fontvi"
-  print "\\begin{tabular}{|c|r|r|c|r|}"
-  print "\\multicolumn{5}{c}{Assesment of Input Feature Importance} \\\\ \\hline"
-  print " Category & All Features Except & Only Features & Features & All Features Except \\\\ \\hline \\hline"
-  for cat, list in cats.iteritems():
+  print("\\begin{center} \\Fontvi")
+  print("\\begin{tabular}{|c|r|r|c|r|}")
+  print("\\multicolumn{5}{c}{Assesment of Input Feature Importance} \\\\ \\hline")
+  print(" Category & All Features Except & Only Features & Features & All Features Except \\\\ \\hline \\hline")
+  for cat, list in cats.items():
     cat_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, cat))
     cat_build_up_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_only_%s_*_bdt.npz" % (args.channel, cat))
     feature_scores = {}
     for feature in list["features"]:
       feature_scores[feature["name"]] = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_remove_%s_*_bdt.npz" % (args.channel, feature["name"]))
-    print "\multirow{%d}{*}{%s} & \multirow{%d}{*}{%.2f $\\pm$ %.2f} & \multirow{%d}{*}{%.2f $\\pm$ %.2f} & %s & %.2f $\\pm$ %.2f \\\\" % (len(list["features"]), list["latex_name"], len(list["features"]), (cat_score["mean_mc"] - mean_mc) / (mean_mc*0.01), (cat_score["mean_unc_mc"]) / (cat_score["mean_mc"] * 0.01), len(list["features"]), (cat_build_up_score["mean_mc"] - mean_mc) / (mean_mc*0.01), (cat_build_up_score["mean_unc_mc"]) / (cat_build_up_score["mean_mc"] * 0.01), list["features"][0]["latex_name"], (feature_scores[list["features"][0]["name"]]["mean_mc"] - mean_mc) / (mean_mc*0.01), (feature_scores[list["features"][0]["name"]]["mean_unc_mc"]) / (feature_scores[list["features"][0]["name"]]["mean_mc"] * 0.01))
+    print("\multirow{%d}{*}{%s} & \multirow{%d}{*}{%.2f $\\pm$ %.2f} & \multirow{%d}{*}{%.2f $\\pm$ %.2f} & %s & %.2f $\\pm$ %.2f \\\\" % (len(list["features"]), list["latex_name"], len(list["features"]), (cat_score["mean_mc"] - mean_mc) / (mean_mc*0.01), (cat_score["mean_unc_mc"]) / (cat_score["mean_mc"] * 0.01), len(list["features"]), (cat_build_up_score["mean_mc"] - mean_mc) / (mean_mc*0.01), (cat_build_up_score["mean_unc_mc"]) / (cat_build_up_score["mean_mc"] * 0.01), list["features"][0]["latex_name"], (feature_scores[list["features"][0]["name"]]["mean_mc"] - mean_mc) / (mean_mc*0.01), (feature_scores[list["features"][0]["name"]]["mean_unc_mc"]) / (feature_scores[list["features"][0]["name"]]["mean_mc"] * 0.01)))
     for i in range(1, len(list["features"])):
       postfix = " \\hline \\hline" if i == len(list["features"]) - 1 else ""
-      print " & & & %s & %.2f $\\pm$ %.2f \\\\ %s" % (list["features"][i]["latex_name"], (feature_scores[list["features"][i]["name"]]["mean_mc"] - mean_mc) / (mean_mc*0.01), (feature_scores[list["features"][i]["name"]]["mean_unc_mc"]) / (feature_scores[list["features"][i]["name"]]["mean_mc"] * 0.01), postfix)
-  print "\\end{tabular}"
-  print "\\end{center}"
+      print(" & & & %s & %.2f $\\pm$ %.2f \\\\ %s" % (list["features"][i]["latex_name"], (feature_scores[list["features"][i]["name"]]["mean_mc"] - mean_mc) / (mean_mc*0.01), (feature_scores[list["features"][i]["name"]]["mean_unc_mc"]) / (feature_scores[list["features"][i]["name"]]["mean_mc"] * 0.01), postfix))
+  print("\\end{tabular}")
+  print("\\end{center}")
 
 
-print mean_mc
-print mean_data
-print unc_mc
-print unc_data
+print(mean_mc)
+print(mean_data)
+print(unc_mc)
+print(unc_data)

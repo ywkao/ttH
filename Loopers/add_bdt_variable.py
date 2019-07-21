@@ -23,19 +23,19 @@ def write_file(file, lines):
       f_out.write(line)
 
 def insert_line(i, line, lines):
-  print "Adding line: [%d] %s" % (i, line.strip())
+  print("Adding line: [%d] %s" % (i, line.strip()))
   lines.insert(i, line)
 
 def modify_line(i, old_line, new_line, lines):
-  print "Modifying line: [%d] from \n%s\n to \n%s" % (i, old_line.strip(), new_line.strip())
+  print("Modifying line: [%d] from \n%s\n to \n%s" % (i, old_line.strip(), new_line.strip()))
   lines[i] = new_line
 
 def remove_line(i, lines):
-  print "Removing line: [%d] %s" % (i, lines[i].strip())
+  print("Removing line: [%d] %s" % (i, lines[i].strip()))
   lines.pop(i)
 
 def modify_header(lines, add):
-  print "Modifying header file"
+  print("Modifying header file")
   if add: # add this variable
     for i, line in enumerate(lines):
       if "// Variable names" in line:
@@ -44,7 +44,7 @@ def modify_header(lines, add):
 	  new_line = lines[i+1][:index] + '"' + args.name + '", ' + lines[i+1][index:]
 	  modify_line(i+1, lines[i+1], new_line, lines)
 	else:
-	  print "No need to remove"
+	  print("No need to remove")
       if "// Variable declarations" in line:
 	line_to_insert = "    %s           %s;\n" % (args.type, args.name)
 	insert_line(i+1, line_to_insert, lines)
@@ -61,11 +61,11 @@ def modify_header(lines, add):
 	remove_line(i, lines)
       if 'BabyTree_->Branch("%s"' % args.name in line:
 	remove_line(i, lines)
-  print "\n\n\n"
+  print("\n\n\n")
   return lines
 
 def modify_src(lines, add):
-  print "Modifying src file"
+  print("Modifying src file")
   if add:
     for i, line in enumerate(lines):
       if "// Variable definitions" in line:
@@ -75,11 +75,11 @@ def modify_src(lines, add):
     for i, line in enumerate(lines):
       if "%s = %s;" % (args.name, args.function) in line:
 	remove_line(i, lines)
-  print "\n\n\n"
+  print("\n\n\n")
   return lines
 
 def modify_scanchain(lines, add):
-  print "Modifying scanchain"
+  print("Modifying scanchain")
   if add:
     for i, line in enumerate(lines):
       if "// Declare BDT vars" in line:
@@ -99,7 +99,7 @@ def modify_scanchain(lines, add):
 	remove_line(i, lines)
       if '%s = %s;' % (args.name, args.function) in line:
 	remove_line(i, lines)
-  print "\n\n\n"
+  print("\n\n\n")
   return lines
 
 

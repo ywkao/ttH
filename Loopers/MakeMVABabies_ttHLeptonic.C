@@ -230,7 +230,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       } 
 
       // Scale bkg weight
-      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Leptonic");
+      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Leptonic", fcnc);
+
+      // Scale FCNC to current best observed limit (ATLAS 2016 combination)
+      if (currentFileTitle.Contains("FCNC"))
+        evt_weight_ *= scale_fcnc(currentFileTitle);  
 
       // Blinded region
       if (isData && process_id_ != 18 && blind && mass() > 120 && mass() < 130)  continue;
@@ -288,11 +292,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 22 || process_id_ == 23 || process_id_ == 24 || process_id_ == 25) ? 1 : 0; // 0 = bkg, 1 = fcnc, 2 = data
       else {
         label_ = (isData && process_id_ != 18) ? 2 : (process_id_ == 0 ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data sidebands
-	    //if (process_id_ == 22 || process_id_ == 23 || process_id_ == 24 || process_id_ == 25)
-	    //  label_ = -1; // don't use FCNC as a bkg when ttH is signal
+	    if (process_id_ == 22 || process_id_ == 23 || process_id_ == 24 || process_id_ == 25)
+	      label_ = -1; // don't use FCNC as a bkg when ttH is signal
       }
 
-      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
+      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId, fcnc);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 
       tth_2017_reference_mva_ = tthMVA();
@@ -313,6 +317,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
 
       // Variable definitions
+      tth_runII_mva_ = tthMVA_RunII();
+
       year_ = mYear == "2016" ? 2016 : (mYear == "2017" ? 2017 : (mYear == "2018" ? 2018 : -1));
 
       evt_ = cms3.event();

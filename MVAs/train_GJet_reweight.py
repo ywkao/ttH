@@ -44,7 +44,7 @@ X_train = pandas.DataFrame(data=x_train, columns = feature_names)
 sum_neg_weights = utils.sum_of_weights(evt_weight, label, 0)
 sum_pos_weights = utils.sum_of_weights(evt_weight, label, 1)
 
-print sum_pos_weights, sum_neg_weights
+print((sum_pos_weights, sum_neg_weights))
 
 d_train = xgboost.DMatrix(X_train, label = y_train, weight = weights_train) 
 #d_test = xgboost.DMatrix(X_test, label = y_test)
@@ -63,7 +63,7 @@ param = {
 	'min_child_weight' : 1,
 	}
 
-print param
+print(param)
 
 n_round = 100
 evallist = [(d_train, 'train')]
@@ -86,7 +86,7 @@ pred_train = bdt.predict(d_train, output_margin=False)
 #pred_test = bdt.predict(d_test, output_margin=False)
 
 for i in range(5):
-  print pred_train[i]
+  print((pred_train[i]))
 
 import matplotlib
 matplotlib.use('Agg')
@@ -116,7 +116,7 @@ fpr_train, tpr_train, thresh_train = metrics.roc_curve(y_train, pred_train)
 auc_train = metrics.auc(fpr_train, tpr_train)
 #auc_test = metrics.auc(fpr_test, tpr_test)
 
-print("Training AUC: %.4f" % auc_train)
+print(("Training AUC: %.4f" % auc_train))
 #print("Testing  AUC: %.4f" % auc_test)
 
 ### Make diagnostic plots ###

@@ -65,6 +65,11 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hMassTop1", 100, 0, 500);
     v[i]->add_histogram("hMassTop2", 100, 0, 500);
 
+    v[i]->add_histogram("hMassTop_Hq_1", 100, 0, 500);
+    v[i]->add_histogram("hMassTop_Hq_2", 100, 0, 500);
+    v[i]->add_histogram("hMassTop_qqq_1", 100, 0, 500);
+    v[i]->add_histogram("hMassTop_qqq_2", 100, 0, 500);
+
     v[i]->add_histogram("hGJet_BDT", 100, 0, 1);
 
     v[i]->add_histogram("hNJets", 16, -0.5, 15.5);
@@ -76,17 +81,17 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hNbMedium", 16, -0.5, 15.5);
     v[i]->add_histogram("hNbTight", 16, -0.5, 15.5);
     v[i]->add_histogram("hJet1pT", 25, 0, 500);
-    v[i]->add_histogram("hJet1Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet1Eta", 25, -5, 5);
     v[i]->add_histogram("hJet2pT", 25, 0, 500);
-    v[i]->add_histogram("hJet2Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet2Eta", 25, -5, 5);
     v[i]->add_histogram("hJet3pT", 25, 0, 500);
-    v[i]->add_histogram("hJet3Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet3Eta", 25, -5, 5);
     v[i]->add_histogram("hJet4pT", 25, 0, 500);
-    v[i]->add_histogram("hJet4Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet4Eta", 25, -5, 5);
     v[i]->add_histogram("hJet5pT", 25, 0, 500);
-    v[i]->add_histogram("hJet5Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet5Eta", 25, -5, 5);
     v[i]->add_histogram("hJet6pT", 25, 0, 500);
-    v[i]->add_histogram("hJet6Eta", 25, -3, 3);
+    v[i]->add_histogram("hJet6Eta", 25, -5, 5);
     v[i]->add_histogram("hJet1BTag", 25, 0, 1);   
     v[i]->add_histogram("hJet2BTag", 25, 0, 1);
     v[i]->add_histogram("hJet3BTag", 25, 0, 1);  
@@ -389,7 +394,13 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
   }
 }
 
-int multiclassifier_label(TString currentFileTitle, int genPhotonId) {
+int multiclassifier_label(TString currentFileTitle, int genPhotonId, bool fcnc = false) {
+  if (fcnc) {
+    if (currentFileTitle.Contains("FCNC")) return 0; // signal
+    else if (currentFileTitle.Contains("ttHJetToGG") || currentFileTitle.Contains("ttHToGG") || currentFileTitle.Contains("THQ") || currentFileTitle.Contains("THW") || currentFileTitle.Contains("VBF") || currentFileTitle.Contains("GluGluHToGG") || currentFileTitle.Contains("VHToGG")) return 1; // resonant bkg
+    else return 2; // non-resonant bkg
+  }
+
   if (currentFileTitle.Contains("ttHJet"))
     return 0;
   else if (currentFileTitle.Contains("TTGG") || currentFileTitle.Contains("TTGJets") || currentFileTitle.Contains("TTJets") || currentFileTitle.Contains("TTTo2L2Nu") || currentFileTitle.Contains("TTToSemiLeptonic")) {
@@ -552,7 +563,23 @@ const double diphoton_nTightLep0_prob = 0.4865;
 const double diphoton_nTightLep1_prob = 0.4791;
 const double diphoton_nTightLep2_prob = 0.0344;
 
-double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel) {
+const double br_tToHq_assumed = 0.1441; // width(t->Hq|kappa_{Hqt}=1) / width^{SM}_{total} (values taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopFCNCxsection)
+const double br_tToHc_limit = 0.0011; // from p34 of https://arxiv.org/pdf/1812.11568.pdf
+const double br_tToHu_limit = 0.0012; // ""
+
+double scale_fcnc(TString currentFileTitle) {
+  if (currentFileTitle.Contains("eta_hut"))
+    return br_tToHu_limit / br_tToHq_assumed;
+  else if (currentFileTitle.Contains("eta_hct"))
+    return br_tToHc_limit / br_tToHq_assumed;
+  return 1.0; 
+}
+
+double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel, bool fcnc = false) {
+  // Better to scale mass points in prep.py
+  //if (fcnc && currentFileTitle.Contains("ttHJet"))
+  //  return (1.0/7.0); // we use 6 ttH mass points in training, so scale by a factor of 1/6
+  
   if (bkg_options == "none")
     return 1.0;
 
@@ -1108,6 +1135,167 @@ double min_dr(const TLorentzVector target, const vector<TLorentzVector> objects)
     min = dr < min ? dr : min;
   }
   return min;
+}
+
+const float pad_value = -9.;
+void calculate_masses(TLorentzVector diphoton, vector<TLorentzVector> jets, float &m1, float &m2) {
+  if (jets.size() < 4) {
+    m1 = pad_value;
+    m2 = pad_value;
+    return;
+  }
+  float min_mass_diff = 999999;
+  for (int i = 0; i < 4; i++) {
+    TLorentzVector t1 = diphoton + jets[i];
+    TLorentzVector t2;
+    for (int j = 0; j < 4; j++) {
+      if (j == i) continue;
+      t2 += jets[j];
+    }
+    float mass_diff = abs(t1.M() - m_top) + abs(t2.M() - m_top);
+    if (mass_diff < min_mass_diff) {
+      min_mass_diff = mass_diff;
+      m1 = t1.M();
+      m2 = t2.M();
+    }
+  }
+  return;
+}
+
+bool sortByTopMass(const std::pair<int,double>& pair1, const std::pair<int,double>& pair2 ) {
+  return abs(pair1.second - m_top) < abs(pair2.second - m_top);
+}
+
+vector<float> sort_by_top_mass_difference(vector<float> masses, std::vector<std::pair<int, double>> &ordering) {
+    vector<float> v;
+    
+    for (unsigned int i = 0; i < masses.size(); i++)
+        ordering.push_back(std::pair<int,double>(i, masses[i]));
+
+    // sort
+    std::sort(ordering.begin(), ordering.end(), sortByTopMass);
+    for (unsigned int i = 0; i < masses.size(); i++)
+        v.push_back(masses.at(ordering[i].first));
+    return v;    
+}
+
+unsigned int factorial(unsigned int a) {
+    unsigned int b = 1;
+    for (int i = 1; i <= a; i++)
+        b *= i;
+    return b;
+}
+
+unsigned int N_choose_K(unsigned int N, unsigned int K) {
+    return factorial(N) / ( factorial(N - K) * factorial(K));
+}
+
+const unsigned int max_jets = 6;
+vector<float> calculate_top_candidates(TLorentzVector diphoton, vector<TLorentzVector> jets, vector<double> btag_scores, float max_btag) {
+    vector<float> top_candidates;
+    vector<float> t_Hq_candidates;
+    vector<float> t_qqq_candidates;
+    unsigned int n_jets = jets.size();
+    // First calculate t->Hc candidates
+    for (unsigned int i = 0; i < min(max_jets, n_jets); i++) { // gives up to max_jets-1 candidates
+        vector<float> t_qqq_candidates_mini;
+        if (btag_scores[i] >= max_btag)
+            continue;
+        TLorentzVector top_cand = diphoton + jets[i];
+        t_Hq_candidates.push_back(top_cand.M());
+        //cout << "ggj jet: " << i << endl;
+        // Now reconstruct other top quark
+        for (unsigned int j = 0; j < min(max_jets, n_jets); j++) { // for each m_ggj candidate, gives up to Binomial(max_jets-2,2) candidates
+            if (j == i)
+                continue;
+            if (btag_scores[j] < max_btag)
+                continue;
+            for (unsigned int k = 0; k < min(max_jets, n_jets); k++) {
+                if (k == i || k == j)
+                    continue;
+                for (unsigned int m = k + 1; m < min(max_jets, n_jets); m++) {
+                    if (m == i || m == j)
+                        continue;
+                    TLorentzVector bjet = jets[j];
+                    TLorentzVector qjet1 = jets[k];
+                    TLorentzVector qjet2 = jets[m];
+                    TLorentzVector top_cand = bjet + qjet1 + qjet2;
+                    t_qqq_candidates_mini.push_back(top_cand.M());
+                    //cout << "bjj jet: " << j << ", " << k << ", " << m << endl;
+                }
+            }
+        }
+        std::vector<std::pair<int, double>> ordering_;
+        t_qqq_candidates_mini = sort_by_top_mass_difference(t_qqq_candidates_mini, ordering_);
+        t_qqq_candidates.insert(t_qqq_candidates.end(), t_qqq_candidates_mini.begin(), t_qqq_candidates_mini.end());
+        while (t_qqq_candidates.size() < (t_Hq_candidates.size())*N_choose_K(max_jets-2, 2))
+            t_qqq_candidates.push_back(pad_value);
+        //for (unsigned int l = 0; l < t_qqq_candidates.size(); l++)
+        //    cout << t_qqq_candidates[l] << endl;
+
+        //cout << endl << endl;
+    }
+    std::vector<std::pair<int, double>> ordering;
+    t_Hq_candidates = sort_by_top_mass_difference(t_Hq_candidates, ordering);
+
+    unsigned int n_t_Hq = t_Hq_candidates.size();
+    unsigned int max_Hqs = 2;
+    for (unsigned int i = 0; i < min(max_Hqs, n_t_Hq); i++) {
+        top_candidates.push_back(t_Hq_candidates[i]);
+        unsigned int idx = ordering[i].first;
+        for (unsigned int j = idx*N_choose_K(max_jets-2, 2); j < (idx+1)*N_choose_K(max_jets-2, 2); j++) {
+            top_candidates.push_back(t_qqq_candidates[j]);
+        }
+    } 
+    
+    //cout << "Sorted t_Hq_candidates:" << endl;
+    //for (unsigned int i = 0; i < t_Hq_candidates.size(); i++)
+    //    cout << t_Hq_candidates[i] <<endl;
+    //while (t_Hq_candidates.size() < (max_jets - 1)) {
+    //    t_Hq_candidates.push_back(0);
+    //}
+
+    /*
+    // Now calculate t->qqq candidates
+    vector<float> t_qqq_candidates;
+    for (unsigned int i = 0; i < min(max_jets, n_jets); i++) { // gives up to Binomial(max_jets-1,2) candidates
+        if (btag_scores[i] < max_btag) // demand that the b-jet be in the top candidate
+            continue;
+        for (unsigned int j = 0; j < min(max_jets, n_jets); j++) {
+            if (i == j)
+                continue;
+            for (unsigned int k = j+1; k < min(max_jets, n_jets); k++) {
+                if (i == k)
+                   continue;
+                TLorentzVector bjet = jets[i];
+                TLorentzVector qjet1 = jets[j];
+                TLorentzVector qjet2 = jets[k];
+                TLorentzVector top_cand = bjet + qjet1 + qjet2;
+                t_qqq_candidates.push_back(top_cand.M());
+            }
+        }
+    }
+    t_qqq_candidates = sort_by_top_mass_difference(t_qqq_candidates);
+    //cout << "Sorted t_qqq_candidates:" << endl;
+    //for (unsigned int i = 0; i < t_qqq_candidates.size(); i++) 
+    //    cout << t_qqq_candidates[i] << endl;
+    while (t_qqq_candidates.size() < N_choose_K(max_jets-1, 2))
+        t_qqq_candidates.push_back(0);
+    */
+
+    // concatenate two vectors
+    //top_candidates = t_Hq_candidates;
+    //top_candidates.insert(top_candidates.end(), t_qqq_candidates.begin(), t_qqq_candidates.end());
+
+    //cout << "N_jets: " << jets.size() << endl;
+    while (top_candidates.size() < 2 * (1 + N_choose_K(max_jets-2, 2)))
+        top_candidates.push_back(0);
+    //cout << "Top candidates size: " << top_candidates.size() << endl;
+    //for (unsigned int i = 0; i < top_candidates.size(); i++)
+    //    cout << top_candidates[i] << endl;
+    //cout << "End event" << endl << endl;
+    //cout << top_candidates.size() << endl;
+    return top_candidates;
 }
 
 double helicity(const TLorentzVector particle_1, const TLorentzVector particle_2) {

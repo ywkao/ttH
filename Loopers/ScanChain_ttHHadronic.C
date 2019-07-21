@@ -325,6 +325,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       // Scale bkg weight
       evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Hadronic");
+    
+      // Scale FCNC to current best observed limit (ATLAS 2016 combination)
+      if (currentFileTitle.Contains("FCNC"))
+        evt_weight *= scale_fcnc(currentFileTitle);
 
       double leadID_ = leadIDMVA() == maxIDMVA_ ? maxIDMVA_ : minIDMVA_;
       double subleadID_ = leadIDMVA() == maxIDMVA_ ? minIDMVA_ : maxIDMVA_; 
@@ -392,6 +396,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       calculate_masses(diphoton, jets, m1_, m2_);
 
+      vector<float> top_candidates = calculate_top_candidates(diphoton, jets, btag_scores, max1_btag_);
+
       if (evaluate_mva) 
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       double reference_mva = tthMVA();
@@ -433,7 +439,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
 
       if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
-      if (!passes_selection(tag, minIDMVA_, maxIDMVA_))	continue;
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, mva_value))	continue;
 
       // Fill histograms //
       vProcess[processId]->fill_histogram("hGJet_BDT", gjet_mva_value, evt_weight, vId);
@@ -441,7 +447,12 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hMassTop1", m1_, evt_weight, vId);   
       vProcess[processId]->fill_histogram("hMassTop2", m2_, evt_weight, vId);   
-      
+      vProcess[processId]->fill_histogram("hMassTop_Hq_1", top_candidates[0], evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMassTop_Hq_2", top_candidates[6], evt_weight, vId);
+
+      vProcess[processId]->fill_histogram("hMassTop_qqq_1", top_candidates[1], evt_weight, vId);
+      vProcess[processId]->fill_histogram("hMassTop_qqq_2", top_candidates[7], evt_weight, vId);
+
       if (leadptoM_ > 0.33 && subleadptoM_ > 0.25) {
 	vProcess[processId]->fill_histogram("hMass_PassPtToM", mass(), evt_weight, vId);
 	if (mva_value > 0.9)

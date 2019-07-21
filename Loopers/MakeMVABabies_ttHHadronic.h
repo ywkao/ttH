@@ -39,33 +39,36 @@ class BabyMaker {
     vector<string> mva_branches = {"maxIDMVA_", "minIDMVA_", "max2_btag_", "max1_btag_", "dipho_delta_R", "njets_", "ht_", "leadptoM_", "subleadptoM_", "leadIDMVA_", "subleadIDMVA_", "lead_eta_", "sublead_eta_", "jet1_pt_", "jet1_eta_", "jet1_btag_", "jet2_pt_", "jet2_eta_", "jet2_btag_", "jet3_pt_", "jet3_eta_", "jet3_btag_", "jet4_pt_", "jet4_eta_", "jet4_btag_", "jet5_pt_", "jet5_eta_", "jet5_btag_", "jet6_pt_", "jet6_eta_", "jet6_btag_", "leadPSV_", "subleadPSV_", "dipho_cosphi_", "dipho_rapidity_", "met_"};
     
 
-    int		year_;
+    int		                year_;
     unsigned long long		evt_;
     unsigned long long		run_;
     unsigned long long		lumi_;
-    int 	label_;
-    int         multi_label_;
-    int		data_sideband_label_;
-    int		signal_mass_label_;
-    float	evt_weight_;
-    int 	process_id_;
-    int         genPhotonId_;
-    float 	rand_;
-    float       super_rand_;
-    float       mass_;
-    float       lead_sigmaEtoE_;
-    float       sublead_sigmaEtoE_;
+    int 	                label_;
+    int                     multi_label_;
+    int		                data_sideband_label_;
+    int		                signal_mass_label_;
+    float	                evt_weight_;
+    int 	                process_id_;
+    int                     genPhotonId_;
+    float 	                rand_;
+    float                   super_rand_;
+    float                   mass_;
+    float                   lead_sigmaEtoE_;
+    float                   sublead_sigmaEtoE_;
 
-    float	tth_2017_reference_mva_;
-    float	tth_qcdX_mva_;
-    float	tth_ttX_mva_;
-    float	tth_ttPP_mva_;
-    float	tth_dipho_mva_;
-    float	tth_std_mva_;
+    float                   tth_runII_mva_;
+    float	                tth_2017_reference_mva_;
+    float	                tth_qcdX_mva_;
+    float	                tth_ttX_mva_;
+    float	                tth_ttPP_mva_;
+    float	                tth_dipho_mva_;
+    float	                tth_std_mva_;
 
     // DNN Business
     vector<vector<float>>  objects_;
     vector<vector<float>>  objects_boosted_;
+
+    vector<float> top_candidates_;
 
     // Variable declarations
     float       maxIDMVA_;
@@ -73,9 +76,9 @@ class BabyMaker {
     float       max2_btag_;
     float       max1_btag_;
     float       dipho_delta_R;
-    float	njets_;
-    int		nbjets_;
-    float	ht_;
+    float   	njets_;
+    int		    nbjets_;
+    float	    ht_;
 
     float       top_tag_score_;
     float       top_tag_mass_;
@@ -83,9 +86,9 @@ class BabyMaker {
     float       top_tag_eta_;
     float       top_tag_phi_;
 
-    float	jet1_pt_;
+    float	    jet1_pt_;
     float       jet1_eta_;
-    float 	jet1_btag_;
+    float 	    jet1_btag_;
     float       jet2_pt_;
     float       jet2_eta_;
     float       jet2_btag_;
@@ -104,29 +107,42 @@ class BabyMaker {
 
     float       lead_pT_;
     float       sublead_pT_;
-    float	leadptoM_;
-    float	subleadptoM_;
-    float	leadIDMVA_;
-    float 	subleadIDMVA_;
+    float	    leadptoM_;
+    float	    subleadptoM_;
+    float	    leadIDMVA_;
+    float 	    subleadIDMVA_;
     float       lead_eta_;
     float       sublead_eta_;
-    float	lead_phi_;
-    float	sublead_phi_;
+    float	    lead_phi_;
+    float	    sublead_phi_;
  
     float       leadPSV_;
     float       subleadPSV_;
 
-    float	dipho_cosphi_;
-    float 	dipho_rapidity_;
+    float	    dipho_cosphi_;
+    float 	    dipho_rapidity_;
     float       dipho_pt_;
-    float	dipho_pt_over_mass_;
+    float	    dipho_pt_over_mass_;
     float       met_;
-    float	log_met_;
-    float	met_phi_; 
+    float	    log_met_;
+    float	    met_phi_; 
 
     float       helicity_angle_;
-    float	m_ggj_;
-    float	m_jjj_;
+    float	    m_ggj_;
+    float	    m_jjj_;
+
+    float       top_candidates_1_;
+    float       top_candidates_2_;
+    float       top_candidates_3_;
+    float       top_candidates_4_;
+    float       top_candidates_5_;
+    float       top_candidates_6_;
+    float       top_candidates_7_;
+    float       top_candidates_8_;
+    float       top_candidates_9_;
+    float       top_candidates_10_;
+    float       top_candidates_11_;
+    float       top_candidates_12_;
 };
 
 inline
@@ -152,6 +168,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("super_rand_"            , &super_rand_       );
   BabyTree_->Branch("mass_"             , &mass_        );
  
+  BabyTree_->Branch("tth_runII_mva_", &tth_runII_mva_);
   BabyTree_->Branch("tth_2017_reference_mva_", 	&tth_2017_reference_mva_); 
   BabyTree_->Branch("tth_qcdX_mva_"             , &tth_qcdX_mva_        );
   BabyTree_->Branch("tth_ttX_mva_"             , &tth_ttX_mva_        );
@@ -164,6 +181,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("objects_"             , &objects_        );
   BabyTree_->Branch("objects_boosted_"             , &objects_boosted_        );
+  BabyTree_->Branch("top_candidates_"             , &top_candidates_        );
 
   // Variable branches
   BabyTree_->Branch("maxIDMVA_" ,&maxIDMVA_);
@@ -224,6 +242,19 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("helicity_angle_"           , &helicity_angle_      );
   BabyTree_->Branch("m_ggj_"           , &m_ggj_      );
   BabyTree_->Branch("m_jjj_"           , &m_jjj_      );
+
+  BabyTree_->Branch("top_candidates_1_"             , &top_candidates_1_        );
+  BabyTree_->Branch("top_candidates_2_"             , &top_candidates_2_       );
+  BabyTree_->Branch("top_candidates_3_"             , &top_candidates_3_        );
+  BabyTree_->Branch("top_candidates_4_"             , &top_candidates_4_        );
+  BabyTree_->Branch("top_candidates_5_"             , &top_candidates_5_       );
+  BabyTree_->Branch("top_candidates_6_"             , &top_candidates_6_        );
+  BabyTree_->Branch("top_candidates_7_"             , &top_candidates_7_        );
+  BabyTree_->Branch("top_candidates_8_"             , &top_candidates_8_        );
+  BabyTree_->Branch("top_candidates_9_"             , &top_candidates_9_        );
+  BabyTree_->Branch("top_candidates_10_"             , &top_candidates_10_        );
+  BabyTree_->Branch("top_candidates_11_"             , &top_candidates_11_        );
+  BabyTree_->Branch("top_candidates_12_"             , &top_candidates_12_        );
 
   return;
 }

@@ -14,7 +14,7 @@ args = parser.parse_args()
 
 build_success = os.system("make")
 if build_success != 0:
-  print "Errors building, will not run rest of BDT workflow"
+  print("Errors building, will not run rest of BDT workflow")
   os.system("exit(1)")
 
 if args.randomize:

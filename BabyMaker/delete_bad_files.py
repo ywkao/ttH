@@ -11,6 +11,6 @@ os.system("du -a /hadoop/cms/store/user/smay/ttH/*" + args.tag + "* | awk '$1*51
 
 with open ("bad_files.txt") as fin:
   for line in fin:
-    print("Removing file %s" % line)
+    print(("Removing file %s" % line))
     os.system("rm %s" % line)
 

@@ -41,8 +41,8 @@ def calc_za_and_unc(file_pattern):
     max_za_mc.append(numpy.max(za_mc))
 
 
-  filter(lambda v: v==v, max_za_data)
-  filter(lambda v: v==v, max_za_mc)
+  [v for v in max_za_data if v==v]
+  [v for v in max_za_mc if v==v]
 
   mean_mc = numpy.mean(max_za_mc)
   mean_unc_mc = unc_mc / (float(len(files)) ** 0.5)
@@ -66,7 +66,7 @@ def calc_za_and_unc(file_pattern):
 
   fig = plt.figure()
   bins = numpy.linspace(2, 4, 40)
-  for var, info in vars_of_interest.iteritems():
+  for var, info in vars_of_interest.items():
     dist_to_plot = info[0]
     plt.hist(dist_to_plot, label = info[1], bins = bins)
     plt.ylabel("# of MVA Trainings")
@@ -153,24 +153,24 @@ do_hyperparameter_scan = False
 
 if do_hyperparameter_scan:
   baseline_results = {}
-  for var, info in vars.iteritems():
-      print "python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel)
+  for var, info in vars.items():
+      print("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
       os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s' --remove" % (info["name"], info["type"], info["function"], args.channel))
 
   # Now, add in variables for baseline BDT
   for var in baseline_vars:
     info = vars[var]
-    print "python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel)
+    print("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
     os.system("python add_bdt_variable.py '%s' '%s' '%s' '%s'" % (info["name"], info["type"], info["function"], args.channel))
 
   build_success = os.system("make")
   if build_success != 0:
-    print "Errors building, will not run rest of workflow"
+    print("Errors building, will not run rest of workflow")
     os.system("exit(1)")
 
   if not args.dry_run:
     for i in range(args.n_hyperparameter_points):
-      print "python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "hyperparameter_grid_search_%s" % i, args.n_trainings)
+      print("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "hyperparameter_grid_search_%s" % i, args.n_trainings))
       os.system("python bdt_ducks.py '%s' '%s' '%s' '%s' '%s'" % (args.channel, args.selection, args.year, "hyperparameter_grid_search_%s" % i, args.n_trainings))
 
 if do_results:
@@ -180,7 +180,7 @@ if do_results:
   with open("../MVAs/hyperparameter_points.json") as f_in:
     all_hyperparams = json.load(f_in)
   for i in range(args.n_hyperparameter_points):
-    print "Optimization/ZA_curves/MVAOptimizationBaby_*_%s_hyperparameter_grid_search_%s_*_bdt.npz" % (args.channel, str(i))
+    print("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_hyperparameter_grid_search_%s_*_bdt.npz" % (args.channel, str(i)))
     hyperparam_score = calc_za_and_unc("Optimization/ZA_curves/MVAOptimizationBaby_*_%s_hyperparameter_grid_search_%s_*_bdt.npz" % (args.channel, str(i)))
     max_za_mc[i] = hyperparam_score["mean_mc"]
     max_za_data[i] = hyperparam_score["mean_data"]

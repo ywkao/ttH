@@ -26,7 +26,7 @@ def train_bdt(config):
   feature_names = utils.load_array(f, 'feature_names')
   training_feature_names = utils.load_array(f, 'training_feature_names')
 
-  print "Training with the following features: ", training_feature_names
+  print(("Training with the following features: ", training_feature_names))
 
   #if config["invert_test_and_train"]:
     #print "Inverting test and train splits"
@@ -72,17 +72,17 @@ def train_bdt(config):
   weights_data = utils.load_array(f, 'weights_data')
   mass_data = utils.load_array(f, 'mass_data')
 
-  print global_features.shape
-  print label.shape
-  print weights.shape
+  print((global_features.shape))
+  print((label.shape))
+  print((weights.shape))
 
-  print global_features_validation.shape
-  print label_validation.shape
-  print weights_validation.shape
+  print((global_features_validation.shape))
+  print((label_validation.shape))
+  print((weights_validation.shape))
 
-  print global_features_data.shape
-  print label_data.shape
-  print weights_data.shape
+  print((global_features_data.shape))
+  print((label_data.shape))
+  print((weights_data.shape))
 
   x_train, y_train, y_train_multi, weights_train = global_features, label, multi_label, weights
   x_test, y_test, y_test_multi, weights_test  = global_features_validation, label_validation, multi_label_validation, weights_validation
@@ -101,7 +101,7 @@ def train_bdt(config):
   sum_neg_weights = utils.sum_of_weights_v2(weights_train, label, 0)
   sum_pos_weights = utils.sum_of_weights_v2(weights_train, label, 1)
 
-  print sum_pos_weights, sum_neg_weights
+  print((sum_pos_weights, sum_neg_weights))
 
   d_train = xgboost.DMatrix(X_train, label = Y_train, weight = weights_train)
   d_test = xgboost.DMatrix(X_test, label = Y_test)
@@ -131,7 +131,7 @@ def train_bdt(config):
   progress = {}
 
   n_round = config["n_round"]
-  print param, n_round
+  print((param, n_round))
 
   # train
   bdt = xgboost.train(param, d_train, n_round, evallist, evals_result = progress)
@@ -158,8 +158,8 @@ def train_bdt(config):
   #auc_train = metrics.auc(fpr_train, tpr_train, reorder = True)
   #auc_test  = metrics.auc(fpr_test , tpr_test , reorder = True)
 
-  print "Training AUC: %.3f" % auc_train
-  print "Testing  AUC: %.3f" % auc_test 
+  print(("Training AUC: %.3f" % auc_train))
+  print(("Testing  AUC: %.3f" % auc_test)) 
 
   # estimate z_a w/at least 4 signal events
   n_quantiles = 25
@@ -200,7 +200,7 @@ def train_bdt(config):
   max_za_mc_unc   = za_unc[max_za_mc_idx]
   max_za_data_unc = za_unc_data[max_za_data_idx]
 
-  print "Max Z_A on MC:   %.4f +/- %.4f" % (max_za_mc,   max_za_mc_unc)
-  print "Max Z_A on data: %.4f +/- %.4f" % (max_za_data, max_za_data_unc)
+  print(("Max Z_A on MC:   %.4f +/- %.4f" % (max_za_mc,   max_za_mc_unc)))
+  print(("Max Z_A on data: %.4f +/- %.4f" % (max_za_data, max_za_data_unc)))
 
   return max_za_mc, max_za_mc_unc, max_za_data, max_za_data_unc, auc_train, auc_train_unc, auc_test, auc_test_unc

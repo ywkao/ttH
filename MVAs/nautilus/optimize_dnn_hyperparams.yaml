@@ -8,14 +8,22 @@ metadata:
 spec:
   template:
     spec:
+      volumes:
+      - name: secret-volume
+        secret:
+            secretName: ssh-key-secret 
       containers:
       - name: optimizednnhyperparams
         image: tensorflow/tensorflow:latest-gpu-py3
         imagePullPolicy: Always
+        volumeMounts:
+        - name: secret-volume
+          readOnly: true
+          mountPath: "/etc/secret-volume"
         command: 
             - sh
             - -c
-            - "apt-get install wget && wget https://raw.githubusercontent.com/sam-may/ttH/master/MVAs/nautilus/nautilus_exe.sh && ls -althr && chmod 755 nautilus_exe.sh && ./nautilus_exe.sh" 
+            - "apt-get install wget && wget https://raw.githubusercontent.com/sam-may/ttH/master/MVAs/nautilus/nautilus_exe.sh && ls -althr && chmod 755 nautilus_exe.sh && bash ./nautilus_exe.sh INPUT TAG CHANNEL NPOINTS RANDOM FIXED NO_BUILDUP XI" 
         resources:
           limits:
             memory: 48Gi

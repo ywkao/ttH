@@ -453,8 +453,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       double subleadID_ = leadIDMVA() == maxIDMVA_ ? minIDMVA_ : maxIDMVA_;
 
       // Scale bkg weight
-      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Hadronic");
+      evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Hadronic", fcnc);
  
+      // Scale FCNC to current best observed limit (ATLAS 2016 combination)
+      if (currentFileTitle.Contains("FCNC"))
+        evt_weight_ *= scale_fcnc(currentFileTitle);
 
       if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
       if (!passes_selection(tag, minIDMVA_, maxIDMVA_)) continue;
@@ -470,14 +473,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 	    if (process_id_ == 22 || process_id_ == 23 || process_id_ == 24 || process_id_ == 25)
           label_ = -1; // don't use FCNC as a bkg when ttH is signal
       }
-      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId);
+      multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId, fcnc);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
 
       tth_2017_reference_mva_ = tthMVA();
-
-      // Temporary!!! FIXME
-      //if (fcnc && process_id_ == 0)
-      //    evt_weight_ *= 100.;
 
       if (tag == "ttHHadronic_data_sideband_0b") {
 	if (nb_medium() == 0)
@@ -515,11 +514,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       }
       else {
       */
-	top_tag_mass_ = -1;
+	    top_tag_mass_ = -1;
         top_tag_pt_ = -1;
         top_tag_eta_ = -1;
         top_tag_phi_ = -1;
       //}
+
+      tth_runII_mva_ = tthMVA_RunII();
 
       year_ = mYear == "2016" ? 2016 : (mYear == "2017" ? 2017 : (mYear == "2018" ? 2018 : -1)); 
 
@@ -578,6 +579,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       helicity_angle_ = helicity(lead_photon, sublead_photon);
 
       calculate_masses(diphoton, jets, m_ggj_, m_jjj_);
+      m_ggj_ = m_ggj_ > 0 ? log(m_ggj_) : -9;
+      m_jjj_ = m_jjj_ > 0 ? log(m_jjj_) : -9;
 
       rand_ = cms3.rand();
       super_rand_ = -1; //rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
@@ -616,7 +619,32 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       objects_ = sort_objects(jet_objects);
       objects_boosted_ = sort_objects(jet_objects_boosted);
 
-      FillBabyNtuple();
+      top_candidates_ = calculate_top_candidates(diphoton, jets, btag_scores, max1_btag_);
+
+      // Do this a dumb hacky way because it is easier to deal with down the line in DNN/BDT prep+training
+      top_candidates_1_ = top_candidates_[0] > 0 ? log(top_candidates_[0]) : -9;
+      top_candidates_2_ = top_candidates_[1] > 0 ? log(top_candidates_[1]) : -9;
+      top_candidates_3_ = top_candidates_[2] > 0 ? log(top_candidates_[2]) : -9;
+      top_candidates_4_ = top_candidates_[3] > 0 ? log(top_candidates_[3]) : -9;
+      top_candidates_5_ = top_candidates_[4] > 0 ? log(top_candidates_[4]) : -9;
+      top_candidates_6_ = top_candidates_[5] > 0 ? log(top_candidates_[5]) : -9;
+      top_candidates_7_ = top_candidates_[6] > 0 ? log(top_candidates_[6]) : -9;
+      top_candidates_8_ = top_candidates_[7] > 0 ? log(top_candidates_[7]) : -9;
+      top_candidates_9_ = top_candidates_[8] > 0 ? log(top_candidates_[8]) : -9;
+      top_candidates_10_ = top_candidates_[9] > 0 ? log(top_candidates_[9]) : -9;
+      top_candidates_11_ = top_candidates_[10] > 0 ? log(top_candidates_[10]) : -9;
+      top_candidates_12_ = top_candidates_[11] > 0 ? log(top_candidates_[11]) : -9;
+
+      const float oversample = 10.;
+      if (fcnc && process_id_ == 14) { // oversample ggH
+        evt_weight_ *= 1./oversample;
+        for (int i = 0; i < int(oversample); i++)
+          FillBabyNtuple();
+      }
+
+      else
+        FillBabyNtuple();
+       
 
       /*
       if (deriving_gjet_weights) {

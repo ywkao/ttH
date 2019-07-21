@@ -3,7 +3,7 @@ import sys, os
 from multiprocessing import Process
 
 def run(command):
-  print "Command is ", command
+  print("Command is ", command)
   os.system(command)
   return
 

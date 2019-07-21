@@ -46,7 +46,7 @@ babies_2016 = [
                 "THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
                 "THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
                 "VBFHToGG_M125_13TeV_amcatnlo_pythia8_v2_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
-                # missing VH, THQ, THW
+                # missing VH
 
                 # QCD backgrounds
                 "DiPhotonJetsBox_M40_80-Sherpa_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_RunII",
@@ -197,13 +197,14 @@ babies_2017 = [
                 "ST_FCNC-TH_Thadronic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
                 "ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
                 # ST FCNC Hct
-                "ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII"
+                "ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
+                "ST_FCNC-TH_Thadronic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII"
 
 ]
 
 babies_2018 = [
 		# 2018
-		"EGamma_Run2018A-17Sep2018-v2_MINIAOD_RunII",
+		        "EGamma_Run2018A-17Sep2018-v2_MINIAOD_RunII",
                 "EGamma_Run2018B-17Sep2018-v1_MINIAOD_RunII",
                 "EGamma_Run2018C-17Sep2018-v1_MINIAOD_RunII",
                 "EGamma_Run2018D-22Jan2019-v2_MINIAOD_RunII",
@@ -219,6 +220,8 @@ babies_2018 = [
                 # other signal modes
                 "VBFHToGG_M126_13TeV_amcatnlo_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
                 "GluGluHToGG_M-125_13TeV_powheg_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
+                "THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2_MINIAODSIM_RunII",
+                "THW_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
 
                 # QCD backgrounds
                 "DiPhotonJetsBox_M40_80-Sherpa_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII",
@@ -325,9 +328,9 @@ for hist in histos:
   size = os.stat(hist).st_size * (1./(1024))
   if size >= 1.:
     good_histos.append(hist)
-    print "good hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024)))
+    print("good hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024))))
   else:
-    print "bad  hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024)))
+    print("bad  hist: %s, size (kb): %d" % (hist, os.stat(hist).st_size * (1./(1024))))
 
 target = " "
 for hist in good_histos:

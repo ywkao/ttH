@@ -55,6 +55,7 @@ class BabyMaker {
     float 	lead_sigmaEtoE_;
     float 	sublead_sigmaEtoE_;
 
+    float       tth_runII_mva_;
     float       tth_2017_reference_mva_;
     float       tth_qcdX_mva_;
     float       tth_ttX_mva_;
@@ -158,6 +159,7 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("super_rand_"            , &super_rand_       );
   BabyTree_->Branch("mass_"		, &mass_	);
 
+  BabyTree_->Branch("tth_runII_mva_", &tth_runII_mva_);
   BabyTree_->Branch("tth_2017_reference_mva_",  &tth_2017_reference_mva_);
   BabyTree_->Branch("tth_qcdX_mva_"             , &tth_qcdX_mva_        );
   BabyTree_->Branch("tth_ttX_mva_"             , &tth_ttX_mva_        );
