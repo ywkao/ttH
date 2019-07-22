@@ -2,10 +2,10 @@
 import keras_layer_normalization
 
 import tensorflow as tf
-try:
-    import tensorflow.keras as keras
-except:
-    import keras
+#try:
+import tensorflow.keras as keras
+#except:
+#    import keras
 
 def standard(max_objects, n_features):
   input_objects = keras.layers.Input(shape=(max_objects, n_features), name = 'input')
@@ -160,7 +160,8 @@ def tth_learner(max_objects, n_features, n_global_features, config):
   lstm = input_objects
 
   for i in range(n_lstm):
-    lstm =  keras.layers.LSTM(n_nodes_lstm, implementation=2, activation='tanh', kernel_constraint = keras.constraints.max_norm(maxnorm), go_backwards=False, return_sequences=(i != (n_lstm-1)), name='lstm_%d' % i)(lstm)
+    decay = 0
+    lstm =  keras.layers.LSTM(n_nodes_lstm, implementation=2, activation='tanh', kernel_regularizer=keras.regularizers.l2(decay), recurrent_regularizer=keras.regularizers.l2(decay), bias_regularizer=keras.regularizers.l2(decay), kernel_constraint = keras.constraints.max_norm(maxnorm), go_backwards=False, return_sequences=(i != (n_lstm-1)), name='lstm_%d' % i)(lstm)
     if layer_norm: 
       #lstm = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'lstm_batch_norm_%d' % i)(lstm)
       lstm = keras_layer_normalization.LayerNormalization()(lstm)
@@ -168,13 +169,13 @@ def tth_learner(max_objects, n_features, n_global_features, config):
   # Merge LSTM output with high-level features in fully-connected layers
   dense = keras.layers.concatenate([input_global, lstm])
   for i in range(n_dense_1):
-    dense = keras.layers.Dense(n_nodes_dense_1, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense1_%d' % i)(dense)
+    dense = keras.layers.Dense(n_nodes_dense_1, activation = 'elu', kernel_initializer = 'lecun_uniform', kernel_regularizer = keras.regularizers.l2(decay), kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense1_%d' % i)(dense)
     if batch_norm:
       dense = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm1_%d' % i)(dense)
     dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout1_%d' % i)(dense)
 
   for i in range(n_dense_2):
-    dense = keras.layers.Dense(n_nodes_dense_2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense2_%d' % i)(dense)
+    dense = keras.layers.Dense(n_nodes_dense_2, activation = 'elu', kernel_initializer = 'lecun_uniform', kernel_regularizer = keras.regularizers.l2(decay), kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense2_%d' % i)(dense)
     if batch_norm and i < (n_dense_2 - 1):
       dense = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm2_%d' % i)(dense) 
     if i < (n_dense_2 - 1):
@@ -182,7 +183,13 @@ def tth_learner(max_objects, n_features, n_global_features, config):
 
   output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'output')(dense)
   optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate, epsilon = epsilon)
-  #optimizer = keras.optimizers.Adam(lr = learning_rate)
+  #gradients, variables = zip(*optimizer.compute_gradients(loss))
+  #gradients, _ = tf.clip_by_global_norm(gradients, 5.0)
+  #optimize = optimizer.apply_gradients(zip(gradients, variables))
+  #original_optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate, epsilon = epsilon)
+  #optimizer = tf.contrib.estimator.clip_gradients_by_norm(optimizer, clip_norm=1.0)
+
+  #optimizer = keras.optimizers.Adam(lr = learning_rate, clipnorm = 5.)
 
   model = keras.models.Model(inputs = [input_global, input_objects], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')

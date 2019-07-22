@@ -1,13 +1,31 @@
 import numpy
 import random
 from sklearn import metrics
+#from sklearn.preprocessing import quantile_transform
 
 n_max_objects = 8
 pad_value = -9
-def preprocess(array, mean, std):
-  array[array != pad_value] += -mean
-  array[array != pad_value] *= 1./std
-  #array[array == pad_value] = 0
+def preprocess(array, mean, std, z_score=True):
+  if z_score:
+    array[array != pad_value] += -mean
+    array[array != pad_value] *= 1./std
+  #elif z_score:
+  else:
+    min = numpy.min(array[array != pad_value])
+    max = numpy.max(array[array != pad_value])
+    array[array != pad_value] += -min
+    array[array != pad_value] *= 1./(max - min)
+    array[array != pad_value] += -0.5
+    array[array != pad_value] *= 2
+    array[array == pad_value] = -1.1
+    print (min, max, numpy.min(array[array != pad_value]), numpy.max(array[array != pad_value]), numpy.mean(array[array != -1.1]))
+  #else:
+  #  array[array != pad_value] = quantile_transform(array[array != pad_value].reshape(-1,1))
+  #  array[array != pad_value] += -0.5
+  #  array[array != pad_value] *= 2
+  #  array[array == pad_value] = -1.1
+  #  print (min, max, numpy.min(array[array != pad_value]), numpy.max(array[array != pad_value]), numpy.mean(array[array != pad_value]))
+#array[array == pad_value] = 0
   return array
 
 def get_mean_and_std(array):

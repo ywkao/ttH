@@ -18,3 +18,6 @@ fi
 
 source /home/users/sjmay/Utilities/ShellFunctions.sh
 export -f addHistos
+
+#export PYTHONPATH=$HOME/.local/lib/python2.7/site-packages/:$PYTHONPATH
+

@@ -76,20 +76,20 @@ def base_network(max_objects, n_features, n_global_features, config):
     # Merge LSTM output with high-level features in fully-connected layers
     dense = keras.layers.concatenate([input_global, lstm])
     for i in range(n_dense_1):
-        dense = keras.layers.Dense(n_nodes_dense_1, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense1_%d' % i)(dense)
+        dense = keras.layers.Dense(n_nodes_dense_1, activation = 'elu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense1_%d' % i)(dense)
         if batch_norm:
             dense = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm1_%d' % i)(dense)
         dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout1_%d' % i)(dense)
         
 
     for i in range(n_dense_2):
-        dense = keras.layers.Dense(n_nodes_dense_2, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense2_%d' % i)(dense)
+        dense = keras.layers.Dense(n_nodes_dense_2, activation = 'elu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'dense2_%d' % i)(dense)
         if batch_norm:
             dense = keras.layers.BatchNormalization(momentum = batch_momentum, name = 'dense_batch_norm2_%d' % i)(dense)
         if i < (n_dense_2 - 1):
             dense = keras.layers.Dropout(dropout_rate, name = 'dense_dropout2_%d' % i)(dense)
 
-    dense = keras.layers.Dense(n_manifold, activation = 'relu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'manifold')(dense)
+    dense = keras.layers.Dense(n_manifold, activation = 'elu', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'manifold')(dense)
 
     model = keras.models.Model(inputs = [input_global, input_objects], outputs = [dense])
     print((model.summary()))
