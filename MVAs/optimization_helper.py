@@ -42,6 +42,7 @@ class Optimization_Helper:
         self.args = kwargs.get('args')
 
         self.parameter_ranges = {}
+        self.parameter_combinations_unshuffled = []
         self.parameter_combinations = []
         self.results = {}
         self.idx = 0
@@ -74,13 +75,13 @@ class Optimization_Helper:
             self.parameter_ranges[hyperparameter] = points
         raw_parameters = list(itertools.product(*[tuple(self.parameter_ranges[key]) for key in self.parameter_ranges.keys()]))
         for params in raw_parameters:
-            point = self.default_config
+            point = dict(self.default_config)
             i = 0
             for key in self.parameter_ranges.keys():
                 point[key] = params[i]
                 i += 1
-            self.parameter_combinations.append(point)
-        random.shuffle(self.parameter_combinations) 
+            self.parameter_combinations_unshuffled.append(point)
+        self.parameter_combinations = random.sample(self.parameter_combinations_unshuffled, len(self.parameter_combinations_unshuffled)) 
         self.n_points = min(self.n_points, len(self.parameter_combinations))
         if self.verbose:
             print("Here are all %d hyperparameter combinations that will be tested:" % self.n_points) 
