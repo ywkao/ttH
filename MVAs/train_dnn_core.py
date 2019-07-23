@@ -10,6 +10,7 @@ config.gpu_options.allow_growth = True
 session = tf.Session(config=config)
 
 print(session)
+print(tf.__version__)
 
 import numpy
 import sys
@@ -25,7 +26,7 @@ import ks_test
 def train(args, config):
   f = h5py.File(args.input, "r")
   if len(list(config.keys())) == 0:
-      config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.005, "start_batch" : 1024, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False, "epsilon" : 1e-08} 
+      config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False, "epsilon" : 1e-08} 
 
 
   #if args.channel == "Hadronic" and "fcnc" in args.input.lower(): # convergence issues in FCNC Hadronic DNN
@@ -101,5 +102,5 @@ def train(args, config):
     dnn.train_with_early_stopping()
 
     # Diagnostics
-    #dnn.do_diagnostics()
+    dnn.do_diagnostics()
   return dnn

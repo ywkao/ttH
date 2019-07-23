@@ -635,8 +635,16 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       top_candidates_11_ = top_candidates_[10] > 0 ? log(top_candidates_[10]) : -9;
       top_candidates_12_ = top_candidates_[11] > 0 ? log(top_candidates_[11]) : -9;
 
-      const float oversample = 10.;
-      if (fcnc && process_id_ == 14) { // oversample ggH
+      const float oversample_ggh = 81.;
+      const float oversample_tth = 1.;
+      float oversample;
+      if (fcnc) {
+        if (process_id_ == 14)
+          oversample = oversample_ggh;
+        else if (process_id_ == 0)
+          oversample = oversample_tth;
+        else
+          oversample = 1.;
         evt_weight_ *= 1./oversample;
         for (int i = 0; i < int(oversample); i++)
           FillBabyNtuple();

@@ -10,6 +10,7 @@ RANDOM=$5
 FIXED=$6
 BUILDUP=$7
 XI=$8
+METHOD=$9
 
 # Set up ssh key
 apt-get install -y openssh-client
@@ -47,6 +48,10 @@ mkdir dnn_weights
 
 cp nautilus/copy_jsons.sh .
 ./copy_jsons.sh &
+
+if [ "$METHOD" == "GRID" ]; then
+    python optimization_helper.py --input "$INPUT" --tag "$TAG" --channel "$CHANNEL" --no_bootstrap --n_points "$NPOINTS"
+fi
 
 if [ "$BUILDUP" == "NO_BUILDUP" ]; then
     if [ "$RANDOM" == "RANDOM" ]; then

@@ -9,6 +9,7 @@ parser.add_argument("--random", help = "do random exploration instead of BayesOp
 parser.add_argument("--fixed", help = "sample a fixed pbound set", action = "store_true")
 parser.add_argument("--no_buildup", help = "explore all hyperparameters at once", action = "store_true")
 parser.add_argument("--xi", help = "exploitation vs. exploration parameter", type=float, default = 0.0005)
+parser.add_argument("--method", help = "Bayesian Optmization vs. grid search", type=str, default = "GRID")
 args = parser.parse_args()
 
 if args.random:
@@ -48,6 +49,8 @@ for i in range(len(lines)):
             lines[i] = lines[i].replace("NO_BUILDUP", "not_no_buildup")
     if "XI" in lines[i]:
         lines[i] = lines[i].replace("XI", str(args.xi))
+    if "METHOD" in lines[i]:
+        lines[i] = lines[i].replace("METHOD", args.method)
 
 submit_script = "submit_scripts/" + template + "_" + args.tag + ".yaml"
 with open(submit_script, "w") as f_out:

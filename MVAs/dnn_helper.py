@@ -69,7 +69,7 @@ class DNN_Helper:
     self.tag = kwargs.get('tag', '')
 
     self.n_bootstrap = kwargs.get('n_bootstrap', 0)
-    self.max_epochs = kwargs.get('max_epochs', 50)
+    self.max_epochs = kwargs.get('max_epochs', 25)
 
     if 'tag' in kwargs:
       self.save_name = "dnn_weights/" + self.tag + "_weights_{epoch:02d}.hdf5"
@@ -257,7 +257,7 @@ class DNN_Helper:
     plt.ylabel("AUC")
     plt.legend(loc = 'lower right')
     plt.savefig('learning_curve_%s.pdf' % self.tag)
-    plt.clf()
+    plt.close('all')
 
   def make_comparison(self, reference):
     fpr_ref, tpr_ref, thresh_ref = metrics.roc_curve(self.features_validation.label, self.features_validation.references[reference], pos_label = 1, sample_weight = self.features_validation.weights)
@@ -271,7 +271,7 @@ class DNN_Helper:
     plt.ylabel("True Positive Rate (sig. eff.)")
     plt.legend(loc = 'lower right')
     plt.savefig('dnn_roc_%s_%s.pdf' % (reference.replace(" ", "_"), self.tag))
-    plt.clf()
+    plt.close('all')
 
   def do_diagnostics(self):
     numpy.savez("dnn_scores_%s_.npz" % self.tag, scores_train = self.predictions["train"], scores_validation = self.predictions["validation"], scores_data = self.predictions["data"], scores_final_fit = self.predictions["final_fit"], evt_data = self.evt_data, run_data = self.run_data, lumi_data = self.lumi_data, mass_data = self.mass_data)

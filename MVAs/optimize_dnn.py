@@ -150,14 +150,14 @@ pbounds_medium = {
     "n_nodes_dense_2" : (200, 200),
     "n_dense_1" : (1,1),
     "n_dense_2" : (2,2), 
-    "n_nodes_lstm" : (100, 100),
+    "n_nodes_lstm" : (25, 250),
     "n_lstm" : (1,1), 
-    "maxnorm" : (-1, 2), # 10**(maxnorm)
+    "maxnorm" : (0.5, 0.5), # 10**(maxnorm)
     "dropout_rate" : (0.0, 0.5), 
     "learning_rate" : (-5, -1), # 10**(learning_rate)
     "start_batch" : (11, 11), # 2**(start_batch)
     "batch_momentum" : (0.99, 0.99),
-    "epsilon" : (-10, -6)
+    "epsilon" : (-8, -8)
 }
 
 pbounds_full = {
@@ -227,13 +227,14 @@ xi = float(args.xi)
 
 x = numpy.linspace(pbounds_light["learning_rate"][0], pbounds_light["learning_rate"][1], 1000).reshape(-1,1)
 
-optimizer.maximize(init_points=3, n_iter=0)
+#optimizer.maximize(init_points=3, n_iter=0)
 
 def maximize(optimizer, pbounds, n_probe, n_points, random, do_plot = False):
     optimizer.set_bounds(new_bounds = pbounds)
     utility_function = UtilityFunction(kind="ucb", kappa=5, xi=0)
     for i in range(n_points):
         if i % 3 == 0 or random:
+            print("Probing a RANDOM point")
             optimizer.maximize(init_points=1, n_iter=0, alpha=float(args.alpha))
         else:
             next_point = optimizer.suggest(utility_function)
@@ -244,7 +245,7 @@ def maximize(optimizer, pbounds, n_probe, n_points, random, do_plot = False):
         if do_plot:
             plot_gp(optimizer,x)
 
-maximize(optimizer, pbounds_light, 0, 20, args.random, True)
+#maximize(optimizer, pbounds_light, 0, 10, args.random, True)
 maximize(optimizer, pbounds_medium, 0, args.n_points, args.random)
 #maximize(optimizer, pbounds_full, 0, args.n_points, args.random)
 
