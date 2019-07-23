@@ -37,7 +37,7 @@ for i in range(len(lines)):
     if "CHANNEL" in lines[i]:
         lines[i] = lines[i].replace("CHANNEL", channel)
     if "NPOINTS" in lines[i]:
-        lines[i] = lines[i].replace("NPOINTS", str(int(args.n_points)/3))
+        lines[i] = lines[i].replace("NPOINTS", str(int(args.n_points)))
     if "RANDOM" in lines[i]:
         if not args.random:
             lines[i] = lines[i].replace("RANDOM", "not_random")
