@@ -287,5 +287,11 @@
 	"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 3.8646086e-3, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
 	"ST_FCNC-TH_Thadronic_HToaa_eta_hct-MadGraph5-pythia8" : { "xs" : 7.6034458e-3, "br" : 1.0, "comment" : "see FCNC_xs.txt"},
     "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8" : { "xs" : 16000, "br" : 1.0, "comment" : "from MCM"},
-    "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : { "xs" : 18590, "br" : 1.0, "comment" : "from MCM"}
+    "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" : { "xs" : 18590, "br" : 1.0, "comment" : "from MCM"},
+    "ttHiggs0MToGG_M125_13TeV_JHUGenV7011_pythia8" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
+    "ttHiggs0Mf05ph0ToGG_M125_13TeV_JHUGenV7011_pythia8" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
+    "ttHiggs0PMToGG_M125_13TeV_JHUGenV7011_pythia8" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
+    "ttHiggs0M_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
+    "ttHiggs0Mf05ph0_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
+    "ttHiggs0PM_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"}
 }

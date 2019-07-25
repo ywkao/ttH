@@ -69,11 +69,11 @@ for year, year_info in years.iteritems():
       if year_info not in production:
         continue
       if "BSandPUSummer16" in production and "ttHJetToGG" in sample: #skip this one, not sure what it is
-	production_info["comment"] = "unused in scale1fb calc"
-	continue
+	    production_info["comment"] = "unused in scale1fb calc"
+	    continue
       if args.old_weights:
         n_events_pos += production_info["n_events_pos"]
-	n_events_neg += production_info["n_events_neg"]
+        n_events_neg += production_info["n_events_neg"]
       else: 
         sum_of_weights += production_info["sum_of_weights"]
       #n_events_pos += production_info["n_events_pos"]
@@ -83,9 +83,9 @@ for year, year_info in years.iteritems():
         sample_info["scale1fb_" + year] = float(sample_info["xs"] * sample_info["br"] * sample_info["filter_eff"] * 1000) / float(n_events_pos - n_events_neg)
     else:
       if sum_of_weights > 0:
-	sample_info["scale1fb_" + year] = float(sample_info["xs"] * sample_info["br"] * sample_info["filter_eff"] * 1000) / float(sum_of_weights)
+	    sample_info["scale1fb_" + year] = float(sample_info["xs"] * sample_info["br"] * sample_info["filter_eff"] * 1000) / float(sum_of_weights)
       else:
-	sample_info["scale1fb_" + year] = 0
+	    sample_info["scale1fb_" + year] = 0
 
 with open("scale1fb.json", "w") as f_out:
   json.dump(scale1fb, f_out, indent=4, sort_keys=True)
