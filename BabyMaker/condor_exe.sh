@@ -35,10 +35,13 @@ cd $CMSSW_VER/src/flashgg
 echo "[wrapper] in directory: " ${PWD}
 cd ../..
 cd src/flashgg
+echo "[wrapper] copying data from /eos"
+xrdcp root://eoscms.cern.ch//eos/cms/store/group/phys_higgs/cmshgg/flashgg-data/Taggers/data/resTop_xgb_csv_order_deepCTag.xml Taggers/data/ 
+
 echo "[wrapper] attempting to build"
 eval `scramv1 runtime -sh`
 scramv1 b ProjectRename
-scram b
+scram b -j1
 eval `scramv1 runtime -sh`
 cd $CMSSW_BASE/src/flashgg
 export PYTHONPATH=$PYTHONPATH:$CMSSW_BASE/src/flashgg/Taggers/test/

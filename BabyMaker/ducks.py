@@ -31,7 +31,8 @@ if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "*")
   os.system("rm package.tar.gz")
 
-  os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' -f package.tar.gz %s" % cmssw_ver) 
+  #os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' --exclude *resTop_xgb_csv_order_deepCTag.xml -f package.tar.gz %s" % cmssw_ver) 
+  os.system("XZ_OPT=-9 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' --exclude *lib* --exclude *MicroAOD/BatchSubmit/* --exclude *tmp* --exclude *MetaData/data/Era201*/*.json --exclude *Taggers/data/resTop*.xml --exclude *Taggers/data/*76x* --exclude *Taggers/data/*80x* --exclude *Taggers/data/*dijet* --exclude *Taggers/data/*vbf* -f package.tar.gz %s" % cmssw_ver)
   os.system("for task in `ls -1 -d tasks/*%s*/`; do echo cp package.tar.gz $task/package.tar.gz; cp package.tar.gz $task/package.tar.gz; done" % args.tag) # make sure we overwrite any previously existing tar files
 
   with open("versions.txt", "a") as fout:
@@ -52,22 +53,24 @@ conds_dict = {
 samples = glob.glob(base_path + "/*")
 datasets = {}
 
-signal_strings = ["ttHJetToGG", "ttHToGG", "THQ", "THW", "VBF", "GluGluHToGG", "VHToGG", "FCNC"]
+signal_strings = ["ttHJetToGG", "ttHToGG", "THQ", "THW", "VBF", "GluGluHToGG", "VHToGG", "FCNC", "ttHiggs"]
 
 for sample in samples:
   name = sample.split("/")[-1]
   datasets[name] = { "input_loc" : sample }
   datasets[name]["isData"] = True if ("EGamma" in name or "DoubleEG" in name) else False
   if datasets[name]["isData"]:
-    datasets[name]["fpo"] = 50
-  if any([x in name for x in signal_strings]):
+    datasets[name]["fpo"] = 300
+  elif "ttHiggs" in name:
+    datasets[name]["fpo"] = 5
+  elif any([x in name for x in signal_strings]):
     datasets[name]["fpo"] = 1
   elif "DiPhoton" in name:
-    datasets[name]["fpo"] = 5
+    datasets[name]["fpo"] = 10
   elif "EGamma" in name and datasets[name]["isData"]:
-    datasets[name]["fpo"] = 250
+    datasets[name]["fpo"] = 500
   else:
-    datasets[name]["fpo"] = 100
+    datasets[name]["fpo"] = 300
 
   if datasets[name]["isData"]:
     if "Run2016" in sample:
@@ -98,12 +101,13 @@ while True:
     for dataset, info in datasets.items():
       if args.data_only and not info["isData"]:
         continue
-      #if "VHToGG" in dataset:
-      #  print "Skipping VH for now"
-      #  continue
+      if "VHToGG" in dataset:
+        print "Skipping VH for now"
+        continue
       #if not ("Run2016" in dataset or "Run2017" in dataset or "Run2018" in dataset): 
       #  continue
-      print("Submitting jobs for: ", dataset)
+      if "ttHiggs" in dataset:
+          print("Submitting jobs for: ", dataset)
       sample = DirectorySample( dataset = dataset, location = info["input_loc"])
       files = [f.name for f in sample.get_files()]
       print(len(files))
