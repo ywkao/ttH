@@ -122,7 +122,7 @@ double scale1fb_2016_RunII(TString currentFileTitle) {
         {"DiPhotonJetsBox1BJet_MGG-80toInf_13TeV-Sherpa", 0.0000000000},
         {"tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-madgraph-pythia8", 0.0000000000},
         {"TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8", 0.0000000000},
-        {"ttHiggs0M_M-125_13TeV-JHUGenV7", 0.0000000000},
+        {"ttHiggs0M_M-125_13TeV-JHUGenV7", 0.0000057556},
         {"TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8", 0.0000727812},
         {"ttHJetToGG_M105_13TeV_amcatnloFXFX_madspin_pythia8", 0.0000021777},
         {"QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8", 6.9258319174},
