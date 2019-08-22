@@ -68,15 +68,15 @@ train_frac = args.train_frac
 if args.backgrounds == "all":
   selection = ""
 else:
-  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11, "ttG" : 6, "ttJets" : 9, "GJets_QCD" : 18 if args.channel == "Hadronic" else 3, "VGamma" : 7, "FCNC_hut" : 22, "FCNC_hct" : 23, "ggH" : 14}
+  process_dict = {"ttH" : 0, "ttGG" : 5, "dipho" : 2, "tH" : 11, "ttG" : 6, "ttJets" : 9, "GJets_QCD" : 18 if args.channel == "Hadronic" else 3, "VGamma" : 7, "FCNC_hut" : 22, "FCNC_hct" : 23, "ggH" : 14, "DY" : 1, "TGamma" : 13, "VBF" : 15, "VH" : 16, "ttV" : 19, "VV" : 20, "tV" : 21}
   selection = "&& ("
   procs = args.backgrounds.split(",") + args.signal.split(",")
   for i in range(len(procs)):
     selection += "((process_id_ == %d" % (process_dict[procs[i]])
     
-    #if procs[i] == "ttGG":
-    #  selection += " || process_id_ == 6 || process_id_ == 9) && abs(evt_weight_) < 0.01)"
-    if procs[i] == "tH":
+    if procs[i] == "ttGG":
+      selection += " && abs(evt_weight_) < 0.01))"
+    elif procs[i] == "tH":
       selection += " || process_id_ == 12))"
     elif procs[i] == "FCNC_hut":
       selection += " || process_id_ == 24))"
@@ -89,11 +89,13 @@ else:
 
   selection += ")"
 
+selection_train = selection
+#if "ttGG" in procs:
+#    selection_train += " && abs(evt_weight_) < 0.01" 
 if args.ggH_treatment == "dont_train":
     selection_train = selection.replace(" || ((process_id_ == 14))", "") # don't train with ggH because it has high weights
-else:
-    selection_train = selection
-print(selection_train)
+print("Training selection:", selection_train)
+print("Validation selection:", selection)
 
 if args.fcnc:
     features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection_train))
@@ -114,7 +116,7 @@ if args.fcnc:
         #        for j in range(oversample_factor):
 
 else:
-    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection_train))
     features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
     features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 1 && signal_mass_label_ == 0))')
 

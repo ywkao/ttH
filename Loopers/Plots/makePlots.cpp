@@ -141,7 +141,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   TString output = output_name;
 
-  if (type == "std" || type == "std_linear") {
+  if (type.Contains("std")) {
     if (vSigs.size() == 0) { 
       vLegendLabels = {year + " Data", "ttH (M125)", "FCNC_hut", "FCNC_hct"};
       TH1D* hSig_TTH = (TH1D*)file->Get(hist_name + "_ttH" + extension);
@@ -345,23 +345,33 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   //double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9))); 
 
-  if (type == "std" || type == "std_linear") {
-    if (file_ref == nullptr)
-      c = new Comparison(c1, {hData}, hSig, hBkg);
-    else {
-      c = new Comparison(c1, {hData}, hSig, {hData_ref});
-      //c = new Comparison(c1, {hData, hData_ref}, hSig, hBkg);
+  if (type.Contains("std")) {
+    if (type.Contains("shape")) {
+      hSig[0]->Scale(1./hSig[0]->Integral(0, hSig[0]->GetNbinsX()+1));
+      c = new Comparison(c1, hSig[0], hBkg);
+      c->set_scale(-1);
+      c->set_rat_label("#frac{Signal}{Background}");
+      c->set_data_drawOpt("HIST");
+      c->set_y_label("Fraction of events");
     }
-    c->set_data_drawOpt("E");
-    c->set_rat_label("#frac{Data}{MC}");
-    c->set_y_label("Events");
+    else {
+      if (file_ref == nullptr)
+        c = new Comparison(c1, {hData}, hSig, hBkg);
+      else {
+        c = new Comparison(c1, {hData}, hSig, {hData_ref});
+        //c = new Comparison(c1, {hData, hData_ref}, hSig, hBkg);
+      }
+      c->set_data_drawOpt("E");
+      c->set_rat_label("#frac{Data}{MC}");
+      c->set_y_label("Events");
+    }
     c->set_lumi(lumi);
     //c->set_log_rat();
     c->set_rat_lim_range({0.0, 2.0});
     //if (hist_name.Contains("SigmaEOverE") || hist_name.Contains("DiphotonMassResolution")) {
     //  c->set_no_log();
     //}
-    if (type == "std_linear")
+    if (type.Contains("linear"))
       c->set_no_log();
 
   }
@@ -401,6 +411,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_data_drawOpt("HIST");
     c->set_rat_label("#frac{Signal}{Background}");
   }
+  if (type.Contains("std") && type.Contains("shape"))
+      vLegendLabels.erase(vLegendLabels.begin());
   c->set_legend_labels(vLegendLabels);
   c->set_colors(vColors);
 
@@ -591,10 +603,10 @@ int main(int argc, char* argv[])
   vector<string> vNames = {output};
 
   // Decide which backgrounds you want to plot
-  if (type.Contains("std_linear"))
-    type = "std_linear";
-  else if (type.Contains("std"))
-    type = "std";
+  //if (type.Contains("std_linear"))
+  //  type = "std_linear";
+  //else if (type.Contains("std"))
+  //  type = "std";
 
   vector<TString> vSigs = {"ttH"};
   vector<TString> vBkgs;
@@ -859,11 +871,11 @@ int main(int argc, char* argv[])
 
     make_plot(c1, vFiles[i], vNames[i], "hMassTop_Hq_1", "m_{#gamma#gammaq,1} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hMassTop_Hq_2", "m_{#gamma#gammaq,2} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
-    make_plot(c1, vFiles[i], vNames[i], "hMassTop_Hq_3", "m_{#gamma#gammaq,3} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    //make_plot(c1, vFiles[i], vNames[i], "hMassTop_Hq_3", "m_{#gamma#gammaq,3} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
 
     make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_1", "m_{bqq,1} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_2", "m_{bqq,2} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
-    make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_3", "m_{bqq,3} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    //make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_3", "m_{bqq,3} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
  
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, vSigs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);

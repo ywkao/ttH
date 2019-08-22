@@ -26,7 +26,7 @@ import ks_test
 def train(args, config):
   f = h5py.File(args.input, "r")
   if len(list(config.keys())) == 0:
-      config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 100, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.25, "learning_rate" : 0.001, "start_batch" : 512, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False, "epsilon" : 1e-08} 
+      config = {"n_nodes_dense_1" : 300, "n_nodes_dense_2" : 200, "n_dense_1" : 1, "n_dense_2" : 4, "n_nodes_lstm" : 150, "n_lstm" : 3, "maxnorm" : 3, "dropout_rate" : 0.1, "learning_rate" : 0.001, "start_batch" : 1024, "batch_norm" : True, "batch_momentum" : 0.99, "layer_norm" : False, "epsilon" : 1e-08} 
 
 
   #if args.channel == "Hadronic" and "fcnc" in args.input.lower(): # convergence issues in FCNC Hadronic DNN
@@ -89,7 +89,7 @@ def train(args, config):
 
   # DNN Helper
   metadata = { "input" : args.input, "config" : config, "preprocess_scheme" : args.preprocess_scheme if args.preprocess_scheme else "none"}
-  dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.channel + "_" + args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data, mass_data = mass_data, metadata = metadata)
+  dnn = dnn_helper.DNN_Helper(features_train = dnn_features_train, features_validation = dnn_features_validation, features_data = dnn_features_data, tag = args.channel + "_" + args.tag, evt_data = evt_data, run_data = run_data, lumi_data = lumi_data, mass_data = mass_data, metadata = metadata, curriculum_learn = False)
   if args.no_bootstrap:
     dnn.n_bootstrap = 0
 

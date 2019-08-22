@@ -201,3 +201,6 @@ Submitting ttH Babies version v1.7 using skims in /hadoop/cms/store/user/smay/tt
 Date: 2019-06-18 02:32:39.324093 
 Submitting ttH Babies version v1.8 using skims in /hadoop/cms/store/user/smay/ttH/MicroAOD/RunII and commit 787a249e4a7a3caa0c49bd6f7c54295726fae71d of tth_dev_runII branch of flashgg
 
+Date: 2019-08-08 12:37:54.890217 
+Submitting ttH Babies version test_workflow_8Aug2019 using skims in /hadoop/cms/store/user/smay/ttH/MicroAOD/RunII and commit 832ca8de2b0bbc654fc3f9fed8ac9c27ccda0a2b of tth_dev_runII branch of flashgg
+

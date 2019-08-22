@@ -71,18 +71,23 @@ class DNN_Helper:
     self.n_bootstrap = kwargs.get('n_bootstrap', 0)
     self.max_epochs = kwargs.get('max_epochs', 25)
 
+    self.curriculum_learn = kwargs.get('curriculum_learn', False)
+
     if 'tag' in kwargs:
       self.save_name = "dnn_weights/" + self.tag + "_weights_{epoch:02d}.hdf5"
       self.callbacks = [keras.callbacks.ModelCheckpoint(self.save_name)]
     else:
       self.callbacks = []
 
-    self.metadata["weights"] = self.tag + "_weights.hdf5"
-    if self.metadata["preprocess_scheme"] != "none":
-      with open(self.metadata["preprocess_scheme"], "r") as f_in:
-        self.metadata["preprocess_scheme"] = json.load(f_in)
-    with open("dnn_weights/metadata_" + self.tag + ".json", "w") as f_out:
-      json.dump(self.metadata, f_out, indent=4, sort_keys=True)
+    self.train_mode = kwargs.get('train_mode', True)
+
+    if self.train_mode:
+        self.metadata["weights"] = self.tag + "_weights.hdf5"
+        if self.metadata["preprocess_scheme"] != "none":
+          with open(self.metadata["preprocess_scheme"], "r") as f_in:
+            self.metadata["preprocess_scheme"] = json.load(f_in)
+        with open("dnn_weights/metadata_" + self.tag + ".json", "w") as f_out:
+          json.dump(self.metadata, f_out, indent=4, sort_keys=True)
 
     self.n_objects = len(self.features_validation.objects[0])
     self.n_object_features = len(self.features_validation.objects[0][0])
@@ -144,6 +149,7 @@ class DNN_Helper:
       sum_neg_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 0)
       sum_pos_weights = utils.sum_of_weights_v2(self.features_train.weights, self.features_train.label, 1)
       print(("Sum of weights after scaling: ", sum_pos_weights, sum_neg_weights))
+      print(("Sum of weights in validation set ", utils.sum_of_weights_v2(self.features_validation.weights, self.features_validation.label, 1), utils.sum_of_weights_v2(self.features_validation.weights, self.features_validation.label, 0)))
 
     for i in range(n_epochs):
       self.model.fit(self.features_train.features, self.features_train.label, epochs = 1, batch_size = self.batch_size_train, sample_weight = self.features_train.weights, callbacks = self.callbacks)
@@ -173,7 +179,8 @@ class DNN_Helper:
       with open("dnn_weights/" + self.tag + "_model_architecture_%d.json" % i, "w") as f_out:
           f_out.write(self.model.to_json())
 
-    return auc_train, auc
+    rocs = { "fpr_train" : fpr_train, "tpr_train" : tpr_train, "thresh_train" : thresh_train, "fpr_validation" : fpr_validation, "tpr_validation" : tpr_validation, "thresh_validation" : thresh_validation }
+    return auc_train, auc, rocs
     
   def train_with_early_stopping(self):
     best_auc = 0.5
@@ -183,7 +190,7 @@ class DNN_Helper:
     epochs = 1
     bad_epochs = 0
     while keep_training:
-      auc_train, auc = self.train(epochs, self.batch_size_train)
+      auc_train, auc, rocs = self.train(epochs, self.batch_size_train)
       improvement = ((1-best_auc)-(1-auc))/(1-best_auc)
       overfit = (auc_train - auc) / auc_train
       if improvement > 0.01:
@@ -206,18 +213,30 @@ class DNN_Helper:
           print(("Improvement in (1-AUC) of %.3f percent. Can't increase batch size anymore" % (improvement*100.))) 
           bad_epochs = 0
           best_auc = auc
-      elif improvement < 0 and overfit < 0.01 and bad_epochs < 3:
-          print (("Overfitting by less than 1%, continue training"))
-          bad_epochs += 1
+      #elif improvement < 0 and overfit < 0.01 and bad_epochs < 3:
+      #    print (("Overfitting by less than 1%, continue training"))
+      #    bad_epochs += 1
       else:
           print("AUC did not improve and we can't increase batch size anymore. Stopping training.")
           keep_training = False
       if self.n_epochs >= self.max_epochs:
           print("Have already trained for 25 epochs. Stopping training.")
           keep_training = False
+      if self.curriculum_learn:
+          value, idx = utils.find_nearest(rocs["tpr_train"], 0.90)
+          cut = rocs["thresh_train"][idx]
+          good_indices = numpy.where(self.predictions["train"] > cut)
+          self.features_train.features[0] = self.features_train.features[0][good_indices]
+          self.features_train.features[1] = self.features_train.features[1][good_indices]
+          self.features_train.global_features = self.features_train.global_features[good_indices]
+          self.features_train.objects = self.features_train.objects[good_indices]
+          self.features_train.label = self.features_train.label[good_indices]
+          self.features_train.weights = self.features_train.weights[good_indices]
+          self.prepped = False
 
-    auc, auc_unc, blah, blah, blah = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 50)
-    auc_train, auc_unc_train, blah, blah, blah = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, 50)
+
+    auc, auc_unc, fpr, tpr, thresh = utils.auc_and_unc(self.features_validation.label, self.predictions["validation"], self.features_validation.weights, 50)
+    auc_train, auc_unc_train, fpr_train, tpr_train, threshd_train = utils.auc_and_unc(self.features_train.label, self.predictions["train"], self.features_train.weights, 50)
     self.auc_unc["validation"] = auc_unc
     self.auc_unc["train"] = auc_unc_train
 

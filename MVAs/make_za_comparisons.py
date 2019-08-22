@@ -47,11 +47,12 @@ ax1 = fig.add_subplot(111)
 for i in range(len(files)):
   print("Data")
   print((numpy.max(files[i]["za_data"]), " +/- ", files[i]["za_unc_data"][numpy.argmax(files[i]["za_data"])]))
+  print files[i]["za_data"]
   print((files[i]["za_data"][len(files[i]["za_data"])/2], " +/- ", files[i]["za_unc_data"][len(files[i]["za_data"])/2]))
   ax1.plot(files[i]["signal_data"], files[i]["za_data"], label = labels[i], color = colors[i])
   ax1.fill_between(files[i]["signal_data"], files[i]["za_data"] - files[i]["za_unc_data"], files[i]["za_data"] + files[i]["za_unc_data"], color = colors[i], alpha = 0.25)
   plt.xlabel('# Signal Events')
-  plt.gca().set_xlim(left=2)
+  plt.gca().set_xlim(left=2.5)
   ax1.set_ylabel('Significance (Z_A)')
   ax1.legend(loc='lower left')
 

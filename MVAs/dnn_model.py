@@ -2,10 +2,10 @@
 import keras_layer_normalization
 
 import tensorflow as tf
-#try:
-import tensorflow.keras as keras
-#except:
-#    import keras
+try:
+    import tensorflow.keras as keras
+except:
+    import keras
 
 def standard(max_objects, n_features):
   input_objects = keras.layers.Input(shape=(max_objects, n_features), name = 'input')

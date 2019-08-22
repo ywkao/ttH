@@ -113,31 +113,31 @@ else:
     non_resonant_train_selection = ""
 
 if args.fcnc_hut:
-    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, non_resonant_train_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-    selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, non_resonant_train_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
     selection_final_fit      = '((process_id_ == 2 && rand_ < 0.01))' # dummy selection
 
 elif args.fcnc_hct:
-    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, non_resonant_train_selection, "&& process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-    selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, non_resonant_train_selection, "&& process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
     selection_final_fit      = '((process_id_ == 2 && rand_ < 0.01))' # dummy selection
 
 elif args.ttH_vs_tH:
-  selection_train      = '((label_ == 0%s%s && (process_id_ == 11 || process_id_ == 12)) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+  selection_train      = '((label_ == 0%s%s && (process_id_ == 11 || process_id_ == 12)) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
-  selection_validation = '((label_ == 0%s%s && (process_id_ == 11 || process_id_ == 12)) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+  selection_validation = '((label_ == 0%s%s && (process_id_ == 11 || process_id_ == 12)) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
   selection_final_fit      = '((label_ == 1 && signal_mass_label_ == 0))'
 
 else:
-  selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+  selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
   if args.one_mass_point:
-    selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
-  selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+  selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
   selection_final_fit      = '((label_ == 1 && signal_mass_label_ == 0))' 
 
@@ -203,7 +203,7 @@ if do_dnn:
     dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = utils.create_array(features_final_fit, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features_final_fit["objects_"]), model["preprocess_scheme"]))
     dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = utils.create_array(features, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features["objects_"]), model["preprocess_scheme"]))
 
-    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, metadata = model, weights_file = "dnn_weights/" + model["weights"])
+    dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, metadata = model, weights_file = "dnn_weights/" + model["weights"], train_mode = False)
     #dnn.predict()
     #dnn_predictions.append([dnn.predictions["train"], dnn.predictions["validation"], dnn.predictions["data"]])
     dnn_predictions.append(dnn.predict())

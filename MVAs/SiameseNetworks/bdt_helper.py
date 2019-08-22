@@ -35,7 +35,7 @@ class BDT_Helper:
         self.weights_validation = kwargs.get('weights_validation')
 
         self.config = kwargs.get('config', default_config)
-        self.n_round = kwargs.get('n_round', 100)
+        self.n_round = kwargs.get('n_round', 50)
 
         self.metadata = kwargs.get('metadata')
 

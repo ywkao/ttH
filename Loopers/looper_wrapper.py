@@ -22,7 +22,7 @@ if args.fcnc:
   args.tag += "_FCNC"
 
 babies_2016 = [
- 		"DoubleEG_Run2016B-17Jul2018_ver1-v1_MINIAOD_RunII",
+ 		        "DoubleEG_Run2016B-17Jul2018_ver1-v1_MINIAOD_RunII",
                 "DoubleEG_Run2016B-17Jul2018_ver2-v1_MINIAOD_RunII",
                 "DoubleEG_Run2016C-17Jul2018-v1_MINIAOD_RunII",
                 "DoubleEG_Run2016D-17Jul2018-v1_MINIAOD_RunII",
@@ -214,6 +214,7 @@ babies_2018 = [
                 "ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
                 "ttHJetToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
                 "ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
+                "ttHJetToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
                 "ttHJetToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
                 "ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
 
@@ -235,7 +236,7 @@ babies_2018 = [
                 "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
                 "QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII",
 
-		 # tt + X bkgs
+		        # tt + X bkgs
                 "TTGG_0Jets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v2_MINIAODSIM_RunII",
                 "TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII",
                 "TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2_MINIAODSIM_RunII",
@@ -316,7 +317,7 @@ else:
 	command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2018", "_" + str(idx)))    
 	idx += 1
 
-nPar = 36
+nPar = 24
 parallel_utils.submit_jobs(command_list, nPar)
 
 if args.babymaker:
@@ -340,7 +341,7 @@ if args.babymaker:
   master = "MVABaby_ttH%s_%s.root" % (args.channel, args.tag)
 else:
   master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag)
-os.system('hadd -f -k -j 3 %s %s' % (master, target))
+os.system('hadd -f -k -j 12 %s %s' % (master, target))
 
 
 # Cleanup

@@ -293,5 +293,6 @@
     "ttHiggs0PMToGG_M125_13TeV_JHUGenV7011_pythia8" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
     "ttHiggs0M_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
     "ttHiggs0Mf05ph0_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
-    "ttHiggs0PM_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"}
+    "ttHiggs0PM_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
+    "ttHJetToGG_M124_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8"                          : { "xs" : 0.5193,   "br" : 0.002266, "kf" : 1.06, "itype":-124300 , "comment" : "copied from ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8"},
 }

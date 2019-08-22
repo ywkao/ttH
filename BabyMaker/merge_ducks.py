@@ -37,7 +37,7 @@ old_files = glob.glob(destination + "/*.root")
 if len(old_files) > 0:
   os.system("rm %s/*.root" % destination)
 
-nPar = 4
+nPar = 20
 command_list = []
 
 for dir in dirs:

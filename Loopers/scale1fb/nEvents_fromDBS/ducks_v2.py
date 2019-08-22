@@ -73,7 +73,7 @@ for input_json in input_jsons:
     datasets = json.load(f_in)
     for key, dict in datasets["processes"].iteritems():
       if key == "data":
-	continue
+	    continue
       for sample in dict["datasets"]:
         if sample in mc_samples.keys():
           print "%s already found in samples list\n" % sample

@@ -536,9 +536,9 @@ const double qcd_gjets_impute_factor_hadronic_runII = 0.9383634106686037;
 const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
 */
 // No cut on p_T/m_gg
-const double diphoton_factor_hadronic_runII = 1.2247879210012904;
-const double gjets_factor_hadronic_runII    = 1.8330524459247017;
-const double qcd_factor_hadronic_runII      = 2.0797761555731786;
+const double diphoton_factor_hadronic_runII = 1.233076855887245;
+const double gjets_factor_hadronic_runII    = 2.081601597627392;
+const double qcd_factor_hadronic_runII      = 2.5892320260734283;
 
 //v1.5
 //const double qcd_gjets_impute_factor_hadronic_runII = 0.9433630221924071; 
@@ -945,7 +945,7 @@ bool is_low_stats_process(TString currentFileTitle) {
 
 int categorize_signal_sample(TString currentFileTitle) {
   if (currentFileTitle.Contains("ttHJet")) {
-    if (currentFileTitle.Contains("M125")) { // save for fgg final fit purposes
+    if (currentFileTitle.Contains("M125") || currentFileTitle.Contains("M120") || currentFileTitle.Contains("M130")) { // save for fgg final fit purposes
       return 0; 
     }
     else if (currentFileTitle.Contains("M127")) {
