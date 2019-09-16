@@ -24,7 +24,7 @@ echo "[wrapper] linux timestamp = " `date +%s`
 # Set up environment #
 ######################
 
-export SCRAM_ARCH=slc6_amd64_gcc530
+export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 # Untar
@@ -33,19 +33,22 @@ tar -xvf package.tar.gz
 # Build
 cd $CMSSW_VER/src/flashgg
 echo "[wrapper] in directory: " ${PWD}
-cd ../..
-cd src/flashgg
+
+eval `scramv1 runtime -sh`
 echo "[wrapper] copying data from /eos"
-xrdcp root://eoscms.cern.ch//eos/cms/store/group/phys_higgs/cmshgg/flashgg-data/Taggers/data/resTop_xgb_csv_order_deepCTag.xml Taggers/data/ 
+source MetaData/scripts/fggPopulateDataDir_auto.sh
+echo "[wrapper] done copying, ls-ing dirs now"
+ls -altrh Systematics/data
+ls -altrh Taggers/data
+ls -atlrh MicroAOD/data
 
 echo "[wrapper] attempting to build"
-eval `scramv1 runtime -sh`
 scramv1 b ProjectRename
 scram b -j1
 eval `scramv1 runtime -sh`
 cd $CMSSW_BASE/src/flashgg
-export PYTHONPATH=$PYTHONPATH:$CMSSW_BASE/src/flashgg/Taggers/test/
-
+pip install --user htcondor
+#export PYTHONPATH=$PYTHONPATH:$CMSSW_BASE/src/flashgg/Taggers/test/
 
 # Create tag file
 echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} ${ARGS}"

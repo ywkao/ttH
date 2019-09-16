@@ -140,7 +140,7 @@ fi
 
 if [ "$CMSSW_VER" = "105X" ]; then
   # Set up CMSSW 105X
-  export SCRAM_ARCH=slc6_amd64_gcc700
+  export SCRAM_ARCH=slc7_amd64_gcc700
   if [ ! -d CMSSW_10_5_0 ]; then
     cmsrel CMSSW_10_5_0
     cd CMSSW_10_5_0/src

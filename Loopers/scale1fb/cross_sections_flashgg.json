@@ -295,4 +295,16 @@
     "ttHiggs0Mf05ph0_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
     "ttHiggs0PM_M-125_13TeV-JHUGenV7" : { "xs" : 0.5071, "br" :  0.00227, "comment" : "copied from nominal ttH M125 sample"},
     "ttHJetToGG_M124_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8"                          : { "xs" : 0.5193,   "br" : 0.002266, "kf" : 1.06, "itype":-124300 , "comment" : "copied from ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8"},
+    "GluGluHToGG_M120_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 52.2200,   "br" : 0.002218, "kf" : 1.06, "itype":-120000 },
+    "GluGluHToGG_M124_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 49.2700,   "br" : 0.002266, "kf" : 1.06, "itype":-124000 },
+    "GluGluHToGG_M126_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 47.8900,   "br" : 0.00227, "kf" : 1.06, "itype":-126000 },
+    "GluGluHToGG_M127_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 47.2300,   "br" : 0.002267, "kf" : 1.06, "itype":-127000 },
+    "GluGluHToGG_M130_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 45.3100,   "br" : 0.002238, "kf" : 1.06, "itype":-130000 },
+    "GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8" : { "xs" : 48.5800,   "br" : 0.00227, "kf" : 1.06, "itype":-125000 },
+    "THQ_ctcvcp_HToGG_M123_13TeV-madgraph-pythia8_TuneCP5" : { "xs" : 0.07425, "br" : 0.00227 },
+    "THQ_ctcvcp_HToGG_M124_13TeV-madgraph-pythia8_TuneCP5" : { "xs" : 0.07425, "br" : 0.00227 },
+    "THQ_ctcvcp_HToGG_M126_13TeV-madgraph-pythia8_TuneCP5" : { "xs" : 0.07425, "br" : 0.00227 },
+    "THQ_ctcvcp_HToGG_M127_13TeV-madgraph-pythia8_TuneCP5" : { "xs" : 0.07425, "br" : 0.00227 },
+    "THQ_ctcvcp_HToGG_M130_13TeV-madgraph-pythia8_TuneCP5" : { "xs" : 0.07425, "br" : 0.00227 },
+    "THQ_ctcvcp_HToGG_M120_13TeV-madgraph-pythia8_TuneCP5" : { "xs" : 0.07425, "br" : 0.00227 } 
 }
