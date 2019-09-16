@@ -479,6 +479,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       }
 
       vProcess[processId]->fill_histogram("htthMVA_RunII", tthMVA_RunII(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf", -log(1-tthMVA_RunII()), evt_weight, vId);
       vProcess[processId]->fill_histogram("hLeptonicMVA", mva_value, evt_weight, vId);
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hDiphotonSumPt", dipho_sumpt(), evt_weight, vId);

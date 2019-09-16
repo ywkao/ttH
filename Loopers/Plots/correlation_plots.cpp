@@ -63,7 +63,9 @@ int main(int argc, char* argv[]) {
   TCanvas* c1 = new TCanvas("c1", "histos", 800, 800);
   string filename = "correlation_plots.pdf";
 
-  /*
+  make_correlation_plot(c1, filename, f, "DiPhoton", "hMass_MVAScore", "m_{#gamma#gamma} [GeV]", "MVA Score", 1);
+
+  /* 
   make_correlation_plot(c1, filename, f, "GammaJets", "hFakePhotonIDMVA_NJets", "#gamma ID MVA (Fakes)", "N_{jets}", 0);
   make_correlation_plot(c1, filename, f, "GammaJets", "hFakePhotonIDMVA_MaxBTag", "#gamma ID MVA (Fakes)", "Max B-tag", 1);
   make_correlation_plot(c1, filename, f, "GammaJets", "hFakePhotonIDMVA_2ndMaxBTag", "#gamma ID MVA (Fakes)", "2nd Max B-tag", 1);
@@ -83,11 +85,13 @@ int main(int argc, char* argv[]) {
   make_correlation_plot(c1, filename, f, "GammaJets", "hPhotonSubleadIDMVA_SubleadEta", "Sublead #gamma ID MVA", "Sublead #gamma |#eta|", 2);
   */
 
+  /*
   make_correlation_plot(c1, filename, f, "Data", "hBDT_LeadPtoM", "MVA Score", "Lead #gamma p_{T}/m_{#gamma#gamma}", 0);
   make_correlation_plot(c1, filename, f, "Data", "hBDT_SubleadPtoM", "MVA Score", "Sublead #gamma p_{T}/m_{#gamma#gamma}", 1);
   make_correlation_plot(c1, filename, f, "Data", "hMass_LeadPtoM", "m_{#gamma#gamma} [GeV]", "Lead #gamma p_{T}/m_{#gamma#gamma}", 1);
   make_correlation_plot(c1, filename, f, "Data", "hMass_SubleadPtoM", "m_{#gamma#gamma} [GeV]", "Sublead #gamma p_{T}/m_{#gamma#gamma}", 1); 
   make_correlation_plot(c1, filename, f, "Data", "hMass_LeadPtoM_afterBDTCut", "m_{#gamma#gamma} [GeV]", "Lead #gamma p_{T}/m_{#gamma#gamma}", 1);
   make_correlation_plot(c1, filename, f, "Data", "hMass_SubleadPtoM_afterBDTCut", "m_{#gamma#gamma} [GeV]", "Sublead #gamma p_{T}/m_{#gamma#gamma}", 2);
+  */
   return 0;
 }

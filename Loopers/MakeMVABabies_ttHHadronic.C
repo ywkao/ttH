@@ -1,7 +1,7 @@
 #include "MakeMVABabies_ttHHadronic.h"
 #include "ScanChain_ttHHadronic.h"
 
-void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool fcnc = false, bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool fcnc = false, bool blind = false, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -475,6 +475,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       }
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId, fcnc);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
+      signal_mass_category_ = categorize_signal_mass_label(currentFileTitle);
 
       tth_2017_reference_mva_ = tthMVA();
 

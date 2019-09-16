@@ -460,6 +460,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 	  vProcess[processId]->fill_histogram("hMass_FailPtToM_AfterBDTCut", mass(), evt_weight, vId);
       }
 
+      vProcess[processId]->fill_2D_histogram("hMass_MVAScore", mass(), tthMVA_RunII(), evt_weight, vId);
+
       cout.setf(ios::fixed);
       cout << std::setprecision(6);
 
@@ -723,6 +725,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, vId);
       vProcess[processId]->fill_histogram("htthMVA", tthMVA(), evt_weight, vId);
       vProcess[processId]->fill_histogram("htthMVA_RunII", tthMVA_RunII(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf", -log(1-tthMVA_RunII()), evt_weight, vId);
 
       if (lead_photon_type() == 1)
         vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", maxID, evt_weight, vId);

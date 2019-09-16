@@ -159,6 +159,8 @@ void add_variables(vector<Process*> v, TString tag) {
 
     v[i]->add_histogram("htthMVA", 50, -1, 1);
     v[i]->add_histogram("htthMVA_RunII", 50, 0, 1);
+    v[i]->add_histogram("htthMVA_RunII_transf", 50, 0, 8);
+
     v[i]->add_histogram("hMaxBTag", 50, 0, 1);
     v[i]->add_histogram("hSecondMaxBTag", 50, 0, 1);  
 
@@ -227,6 +229,8 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_2D_histogram("hMass_SubleadPtoM", 20, 100, 180, 20, 0, 2);
     v[i]->add_2D_histogram("hMass_LeadPtoM_afterBDTCut", 20, 100, 180, 20, 0, 2);
     v[i]->add_2D_histogram("hMass_SubleadPtoM_afterBDTCut", 20, 100, 180, 20, 0, 2);
+
+    v[i]->add_2D_histogram("hMass_MVAScore", 20, 100, 180, 20, 0, 1);
 
     v[i]->add_histogram("hPhotonMaxIDMVA_NJets2", 30, -1, 1);
     v[i]->add_histogram("hPhotonMinIDMVA_NJets2", 30, -1, 1);
@@ -317,7 +321,7 @@ vector<TH1D*> generate_1Dhist_vector(TString name, int length, int nBins, float 
 }
 
 int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
-  if (currentFileTitle.Contains("ttHJet")) // && currentFileTitle.Contains("M125"))
+  if (currentFileTitle.Contains("ttHJet") || currentFileTitle.Contains("ttHToGG")) // && currentFileTitle.Contains("M125"))
     return 0;
   else if (currentFileTitle.Contains("DY"))
     return 1;
@@ -956,6 +960,25 @@ int categorize_signal_sample(TString currentFileTitle) {
   }
   else
     return 0;
+}
+
+int categorize_signal_mass_label(TString currentFileTitle) {
+    if (currentFileTitle.Contains("M120"))
+        return 120;
+    else if (currentFileTitle.Contains("M123"))
+        return 123;
+    else if (currentFileTitle.Contains("M124"))
+        return 124;
+    else if (currentFileTitle.Contains("M125"))
+        return 125;
+    else if (currentFileTitle.Contains("M126"))
+        return 126;
+    else if (currentFileTitle.Contains("M127"))
+        return 127;
+    else if (currentFileTitle.Contains("M130"))
+        return 130;
+    else
+        return -1;
 }
 
 int categorize_photons(int leadGenMatch, int subleadGenMatch) {

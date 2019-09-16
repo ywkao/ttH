@@ -993,7 +993,7 @@ void Comparison::annotate_plot()
   }
   vector<TLine*> vLV(mVVLines.size());
   for (int i=0; i<mVVLines.size(); i++) {
-    vLV[i] = new TLine(mVVLines[i], mYLimRange[0], mVVLines[i], mYLimRange[1]);
+    vLV[i] = new TLine(mVVLines[i], mYLimRange[0], mVVLines[i], exp(log(mYLimRange[1])/2.));
     vLV[i]->SetLineWidth(2);
     vLV[i]->SetLineStyle(2);
     vLV[i]->Draw("SAME");

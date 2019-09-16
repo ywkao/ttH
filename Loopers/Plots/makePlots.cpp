@@ -365,6 +365,18 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_rat_label("#frac{Data}{MC}");
       c->set_y_label("Events");
     }
+
+    if (hist_name == "htthMVA_RunII_transf") {
+        vector<double> vlines;
+        if (output.Contains("Leptonic"))
+            vlines = { 0.8435, 0.9346, 0.9625, 0.9890 };
+        else if (output.Contains("Hadronic"))
+            vlines = { 0.9675, 0.9937, 0.9971, 0.9991 };
+        for (unsigned int i = 0; i < vlines.size(); i++)
+            vlines[i] = -log(1-vlines[i]);
+        c->give_vlines(vlines);
+    }
+
     c->set_lumi(lumi);
     //c->set_log_rat();
     c->set_rat_lim_range({0.0, 2.0});
@@ -876,7 +888,9 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_1", "m_{bqq,1} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_2", "m_{bqq,2} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
     //make_plot(c1, vFiles[i], vNames[i], "hMassTop_qqq_3", "m_{bqq,3} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
- 
+
+    vInfo.erase(vInfo.end() - 2, vInfo.end());
+    make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf", "MVA Score (transformed)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, vSigs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
   }
