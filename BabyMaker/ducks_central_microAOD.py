@@ -28,7 +28,7 @@ if not args.soft_rerun:
   os.system("rm -rf tasks/*" + args.tag + "*")
   os.system("rm package.tar.gz")
 
-  os.system("XZ_OPT=-3 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' --exclude *MicroAOD/BatchSubmit/* --exclude *MetaData/data/Era201*/*.json --exclude *Taggers/data/* --exclude *MicroAOD/data/* --exclude *Systematics/data/* -f package.tar.gz %s" % cmssw_ver)
+  os.system("XZ_OPT=-5 tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' --exclude *MicroAOD/BatchSubmit/* --exclude *MetaData/data/Era201*/*.json --exclude *Taggers/data/* --exclude *MicroAOD/data/* --exclude *Systematics/data/* -f package.tar.gz %s" % cmssw_ver)
   os.system("for task in `ls -1 -d tasks/*%s*/`; do echo cp package.tar.gz $task/package.tar.gz; cp package.tar.gz $task/package.tar.gz; done" % args.tag) # make sure we overwrite any previously existing tar files
 
   with open("versions.txt", "a") as fout:
@@ -51,7 +51,16 @@ samples = get_samples_from_catalogs(catalogs)
 #summarize_samples(samples.copy())
 
 def fpo(sample):
-    return 1
+    if "ttHJetToGG" in sample or "ttHToGG" in sample:
+        return 1
+    elif any([x in sample for x in ["THQ", "THW", "VBF", "GluGluHToGG", "VHToGG", "bbH", "TTGG"]]):
+        return 10
+    elif "DiPhoton" in sample:
+        return 30
+    elif any([x in sample for x in ["DoubleEG", "EGamma"]]):
+        return 250
+    else:
+        return 100
 
 class file:
     def __init__(self, **kwargs):
@@ -67,8 +76,10 @@ while True:
     for sample in samples.keys():
         #if not sample == "ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8":
         #    continue
+        #if not "GJets_HT-200To400" in sample:
+        #    continue
         for year in samples[sample].keys():
-            if year == "xs":
+            if year == "xs" or year == "-1":
                 continue
             for production in samples[sample][year].keys():
                 if production == "scale1fb":

@@ -63,4 +63,5 @@ echo "[wrapper] output root files are currently: "
 ls -lh *.root
 
 # Copy output
+eval `scram unsetenv -sh` # have to add this because CMSSW and gfal interfere with each other or something...
 gfal-copy -p -f -t 4200 --verbose file://`pwd`/${OUTPUTFILENAME}.root gsiftp://gftp.t2.ucsd.edu/${OUTPUTDIR}/${OUTPUTFILENAME}_${INDEX}.root --checksum ADLER32
