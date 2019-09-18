@@ -9,7 +9,7 @@ from metis.Sample import Sample
 from metis.CondorTask import CondorTask
 from metis.StatsParser import StatsParser
 
-from utils import *
+from flashgg_utils import *
 
 import argparse
 parser = argparse.ArgumentParser()
