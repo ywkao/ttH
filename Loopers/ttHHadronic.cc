@@ -429,6 +429,10 @@ void ttHHadronic::Init(TTree *tree) {
   if (tthMVA_branch) tthMVA_branch->SetAddress(&tthMVA_);
   tthMVA_RunII_branch = tree->GetBranch("tthMVA_RunII");
   if (tthMVA_RunII_branch) tthMVA_RunII_branch->SetAddress(&tthMVA_RunII_);
+  dnn_score_dipho_branch = tree->GetBranch("dnn_score_dipho");
+  if (dnn_score_dipho_branch) dnn_score_dipho_branch->SetAddress(&dnn_score_dipho_);
+  dnn_score_ttgg_branch = tree->GetBranch("dnn_score_ttgg");
+  if (dnn_score_ttgg_branch) dnn_score_ttgg_branch->SetAddress(&dnn_score_ttgg_);
   rho_branch = tree->GetBranch("rho");
   if (rho_branch) rho_branch->SetAddress(&rho_);
   nvtx_branch = tree->GetBranch("nvtx");
@@ -664,6 +668,8 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   bjet2_csv_isLoaded = false;
   tthMVA_isLoaded = false;
   tthMVA_RunII_isLoaded = false;
+  dnn_score_dipho_isLoaded = false;
+  dnn_score_ttgg_isLoaded = false;
   rho_isLoaded = false;
   nvtx_isLoaded = false;
   event_isLoaded = false;
@@ -888,6 +894,8 @@ void ttHHadronic::LoadAllBranches() {
   if (bjet2_csv_branch != 0) bjet2_csv();
   if (tthMVA_branch != 0) tthMVA();
   if (tthMVA_RunII_branch != 0) tthMVA_RunII();
+  if (dnn_score_dipho_branch != 0) dnn_score_dipho();
+  if (dnn_score_ttgg_branch != 0) dnn_score_ttgg();
   if (rho_branch != 0) rho();
   if (nvtx_branch != 0) nvtx();
   if (event_branch != 0) event();
@@ -3654,6 +3662,32 @@ const float &ttHHadronic::tthMVA_RunII() {
   return tthMVA_RunII_;
 }
 
+const float &ttHHadronic::dnn_score_dipho() {
+  if (not dnn_score_dipho_isLoaded) {
+    if (dnn_score_dipho_branch != 0) {
+      dnn_score_dipho_branch->GetEntry(index);
+    } else {
+      printf("branch dnn_score_dipho_branch does not exist!\n");
+      exit(1);
+    }
+    dnn_score_dipho_isLoaded = true;
+  }
+  return dnn_score_dipho_;
+}
+
+const float &ttHHadronic::dnn_score_ttgg() {
+  if (not dnn_score_ttgg_isLoaded) {
+    if (dnn_score_ttgg_branch != 0) {
+      dnn_score_ttgg_branch->GetEntry(index);
+    } else {
+      printf("branch dnn_score_ttgg_branch does not exist!\n");
+      exit(1);
+    }
+    dnn_score_ttgg_isLoaded = true;
+  }
+  return dnn_score_ttgg_;
+}
+
 const float &ttHHadronic::rho() {
   if (not rho_isLoaded) {
     if (rho_branch != 0) {
@@ -3993,6 +4027,8 @@ const float &bjet1_csv() { return cms3.bjet1_csv(); }
 const float &bjet2_csv() { return cms3.bjet2_csv(); }
 const float &tthMVA() { return cms3.tthMVA(); }
 const float &tthMVA_RunII() { return cms3.tthMVA_RunII(); }
+const float &dnn_score_dipho() { return cms3.dnn_score_dipho(); }
+const float &dnn_score_ttgg() { return cms3.dnn_score_ttgg(); }
 const float &rho() { return cms3.rho(); }
 const int &nvtx() { return cms3.nvtx(); }
 const unsigned long long &event() { return cms3.event(); }

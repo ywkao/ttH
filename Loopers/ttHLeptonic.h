@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("merged_babies/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2_MINIAODSIM_RunII_ttH_Babies_RunIIv1.7/merged_ntuple_1.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
+// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/GluGluHToGG_M127_13TeV_amcatnloFXFX_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_ttH_Babies_RunIIv2.2/merged_ntuple_1.root", "tthLeptonicTagDumper/trees/tth_13TeV_all", "ttHLeptonic", "tas", "cms3")
 
 #ifndef ttHLeptonic_H
 #define ttHLeptonic_H
@@ -730,6 +730,9 @@ class ttHLeptonic {
   float    jet_energy15_;
   TBranch *jet_energy15_branch;
   bool     jet_energy15_isLoaded;
+  float    dnn_score_ttgg_;
+  TBranch *dnn_score_ttgg_branch;
+  bool     dnn_score_ttgg_isLoaded;
   float    rho_;
   TBranch *rho_branch;
   bool     rho_isLoaded;
@@ -994,6 +997,7 @@ void LoadAllBranches();
   const float &jet_energy13();
   const float &jet_energy14();
   const float &jet_energy15();
+  const float &dnn_score_ttgg();
   const float &rho();
   const int &nvtx();
   const unsigned long long &event();
@@ -1247,6 +1251,7 @@ namespace tas {
   const float &jet_energy13();
   const float &jet_energy14();
   const float &jet_energy15();
+  const float &dnn_score_ttgg();
   const float &rho();
   const int &nvtx();
   const unsigned long long &event();

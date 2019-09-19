@@ -477,6 +477,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (jet_energy14_branch) jet_energy14_branch->SetAddress(&jet_energy14_);
   jet_energy15_branch = tree->GetBranch("jet_energy15");
   if (jet_energy15_branch) jet_energy15_branch->SetAddress(&jet_energy15_);
+  dnn_score_ttgg_branch = tree->GetBranch("dnn_score_ttgg");
+  if (dnn_score_ttgg_branch) dnn_score_ttgg_branch->SetAddress(&dnn_score_ttgg_);
   rho_branch = tree->GetBranch("rho");
   if (rho_branch) rho_branch->SetAddress(&rho_);
   nvtx_branch = tree->GetBranch("nvtx");
@@ -736,6 +738,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   jet_energy13_isLoaded = false;
   jet_energy14_isLoaded = false;
   jet_energy15_isLoaded = false;
+  dnn_score_ttgg_isLoaded = false;
   rho_isLoaded = false;
   nvtx_isLoaded = false;
   event_isLoaded = false;
@@ -984,6 +987,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (jet_energy13_branch != 0) jet_energy13();
   if (jet_energy14_branch != 0) jet_energy14();
   if (jet_energy15_branch != 0) jet_energy15();
+  if (dnn_score_ttgg_branch != 0) dnn_score_ttgg();
   if (rho_branch != 0) rho();
   if (nvtx_branch != 0) nvtx();
   if (event_branch != 0) event();
@@ -4062,6 +4066,19 @@ const float &ttHLeptonic::jet_energy15() {
   return jet_energy15_;
 }
 
+const float &ttHLeptonic::dnn_score_ttgg() {
+  if (not dnn_score_ttgg_isLoaded) {
+    if (dnn_score_ttgg_branch != 0) {
+      dnn_score_ttgg_branch->GetEntry(index);
+    } else {
+      printf("branch dnn_score_ttgg_branch does not exist!\n");
+      exit(1);
+    }
+    dnn_score_ttgg_isLoaded = true;
+  }
+  return dnn_score_ttgg_;
+}
+
 const float &ttHLeptonic::rho() {
   if (not rho_isLoaded) {
     if (rho_branch != 0) {
@@ -4425,6 +4442,7 @@ const float &jet_energy12() { return cms3.jet_energy12(); }
 const float &jet_energy13() { return cms3.jet_energy13(); }
 const float &jet_energy14() { return cms3.jet_energy14(); }
 const float &jet_energy15() { return cms3.jet_energy15(); }
+const float &dnn_score_ttgg() { return cms3.dnn_score_ttgg(); }
 const float &rho() { return cms3.rho(); }
 const int &nvtx() { return cms3.nvtx(); }
 const unsigned long long &event() { return cms3.event(); }
