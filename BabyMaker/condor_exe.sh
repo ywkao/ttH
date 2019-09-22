@@ -28,19 +28,21 @@ export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 # Untar
+#xrdcp root://redirector.t2.ucsd.edu//store/user/smay/ttH/tarballs/FIXME package.tar.gz 
 tar -xvf package.tar.gz
+rm package.tar.gz
 
 # Build
 cd $CMSSW_VER/src/flashgg
 echo "[wrapper] in directory: " ${PWD}
 
 eval `scramv1 runtime -sh`
-echo "[wrapper] copying data from /eos"
-source MetaData/scripts/fggPopulateDataDir_auto.sh
-echo "[wrapper] done copying, ls-ing dirs now"
-ls -altrh Systematics/data
-ls -altrh Taggers/data
-ls -atlrh MicroAOD/data
+#echo "[wrapper] copying data from /eos"
+#source MetaData/scripts/fggPopulateDataDir_auto.sh
+#echo "[wrapper] done copying, ls-ing dirs now"
+#ls -altrh Systematics/data
+#ls -altrh Taggers/data
+#ls -atlrh MicroAOD/data
 
 echo "[wrapper] attempting to build"
 scramv1 b ProjectRename

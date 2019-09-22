@@ -26,7 +26,7 @@ def choose_production(sample):
     return final_production
 
 def skip_samples(sample):
-    bad_samples = ["DoubleMuon", "SingleElectron", "M60", "M65", "M70", "M75", "M80", "M85", "M90", "M95", "M100", "M105", "M110", "M115", "WminusH", "WplusH", "ggZH_HToGG", "Up", "Down", "PSWeights", "GluGluToHH"]
+    bad_samples = ["DoubleMuon", "M60", "M65", "M70", "M75", "M80", "M85", "M90", "M95", "M100", "M105", "M110", "M115", "WminusH", "WplusH", "ggZH_HToGG", "Up", "Down", "PSWeights", "GluGluToHH"]
     for bad_sample in bad_samples:
         if bad_sample in sample:
             #print "Skipping %s" % sample
@@ -37,7 +37,7 @@ def identify_old_productions(productions, sample):
     if len(productions) == 1:
         return []
 
-    if "EGamma" in sample or "DoubleEG" in sample:
+    if "EGamma" in sample or "DoubleEG" in sample or "SingleElectron" in sample or "DoubleMuon" in sample:
         return []
 
     print "Identifying old productions for %s" % sample 
@@ -93,13 +93,15 @@ def get_samples_from_catalogs(catalogs):
                     if production not in samples[sample_name][year].keys():
                         samples[sample_name][year][production] = { "files" : [], "nevents" : 0, "weights" : 0}
                     for file in info[sample]["files"]:
-                        if file["bad"]:
-                            continue
+                        if "bad" in file.keys():
+                            if file["bad"]:
+                                continue
                         samples[sample_name][year][production]["files"].append(file["name"])
                         samples[sample_name][year][production]["nevents"] += file["nevents"]
                         #if "weights" not in file.keys():
                         #    print file
-                        samples[sample_name][year][production]["weights"] += file["weights"]
+                        if "weights" in file.keys(): 
+                            samples[sample_name][year][production]["weights"] += file["weights"]
     # Get XS's
     for file in ["/home/users/sjmay/ttH/BabyMaker/CMSSW_10_5_0/src/flashgg/MetaData/data/cross_sections.json", "/home/users/sjmay/ttH/Loopers/scale1fb/cross_sections_flashgg.json"]:
         with open(file, "r") as f_in:
