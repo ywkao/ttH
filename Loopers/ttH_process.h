@@ -138,13 +138,13 @@ inline Process::Process(TFile* f, TString name)
   mFile = f;
   f->cd();
   mName = name;
-  mGenLepton = true;
-  mRecoLepton = true;
+  mGenLepton = false;
+  mRecoLepton = false;
   mYear = true;
-  mGenPhoton = true;
-  mGenPhotonDetail = true;
-  mPhotonLocations = true; 
-  mMVACategories = true;
+  mGenPhoton = false;
+  mGenPhotonDetail = false;
+  mPhotonLocations = false; 
+  mMVACategories = false;
 }
 
 inline void Process::add_histogram(TString name, int nBins, double xLow, double xHigh)
@@ -295,15 +295,15 @@ inline void Process::fill_histogram(TString name, double value, double weight, i
   int idx = mMap.find(name)->second;
   mH[idx]->Fill(value, weight);
 
-  if (genLeptonId >= 0)
+  if (genLeptonId >= 0 && mGenLepton)
     mHGenLeptonComp[idx][genLeptonId]->Fill(value, weight);
-  if (genPhotonId >= 0)
+  if (genPhotonId >= 0 && mGenPhoton)
     mHGenPhotonComp[idx][genPhotonId]->Fill(value, weight);
-  if (genPhotonDetailId >= 0)
+  if (genPhotonDetailId >= 0 && mGenPhotonDetail)
     mHGenPhotonDetailComp[idx][genPhotonDetailId]->Fill(value, weight);
-  if (photonLocationId >= 0)
+  if (photonLocationId >= 0 && mPhotonLocations)
     mHPhotonLocations[idx][photonLocationId]->Fill(value, weight);
-  if (mvaCategoryId >= 0)
+  if (mvaCategoryId >= 0 && mMVACategories)
     mHMVACategories[idx][mvaCategoryId]->Fill(value, weight);  
 }
 
@@ -320,19 +320,19 @@ inline void Process::fill_histogram(TString name, double value, double weight, v
   int recoLeptonId = vId.size() > 5 ? vId[5]: -1;
   int yearId = vId.size() > 6 ? vId[6]: -1;
 
-  if (genLeptonId >= 0)
+  if (genLeptonId >= 0  && mGenLepton)
     mHGenLeptonComp[idx][genLeptonId]->Fill(value, weight);
-  if (recoLeptonId >= 0)
+  if (recoLeptonId >= 0 && mRecoLepton)
     mHRecoLeptonComp[idx][recoLeptonId]->Fill(value, weight);
-  if (yearId >= 0)
+  if (yearId >= 0 && mYear)
     mHYearComp[idx][yearId]->Fill(value, weight);
-  if (genPhotonId >= 0)
+  if (genPhotonId >= 0 && mGenPhoton)
     mHGenPhotonComp[idx][genPhotonId]->Fill(value, weight);
-  if (genPhotonDetailId >= 0)
+  if (genPhotonDetailId >= 0 && mGenPhotonDetail)
     mHGenPhotonDetailComp[idx][genPhotonDetailId]->Fill(value, weight);
-  if (photonLocationId >= 0)
+  if (photonLocationId >= 0 && mPhotonLocations)
     mHPhotonLocations[idx][photonLocationId]->Fill(value, weight);
-  if (mvaCategoryId >= 0)
+  if (mvaCategoryId >= 0 && mMVACategories)
     mHMVACategories[idx][mvaCategoryId]->Fill(value, weight);
 }
 
@@ -349,19 +349,19 @@ inline void Process::fill_2D_histogram(TString name, double valueX, double value
   int recoLeptonId = vId.size() > 5 ? vId[5]: -1;
   int yearId = vId.size() > 6 ? vId[6]: -1;
 
-  if (genLeptonId >= 0)
+  if (genLeptonId >= 0 && mGenLepton)
     mHGenLeptonComp_2D[idx][genLeptonId]->Fill(valueX, valueY, weight);
-  if (recoLeptonId >= 0)
+  if (recoLeptonId >= 0 && mRecoLepton)
     mHRecoLeptonComp_2D[idx][recoLeptonId]->Fill(valueX, valueY, weight);
-  if (yearId >= 0)
+  if (yearId >= 0 && mYear)
     mHYearComp_2D[idx][yearId]->Fill(valueX, valueY, weight);
-  if (genPhotonId >= 0)
+  if (genPhotonId >= 0 && mGenPhoton)
     mHGenPhotonComp_2D[idx][genPhotonId]->Fill(valueX, valueY, weight);
-  if (genPhotonDetailId >= 0)
+  if (genPhotonDetailId >= 0 && mGenPhotonDetail)
     mHGenPhotonDetailComp_2D[idx][genPhotonDetailId]->Fill(valueX, valueY, weight);
-  if (photonLocationId >= 0)
+  if (photonLocationId >= 0 && mPhotonLocations)
     mHPhotonLocations_2D[idx][photonLocationId]->Fill(valueX, valueY, weight);
-  if (mvaCategoryId >= 0)
+  if (mvaCategoryId >= 0 && mMVACategories)
     mHMVACategories_2D[idx][mvaCategoryId]->Fill(valueX, valueY, weight); 
 }
 

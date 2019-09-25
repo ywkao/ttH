@@ -1,16 +1,16 @@
 import utils
 import dnn_helper
 import os
-print("GPU with lowest memory %s" % str(utils.pick_gpu_lowest_memory()))
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
-os.environ["CUDA_VISIBLE_DEVICES"] = str(utils.pick_gpu_lowest_memory())
+#print("GPU with lowest memory %s" % str(utils.pick_gpu_lowest_memory()))
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+#os.environ["CUDA_VISIBLE_DEVICES"] = str(utils.pick_gpu_lowest_memory())
 import tensorflow as tf
-config = tf.ConfigProto(log_device_placement=True)
-config.gpu_options.allow_growth = True
-session = tf.Session(config=config)
-
-print(session)
 print(tf.__version__)
+#config = tf.ConfigProto(log_device_placement=True)
+#config.gpu_options.allow_growth = True
+#session = tf.Session(config=config)
+
+#print(session)
 
 import numpy
 import sys

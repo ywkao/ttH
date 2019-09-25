@@ -17,7 +17,7 @@ args = parser.parse_args()
 
 
 if args.runII:
-  base_path = "/home/users/sjmay/ttH/BabyMaker/CMSSW_10_5_0/src/flashgg/MicroAOD/BatchSubmit/"
+  base_path = "/home/users/sjmay/ttH/BabyMaker/CMSSW_10_5_0_old/src/flashgg/MicroAOD/BatchSubmit/"
   input_jsons = [base_path + "datasets_RunIISummer16.json", base_path + "datasets_RunIIFall17.json", base_path + "datasets_RunIIAutumn18.json"]
   output_json = "sum_of_weights_runII.json"
 else:

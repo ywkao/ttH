@@ -891,6 +891,10 @@ int main(int argc, char* argv[])
 
     vInfo.erase(vInfo.end() - 2, vInfo.end());
     make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf", "MVA Score (transformed)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    
+    make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_ttGG", "DNN Score (t#bar{t}H vs. t#bar{t} + #gamma#gamma)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
+    if (tag == "Hadronic")
+       make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_dipho", "DNN Score (t#bar{t}H vs. #gamma#gamma + jets)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx); 
 
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, vSigs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx);
   }

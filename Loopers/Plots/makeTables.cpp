@@ -433,13 +433,13 @@ int main(int argc, char* argv[])
     make_table_std(f, "hNVtx", backgrounds, signals, label, "Year_0");
     make_table_std(f, "hNVtx", backgrounds, signals, label, "Year_1");
     make_table_std(f, "hNVtx", backgrounds, signals, label, "Year_2");
-    make_table_components(f, "hNVtx", backgrounds, signals, label, mYears, "Year");
-    make_table_components(f, "hNVtx", backgrounds, signals, label, mLeptons, "GenLepton");
-    make_table_components(f, "hNVtx", backgrounds, signals, label, mPhotons, "GenPhoton"); 
-    make_table_components(f, "hNVtx", backgrounds, signals, label, mPhotonsDetail, "GenPhotonDetail");
-    make_table_components(f, "hNVtx", backgrounds, signals, label, mPhotonLocations, "PhotonLocations", true);
-    backgrounds.push_back("Data");
-    make_table_components(f, "hNVtx", backgrounds, signals, label, mRecoLeptons, "RecoLepton");
+    //make_table_components(f, "hNVtx", backgrounds, signals, label, mYears, "Year");
+    //make_table_components(f, "hNVtx", backgrounds, signals, label, mLeptons, "GenLepton");
+    //make_table_components(f, "hNVtx", backgrounds, signals, label, mPhotons, "GenPhoton"); 
+    //make_table_components(f, "hNVtx", backgrounds, signals, label, mPhotonsDetail, "GenPhotonDetail");
+    //make_table_components(f, "hNVtx", backgrounds, signals, label, mPhotonLocations, "PhotonLocations", true);
+    //backgrounds.push_back("Data");
+    //make_table_components(f, "hNVtx", backgrounds, signals, label, mRecoLeptons, "RecoLepton");
   } 
 
   else if (files.size() > 1) {

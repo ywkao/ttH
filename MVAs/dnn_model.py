@@ -1,5 +1,5 @@
 #import keras
-import keras_layer_normalization
+#import keras_layer_normalization
 
 import tensorflow as tf
 try:
@@ -182,14 +182,14 @@ def tth_learner(max_objects, n_features, n_global_features, config):
       dense = keras.layers.Dropout(rate = dropout_rate, name = 'dense_dropout2_%d' % i)(dense)
 
   output = keras.layers.Dense(1, activation = 'sigmoid', kernel_initializer = 'lecun_uniform', kernel_constraint = keras.constraints.max_norm(maxnorm), name = 'output')(dense)
-  optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate, epsilon = epsilon)
+  #optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate, epsilon = epsilon)
   #gradients, variables = zip(*optimizer.compute_gradients(loss))
   #gradients, _ = tf.clip_by_global_norm(gradients, 5.0)
   #optimize = optimizer.apply_gradients(zip(gradients, variables))
   #original_optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate, epsilon = epsilon)
   #optimizer = tf.contrib.estimator.clip_gradients_by_norm(optimizer, clip_norm=1.0)
 
-  #optimizer = keras.optimizers.Adam(lr = learning_rate, clipnorm = 5.)
+  optimizer = keras.optimizers.Adam(lr = learning_rate)
 
   model = keras.models.Model(inputs = [input_global, input_objects], outputs = [output])
   model.compile(optimizer = optimizer, loss = 'binary_crossentropy')

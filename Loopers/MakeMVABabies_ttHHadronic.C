@@ -354,6 +354,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       continue;
     }
 
+    /*
     // Dumb hacky stuff to use 2017 MC as placeholders for 2018
     if (already_looped_dipho && currentFileTitle.Contains("DiPhotonJetsBox"))
       mYear = "2018";
@@ -368,6 +369,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       already_looped_qcd = true;
     if (currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM"))
       already_looped_dy = true;
+    */
 
     cout << "mYear: " << mYear << endl;
     int yearId = mYear == "2016" ? 0 : (mYear == "2017" ? 1 : (mYear == "2018" ? 2 : -1));

@@ -308,6 +308,9 @@ void add_variables(vector<Process*> v, TString tag) {
     v[i]->add_histogram("hNLepMedium", 3, -0.5, 2.5);
     v[i]->add_histogram("hNLepTight", 3, -0.5, 2.5);
 
+    v[i]->add_histogram("hDNNScore_ttH_vs_dipho", 50, 0, 1);
+    v[i]->add_histogram("hDNNScore_ttH_vs_ttGG", 50, 0, 1);
+
   }
 }
 
@@ -540,17 +543,26 @@ const double qcd_gjets_impute_factor_hadronic_runII = 0.9383634106686037;
 const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
 */
 // No cut on p_T/m_gg
-const double diphoton_factor_hadronic_runII = 1.233076855887245;
-const double gjets_factor_hadronic_runII    = 2.081601597627392;
-const double qcd_factor_hadronic_runII      = 2.5892320260734283;
+// v1.6
+//const double diphoton_factor_hadronic_runII = 1.233076855887245;
+//const double gjets_factor_hadronic_runII    = 2.081601597627392;
+//const double qcd_factor_hadronic_runII      = 2.5892320260734283;
+
+//v3.3
+const double diphoton_factor_hadronic_runII = 1.581909444147183;
+const double gjets_factor_hadronic_runII    = 1.9194433322062885;
+const double qcd_factor_hadronic_runII      = 1.1379965377840637;
 
 //v1.5
 //const double qcd_gjets_impute_factor_hadronic_runII = 0.9433630221924071; 
 //const double diphoton_impute_factor_hadronic_runII  = 1.24575175003913; 
 //v1.6
-const double qcd_gjets_impute_factor_hadronic_runII = 0.9537308742404281;
-const double diphoton_impute_factor_hadronic_runII  = 1.289449696556433;
+//const double qcd_gjets_impute_factor_hadronic_runII = 0.9537308742404281;
+//const double diphoton_impute_factor_hadronic_runII  = 1.289449696556433;
 
+//v3.3
+const double qcd_gjets_impute_factor_hadronic_runII = 1.0897546559555729;
+const double diphoton_impute_factor_hadronic_runII  = 1.207373864372413;
 
 const double diphoton_factor_leptonic_runII = 1.919798;
 const double gjets_factor_leptonic_runII    = 1.919798;
@@ -739,14 +751,14 @@ TF1* get_photon_ID_shape(TString type) {
   }
 
   else if (type == "fake_runII") {
-    f_IDMVA->SetParameter(0, 9284.03);
-    f_IDMVA->SetParameter(1, -11984.8);
-    f_IDMVA->SetParameter(2, 17992.1);
-    f_IDMVA->SetParameter(3, -8591.4);
-    f_IDMVA->SetParameter(4, -13340.2);
-    f_IDMVA->SetParameter(5, 4961.52);
-    f_IDMVA->SetParameter(6, 40897.6);
-    f_IDMVA->SetParameter(7, -30331.9);
+    f_IDMVA->SetParameter(0, 8178.77);
+    f_IDMVA->SetParameter(1, -13853.8);
+    f_IDMVA->SetParameter(2, 25875.7);
+    f_IDMVA->SetParameter(3, -17282.2);
+    f_IDMVA->SetParameter(4, -38417.3);
+    f_IDMVA->SetParameter(5, 47085.7);
+    f_IDMVA->SetParameter(6, 93944.6);
+    f_IDMVA->SetParameter(7, -104479);
   }
 
   else if (type == "fake_barrel_lowPt") {
@@ -948,8 +960,8 @@ bool is_low_stats_process(TString currentFileTitle) {
 }
 
 int categorize_signal_sample(TString currentFileTitle) {
-  if (currentFileTitle.Contains("ttHJet")) {
-    if (currentFileTitle.Contains("M125") || currentFileTitle.Contains("M120") || currentFileTitle.Contains("M130")) { // save for fgg final fit purposes
+  if (currentFileTitle.Contains("HToGG") || currentFileTitle.Contains("ttHJetToGG")) {
+    if ((currentFileTitle.Contains("M125") || currentFileTitle.Contains("M120") || currentFileTitle.Contains("M130")) && !currentFileTitle.Contains("powheg")) { // save for fgg final fit purposes
       return 0; 
     }
     else if (currentFileTitle.Contains("M127")) {
@@ -959,7 +971,7 @@ int categorize_signal_sample(TString currentFileTitle) {
       return 2; // don't need to save for anything, do with it what you please
   }
   else
-    return 0;
+    return -1;
 }
 
 int categorize_signal_mass_label(TString currentFileTitle) {
@@ -1074,6 +1086,7 @@ vector<std::pair<int, double>> sortVector(const vector<double> v) {
   return v2;
 }
 
+const double m_Z = 91.12;
 const double m_top = 172.44;
 TLorentzVector get_hadronic_top(const vector<TLorentzVector> jets, const vector<std::pair<int, double>> btag_scores_sorted) {
   int idx_btag_1 = btag_scores_sorted[0].first;

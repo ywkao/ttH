@@ -186,7 +186,7 @@ class DNN_Helper:
     best_auc = 0.5
     keep_training = True
 
-    max_batch_size = 50000
+    max_batch_size = 10000
     epochs = 1
     bad_epochs = 0
     while keep_training:

@@ -132,12 +132,12 @@ elif args.ttH_vs_tH:
   selection_final_fit      = '((label_ == 1 && signal_mass_label_ == 0))'
 
 else:
-  selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+  selection_train      = '((label_ == 0%s%s && signal_mass_label_ != 0) || (label_ == 1 && signal_mass_label_ != 0)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
   if args.one_mass_point:
     selection_train      = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
-  selection_validation = '((label_ == 0%s%s) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+  selection_validation = '((label_ == 0%s%s && (signal_mass_label_ == 1 || signal_mass_label_ == -1)) || (label_ == 1 && signal_mass_label_ == 1)) && %s %s %.6f %s' % (" && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
   selection_final_fit      = '((label_ == 1 && signal_mass_label_ == 0))' 
 

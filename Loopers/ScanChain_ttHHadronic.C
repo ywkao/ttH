@@ -208,6 +208,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     if (isSignal) {
       if (categorize_signal_sample(currentFileTitle) != 0)
         continue;
+      if (currentFileTitle.Contains("M120") || currentFileTitle.Contains("M130"))
+        continue;
     }
     
     if (mYear == "")
@@ -220,6 +222,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     }
 
 
+    /*
     // Dumb hacky stuff to use 2017 MC as placeholders for 2018
     if (already_looped_dipho && currentFileTitle.Contains("DiPhotonJetsBox"))
       mYear = "2018";
@@ -234,6 +237,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       already_looped_qcd = true;
     if (currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM"))
       already_looped_dy = true;
+    */
 
     cout << "mYear: " << mYear << endl;
     int yearId = mYear == "2016" ? 0 : (mYear == "2017" ? 1 : (mYear == "2018" ? 2 : -1));
@@ -471,6 +475,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       }
 
       // Fill rest of histograms //
+      vProcess[processId]->fill_histogram("hDNNScore_ttH_vs_dipho", dnn_score_dipho(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hDNNScore_ttH_vs_ttGG", dnn_score_ttgg(), evt_weight, vId); 
+
       double dipho_mass_resolution = 0.5* pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), 0.5);
       vProcess[processId]->fill_histogram("hDiphotonMassResolution", dipho_mass_resolution, evt_weight, vId);
       if (tthMVA() >= 0.75)
