@@ -25,6 +25,8 @@ class scanClass():
         self.modelpath = config["modelpath"]
         self.plotpath = config["plotpath"]
         self.combineEnv = config["combineEnv"]
+        self.var = config["var"]
+        self.weightVar = config["weightVar"]
         #/home/users/hmei/flashggFinalFit/CMSSW_7_4_7/src/
 
         self.treename = "t"
@@ -38,13 +40,25 @@ class scanClass():
         self.tree = self.file.Get(self.treename)
 
 
+    def getEfficiency(self, cut_denominator, cut_numerator):
+
+        h_denominator = ROOT.TH1F("h_denominator", "", 320, 100, 180)
+        self.tree.Project(h_denominator.GetName(), self.var, self.weightVar + "*(" + cut_denominator + ")")
+        h_numerator = ROOT.TH1F("h_numerator", "", 320, 100, 180)
+        self.tree.Project(h_numerator.GetName(), self.var, self.weightVar + "*(" + cut_numerator + ")")
+        n_denominator = h_denominator.Integral()
+        n_numerator = h_numerator.Integral()
+
+        efficiency = n_numerator/n_denominator
+        print efficiency
+
     def cleanDir(self):
 
         pathCmd =  "mkdir -p " + self.modelpath + ";"
         pathCmd += "rm " + self.modelpath+ "*;"
         pathCmd += "mkdir -p " + self.plotpath + ";"
         pathCmd += "rm " + self.plotpath+ "*;"
-        pathCmd += "cp ~/public_html/tmpFile/index.php " + self.plotpath
+        pathCmd += "cp ~/public_html/backup/index.php " + self.plotpath
 
         subprocess.call(pathCmd, shell=True)
 
@@ -77,14 +91,14 @@ class scanClass():
         outtxtName = config["outtxtName"]
         grepContent = config["grepContent"]
 
-        cmdCombine = "cd " + self.combineEnv + "; eval `scramv1 runtime -sh`; cd -;"
+        cmdCombine = "cd " + self.combineEnv + "; pwd; eval `scramv1 runtime -sh`; cd -;"
         cmdCombine += "cd " + self.modelpath + ";"
-        cmdCombine += "ls;"
+        #cmdCombine += "ls;"
         cmdCombine += "combine -M " + combineOption + " -n " + combineOutName + " " + cardName + " -t -1 --expectSignal=1 > " + outtxtName + ";"
 
-        #print cmdCombine
+        print cmdCombine
         #subprocess.call(cmdCombine, shell=True)
-        print "echo \"" + cmdCombine + "\" > " + self.modelpath + "combineCmd_" + combineOutName + ".sh"
+        #print "echo \"" + cmdCombine + "\" > " + self.modelpath + "combineCmd_" + combineOutName + ".sh"
         combineCmdFile = open(self.modelpath + "combineCmd_" + combineOutName + ".sh","w")
         combineCmdFile.write(cmdCombine)
         combineCmdFile.close() #to change file access modes

@@ -113,10 +113,10 @@ class makeCards():
                 else:
                     lumi_l5 += "1.025 "
 
-                if processes[i] == "ttH_hgg":
-                    ttH_l6 += "0.8/1.2 "
-                else:
-                    ttH_l6 += "- "
+                #if processes[i] == "ttH_hgg":
+                #    ttH_l6 += "0.8/1.2 "
+                #else:
+                #    ttH_l6 += "- "
 
         bin_l1 = "bin " + bin_l1 + "\n"
         process_l2 = "process " + process_l2 + "\n"
@@ -124,7 +124,7 @@ class makeCards():
         rate_l4 = "rate " + rate_l4 + "\n"
 
         lumi_l5 = "lumi_13TeV lnN " + lumi_l5 + "\n"
-        ttH_l6 = "ttH_xs lnN " + ttH_l6 + "\n"
+        #ttH_l6 = "ttH_xs lnN " + ttH_l6 + "\n"
 
         self.txtfile.write(bin_l1)
         self.txtfile.write(process_l2)

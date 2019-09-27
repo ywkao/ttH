@@ -26,6 +26,7 @@ class makeModel():
         self.savename = config["savename"]
         self.var = config["var"] #mass
         self.weightVar = config["weightVar"] #weight
+        self.norm = -1
 
         self.treename = "t"
 
@@ -77,8 +78,10 @@ class makeModel():
             norm = norm*1/1.527
         if norm <= 0:
             norm = 1e-09
+        #norm = norm*2 # this is because we are only using half of the mc not used in training for optimization
         rv_norm = ROOT.RooRealVar(self.tag+"_norm", "", norm)
 
+        self.norm = norm
         # pdf
         w.factory("DoubleCB:"+self.tag+"(" + rooVar + ", mean_"+self.tag+"[125,120,130], sigma_"+self.tag+"[1,0,5], a1_"+self.tag+"[1,0,10], n1_"+self.tag+"[1,0,10], a2_"+self.tag+"[1,0,10], n2_"+self.tag+"[1,0,10])")
         exPdf = ROOT.RooExtendPdf("extend" + self.tag, "", w.pdf(self.tag), rv_norm)
@@ -211,4 +214,5 @@ class makeModel():
         getattr(w,'import')(d_mgg, ROOT.RooCmdArg())
         w.writeToFile(self.modelpath + "/" + self.savename + ".root")
 
-        #call("echo " + str(nEvt) + " > models/" + modelpath + "/" + savename + ".txt" , shell=True)
+        from subprocess import call
+        call("echo " + str(nEvt) + " > " + self.modelpath + "/" + self.savename + "_nbkg.txt" , shell=True)
