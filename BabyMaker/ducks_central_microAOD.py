@@ -17,6 +17,7 @@ parser.add_argument("--tag", help = "tag to identify this set of babies", type=s
 parser.add_argument("--soft_rerun", help = "don't remake tarball", action="store_true")
 parser.add_argument("--update_tarball", help = "remake and update tarball for each task", action = "store_true")
 parser.add_argument("--use_xrdcp", help = "copy the tarball with xrdcp", action = "store_true")
+parser.add_argument("--use_gridftp", help = "copy the tarball with gfal-copy", action = "store_true")
 args = parser.parse_args()
 
 job_tag = "ttH_Babies_RunII" + args.tag
@@ -29,13 +30,17 @@ cmssw_ver = "CMSSW_10_5_0"
 if not args.soft_rerun:
   if not args.update_tarball:
     os.system("rm -rf tasks/*" + args.tag + "*")
-  os.system("rm package.tar.gz")
+  #os.system("rm package.tar.gz")
 
-  os.system("XZ_OPT='-9e -T24' tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' --exclude *MicroAOD/BatchSubmit/* --exclude *MetaData/data/Era201*/*.json --exclude '*Taggers/data/DNN_models/*' --exclude '*Taggers/data/*dijet*' --exclude '*76X*.root' --exclude '*76X*.xml' --exclude '*80X*.xml' --exclude '*80X*.root' --exclude '*Taggers/data/DNN_models/*' --exclude '*Taggers/data/HHTagger/*' --exclude '*Taggers/data/ttHKiller/*' -f package.tar.gz %s" % cmssw_ver)
+  #os.system("XZ_OPT='-9e -T24' tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' --exclude *MicroAOD/BatchSubmit/* --exclude *MetaData/data/Era201*/*.json --exclude '*Taggers/data/DNN_models/*' --exclude '*Taggers/data/*dijet*' --exclude '*76X*.root' --exclude '*76X*.xml' --exclude '*Taggers/data/DNN_models/*' --exclude '*Taggers/data/HHTagger/*' --exclude '*Taggers/data/ttHKiller/*' -f package.tar.gz %s" % cmssw_ver)
 
-  if args.use_xrdcp:
+  if args.use_xrdcp or args.use_gridftp:
       os.system("cp package.tar.gz /hadoop/cms/store/user/smay/ttH/tarballs/%s" % tar_path)
-      os.system("cp condor_exe_xrd.sh condor_exe_%s.sh" % job_tag)
+      os.system("hadoop fs -setrep -R 30 /cms/store/user/smay/ttH/tarballs/%s" % tar_path)
+      if args.use_xrdcp:
+          os.system("cp condor_exe_xrd.sh condor_exe_%s.sh" % job_tag)
+      elif args.use_gridftp:
+          os.system("cp condor_exe_gridftp.sh condor_exe_%s.sh" % job_tag)
       with open("condor_exe_%s.sh" % job_tag, "r") as f_in:
           lines = f_in.readlines()
       with open("condor_exe_%s.sh" % job_tag, "w") as f_out:
@@ -75,13 +80,19 @@ def fpo(sample):
     elif any([x in sample for x in ["VBF", "GluGluHToGG", "VHToGG", "bbH"]]):
         return 3
     elif "DiPhoton" in sample or "TTGG" in sample:
-        return 3
-    elif any([x in sample for x in ["DoubleEG", "EGamma"]]):
-        return 10
-    elif any([x in sample for x in ["DYJetsToLL", "QCD", "GJets_HT", "TTJets", "GJet-Pt"]]):
-        return 10
-    else:
         return 5
+    elif any([x in sample for x in ["DoubleEG", "EGamma"]]):
+        return 20
+    elif any([x in sample for x in ["DYJetsToLL", "QCD", "GJets_HT", "TTJets", "GJet-Pt"]]):
+        return 20
+    else:
+        return 10
+
+blacklist = ["SingleElectron", "Box1BJet", "Box2BJets", "GJet_Pt", "ZH_HtoGG", "bbHToGG"]
+def skip(sample):
+    if any([x in sample for x in blacklist]):
+        return True
+    return False
 
 class file:
     def __init__(self, **kwargs):
@@ -96,11 +107,7 @@ first_run = False
 while True:
     allcomplete = True
     for sample in samples.keys():
-        #if not sample == "ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8":
-        #    continue
-        #if not "GJets_HT-200To400" in sample: 
-        #    continue
-        if "SingleElectron" in sample and "ttZ" not in job_tag:
+        if skip(sample):
             continue
         for year in samples[sample].keys():
             if year == "xs" or year == "-1":
@@ -125,8 +132,8 @@ while True:
                         output_name = "merged_ntuple.root",
                         tag = job_tag,
                         cmssw_version = cmssw_ver,
-                        executable = "condor_exe_%s.sh" % job_tag if args.use_xrdcp else "condor_exe.sh",
-                        tarfile = "empty" if args.use_xrdcp else tar_path,
+                        executable = "condor_exe_%s.sh" % job_tag if (args.use_xrdcp or args.use_gridftp) else "condor_exe.sh",
+                        tarfile = "empty" if (args.use_xrdcp or args.use_gridftp) else tar_path,
                         condor_submit_params = {"sites" : "T2_US_UCSD"} if args.use_xrdcp else {"sites" : "T2_US_UCSD,T2_US_CALTECH,T2_US_MIT,T2_US_WISCONSIN,T2_US_Nebraska,T2_US_Purdue,T2_US_Vanderbilt,T2_US_Florida"},
                         special_dir = hadoop_path,
                         arguments = conds_dict[year]
