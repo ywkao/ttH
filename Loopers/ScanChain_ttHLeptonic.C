@@ -409,7 +409,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
         mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
       }
 
-      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_, mva_value)) continue;
+      float m_gl_lead = (leps[0] + lead_photon).M();
+      float m_gl_sublead = (leps[0] + sublead_photon).M(); 
+
+      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_, mva_value, m_gl_lead, m_gl_sublead)) continue;
       int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
 
       vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId, recoLeptonId, yearId}; 
@@ -487,12 +490,18 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       //vProcess[processId]->fill_histogram("htthMVA_RunII_transf", -log(1-tthMVA_RunII()), evt_weight, vId);
       vProcess[processId]->fill_histogram("htthMVA_RunII", tthMVA(), evt_weight, vId);
       vProcess[processId]->fill_histogram("htthMVA_RunII_transf", -log(1-tthMVA()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ", -log(1-tthMVA()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v2", -log(1-tthMVA_RunII()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v3", -log(1-tthMVA_RunII()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v4", -log(1-tthMVA_RunII()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v5", -log(1-tthMVA_RunII()), evt_weight, vId);
       vProcess[processId]->fill_histogram("hLeptonicMVA", mva_value, evt_weight, vId);
       vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hDiphotonSumPt", dipho_sumpt(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hDiphotonCosPhi", dipho_cosphi(), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hNVtx", nvtx(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hRho", rho(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hMetPt", MetPt(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hHT", get_ht(jets), evt_weight, vId);
 

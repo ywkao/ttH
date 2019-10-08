@@ -159,7 +159,12 @@ void add_variables(vector<Process*> v, TString tag) {
 
     v[i]->add_histogram("htthMVA", 50, -1, 1);
     v[i]->add_histogram("htthMVA_RunII", 50, 0, 1);
-    v[i]->add_histogram("htthMVA_RunII_transf", 50, 0, 8);
+    v[i]->add_histogram("htthMVA_RunII_transf", 25, 0, 8);
+    v[i]->add_histogram("htthMVA_RunII_transf_ttZ", 25, 0, 12);
+    v[i]->add_histogram("htthMVA_RunII_transf_ttZ_v2", 18, 0, 10);
+    v[i]->add_histogram("htthMVA_RunII_transf_ttZ_v3", 12, 0, 10);
+    v[i]->add_histogram("htthMVA_RunII_transf_ttZ_v4", 10, 0, 10);
+    v[i]->add_histogram("htthMVA_RunII_transf_ttZ_v5", 15, 0, 10);
 
     v[i]->add_histogram("hMaxBTag", 50, 0, 1);
     v[i]->add_histogram("hSecondMaxBTag", 50, 0, 1);  
@@ -310,6 +315,8 @@ void add_variables(vector<Process*> v, TString tag) {
 
     v[i]->add_histogram("hDNNScore_ttH_vs_dipho", 50, 0, 1);
     v[i]->add_histogram("hDNNScore_ttH_vs_ttGG", 50, 0, 1);
+
+    v[i]->add_histogram("hRho", 50, 0, 100);
 
   }
 }
@@ -548,10 +555,10 @@ const double diphoton_impute_factor_hadronic_runII  = 1.1823424964786557;
 //const double gjets_factor_hadronic_runII    = 2.081601597627392;
 //const double qcd_factor_hadronic_runII      = 2.5892320260734283;
 
-//v3.3
-const double diphoton_factor_hadronic_runII = 1.581909444147183;
-const double gjets_factor_hadronic_runII    = 1.9194433322062885;
-const double qcd_factor_hadronic_runII      = 1.1379965377840637;
+//v3.10
+const double diphoton_factor_hadronic_runII = 2.2971182909603067;
+const double gjets_factor_hadronic_runII    = 2.0113788480528183;
+const double qcd_factor_hadronic_runII      = 1.3362705187667576;
 
 //v1.5
 //const double qcd_gjets_impute_factor_hadronic_runII = 0.9433630221924071; 
@@ -560,9 +567,9 @@ const double qcd_factor_hadronic_runII      = 1.1379965377840637;
 //const double qcd_gjets_impute_factor_hadronic_runII = 0.9537308742404281;
 //const double diphoton_impute_factor_hadronic_runII  = 1.289449696556433;
 
-//v3.3
-const double qcd_gjets_impute_factor_hadronic_runII = 1.0897546559555729;
-const double diphoton_impute_factor_hadronic_runII  = 1.207373864372413;
+//v3.10
+const double qcd_gjets_impute_factor_hadronic_runII = 1.0462238864596276;
+const double diphoton_impute_factor_hadronic_runII  = 1.3852459996672792;
 
 const double diphoton_factor_leptonic_runII = 1.919798;
 const double gjets_factor_leptonic_runII    = 1.919798;
@@ -751,14 +758,14 @@ TF1* get_photon_ID_shape(TString type) {
   }
 
   else if (type == "fake_runII") {
-    f_IDMVA->SetParameter(0, 8178.77);
-    f_IDMVA->SetParameter(1, -13853.8);
-    f_IDMVA->SetParameter(2, 25875.7);
-    f_IDMVA->SetParameter(3, -17282.2);
-    f_IDMVA->SetParameter(4, -38417.3);
-    f_IDMVA->SetParameter(5, 47085.7);
-    f_IDMVA->SetParameter(6, 93944.6);
-    f_IDMVA->SetParameter(7, -104479);
+    f_IDMVA->SetParameter(0, 8818.17);
+    f_IDMVA->SetParameter(1, -12755.5);
+    f_IDMVA->SetParameter(2, 26130);
+    f_IDMVA->SetParameter(3, -26664.9);
+    f_IDMVA->SetParameter(4, -54741.1);
+    f_IDMVA->SetParameter(5, 76558);
+    f_IDMVA->SetParameter(6, 112245);
+    f_IDMVA->SetParameter(7, -123913);
   }
 
   else if (type == "fake_barrel_lowPt") {

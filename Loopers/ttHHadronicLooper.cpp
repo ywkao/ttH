@@ -28,7 +28,11 @@ int main(int argc, char* argv[]) {
   else
     cout << "Did not recognize background treatment option" << endl;
 
-  TChain *ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 
+  TChain *ch; 
+  if (tag.Contains("v4.")) 
+    ch = new TChain("tagsDumper/trees/_13TeV_TTHHadronicTag");
+  else
+    ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 
 
   TString file = argc <= 6 ? "all" : argv[6];
   TString mYear = argc <= 7 ? "" : argv[7];

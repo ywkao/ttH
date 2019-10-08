@@ -68,6 +68,14 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, float mva_v
     return true;
   }
 
+  else if (tag == "ttHHadronic_RunII_ttZ_Tight_CR") {
+    if (abs(mass() - m_Z) > 10.)         return false;
+    if (n_jets() < 5)                   return false;
+    if (nb_tight() < 2)                 return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
+    return true;
+  } 
+
   // common to all selections
   if (!(leadPassEVeto() && subleadPassEVeto()))       return false; // always require e veto
   if (leadIDMVA() < -0.9 || subleadIDMVA() < -0.9)    return false; // don't use photon ID below -0.9

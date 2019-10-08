@@ -523,6 +523,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("hDiphotonCosPhi", dipho_cosphi(), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hNVtx", nvtx(), evt_weight, vId);
+      vProcess[processId]->fill_histogram("hRho", rho(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hMetPt", MetPt(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hHT", get_ht(jets), evt_weight, vId);
 
@@ -733,6 +734,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       vProcess[processId]->fill_histogram("htthMVA", tthMVA(), evt_weight, vId);
       vProcess[processId]->fill_histogram("htthMVA_RunII", tthMVA_RunII(), evt_weight, vId);
       vProcess[processId]->fill_histogram("htthMVA_RunII_transf", -log(1-tthMVA_RunII()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ", -log(1-tthMVA_RunII()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v2", -log(1-tthMVA_RunII()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v3", -log(1-tthMVA_RunII()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v4", -log(1-tthMVA_RunII()), evt_weight, vId);
+      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v5", -log(1-tthMVA_RunII()), evt_weight, vId);
 
       if (lead_photon_type() == 1)
         vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", maxID, evt_weight, vId);
