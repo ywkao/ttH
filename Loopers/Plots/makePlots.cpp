@@ -107,6 +107,50 @@ std::map<int, TString> mLeptonsLatex = {
         {5, "$\\mu\\mu$"}
 };
 
+const std::vector<TString> syst_ext = {
+    "MvaShift",
+    "SigmaEOverEShift",
+    "MaterialCentralBarrel",
+    "MaterialOuterBarrel",
+    "MaterialForward",
+    "FNUFEB",
+    "FNUFEE",
+    "MCScaleGain6EB",
+    "MCScaleGain1EB",
+    "ShowerShapeHighR9EB",
+    "MCScaleHighR9EB",
+    "MCSmearHighR9EBRho",
+    "MCSmearHighR9EBPhi",
+    "ShowerShapeHighR9EE",
+    "MCScaleHighR9EE",
+    "MCSmearHighR9EERho",
+    "MCSmearHighR9EEPhi",
+    "ShowerShapeLowR9EB",
+    "MCScaleLowR9EB",
+    "MCSmearLowR9EBRho",
+    "MCSmearLowR9EBPhi",
+    "ShowerShapeLowR9EE",
+    "MCScaleLowR9EE",
+    "MCSmearLowR9EERho",
+    "MCSmearLowR9EEPhi",
+    "JEC",
+    "JER",
+    "PUJIDShift",
+    "metJecUncertainty",
+    "metJerUncertainty",
+    "metPhoUncertainty",
+    "metUncUncertainty",
+    "UnmatchedPUWeight",
+    "MvaLinearSyst",
+    "LooseMvaSF",
+    "PreselSF",
+    "electronVetoSF",
+    "TriggerWeight",
+    "FracRVWeight",
+    "ElectronWeight",
+    "JetBTagCutWeight",
+    "JetBTagReshapeWeight",
+};
 
 void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, vector<TString> vSigs, int idx, TString type = "std", TString year = "2016", bool loose_mva_cut = false, TFile* file_ref = nullptr, vector<TString> vExtraInfo = {}, int yearIdx = -1, bool doSyst = false) {
 
@@ -169,11 +213,13 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     }
  
     // Get systs
-    int n_systs = 3;
+    int n_systs = syst_ext.size();
     for (int i = 0; i < n_systs; i++) {
       for (int j = 0; j < vBkgs.size(); j++) {
-        TH1D* hSystUp = (TH1D*)(file->Get(hist_name + "_" + vBkgs[j] + extension))->Clone("hSystUp" + hist_name + vBkgs[j]);
-        TH1D* hSystDown = (TH1D*)(file->Get(hist_name + "_" + vBkgs[j] + extension))->Clone("hSystDown" + hist_name + vBkgs[j]);
+        TString syst_hist_name_up = "h" + syst_ext[i] + "Up01Sigma" + hist_name.Remove(0);
+        TString syst_hist_name_down = "h" + syst_ext[i] + "Down01Sigma" + hist_name.Remove(0);
+        TH1D* hSystUp = (TH1D*)(file->Get(syst_hist_name_up + "_" + vBkgs[j] + extension))->Clone("hSystUp" + hist_name + vBkgs[j]);
+        TH1D* hSystDown = (TH1D*)(file->Get(syst_hist_name_down + "_" + vBkgs[j] + extension))->Clone("hSystDown" + hist_name + vBkgs[j]);
         if (j == 0) {
           hBkgSystUp.push_back(hSystUp);
           hBkgSystDown.push_back(hSystDown);
@@ -185,11 +231,13 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         //delete hSystUp;
         //delete hSystDown;
       }
+      /*
       // Insert dummy systematics
       for (int j = 0; j < hBkgSystUp[i]->GetSize(); j++) {
         hBkgSystUp[i]->SetBinContent(j, hBkgSystUp[i]->GetBinContent(j) * 1.0000001);
         hBkgSystDown[i]->SetBinContent(j, hBkgSystDown[i]->GetBinContent(j) * 0.9999999);
       } 
+      */
     }
 
     // print latex table

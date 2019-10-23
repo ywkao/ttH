@@ -126,7 +126,12 @@ class Comparison
     TH1D* hMC_TotalSyst_down_noPlot;
     TH1D* hRat_TotalSyst_up;
     TH1D* hRat_TotalSyst_down;
+    TH1D* hMC_StatUnc_up;
+    TH1D* hMC_StatUnc_down;
+    TH1D* hRat_StatUnc_up;
+    TH1D* hRat_StatUnc_down; 
     int mSystColor;
+    int mStatColor;
 
     THStack* mStack;
 
@@ -383,6 +388,9 @@ Comparison::Comparison(TCanvas* c1, vector<TH1D*> hData)
 inline
 void Comparison::calculate_systematics()
 {
+    vector<double> stat_unc_up((mXBinRange[1] - mXBinRange[0]) + 3, 0);
+    vector<double> stat_unc_down((mXBinRange[1] - mXBinRange[0]) + 3, 0);
+
     vector<double> total_unc_up((mXBinRange[1] - mXBinRange[0]) + 3, 0);
     vector<double> total_unc_down((mXBinRange[1] - mXBinRange[0]) + 3, 0);    
 
@@ -418,6 +426,8 @@ void Comparison::calculate_systematics()
     for (int i = 0; i < (mXBinRange[1] - mXBinRange[0]) + 3; i++) {
         int idx = mXBinRange[0] + (i - 1);
         double stat_unc = mHMC->GetBinError(idx);
+        stat_unc_up[i] = stat_unc/2.;
+        stat_unc_down[i] = stat_unc/2.;
         total_unc_up[i] += pow(stat_unc/2., 2);
         total_unc_down[i] += pow(stat_unc/2., 2);
     }
@@ -433,8 +443,19 @@ void Comparison::calculate_systematics()
     hMC_TotalSyst_down = (TH1D*)mHMC->Clone("mHMC_syst_down");   
     hMC_TotalSyst_down_noPlot = (TH1D*)mHMC->Clone("mHMC_syst_down_noPlot");
 
+    hMC_StatUnc_up = (TH1D*)mHMC->Clone("mHMC_stat_up");
+    hMC_StatUnc_down = (TH1D*)mHMC->Clone("mHMC_stat_down"); 
+    hRat_StatUnc_up = (TH1D*)mHMC->Clone("mHMC_rat_up");
+    hRat_StatUnc_down = (TH1D*)mHMC->Clone("mHMC_rat_down");
+
     for (int i = 0; i < (mXBinRange[1] - mXBinRange[0]) + 3; i++) {
         int idx = mXBinRange[0] + (i - 1);
+
+        hMC_StatUnc_up->SetBinContent(idx, mHMC->GetBinContent(idx) + (stat_unc_up[i]/2.));
+        hMC_StatUnc_up->SetBinError(idx, stat_unc_up[i]/2.);
+
+        hMC_StatUnc_down->SetBinContent(idx, mHMC->GetBinContent(idx) + (stat_unc_down[i]/2.));
+        hMC_StatUnc_down->SetBinError(idx, stat_unc_down[i]/2.); 
 
         hMC_TotalSyst_up_noPlot->SetBinContent(idx, mHMC->GetBinContent(idx) + total_unc_up[i]);
         hMC_TotalSyst_up->SetBinContent(idx, mHMC->GetBinContent(idx) + (total_unc_up[i]/2.));
@@ -489,7 +510,8 @@ void Comparison::default_options(TCanvas* c1)
   mVerbose = false;
   mDoSystBand = false;
 
-  mSystColor = kGray+2;
+  mSystColor = kRed;
+  mStatColor = kGray+2;
 }
 
 inline
@@ -940,6 +962,19 @@ void Comparison::draw_main_histograms()
     hMC_TotalSyst_down->SetMarkerSize(0.);
     hMC_TotalSyst_down->SetLineColor(mSystColor);
     hMC_TotalSyst_down->Draw("E2, SAME");
+
+    hMC_StatUnc_up->SetFillStyle(3144);
+    hMC_StatUnc_up->SetFillColorAlpha(mStatColor, 0.5);
+    hMC_StatUnc_up->SetMarkerColor(mStatColor);
+    hMC_StatUnc_up->SetMarkerSize(0.);
+    hMC_StatUnc_up->SetLineColor(mStatColor);
+    hMC_StatUnc_up->Draw("E2, SAME");
+    hMC_StatUnc_down->SetFillStyle(3144);
+    hMC_StatUnc_down->SetFillColorAlpha(mStatColor, 0.5);
+    hMC_StatUnc_down->SetMarkerColor(mStatColor);
+    hMC_StatUnc_down->SetMarkerSize(0.);
+    hMC_StatUnc_down->SetLineColor(mStatColor);
+    hMC_StatUnc_down->Draw("E2, SAME");
   }
 
   //mStack->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
@@ -1222,17 +1257,22 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
 
       double central_value_up = (mVHRat[0]->GetBinContent(idx) + hRat_TotalSyst_up->GetBinContent(idx)) / 2.;
       double unc_up = (abs(hMC_TotalSyst_up_noPlot->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx)) / 2.;
-      //double unc_up = abs(mVHRat[0]->GetBinContent(i) - hRat_TotalSyst_up->GetBinContent(i)) / 2.;
       hRat_TotalSyst_up->SetBinContent(idx, 1 + (unc_up));
-      //hRat_TotalSyst_up->SetBinContent(idx, central_value_up);
       hRat_TotalSyst_up->SetBinError(idx, unc_up);
 
       double central_value_down = (mVHRat[0]->GetBinContent(idx) + hRat_TotalSyst_down->GetBinContent(idx)) / 2.;
       double unc_down = (abs(hMC_TotalSyst_down_noPlot->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx)) / 2.;
-      //double unc_down = abs(mVHRat[0]->GetBinContent(idx) - hRat_TotalSyst_down->GetBinContent(idx)) / 2.;
       hRat_TotalSyst_down->SetBinContent(idx, 1 - (unc_down));
-      //hRat_TotalSyst_down->SetBinContent(idx, central_value_down);
       hRat_TotalSyst_down->SetBinError(idx, unc_down);
+
+      double stat_unc_up = (abs(hMC_StatUnc_up->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx));
+      double stat_unc_down = (abs(hMC_StatUnc_down->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx));
+
+      hRat_StatUnc_up->SetBinContent(idx, 1 + (unc_up));
+      hRat_StatUnc_up->SetBinError(idx, unc_up);
+
+      hRat_StatUnc_down->SetBinContent(idx, 1 - (unc_down));
+      hRat_StatUnc_down->SetBinError(idx, unc_down);
     }
 
     hRat_TotalSyst_up->SetFillStyle(3144);
@@ -1249,8 +1289,23 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
     hRat_TotalSyst_down->SetLineColor(mSystColor);
     hRat_TotalSyst_down->Draw("E2, SAME");
 
+    hRat_StatUnc_up->SetFillStyle(3144);
+    hRat_StatUnc_up->SetFillColorAlpha(mStatColor, 0.5);
+    hRat_StatUnc_up->SetMarkerColor(mStatColor);
+    hRat_StatUnc_up->SetMarkerSize(0.);
+    hRat_StatUnc_up->SetLineColor(mStatColor);
+    hRat_StatUnc_up->Draw("E2, SAME");
+
+    hRat_StatUnc_down->SetFillStyle(3144);
+    hRat_StatUnc_down->SetFillColorAlpha(mStatColor, 0.5);
+    hRat_StatUnc_down->SetMarkerColor(mStatColor);
+    hRat_StatUnc_down->SetMarkerSize(0.);
+    hRat_StatUnc_down->SetLineColor(mStatColor);
+    hRat_StatUnc_down->Draw("E2, SAME");
+
     TLegend* legend = new TLegend(0.14, 0.38, 0.34, 0.48);
-    legend->AddEntry(hRat_TotalSyst_up, "Stat. Unc.", "f");
+    legend->AddEntry(hRat_StatUnc_up, "Stat. Unc.", "f");
+    legend->AddEntry(hRat_TotalSyst_up, "Stat. + Syst. Unc.", "f");
     legend->SetBorderSize(0);
     legend->Draw("SAME");
 
