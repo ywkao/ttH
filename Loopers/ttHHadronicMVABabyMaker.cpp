@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     cout << "Did not recognize background treatment option" << endl;
 
   TChain *ch; 
-  if (tag.Contains("v4."))
+  if (ext.Contains("v4."))
     ch = new TChain("tagsDumper/trees/_13TeV_TTHHadronicTag");
   else
     ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 

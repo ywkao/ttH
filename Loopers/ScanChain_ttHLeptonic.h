@@ -54,7 +54,7 @@ bool pass_2017_mva_presel() {
 bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_medium, int n_lep_tight, float mva_value = -1, float m_gl_lead = 999, float m_gl_sublead = 999) {
 
   if (tag == "ttHLeptonic_RunII_ttZ_CR") {
-    if (abs(mass() - m_Z) > 5.)         return false;
+    if (abs(mass() - m_Z) > 10.)         return false;
     if (n_jets() < 1)                   return false;
     if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
     if (n_lep_medium < 1)                               return false;
@@ -134,9 +134,46 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_m
     if (n_jets() < 1)                                   return false;
     if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
     if (n_lep_medium < 1)                               return false;
-    if (tthMVA() < 0.8435)                        return false;
+    if (tthMVA() < 0.8997816)                        return false;
     return true;
   } 
+
+  else if (tag == "ttHLeptonic_RunII_SR_3") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 1)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)                               return false;
+    if (tthMVA_RunII() < 0.8997816 || tthMVA_RunII() > 0.95635754)      return false;
+    return true;
+  } 
+
+  else if (tag == "ttHLeptonic_RunII_SR_2") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 1)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)                               return false;
+    if (tthMVA_RunII() < 0.95635754 || tthMVA_RunII() > 0.9725133)      return false;
+    return true;
+  } 
+
+  else if (tag == "ttHLeptonic_RunII_SR_1") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 1)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)                               return false;
+    if (tthMVA_RunII() < 0.9725133 || tthMVA_RunII() > 0.9870608)      return false;
+    return true;
+  } 
+
+  else if (tag == "ttHLeptonic_RunII_SR_0") {
+    if (mass() < 100)                                   return false;
+    if (n_jets() < 1)                                   return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)           return false;
+    if (n_lep_medium < 1)                               return false;
+    if (tthMVA_RunII() < 0.9870608)                     return false; 
+    return true;
+  } 
+ 
 
   else if (tag == "ttHLeptonic_RunII_MVA_Presel_CutPtoM_light") {
     if (mass() < 100)                                   return false;

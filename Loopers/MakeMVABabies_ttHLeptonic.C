@@ -104,7 +104,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     TString currentFileTitle = currentFile->GetTitle();
     cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
-    TTree *tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all");
+    TTree *tree;
+    if (currentFileTitle.Contains("v4."))
+        tree = (TTree*)file.Get("tagsDumper/trees/_13TeV_TTHLeptonicTag");
+    else
+        tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all"); 
     if (fast) TTreeCache::SetLearnEntries(10);
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);

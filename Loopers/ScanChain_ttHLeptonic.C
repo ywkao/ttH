@@ -1,6 +1,6 @@
 #include "ScanChain_ttHLeptonic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool doSyst = false, TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + idx + ".root", "RECREATE");
   f1->cd();
 
@@ -175,7 +175,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     TString currentFileTitle = currentFile->GetTitle();
     cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
-    TTree *tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all");
+    TTree *tree;
+    if (currentFileTitle.Contains("v4."))
+        tree = (TTree*)file.Get("tagsDumper/trees/_13TeV_TTHLeptonicTag");
+    else
+        tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all"); 
     if (fast) TTreeCache::SetLearnEntries(10);
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);
@@ -328,7 +332,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       muon1_mini_iso_ = muon1_pt() > 0 ? muonLeadIso() / muon1_pt() : -999;
       muon2_mini_iso_ = muon2_pt() > 0 ? muonSubleadIso() / muon2_pt() : -999;
 
-      top_tag_score_ = topTag_score();
+      top_tag_score_ = -1;
+      //top_tag_score_ = topTag_score();
 
       maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
       minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
@@ -400,7 +405,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       dipho_cosphi_ = dipho_cosphi();
       dipho_rapidity_ = dipho_rapidity();
       dipho_pt_ = diphoton.Pt();
-      met_ = MetPt();
+      //met_ = MetPt();
+      met_ = -1;
 
       dipho_pt_over_mass_ = diphoton.Pt() / mass();
       helicity_angle_ = helicity(lead_photon, sublead_photon);
@@ -428,14 +434,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       // Skip blinded region for MC after filling mass histogram
       if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
 
-      vProcess[processId]->fill_histogram("hDNNScore_ttH_vs_ttGG", dnn_score_ttgg(), evt_weight, vId);
+      //vProcess[processId]->fill_histogram("hDNNScore_ttH_vs_ttGG", dnn_score_ttgg(), evt_weight, vId);
 
       double dipho_mass_resolution = 0.5* pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), 0.5);
       vProcess[processId]->fill_histogram("hDiphotonMassResolution", dipho_mass_resolution, evt_weight, vId);
 
+      /*
       vProcess[processId]->fill_histogram("hTopTagger_score", topTag_score(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hTopTagger_topMass", topTag_topMass(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hTopTagger_WMass", topTag_WMass(), evt_weight, vId);
+      */
 
       double helic = helicity(lead_photon,  sublead_photon);//
       vProcess[processId]->fill_histogram("hAbsCosHelicity", helic, evt_weight, vId);
@@ -502,7 +510,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
       vProcess[processId]->fill_histogram("hNVtx", nvtx(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hRho", rho(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMetPt", MetPt(), evt_weight, vId);
+      //vProcess[processId]->fill_histogram("hMetPt", MetPt(), evt_weight, vId);
       vProcess[processId]->fill_histogram("hHT", get_ht(jets), evt_weight, vId);
 
       vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, vId);

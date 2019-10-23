@@ -28,16 +28,20 @@ int main(int argc, char* argv[]) {
   else
     cout << "Did not recognize background treatment option" << endl;
 
-  TChain *ch; 
-  if (tag.Contains("v4.")) 
-    ch = new TChain("tagsDumper/trees/_13TeV_TTHHadronicTag");
-  else
-    ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 
-
   TString file = argc <= 6 ? "all" : argv[6];
   TString mYear = argc <= 7 ? "" : argv[7];
   TString idx = argc <= 8 ? "" : argv[8];
-  
+
+  TString tree = argc <= 9 ? "" : argv[9];
+
+  TChain *ch; 
+  if (ext.Contains("v4.")) {
+    ch = new TChain("tagsDumper/trees/_13TeV_TTHHadronicTag");
+    cout << "Using new tree naming convention" << endl;
+  }  
+  else
+    ch = new TChain("tthHadronicTagDumper/trees/tth_13TeV_all"); 
+
   if (file == "all") {
     if (year.Contains("RunII")) {
       if (year == "RunII") {

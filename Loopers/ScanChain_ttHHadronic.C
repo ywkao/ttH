@@ -1,6 +1,6 @@
 #include "ScanChain_ttHHadronic.h"
 
-int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool doSyst = false, TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + idx + ".root", "RECREATE");
   f1->cd();
 
@@ -16,7 +16,16 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   // Create "process" objects
   vector<Process*> vProcess = generate_processes(f1);
-  add_variables(vProcess, tag); // defined in ttHLooper
+  vector<TString> syst_labels = {""};
+  if (doSyst) {
+    for (unsigned int i = 0; i < independent_systematic_collections.size(); i++) {
+      syst_labels.push_back(independent_systematic_collections[i]);
+    }
+    for (unsigned int i = 0; i < weight_systematics.size(); i++) {
+      syst_labels.push_back(weight_systematics[i]);
+    }
+  }
+  add_variables(vProcess, tag, syst_labels); // defined in ttHLooper
 
   // Loop over events to Analyze
   unsigned int nEventsTotal = 0;
@@ -196,10 +205,24 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     TString currentFileTitle = currentFile->GetTitle();
     cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
-    TTree *tree = (TTree*)file.Get("tthHadronicTagDumper/trees/tth_13TeV_all");
+    TTree *tree;
+    if (currentFileTitle.Contains("v4."))
+        tree = (TTree*)file.Get("tagsDumper/trees/_13TeV_TTHHadronicTag");
+    else
+        tree = (TTree*)file.Get("tthHadronicTagDumper/trees/tth_13TeV_all");
     if (fast) TTreeCache::SetLearnEntries(10);
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);
+
+    std::vector<TTree*> syst_trees;
+    syst_trees.push_back(tree);
+    if (doSyst) {
+        for (unsigned int i = 0; i < independent_systematic_collections.size(); i++) {
+            syst_trees.push_back((TTree*)file.Get("tagsDumper/trees/" + independent_systematic_collections[i] + "_13TeV_TTHHadronicTag"));
+            if (fast) syst_trees[i+1]->SetCacheSize(128*1024*1024);
+            cms3.Init(syst_trees[i+1]);
+        } 
+    }
 
     // Decide what type of sample this is
     bool isData = currentFileTitle.Contains("DoubleEG") || currentFileTitle.Contains("EGamma"); 
@@ -221,24 +244,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       continue;
     }
 
-
-    /*
-    // Dumb hacky stuff to use 2017 MC as placeholders for 2018
-    if (already_looped_dipho && currentFileTitle.Contains("DiPhotonJetsBox"))
-      mYear = "2018";
-    if (already_looped_qcd && currentFileTitle.Contains("QCD"))
-      mYear = "2018";
-    if (already_looped_dy && currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX"))
-      mYear = "2018";
-
-    if (currentFileTitle.Contains("DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa_RunIIFall17MiniAODv2"))
-      already_looped_dipho = true;
-    if (currentFileTitle.Contains("QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM"))
-      already_looped_qcd = true;
-    if (currentFileTitle.Contains("DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1_MINIAODSIM"))
-      already_looped_dy = true;
-    */
-
     cout << "mYear: " << mYear << endl;
     int yearId = mYear == "2016" ? 0 : (mYear == "2017" ? 1 : (mYear == "2018" ? 2 : -1));
 
@@ -253,511 +258,569 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       }
     }
 
-    // Loop over Events in current file
-    if (nEventsTotal >= nEventsChain) continue;
-    unsigned int nEventsTree = tree->GetEntriesFast();
-    for (unsigned int event = 0; event < nEventsTree; ++event) {
-
-      // Get Event Content
-      if (nEventsTotal >= nEventsChain) continue;
-      if (fast) tree->LoadTree(event);
-      cms3.GetEntry(event);
-      ++nEventsTotal;
-
-      // Progress
-      ttHHadronic::progress( nEventsTotal, nEventsChain );
-
-      // Check golden json
-      if (isData) {
-        if (!pass_json(mYear, cms3.run(), cms3.lumi()))            continue;
-      }
-
-      // Fill mva baby before any selections
-      int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
-      int processId = categorize_process(currentFileTitle, genPhotonId);
-      if (processId == 17)
-        processId = 3; // use Madgraph GJets instead of Pythia
-
-      int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
-      int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
-      int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
-
-      float evt_weight = 1.;
-     
-      int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
-
-      if (year.Contains("RunII") && !isData) {
-        double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
-        if (mYear == "2016")
-          evt_weight *= scale1fb * lumi_2016 * weight();
-        else if (mYear == "2017")
-          evt_weight *= scale1fb * lumi_2017 * weight();
-        else if (mYear == "2018")
-          evt_weight *= scale1fb * lumi_2018 * weight();
-      }     
- 
-      else if (!isData) {
-        if (year == "2018") // temporary hack to use 2017 mc with 2018 data
-          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
-        else if (mYear == "2016")
-          evt_weight *= scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
-        else if (mYear == "2017")
-          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
-        else if (mYear == "2018")
-          evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
-      }
-
-      bool pu_weight = true;
-      if (pu_weight) {
-        evt_weight *= puweight();
-      }
-
-      // Impute, if applicable
-      maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
-      if (bkg_options.Contains("impute")) {
-        if (isData)
-          impute_photon_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, evt_weight, processId);
-      }
-
-      // Blinded region
-      if (isData && processId != 18 && blind && mass() > 120 && mass() < 130)  continue;
-
-      // Scale bkg weight
-      evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Hadronic");
-    
-      // Scale FCNC to current best observed limit (ATLAS 2016 combination)
-      if (currentFileTitle.Contains("FCNC"))
-        evt_weight *= scale_fcnc(currentFileTitle);
-
-      double leadID_ = leadIDMVA() == maxIDMVA_ ? maxIDMVA_ : minIDMVA_;
-      double subleadID_ = leadIDMVA() == maxIDMVA_ ? minIDMVA_ : maxIDMVA_; 
-
-      vector<TLorentzVector> jets;
-      TLorentzVector lead_photon;
-      TLorentzVector sublead_photon;
-      lead_photon = make_lead_photon();
-      sublead_photon = make_sublead_photon();
-      TLorentzVector diphoton = lead_photon + sublead_photon;
-
-      vector<double> btag_scores;
-      vector<std::pair<int, double>> btag_scores_sorted;
-      jets = make_jets(btag_scores, year);
-      btag_scores_sorted = sortVector(btag_scores);
-
-      double mva_value = -999;
-
-      max2_btag_ = btag_scores_sorted[1].second;
-      max1_btag_ = btag_scores_sorted[0].second;
-      dipho_delta_R = lead_photon.DeltaR(sublead_photon);
-      ht_ = get_ht(jets);
-      njets_ = n_jets();
-      nbjets_ = nb_medium();
-
-      jet1_pt_   = njets_ >= 1 ? jets[0].Pt()   : -999;
-      jet1_eta_  = njets_ >= 1 ? jets[0].Eta()  : -999;
-      jet1_btag_ = njets_ >= 1 ? btag_scores[0] : -999;
-      jet2_pt_   = njets_ >= 2 ? jets[1].Pt()   : -999; 
-      jet2_eta_  = njets_ >= 2 ? jets[1].Eta()  : -999;
-      jet2_btag_ = njets_ >= 2 ? btag_scores[1] : -999;
-      jet3_pt_   = njets_ >= 3 ? jets[2].Pt()   : -999;
-      jet3_eta_  = njets_ >= 3 ? jets[2].Eta()  : -999;
-      jet3_btag_ = njets_ >= 3 ? btag_scores[2] : -999;
-      jet4_pt_   = njets_ >= 4 ? jets[3].Pt()   : -999;
-      jet4_eta_  = njets_ >= 4 ? jets[3].Eta()  : -999;
-      jet4_btag_ = njets_ >= 4 ? btag_scores[3] : -999;
-      jet5_pt_   = njets_ >= 5 ? jets[4].Pt()   : -999;
-      jet5_eta_  = njets_ >= 5 ? jets[4].Eta()  : -999;
-      jet5_btag_ = njets_ >= 5 ? btag_scores[4] : -999;
-      jet6_pt_   = njets_ >= 6 ? jets[5].Pt()   : -999;
-      jet6_eta_  = njets_ >= 6 ? jets[5].Eta()  : -999;
-      jet6_btag_ = njets_ >= 6 ? btag_scores[5] : -999;
-
-      lead_pT_ = leadPt();
-      sublead_pT_ = subleadPt();
-      leadptoM_ = lead_ptoM();
-      subleadptoM_ = sublead_ptoM();
-      leadIDMVA_ = leadID_;
-      subleadIDMVA_ = subleadID_;
-      lead_eta_ = leadEta();
-      sublead_eta_ = subleadEta();
-
-      leadPSV_ = leadPixelSeed();
-      subleadPSV_ = subleadPixelSeed();
-
-      dipho_cosphi_ = dipho_cosphi();
-      dipho_rapidity_ = dipho_rapidity();
-      dipho_pt_ = diphoton.Pt();
-      dipho_pt_over_mass_ = diphoton.Pt() / mass();
-
-      helicity_angle_ = helicity(lead_photon, sublead_photon);
-
-      met_ = MetPt();
-
-      calculate_masses(diphoton, jets, m1_, m2_);
-
-      vector<float> top_candidates = calculate_top_candidates(diphoton, jets, btag_scores, max1_btag_);
-
-      if (evaluate_mva) 
-        mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
-      double reference_mva = tthMVA();
-      double super_rand = -999;
-
-      int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
-      vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId, -1, yearId};
-
-
-      // Gamma + jets reweighting
-      double gjet_mva_value = -999;	
-
-      //gjet_mva_value = convert_tmva_to_prob(gjet_mva->EvaluateMVA( "BDT" )); 
-
-      /* turn this off for now
-      if (combine_gjets_samples) {
-	if (processId == 17) 
-	  processId = 3;
-      }
-      if (processId == 3 && combine_gjets_samples) {
-	double prob = gjet_mva_value;
-	double prob_ratio = prob / ( 1 - prob);
-	evt_weight *= prob_ratio;
-	if (scale_gjets_normalization)
-	  evt_weight *= gjet_normalization;
-	//cout << "Reweighting GJets event by: " << prob_ratio * gjet_normalization << endl;
-      } 
-
-      if (!combine_gjets_samples) { // skip Pythia if we aren't combining Pythia and MadGraph
-	if (processId == 3) {
-	  continue; 
-	}
-      }
-      */
-
-      if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) {
-        continue; //some pu weights are nan/inf and this causes problems for histos 
-      }
-
-
-      if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
-      if (!passes_selection(tag, minIDMVA_, maxIDMVA_, mva_value))	continue;
-
-      // Fill histograms //
-      vProcess[processId]->fill_histogram("hGJet_BDT", gjet_mva_value, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMass", mass(), evt_weight, vId);   
-      vProcess[processId]->fill_histogram("hMassAN", mass(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMassTop1", m1_, evt_weight, vId);   
-      vProcess[processId]->fill_histogram("hMassTop2", m2_, evt_weight, vId);   
-      vProcess[processId]->fill_histogram("hMassTop_Hq_1", top_candidates[0], evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMassTop_Hq_2", top_candidates[6], evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hMassTop_qqq_1", top_candidates[1], evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMassTop_qqq_2", top_candidates[7], evt_weight, vId);
-
-      if (leadptoM_ > 0.33 && subleadptoM_ > 0.25) {
-	vProcess[processId]->fill_histogram("hMass_PassPtToM", mass(), evt_weight, vId);
-	if (mva_value > 0.9)
-	  vProcess[processId]->fill_histogram("hMass_PassPtToM_AfterBDTCut", mass(), evt_weight, vId);
-      }
-      else {
-	vProcess[processId]->fill_histogram("hMass_FailPtToM", mass(), evt_weight, vId);
-	if (mva_value > 0.9)
-	  vProcess[processId]->fill_histogram("hMass_FailPtToM_AfterBDTCut", mass(), evt_weight, vId);
-      }
-
-      vProcess[processId]->fill_2D_histogram("hMass_MVAScore", mass(), tthMVA_RunII(), evt_weight, vId);
-
-      cout.setf(ios::fixed);
-      cout << std::setprecision(6);
-
-      // Skip blinded region for MC after filling mass histogram
-      if (!(tag.Contains("GJet_Reweight_Preselection"))) {
-        if (!isSignal && blind && mass() > 120 && mass() < 130)	continue;
-      }
-
-      // Fill rest of histograms //
-      vProcess[processId]->fill_histogram("hDNNScore_ttH_vs_dipho", dnn_score_dipho(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hDNNScore_ttH_vs_ttGG", dnn_score_ttgg(), evt_weight, vId); 
-
-      double dipho_mass_resolution = 0.5* pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), 0.5);
-      vProcess[processId]->fill_histogram("hDiphotonMassResolution", dipho_mass_resolution, evt_weight, vId);
-      if (tthMVA() >= 0.75)
-        vProcess[processId]->fill_histogram("hDiphotonMassResolutionHighMVA", dipho_mass_resolution, evt_weight, vId);
-      else if (tthMVA() >= 0.3)
-        vProcess[processId]->fill_histogram("hDiphotonMassResolutionMedMVA", dipho_mass_resolution, evt_weight, vId);
-      else
-        vProcess[processId]->fill_histogram("hDiphotonMassResolutionLowMVA", dipho_mass_resolution, evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hTopTagger_score", topTag_score(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hTopTagger_topMass", topTag_topMass(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hTopTagger_WMass", topTag_WMass(), evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hPixelSeed", leadPixelSeed(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPixelSeed", subleadPixelSeed(), evt_weight, vId);
-      if (abs(leadEta()) < barrel_eta)
-	vProcess[processId]->fill_histogram("hPixelSeedEB", leadPixelSeed(), evt_weight, vId);
-      else
-	vProcess[processId]->fill_histogram("hPixelSeedEE", leadPixelSeed(), evt_weight, vId);
-      if (abs(subleadEta()) < barrel_eta)
-        vProcess[processId]->fill_histogram("hPixelSeedEB", subleadPixelSeed(), evt_weight, vId);
-      else
-        vProcess[processId]->fill_histogram("hPixelSeedEE", subleadPixelSeed(), evt_weight, vId);
-	
-      double helic = helicity(lead_photon, sublead_photon);
-      vProcess[processId]->fill_histogram("hAbsCosHelicity", helic, evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hLeadMinDr", min_dr(lead_photon, jets), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hSubleadMinDr", min_dr(sublead_photon, jets), evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hPhotonDeltaR", lead_photon.DeltaR(sublead_photon), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hDiphotonPtOverMass", diphoton.Pt() / mass(), evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hPtHiggs", diphoton.Pt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hHadronicMVA", mva_value, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hHadronicMVA_coarse", mva_value, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hHadronicMVA_fine", mva_value, evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hRapidity", dipho_rapidity(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hDiphotonSumPt", dipho_sumpt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hDiphotonCosPhi", dipho_cosphi(), evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hNVtx", nvtx(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hRho", rho(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hMetPt", MetPt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hHT", get_ht(jets), evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hNJets", n_jets(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hNbLoose", nb_loose(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hNbMedium", nb_medium(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hNbTight", nb_tight(), evt_weight, vId); 
-
-
-      if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("hJet1pT", jet1_pt(), evt_weight, vId);
-      if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("hJet2pT", jet2_pt(), evt_weight, vId);
-      if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("hJet3pT", jet3_pt(), evt_weight, vId);
-      if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("hJet4pT", jet4_pt(), evt_weight, vId);
-
-      if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("hJet1Eta", jet1_eta(), evt_weight, vId);
-      if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("hJet2Eta", jet2_eta(), evt_weight, vId);
-      if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("hJet3Eta", jet3_eta(), evt_weight, vId);
-      if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("hJet4Eta", jet4_eta(), evt_weight, vId);
-
-      if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("hJet1BTag", btag_scores[0], evt_weight, vId);
-      if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("hJet2BTag", btag_scores[1], evt_weight, vId);
-      if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("hJet3BTag", btag_scores[2], evt_weight, vId);
-      if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("hJet4BTag", btag_scores[3], evt_weight, vId);
-
-      if (bjet1_pt() != -1)     vProcess[processId]->fill_histogram("hbJet1pT", bjet1_pt(), evt_weight, vId);
-      if (bjet2_pt() != -1)     vProcess[processId]->fill_histogram("hbJet2pT", bjet2_pt(), evt_weight, vId);
-
-      // Leading Photon
-      vProcess[processId]->fill_histogram("hPhotonLeadPt", leadPt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadEt", leadEt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadEta", leadEta(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadPhi", leadPhi(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadSigmaIEtaIEta", lead_sieie(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadHOverE", lead_hoe(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadR9", leadR9(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadIDMVA", leadID_, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadPToM", lead_ptoM(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadSigmaEOverE", lead_sigmaEoE(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonLeadPixelSeed", leadPixelSeed(), evt_weight, vId);
-
-      if (lead_closest_gen_dR() < 999) {
-        vProcess[processId]->fill_histogram("hPhotonLeadPtGen", lead_closest_gen_Pt(), evt_weight, vId);
-	if (lead_photon_type() == 1)
-          vProcess[processId]->fill_histogram("hPhotonPtRatio", leadPt() / leadPtGen(), evt_weight, vId);
-        vProcess[processId]->fill_histogram("hPhotonDeltaRGen", lead_closest_gen_dR(), evt_weight, vId);
-      }
-
-      // Subleading Photon
-      vProcess[processId]->fill_histogram("hPhotonSubleadPt", subleadPt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadEt", subleadEt(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadEta", subleadEta(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadPhi", subleadPhi(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadSigmaIEtaIEta", sublead_sieie(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadHOverE", sublead_hoe(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadR9", subleadR9(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadIDMVA", subleadID_, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadPToM", sublead_ptoM(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonSubleadPixelSeed", subleadPixelSeed(), evt_weight, vId);
-
-      if (sublead_closest_gen_dR() < 999) {
-        vProcess[processId]->fill_histogram("hPhotonSubleadPtGen", sublead_closest_gen_Pt(), evt_weight, vId);
-	if (sublead_photon_type() == 1)
-          vProcess[processId]->fill_histogram("hPhotonPtRatio", subleadPt() / subleadPtGen(), evt_weight, vId);
-        vProcess[processId]->fill_histogram("hPhotonDeltaRGen", sublead_closest_gen_dR(), evt_weight, vId);
-      }
-
-      double maxID = maxIDMVA_;
-      double minID = minIDMVA_; 
-
-      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA", maxID, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_fine", maxID, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse", maxID, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_entries", maxID, 1, vId);
-      vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_fine_entries", maxID, 1, vId);
-      if (njets_ >= 5)
-	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets5+", maxID, evt_weight, vId);
-      if (njets_ >= 7)
-        vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets7+", maxID, evt_weight, vId);
-
-      vProcess[processId]->fill_histogram("hPhotonMinIDMVA", minID, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_fine", minID, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse", minID, evt_weight, vId);
-      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_entries", minID, 1, vId);
-      vProcess[processId]->fill_histogram("hPhotonMinIDMVA_fine_entries", minID, 1, vId);
-      if (njets_ >= 5)
-        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets5+", minID, evt_weight, vId);
-      if (njets_ >= 7)
-        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets7+", minID, evt_weight, vId);
-
-
-
-      if (nb_medium() == 0) {
-        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_coarse_0b", minID, evt_weight, vId);
-        vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_coarse_0b", maxID, evt_weight, vId);
-      }
-
-      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets", maxID, n_jets(), evt_weight, vId);
-      vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets", minID, n_jets(), evt_weight, vId); 
-      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets_entries", maxID, n_jets(), 1, vId);
-      vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets_entries", minID, n_jets(), 1, vId);
-
-      vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_MinIDMVA", maxID, minID, evt_weight, vId);
-
-
-      if (leadIDMVA() >= subleadIDMVA()) {
-	vProcess[processId]->fill_histogram("hMaxIDPhotonPt", leadPt(), evt_weight, vId);
-	vProcess[processId]->fill_histogram("hMaxIDPhotonEta", leadEta(), evt_weight, vId);
-	vProcess[processId]->fill_histogram("hMinIDPhotonPt", subleadPt(), evt_weight, vId);
-        vProcess[processId]->fill_histogram("hMinIDPhotonEta", subleadEta(), evt_weight, vId);
-      }
-      else {
-	vProcess[processId]->fill_histogram("hMaxIDPhotonPt", subleadPt(), evt_weight, vId);
-        vProcess[processId]->fill_histogram("hMaxIDPhotonEta", subleadEta(), evt_weight, vId);
-        vProcess[processId]->fill_histogram("hMinIDPhotonPt", leadPt(), evt_weight, vId);
-        vProcess[processId]->fill_histogram("hMinIDPhotonEta", leadEta(), evt_weight, vId);
-      }
-
-      if (lead_photon_type() == 3) {
-	vProcess[processId]->fill_histogram("hFakePhotonIDMVA", leadIDMVA(), evt_weight, vId);
-	if (leadPt() > 40 && abs(leadEta()) < barrel_eta)
-	  vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Barrel_HighPt", leadIDMVA(), evt_weight, vId);
-        else if (leadPt() < 40 && abs(leadEta()) < barrel_eta)
-	  vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Barrel_LowPt", leadIDMVA(), evt_weight, vId); 
-	else if (leadPt() > 40 && abs(leadEta()) > barrel_eta)
-          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Endcap_HighPt", leadIDMVA(), evt_weight, vId); 
-        else if (leadPt() < 40 && abs(leadEta()) > barrel_eta)
-          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Endcap_LowPt", leadIDMVA(), evt_weight, vId); 
-        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", leadIDMVA(), njets_, evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_MaxBTag", leadIDMVA(), max1_btag_, evt_weight, vId); 
-	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", leadIDMVA(), max2_btag_, evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", leadIDMVA(), diphoton.Pt(), evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Pt", leadIDMVA(), leadPt(), evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Eta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
-      }
-      else if (lead_photon_type() == 1) {
-	vProcess[processId]->fill_histogram("hPromptPhotonIDMVA", leadIDMVA(), evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_NJets", leadIDMVA(), njets_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_MaxBTag", leadIDMVA(), max1_btag_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_2ndMaxBTag", leadIDMVA(), max2_btag_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_DiPhotonPt", leadIDMVA(), diphoton.Pt(), evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Pt", leadIDMVA(), leadPt(), evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Eta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
-      }
-
-      if (sublead_photon_type() == 3) {
-	vProcess[processId]->fill_histogram("hFakePhotonIDMVA", subleadIDMVA(), evt_weight, vId);
-	if (subleadPt() > 40 && abs(subleadEta()) < barrel_eta)
-          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Barrel_HighPt", subleadIDMVA(), evt_weight, vId);
-        else if (subleadPt() < 40 && abs(subleadEta()) < barrel_eta)
-          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Barrel_LowPt", subleadIDMVA(), evt_weight, vId);
-        else if (subleadPt() > 40 && abs(subleadEta()) > barrel_eta)
-          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Endcap_HighPt", subleadIDMVA(), evt_weight, vId); 
-        else if (subleadPt() < 40 && abs(subleadEta()) > barrel_eta)
-          vProcess[processId]->fill_histogram("hFakePhotonIDMVA_Endcap_LowPt", subleadIDMVA(), evt_weight, vId); 
-	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", subleadIDMVA(), njets_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_MaxBTag", subleadIDMVA(), max1_btag_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", subleadIDMVA(), max2_btag_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", subleadIDMVA(), diphoton.Pt(), evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Pt", subleadIDMVA(), subleadPt(), evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Eta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId);
-      }
-      else if (sublead_photon_type() == 1) {
-	vProcess[processId]->fill_histogram("hPromptPhotonIDMVA", subleadIDMVA(), evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_NJets", subleadIDMVA(), njets_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_MaxBTag", subleadIDMVA(), max1_btag_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_2ndMaxBTag", subleadIDMVA(), max2_btag_, evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_DiPhotonPt", subleadIDMVA(), diphoton.Pt(), evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Pt", subleadIDMVA(), subleadPt(), evt_weight, vId);
-        vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Eta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId);
-      }
-
-      vProcess[processId]->fill_2D_histogram("hPhotonLeadIDMVA_LeadPt", leadIDMVA(), leadPt(), evt_weight, vId);
-      vProcess[processId]->fill_2D_histogram("hPhotonLeadIDMVA_LeadEta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
-      vProcess[processId]->fill_2D_histogram("hPhotonSubleadIDMVA_SubleadPt", subleadIDMVA(), subleadPt(), evt_weight, vId);
-      vProcess[processId]->fill_2D_histogram("hPhotonSubleadIDMVA_SubleadEta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId); 
-
-      // Checks for p_T/mGG cuts
-      if (mass() > 100 && mass() < 180) {
-	vProcess[processId]->fill_2D_histogram("hBDT_LeadPtoM", mva_value, leadptoM_, evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hBDT_SubleadPtoM", mva_value, subleadptoM_, evt_weight, vId); 
-	vProcess[processId]->fill_2D_histogram("hMass_LeadPtoM", mass(), leadptoM_, evt_weight, vId);
-	vProcess[processId]->fill_2D_histogram("hMass_SubleadPtoM", mass(), subleadptoM_, evt_weight, vId);
-	if (mva_value > 0.9) {
-	  vProcess[processId]->fill_2D_histogram("hMass_LeadPtoM_afterBDTCut", mass(), leadptoM_, evt_weight, vId);
-	  vProcess[processId]->fill_2D_histogram("hMass_SubleadPtoM_afterBDTCut", mass(), subleadptoM_, evt_weight, vId);
-	}
-      }
-
-      if (n_jets() == 2) {
-	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets2", maxID, evt_weight, vId);
-	vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets2", minID, evt_weight, vId);
-      }
-      else if (n_jets() == 3) {
-	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets3", maxID, evt_weight, vId);
-        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets3", minID, evt_weight, vId);
-      }
-      else if (n_jets() >= 4) {
-	vProcess[processId]->fill_histogram("hPhotonMaxIDMVA_NJets4+", maxID, evt_weight, vId);
-        vProcess[processId]->fill_histogram("hPhotonMinIDMVA_NJets4+", minID, evt_weight, vId);
-      }
-
-      vProcess[processId]->fill_histogram("hDiphoMVA", diphoMVARes(), evt_weight, vId);
-
-      // ttH-Hadronic Specific
-      vProcess[processId]->fill_histogram("hMaxBTag", bjet1_csv(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("hSecondMaxBTag", bjet2_csv(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("htthMVA", tthMVA(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("htthMVA_RunII", tthMVA_RunII(), evt_weight, vId);
-      vProcess[processId]->fill_histogram("htthMVA_RunII_transf", -log(1-tthMVA_RunII()), evt_weight, vId);
-      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ", -log(1-tthMVA_RunII()), evt_weight, vId);
-      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v2", -log(1-tthMVA_RunII()), evt_weight, vId);
-      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v3", -log(1-tthMVA_RunII()), evt_weight, vId);
-      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v4", -log(1-tthMVA_RunII()), evt_weight, vId);
-      vProcess[processId]->fill_histogram("htthMVA_RunII_transf_ttZ_v5", -log(1-tthMVA_RunII()), evt_weight, vId);
-
-      if (lead_photon_type() == 1)
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", maxID, evt_weight, vId);
-      else if (lead_photon_type() == 2)
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_elec", maxID, evt_weight, vId);
-      else if (lead_photon_type() == 3)
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_fake", maxID, evt_weight, vId);
-
-      if (sublead_photon_type() == 1)
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_prompt", maxID, evt_weight, vId);
-      else if (sublead_photon_type() == 2)
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_elec", maxID, evt_weight, vId);
-      else if (sublead_photon_type() == 3)
-        vProcess[processId]->fill_histogram("hPhotonIDMVA_fake", maxID, evt_weight, vId);
-
-    }
-  
+    // Loop over each tree
+    for (unsigned int i = 0; i < syst_trees.size(); i++) {
+        TString syst_ext;
+        if (i == 0)
+            syst_ext = "";
+        else
+            syst_ext = independent_systematic_collections[i-1];
+
+        std::vector<TString> weight_systs = {""};
+        if (i == 0) {
+            for (unsigned int j = 0; j < weight_systematics.size(); j++)
+                weight_systs.push_back(weight_systematics[j]);
+        }
+        // Loop over each syst weight
+        for (unsigned int j = 0; j < weight_systs.size(); j++) {
+            syst_ext += weight_systs[j];
+
+            cout << "Looping over syst tree " << i << ", weight syst " << j << ", with syst label: " << syst_ext << endl;
+
+            // Loop over Events in current file
+            //if (nEventsTotal >= nEventsChain) continue;
+            unsigned int nEventsTree = syst_trees[i]->GetEntriesFast();
+            for (unsigned int event = 0; event < nEventsTree; ++event) {
+
+              // Get Event Content
+              if (nEventsTotal >= nEventsChain) continue;
+              if (fast) syst_trees[i]->LoadTree(event);
+              cms3.GetEntry(event);
+              ++nEventsTotal;
+
+              // Progress
+              ttHHadronic::progress( nEventsTotal, nEventsChain );
+
+              // Check golden json
+              if (isData) {
+                if (!pass_json(mYear, cms3.run(), cms3.lumi()))            continue;
+              }
+
+              // Fill mva baby before any selections
+              int genPhotonId = isData ? -1 : categorize_photons(leadGenMatch(), subleadGenMatch());
+              int processId = categorize_process(currentFileTitle, genPhotonId);
+              if (processId == 17)
+                processId = 3; // use Madgraph GJets instead of Pythia
+
+              int genLeptonId = isData ? -1 : categorize_leptons(nGoodEls(), nGoodMus());
+              int genPhotonDetailId = isData ? -1 : categorize_photons_detail(lead_photon_type(), sublead_photon_type());
+              int photonLocationId = categorize_photon_locations(leadEta(), subleadEta());
+
+              float evt_weight = 1.;
+             
+              int label = isData ? 2 : (isSignal ? 1 : 0); // 0 = bkg, 1 = signal, 2 = data
+
+              if (year.Contains("RunII") && !isData) {
+                double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
+                if (mYear == "2016")
+                  evt_weight *= scale1fb * lumi_2016 * weight();
+                else if (mYear == "2017")
+                  evt_weight *= scale1fb * lumi_2017 * weight();
+                else if (mYear == "2018")
+                  evt_weight *= scale1fb * lumi_2018 * weight();
+              }     
+         
+              else if (!isData) {
+                if (year == "2018") // temporary hack to use 2017 mc with 2018 data
+                  evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+                else if (mYear == "2016")
+                  evt_weight *= scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
+                else if (mYear == "2017")
+                  evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2017 * weight();
+                else if (mYear == "2018")
+                  evt_weight *= scale1fb_2017(currentFileTitle) * lumi_2018 * weight();
+              }
+
+              bool pu_weight = true;
+              if (pu_weight) {
+                evt_weight *= puweight();
+              }
+
+              // Impute, if applicable
+              maxIDMVA_ = leadIDMVA() > subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+              minIDMVA_ = leadIDMVA() <= subleadIDMVA() ? leadIDMVA() : subleadIDMVA();
+              if (bkg_options.Contains("impute")) {
+                if (isData)
+                  impute_photon_id(min_photon_ID_presel_cut, maxIDMVA_, photon_fakeID_shape_runII, minIDMVA_, evt_weight, processId);
+              }
+
+              // Blinded region
+              if (isData && processId != 18 && blind && mass() > 120 && mass() < 130)  continue;
+
+              // Scale bkg weight
+              evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Hadronic");
+            
+              // Scale FCNC to current best observed limit (ATLAS 2016 combination)
+              if (currentFileTitle.Contains("FCNC"))
+                evt_weight *= scale_fcnc(currentFileTitle);
+
+              // Modify weight for systematics affecting weights
+              if (j >= 1) {
+                double nominal_weight, up_variation, down_variation;
+                if (syst_ext.Contains("UnmatchedPUWeight")) {
+                  nominal_weight = UnmatchedPUWeightUp01sigma() - UnmatchedPUWeightDown01sigma();
+                  up_variation = UnmatchedPUWeightUp01sigma() / nominal_weight;
+                  down_variation = UnmatchedPUWeightDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("MvaLinearSyst")) {
+                  nominal_weight = MvaLinearSystUp01sigma() - MvaLinearSystDown01sigma();
+                  up_variation = MvaLinearSystUp01sigma() / nominal_weight;
+                  down_variation = MvaLinearSystDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("LooseMvaSF")) {
+                  nominal_weight = LooseMvaSFUp01sigma() - LooseMvaSFDown01sigma();
+                  up_variation = LooseMvaSFUp01sigma() / nominal_weight;
+                  down_variation = LooseMvaSFDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("PreselSF")) {
+                  nominal_weight = PreselSFUp01sigma() - PreselSFDown01sigma();
+                  up_variation = PreselSFUp01sigma() / nominal_weight;
+                  down_variation = PreselSFDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("electronVetoSF")) {
+                  nominal_weight = electronVetoSFUp01sigma() - electronVetoSFDown01sigma();
+                  up_variation = electronVetoSFUp01sigma() / nominal_weight;
+                  down_variation = electronVetoSFDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("TriggerWeight")) {
+                  nominal_weight = TriggerWeightUp01sigma() - TriggerWeightDown01sigma();
+                  up_variation = TriggerWeightUp01sigma() / nominal_weight;
+                  down_variation = TriggerWeightDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("FracRVWeight")) {
+                  nominal_weight = FracRVWeightUp01sigma() - FracRVWeightDown01sigma();
+                  up_variation = FracRVWeightUp01sigma() / nominal_weight;
+                  down_variation = FracRVWeightDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("ElectronWeight")) {
+                  nominal_weight = ElectronWeightUp01sigma() - ElectronWeightDown01sigma();
+                  up_variation = ElectronWeightUp01sigma() / nominal_weight;
+                  down_variation = ElectronWeightDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("JetBTagCutWeight")) {
+                  nominal_weight = JetBTagCutWeightUp01sigma() - JetBTagCutWeightDown01sigma();
+                  up_variation = JetBTagCutWeightUp01sigma() / nominal_weight;
+                  down_variation = JetBTagCutWeightDown01sigma() / nominal_weight;
+                }
+                else if (syst_ext.Contains("JetBTagReshapeWeight")) {
+                  nominal_weight = JetBTagReshapeWeightUp01sigma() - JetBTagReshapeWeightDown01sigma();
+                  up_variation = JetBTagReshapeWeightUp01sigma() / nominal_weight;
+                  down_variation = JetBTagReshapeWeightDown01sigma() / nominal_weight;
+                }
+
+                if (syst_ext.Contains("Up01Sigma"))
+                    evt_weight *= up_variation;
+                else if (syst_ext.Contains("Down01Sigma"))
+                    evt_weight *= down_variation;
+              }
+
+              double leadID_ = leadIDMVA() == maxIDMVA_ ? maxIDMVA_ : minIDMVA_;
+              double subleadID_ = leadIDMVA() == maxIDMVA_ ? minIDMVA_ : maxIDMVA_; 
+
+              vector<TLorentzVector> jets;
+              TLorentzVector lead_photon;
+              TLorentzVector sublead_photon;
+              lead_photon = make_lead_photon();
+              sublead_photon = make_sublead_photon();
+              TLorentzVector diphoton = lead_photon + sublead_photon;
+
+              vector<double> btag_scores;
+              vector<std::pair<int, double>> btag_scores_sorted;
+              jets = make_jets(btag_scores, year);
+              btag_scores_sorted = sortVector(btag_scores);
+
+              double mva_value = -999;
+
+              max2_btag_ = btag_scores_sorted[1].second;
+              max1_btag_ = btag_scores_sorted[0].second;
+              dipho_delta_R = lead_photon.DeltaR(sublead_photon);
+              ht_ = get_ht(jets);
+              njets_ = n_jets();
+              nbjets_ = nb_medium();
+
+              jet1_pt_   = njets_ >= 1 ? jets[0].Pt()   : -999;
+              jet1_eta_  = njets_ >= 1 ? jets[0].Eta()  : -999;
+              jet1_btag_ = njets_ >= 1 ? btag_scores[0] : -999;
+              jet2_pt_   = njets_ >= 2 ? jets[1].Pt()   : -999; 
+              jet2_eta_  = njets_ >= 2 ? jets[1].Eta()  : -999;
+              jet2_btag_ = njets_ >= 2 ? btag_scores[1] : -999;
+              jet3_pt_   = njets_ >= 3 ? jets[2].Pt()   : -999;
+              jet3_eta_  = njets_ >= 3 ? jets[2].Eta()  : -999;
+              jet3_btag_ = njets_ >= 3 ? btag_scores[2] : -999;
+              jet4_pt_   = njets_ >= 4 ? jets[3].Pt()   : -999;
+              jet4_eta_  = njets_ >= 4 ? jets[3].Eta()  : -999;
+              jet4_btag_ = njets_ >= 4 ? btag_scores[3] : -999;
+              jet5_pt_   = njets_ >= 5 ? jets[4].Pt()   : -999;
+              jet5_eta_  = njets_ >= 5 ? jets[4].Eta()  : -999;
+              jet5_btag_ = njets_ >= 5 ? btag_scores[4] : -999;
+              jet6_pt_   = njets_ >= 6 ? jets[5].Pt()   : -999;
+              jet6_eta_  = njets_ >= 6 ? jets[5].Eta()  : -999;
+              jet6_btag_ = njets_ >= 6 ? btag_scores[5] : -999;
+
+              lead_pT_ = leadPt();
+              sublead_pT_ = subleadPt();
+              leadptoM_ = lead_ptoM();
+              subleadptoM_ = sublead_ptoM();
+              leadIDMVA_ = leadID_;
+              subleadIDMVA_ = subleadID_;
+              lead_eta_ = leadEta();
+              sublead_eta_ = subleadEta();
+
+              leadPSV_ = leadPixelSeed();
+              subleadPSV_ = subleadPixelSeed();
+
+              dipho_cosphi_ = dipho_cosphi();
+              dipho_rapidity_ = dipho_rapidity();
+              dipho_pt_ = diphoton.Pt();
+              dipho_pt_over_mass_ = diphoton.Pt() / mass();
+
+              helicity_angle_ = helicity(lead_photon, sublead_photon);
+
+              met_ = MetPt();
+
+              calculate_masses(diphoton, jets, m1_, m2_);
+
+              vector<float> top_candidates = calculate_top_candidates(diphoton, jets, btag_scores, max1_btag_);
+
+              if (evaluate_mva) 
+                mva_value = convert_tmva_to_prob(mva->EvaluateMVA( "BDT" ));
+              double reference_mva = tthMVA();
+              double super_rand = -999;
+
+              int mvaCategoryId = mva_value < -0.8 ? 0 : 1;
+              vector<int> vId = {genLeptonId, genPhotonId, genPhotonDetailId, photonLocationId, mvaCategoryId, -1, yearId};
+
+
+              // Gamma + jets reweighting
+              double gjet_mva_value = -999;	
+
+              if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) {
+                continue; //some pu weights are nan/inf and this causes problems for histos 
+              }
+
+
+              if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
+              if (!passes_selection(tag, minIDMVA_, maxIDMVA_, mva_value))	continue;
+
+              // Fill histograms //
+              vProcess[processId]->fill_histogram("h" + syst_ext + "GJet_BDT", gjet_mva_value, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "Mass", mass(), evt_weight, vId);   
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassAN", mass(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop1", m1_, evt_weight, vId);   
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop2", m2_, evt_weight, vId);   
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop_Hq_1", top_candidates[0], evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop_Hq_2", top_candidates[6], evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop_qqq_1", top_candidates[1], evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop_qqq_2", top_candidates[7], evt_weight, vId);
+
+              if (leadptoM_ > 0.33 && subleadptoM_ > 0.25) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "Mass_PassPtToM", mass(), evt_weight, vId);
+            if (mva_value > 0.9)
+              vProcess[processId]->fill_histogram("h" + syst_ext + "Mass_PassPtToM_AfterBDTCut", mass(), evt_weight, vId);
+              }
+              else {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "Mass_FailPtToM", mass(), evt_weight, vId);
+            if (mva_value > 0.9)
+              vProcess[processId]->fill_histogram("h" + syst_ext + "Mass_FailPtToM_AfterBDTCut", mass(), evt_weight, vId);
+              }
+
+              vProcess[processId]->fill_2D_histogram("hMass_MVAScore", mass(), tthMVA_RunII(), evt_weight, vId);
+
+              cout.setf(ios::fixed);
+              cout << std::setprecision(6);
+
+              // Skip blinded region for MC after filling mass histogram
+              if (!(tag.Contains("GJet_Reweight_Preselection"))) {
+                if (!isSignal && blind && mass() > 120 && mass() < 130)	continue;
+              }
+
+              // Fill rest of histograms //
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DNNScore_ttH_vs_dipho", dnn_score_dipho(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DNNScore_ttH_vs_ttGG", dnn_score_ttgg(), evt_weight, vId); 
+
+              double dipho_mass_resolution = 0.5* pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), 0.5);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonMassResolution", dipho_mass_resolution, evt_weight, vId);
+              if (tthMVA() >= 0.75)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonMassResolutionHighMVA", dipho_mass_resolution, evt_weight, vId);
+              else if (tthMVA() >= 0.3)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonMassResolutionMedMVA", dipho_mass_resolution, evt_weight, vId);
+              else
+                vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonMassResolutionLowMVA", dipho_mass_resolution, evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "TopTagger_score", topTag_score(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "TopTagger_topMass", topTag_topMass(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "TopTagger_WMass", topTag_WMass(), evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PixelSeed", leadPixelSeed(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PixelSeed", subleadPixelSeed(), evt_weight, vId);
+              if (abs(leadEta()) < barrel_eta)
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PixelSeedEB", leadPixelSeed(), evt_weight, vId);
+              else
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PixelSeedEE", leadPixelSeed(), evt_weight, vId);
+              if (abs(subleadEta()) < barrel_eta)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PixelSeedEB", subleadPixelSeed(), evt_weight, vId);
+              else
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PixelSeedEE", subleadPixelSeed(), evt_weight, vId);
+            
+              double helic = helicity(lead_photon, sublead_photon);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "AbsCosHelicity", helic, evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "LeadMinDr", min_dr(lead_photon, jets), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "SubleadMinDr", min_dr(sublead_photon, jets), evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonDeltaR", lead_photon.DeltaR(sublead_photon), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonPtOverMass", diphoton.Pt() / mass(), evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PtHiggs", diphoton.Pt(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MinDrDiphoJet", min_dr(diphoton, jets), evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "HadronicMVA", mva_value, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "HadronicMVA_coarse", mva_value, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "HadronicMVA_fine", mva_value, evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "Rapidity", dipho_rapidity(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonSumPt", dipho_sumpt(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonCosPhi", dipho_cosphi(), evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "NVtx", nvtx(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "Rho", rho(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MetPt", MetPt(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "HT", get_ht(jets), evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "NJets", n_jets(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "NbLoose", nb_loose(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "NbMedium", nb_medium(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "NbTight", nb_tight(), evt_weight, vId); 
+
+
+              if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet1pT", jet1_pt(), evt_weight, vId);
+              if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet2pT", jet2_pt(), evt_weight, vId);
+              if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet3pT", jet3_pt(), evt_weight, vId);
+              if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet4pT", jet4_pt(), evt_weight, vId);
+
+              if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet1Eta", jet1_eta(), evt_weight, vId);
+              if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet2Eta", jet2_eta(), evt_weight, vId);
+              if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet3Eta", jet3_eta(), evt_weight, vId);
+              if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet4Eta", jet4_eta(), evt_weight, vId);
+
+              if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet1BTag", btag_scores[0], evt_weight, vId);
+              if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet2BTag", btag_scores[1], evt_weight, vId);
+              if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet3BTag", btag_scores[2], evt_weight, vId);
+              if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet4BTag", btag_scores[3], evt_weight, vId);
+
+              if (bjet1_pt() != -1)     vProcess[processId]->fill_histogram("h" + syst_ext + "bJet1pT", bjet1_pt(), evt_weight, vId);
+              if (bjet2_pt() != -1)     vProcess[processId]->fill_histogram("h" + syst_ext + "bJet2pT", bjet2_pt(), evt_weight, vId);
+
+              // Leading Photon
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadPt", leadPt(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadEt", leadEt(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadEta", leadEta(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadPhi", leadPhi(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadSigmaIEtaIEta", lead_sieie(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadHOverE", lead_hoe(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadR9", leadR9(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadIDMVA", leadID_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadPToM", lead_ptoM(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadSigmaEOverE", lead_sigmaEoE(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadPixelSeed", leadPixelSeed(), evt_weight, vId);
+
+              if (lead_closest_gen_dR() < 999) {
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonLeadPtGen", lead_closest_gen_Pt(), evt_weight, vId);
+            if (lead_photon_type() == 1)
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonPtRatio", leadPt() / leadPtGen(), evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonDeltaRGen", lead_closest_gen_dR(), evt_weight, vId);
+              }
+
+              // Subleading Photon
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadPt", subleadPt(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadEt", subleadEt(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadEta", subleadEta(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadPhi", subleadPhi(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadSigmaIEtaIEta", sublead_sieie(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadHOverE", sublead_hoe(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadR9", subleadR9(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadIDMVA", subleadID_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadPToM", sublead_ptoM(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadSigmaEOverE", sublead_sigmaEoE(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadPixelSeed", subleadPixelSeed(), evt_weight, vId);
+
+              if (sublead_closest_gen_dR() < 999) {
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonSubleadPtGen", sublead_closest_gen_Pt(), evt_weight, vId);
+            if (sublead_photon_type() == 1)
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonPtRatio", subleadPt() / subleadPtGen(), evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonDeltaRGen", sublead_closest_gen_dR(), evt_weight, vId);
+              }
+
+              double maxID = maxIDMVA_;
+              double minID = minIDMVA_; 
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA", maxID, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_fine", maxID, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_coarse", maxID, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_entries", maxID, 1, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_fine_entries", maxID, 1, vId);
+              if (njets_ >= 5)
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_NJets5+", maxID, evt_weight, vId);
+              if (njets_ >= 7)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_NJets7+", maxID, evt_weight, vId);
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA", minID, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_fine", minID, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_coarse", minID, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_entries", minID, 1, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_fine_entries", minID, 1, vId);
+              if (njets_ >= 5)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_NJets5+", minID, evt_weight, vId);
+              if (njets_ >= 7)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_NJets7+", minID, evt_weight, vId);
+
+
+
+              if (nb_medium() == 0) {
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_coarse_0b", minID, evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_coarse_0b", maxID, evt_weight, vId);
+              }
+
+              vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets", maxID, n_jets(), evt_weight, vId);
+              vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets", minID, n_jets(), evt_weight, vId); 
+              vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_NJets_entries", maxID, n_jets(), 1, vId);
+              vProcess[processId]->fill_2D_histogram("hPhotonMinIDMVA_NJets_entries", minID, n_jets(), 1, vId);
+
+              vProcess[processId]->fill_2D_histogram("hPhotonMaxIDMVA_MinIDMVA", maxID, minID, evt_weight, vId);
+
+
+              if (leadIDMVA() >= subleadIDMVA()) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "MaxIDPhotonPt", leadPt(), evt_weight, vId);
+            vProcess[processId]->fill_histogram("h" + syst_ext + "MaxIDPhotonEta", leadEta(), evt_weight, vId);
+            vProcess[processId]->fill_histogram("h" + syst_ext + "MinIDPhotonPt", subleadPt(), evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "MinIDPhotonEta", subleadEta(), evt_weight, vId);
+              }
+              else {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "MaxIDPhotonPt", subleadPt(), evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "MaxIDPhotonEta", subleadEta(), evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "MinIDPhotonPt", leadPt(), evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "MinIDPhotonEta", leadEta(), evt_weight, vId);
+              }
+
+              if (lead_photon_type() == 3) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA", leadIDMVA(), evt_weight, vId);
+            if (leadPt() > 40 && abs(leadEta()) < barrel_eta)
+              vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA_Barrel_HighPt", leadIDMVA(), evt_weight, vId);
+                else if (leadPt() < 40 && abs(leadEta()) < barrel_eta)
+              vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA_Barrel_LowPt", leadIDMVA(), evt_weight, vId); 
+            else if (leadPt() > 40 && abs(leadEta()) > barrel_eta)
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA_Endcap_HighPt", leadIDMVA(), evt_weight, vId); 
+                else if (leadPt() < 40 && abs(leadEta()) > barrel_eta)
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA_Endcap_LowPt", leadIDMVA(), evt_weight, vId); 
+                vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", leadIDMVA(), njets_, evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_MaxBTag", leadIDMVA(), max1_btag_, evt_weight, vId); 
+            vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", leadIDMVA(), max2_btag_, evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", leadIDMVA(), diphoton.Pt(), evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Pt", leadIDMVA(), leadPt(), evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Eta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
+              }
+              else if (lead_photon_type() == 1) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PromptPhotonIDMVA", leadIDMVA(), evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_NJets", leadIDMVA(), njets_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_MaxBTag", leadIDMVA(), max1_btag_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_2ndMaxBTag", leadIDMVA(), max2_btag_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_DiPhotonPt", leadIDMVA(), diphoton.Pt(), evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Pt", leadIDMVA(), leadPt(), evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Eta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
+              }
+
+              if (sublead_photon_type() == 3) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA", subleadIDMVA(), evt_weight, vId);
+            if (subleadPt() > 40 && abs(subleadEta()) < barrel_eta)
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA_Barrel_HighPt", subleadIDMVA(), evt_weight, vId);
+                else if (subleadPt() < 40 && abs(subleadEta()) < barrel_eta)
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA_Barrel_LowPt", subleadIDMVA(), evt_weight, vId);
+                else if (subleadPt() > 40 && abs(subleadEta()) > barrel_eta)
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA_Endcap_HighPt", subleadIDMVA(), evt_weight, vId); 
+                else if (subleadPt() < 40 && abs(subleadEta()) > barrel_eta)
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "FakePhotonIDMVA_Endcap_LowPt", subleadIDMVA(), evt_weight, vId); 
+            vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_NJets", subleadIDMVA(), njets_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_MaxBTag", subleadIDMVA(), max1_btag_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_2ndMaxBTag", subleadIDMVA(), max2_btag_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_DiPhotonPt", subleadIDMVA(), diphoton.Pt(), evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Pt", subleadIDMVA(), subleadPt(), evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hFakePhotonIDMVA_Eta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId);
+              }
+              else if (sublead_photon_type() == 1) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PromptPhotonIDMVA", subleadIDMVA(), evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_NJets", subleadIDMVA(), njets_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_MaxBTag", subleadIDMVA(), max1_btag_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_2ndMaxBTag", subleadIDMVA(), max2_btag_, evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_DiPhotonPt", subleadIDMVA(), diphoton.Pt(), evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Pt", subleadIDMVA(), subleadPt(), evt_weight, vId);
+                vProcess[processId]->fill_2D_histogram("hPromptPhotonIDMVA_Eta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId);
+              }
+
+              vProcess[processId]->fill_2D_histogram("hPhotonLeadIDMVA_LeadPt", leadIDMVA(), leadPt(), evt_weight, vId);
+              vProcess[processId]->fill_2D_histogram("hPhotonLeadIDMVA_LeadEta", leadIDMVA(), abs(leadEta()), evt_weight, vId);
+              vProcess[processId]->fill_2D_histogram("hPhotonSubleadIDMVA_SubleadPt", subleadIDMVA(), subleadPt(), evt_weight, vId);
+              vProcess[processId]->fill_2D_histogram("hPhotonSubleadIDMVA_SubleadEta", subleadIDMVA(), abs(subleadEta()), evt_weight, vId); 
+
+              // Checks for p_T/mGG cuts
+              if (mass() > 100 && mass() < 180) {
+            vProcess[processId]->fill_2D_histogram("hBDT_LeadPtoM", mva_value, leadptoM_, evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hBDT_SubleadPtoM", mva_value, subleadptoM_, evt_weight, vId); 
+            vProcess[processId]->fill_2D_histogram("hMass_LeadPtoM", mass(), leadptoM_, evt_weight, vId);
+            vProcess[processId]->fill_2D_histogram("hMass_SubleadPtoM", mass(), subleadptoM_, evt_weight, vId);
+            if (mva_value > 0.9) {
+              vProcess[processId]->fill_2D_histogram("hMass_LeadPtoM_afterBDTCut", mass(), leadptoM_, evt_weight, vId);
+              vProcess[processId]->fill_2D_histogram("hMass_SubleadPtoM_afterBDTCut", mass(), subleadptoM_, evt_weight, vId);
+            }
+              }
+
+              if (n_jets() == 2) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_NJets2", maxID, evt_weight, vId);
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_NJets2", minID, evt_weight, vId);
+              }
+              else if (n_jets() == 3) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_NJets3", maxID, evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_NJets3", minID, evt_weight, vId);
+              }
+              else if (n_jets() >= 4) {
+            vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_NJets4+", maxID, evt_weight, vId);
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_NJets4+", minID, evt_weight, vId);
+              }
+
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DiphoMVA", diphoMVARes(), evt_weight, vId);
+
+              // ttH-Hadronic Specific
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MaxBTag", bjet1_csv(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxBTag", bjet2_csv(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA", tthMVA(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII", tthMVA_RunII(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf", -log(1-tthMVA_RunII()), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ", -log(1-tthMVA_RunII()), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v2", -log(1-tthMVA_RunII()), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v3", -log(1-tthMVA_RunII()), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v4", -log(1-tthMVA_RunII()), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v5", -log(1-tthMVA_RunII()), evt_weight, vId);
+
+              if (lead_photon_type() == 1)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonIDMVA_prompt", maxID, evt_weight, vId);
+              else if (lead_photon_type() == 2)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonIDMVA_elec", maxID, evt_weight, vId);
+              else if (lead_photon_type() == 3)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonIDMVA_fake", maxID, evt_weight, vId);
+
+              if (sublead_photon_type() == 1)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonIDMVA_prompt", maxID, evt_weight, vId);
+              else if (sublead_photon_type() == 2)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonIDMVA_elec", maxID, evt_weight, vId);
+              else if (sublead_photon_type() == 3)
+                vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonIDMVA_fake", maxID, evt_weight, vId);
+
+            }
+        }
+    } 
     // Clean Up
-    delete tree;
+    for (unsigned int i = 0; i < syst_trees.size(); i++)
+        delete syst_trees[i];
     file.Close();
   }
   if (nEventsChain != nEventsTotal) {

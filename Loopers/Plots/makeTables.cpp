@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
   vector<TString> files = tokenize(argv[1], "|"); 
 
   vector<TString> signals = {"ttH"};
-  vector<TString> backgrounds = {"DiPhoton", "GammaJets", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
+  vector<TString> backgrounds = {"DiPhoton", "GammaJets", "QCD", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "DY", "THQ", "THW", "TGamma", "VG", "ggH", "VH", "VBF", "GammaJets_Madgraph", "TTV", "VV", "tV"};
   if (argc > 2) {
       signals = tokenize(argv[2], "|");
   }

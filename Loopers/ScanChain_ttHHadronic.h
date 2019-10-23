@@ -61,7 +61,7 @@ bool pass_2017_mva_presel() {
 bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, float mva_value = -1) {
 
   if (tag == "ttHHadronic_RunII_ttZ_CR") {
-    if (abs(mass() - m_Z) > 5.)         return false;
+    if (abs(mass() - m_Z) > 10.)         return false;
     if (n_jets() < 3)                   return false;
     if (nb_loose() < 1)                 return false;
     if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
@@ -119,7 +119,7 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, float mva_v
     if (n_jets() < 3)                   return false;
     if (nb_loose() < 1)                 return false;
     if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
-    if (tthMVA_RunII() < 0.9675)        return false;
+    if (tthMVA_RunII() < 0.986025)        return false;
     return true;
   }    
 
@@ -129,6 +129,42 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, float mva_v
     if (nb_loose() < 1)                 return false;
     if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
     if (tthMVA_RunII() < 0.9971)        return false;
+    return true;
+  }
+
+  else if (tag == "ttHHadronic_RunII_SR_3") {
+    if (mass() < 100 || mass() > 180)   return false;
+    if (n_jets() < 3)                   return false;
+    if (nb_loose() < 1)                 return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
+    if (tthMVA_RunII() < 0.986025 || tthMVA_RunII() > 0.9948537)        return false;
+    return true;
+  }
+
+  else if (tag == "ttHHadronic_RunII_SR_2") {
+    if (mass() < 100 || mass() > 180)   return false;
+    if (n_jets() < 3)                   return false;
+    if (nb_loose() < 1)                 return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
+    if (tthMVA_RunII() < 0.9948537 || tthMVA_RunII() > 0.9983046)        return false;
+    return true;
+  } 
+
+  else if (tag == "ttHHadronic_RunII_SR_1") {
+    if (mass() < 100 || mass() > 180)   return false;
+    if (n_jets() < 3)                   return false;
+    if (nb_loose() < 1)                 return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
+    if (tthMVA_RunII() < 0.9983046 || tthMVA_RunII() > 0.9990729)        return false;
+    return true;
+  }
+
+  else if (tag == "ttHHadronic_RunII_SR_0") {
+    if (mass() < 100 || mass() > 180)   return false;
+    if (n_jets() < 3)                   return false;
+    if (nb_loose() < 1)                 return false;
+    if (minIDMVA_ < min_photon_ID_presel_cut)       return false;
+    if (tthMVA_RunII() < 0.9990729)        return false;
     return true;
   }
 

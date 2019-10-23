@@ -16,6 +16,7 @@ parser.add_argument("--bdt", help = "bdt to evaluate", type=str, default="none")
 parser.add_argument("--bkg_options", help = "how to treat bkg", type=str, default="none")
 parser.add_argument("--years", help = "which years to run for", type=str, default="2016,2017,2018")
 parser.add_argument("--fcnc", help = "run babymaker with fcnc as signal, ttH as bkg", action="store_true")
+parser.add_argument("--do_systematics", help = "loop over independent collections for systematics bands in data/MC plots", action="store_true")
 args = parser.parse_args()
 
 if args.fcnc:
@@ -70,11 +71,11 @@ babies_2016 = [
     "VHToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1",
     "VHToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1",
 
-    "bbHToGG_M-125_4FS_ybyt_13TeV_amcatnlo_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2",
-    "bbHToGG_M-120_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
-    "bbHToGG_M-125_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
-    "bbHToGG_M-130_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
-    "bbHToGG_M-130_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
+    #"bbHToGG_M-125_4FS_ybyt_13TeV_amcatnlo_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2",
+    #"bbHToGG_M-120_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
+    #"bbHToGG_M-125_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
+    #"bbHToGG_M-130_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
+    #"bbHToGG_M-130_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
 
     "THQ_ctcvcp_HToGG_M125_13TeV-madgraph-pythia8_TuneCUETP8M1_v2_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2",
     #"THW_ctcvcp_HToGG_13TeV-madgraph-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2",
@@ -182,11 +183,11 @@ babies_2017 = [
     "VHToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
     "VHToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
 
-    "bbHToGG_M-120_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
-    "bbHToGG_M-125_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
-    "bbHToGG_M-125_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
-    "bbHToGG_M-130_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
-    "bbHToGG_M-130_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
+    #"bbHToGG_M-120_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
+    #"bbHToGG_M-125_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
+    #"bbHToGG_M-125_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
+    #"bbHToGG_M-130_4FS_yb2_13TeV_amcatnlo_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
+    #"bbHToGG_M-130_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
 
     "THQ_ctcvcp_HToGG_M120_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
     "THQ_ctcvcp_HToGG_M123_13TeV-madgraph-pythia8_TuneCP5_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1",
@@ -288,11 +289,11 @@ babies_2018 = [
     "VHToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
     "VHToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
 
-    "bbHToGG_M-120_4FS_yb2_TuneCP5-13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
-    "bbHToGG_M-125_4FS_yb2_TuneCP5-13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
-    "bbHToGG_M-125_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
-    "bbHToGG_M-130_4FS_yb2_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
-    "bbHToGG_M-130_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
+    #"bbHToGG_M-120_4FS_yb2_TuneCP5-13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
+    #"bbHToGG_M-125_4FS_yb2_TuneCP5-13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
+    #"bbHToGG_M-125_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
+    #"bbHToGG_M-130_4FS_yb2_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
+    #"bbHToGG_M-130_4FS_ybyt_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
 
     "THQ_ctcvcp_HToGG_M120_TuneCP5_13TeV-madgraph-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",
     "THQ_ctcvcp_HToGG_M130_TuneCP5_13TeV-madgraph-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1",

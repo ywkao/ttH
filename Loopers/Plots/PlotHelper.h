@@ -40,6 +40,7 @@ class Comparison
     Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData, TH1D* hSignal, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData, vector<TH1D*> hSignal, vector<TH1D*> hMC);
+    Comparison(TCanvas* c1, vector<TH1D*> hData, vector<TH1D*> hSignal, vector<TH1D*> hMC, vector<TH1D*> hMCSyst_up, vector<TH1D*> hMCSyst_down);
     Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData);
     ~Comparison();
@@ -90,6 +91,8 @@ class Comparison
     void plot1D(int idx);
     void plot2D(int idx);
 
+    void calculate_systematics();
+
     void compute_limits(bool customXRange, bool customYRange);
     void compute_limits(bool customXRange, bool customYRange, bool customZRange);
     void compute_flow(vector<int> xBinRange);
@@ -113,6 +116,17 @@ class Comparison
     TH1D* mHRat;
     vector<TH1D*> mVHRat;
     vector<TH1D*> mVHSignal;
+
+    bool mDoSystBand;
+    vector<TH1D*> mVHMCSyst_up;
+    vector<TH1D*> mVHMCSyst_down;
+    TH1D* hMC_TotalSyst_up;
+    TH1D* hMC_TotalSyst_down;
+    TH1D* hMC_TotalSyst_up_noPlot;
+    TH1D* hMC_TotalSyst_down_noPlot;
+    TH1D* hRat_TotalSyst_up;
+    TH1D* hRat_TotalSyst_down;
+    int mSystColor;
 
     THStack* mStack;
 
@@ -306,6 +320,41 @@ Comparison::Comparison(TCanvas* c1, vector<TH1D*> hData, vector<TH1D*> hSignal, 
   }
 }
 
+inline
+Comparison::Comparison(TCanvas* c1, vector<TH1D*> hData, vector<TH1D*> hSignal, vector<TH1D*> hMC, vector<TH1D*> hMCSyst_up, vector<TH1D*> hMCSyst_down)
+{
+  default_options(c1);
+  //mVHData.push_back((TH1D*)hData->Clone("mHData"));
+  for (int i = 0; i < hData.size(); i++) {
+    TString name = "mHData" + to_string(i);
+    mVHData.push_back((TH1D*)hData[i]->Clone(name));
+  }
+
+  int nMCHists = hMC.size();
+  for (int i=0; i<nMCHists; i++) {
+    TString idx = Form("%d", i);
+    mVHMC.push_back((TH1D*)hMC[i]->Clone("mHMC"+idx));
+    //mVHRat.push_back((TH1D*)hData[i]->Clone("mHRat"+idx));
+  }
+
+  mHMC = (TH1D*)hMC[0]->Clone("mHMC");
+  for (int i=1; i<nMCHists; i++)
+    mHMC->Add(hMC[i]);
+
+  for (int i = 0; i < hSignal.size(); i++) {
+    TString idx = Form("%d", i);
+     mVHSignal.push_back((TH1D*)hSignal[i]->Clone("mHSignal" + idx));
+  }
+
+  for (int i = 0; i < hMCSyst_up.size(); i++) {
+    TString idx = Form("%d", i);
+    mVHMCSyst_up.push_back((TH1D*)hMCSyst_up[i]->Clone("mHMCSystUp" + idx));
+    mVHMCSyst_down.push_back((TH1D*)hMCSyst_down[i]->Clone("mHMCSystDown" + idx)); 
+  } 
+
+  mDoSystBand = true; 
+
+}
 
 inline
 Comparison::Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC)
@@ -329,6 +378,79 @@ Comparison::Comparison(TCanvas* c1, vector<TH1D*> hData)
     TString idx = Form("%d", i);
     mVHData.push_back((TH1D*)hData[i]->Clone("mHData"+idx)); 
   }
+}
+
+inline
+void Comparison::calculate_systematics()
+{
+    vector<double> total_unc_up((mXBinRange[1] - mXBinRange[0]) + 3, 0);
+    vector<double> total_unc_down((mXBinRange[1] - mXBinRange[0]) + 3, 0);    
+
+    // Calculate up/down variations for each systematic in each bin
+    for (int i = 0; i < mVHMCSyst_up.size(); i++) {
+        for (int j = 0; j < (mXBinRange[1] - mXBinRange[0]) + 3; j++) {
+            int idx = mXBinRange[0] + (j - 1);
+            double variation_up;
+
+            if (mHMC->GetBinContent(idx) >= mVHMCSyst_up[i]->GetBinContent(idx) && mHMC->GetBinContent(idx) >= mVHMCSyst_down[i]->GetBinContent(idx))
+                variation_up = 0;
+            else {
+                double difference_up = mVHMCSyst_up[i]->GetBinContent(idx) - mHMC->GetBinContent(idx);
+                double difference_down = mVHMCSyst_down[i]->GetBinContent(idx) - mHMC->GetBinContent(idx);
+                variation_up = difference_up > difference_down ? difference_up : difference_down;
+            }
+            
+            double variation_down;
+            if (mHMC->GetBinContent(idx) <= mVHMCSyst_up[i]->GetBinContent(idx) && mHMC->GetBinContent(idx) <= mVHMCSyst_down[i]->GetBinContent(idx))
+                variation_down = 0;
+            else {
+                double difference_up = mVHMCSyst_up[i]->GetBinContent(idx) - mHMC->GetBinContent(idx);
+                double difference_down = mVHMCSyst_down[i]->GetBinContent(idx) - mHMC->GetBinContent(idx);
+                variation_down = difference_down < difference_up ? difference_down : difference_up; 
+            }
+            total_unc_up[j] += pow(variation_up, 2); // add all variations in quadrature
+            total_unc_down[j] += pow(variation_down, 2);
+            //cout << "Bin " << idx << "/" << mXBinRange[1] - mXBinRange[0] << ": " << variation_up << ", " << variation_down << endl;
+        } 
+    }
+
+    // Add in stat unc.
+    for (int i = 0; i < (mXBinRange[1] - mXBinRange[0]) + 3; i++) {
+        int idx = mXBinRange[0] + (i - 1);
+        double stat_unc = mHMC->GetBinError(idx);
+        total_unc_up[i] += pow(stat_unc/2., 2);
+        total_unc_down[i] += pow(stat_unc/2., 2);
+    }
+
+    for (int i = 0; i < total_unc_up.size(); i++) {
+        total_unc_up[i] = pow(total_unc_up[i], 0.5); // take sqrt
+        total_unc_down[i] = pow(total_unc_down[i], 0.5);
+        //cout << "Bin " << i + 1 << "/" << total_unc_up.size() << ": " << total_unc_up[i] << ", " << total_unc_down[i] << endl;
+    }
+
+    hMC_TotalSyst_up = (TH1D*)mHMC->Clone("mHMC_syst_up");
+    hMC_TotalSyst_up_noPlot = (TH1D*)mHMC->Clone("mHMC_syst_up_noPlot");
+    hMC_TotalSyst_down = (TH1D*)mHMC->Clone("mHMC_syst_down");   
+    hMC_TotalSyst_down_noPlot = (TH1D*)mHMC->Clone("mHMC_syst_down_noPlot");
+
+    for (int i = 0; i < (mXBinRange[1] - mXBinRange[0]) + 3; i++) {
+        int idx = mXBinRange[0] + (i - 1);
+
+        hMC_TotalSyst_up_noPlot->SetBinContent(idx, mHMC->GetBinContent(idx) + total_unc_up[i]);
+        hMC_TotalSyst_up->SetBinContent(idx, mHMC->GetBinContent(idx) + (total_unc_up[i]/2.));
+        hMC_TotalSyst_up->SetBinError(idx, total_unc_up[i]/2.);
+
+        hMC_TotalSyst_down_noPlot->SetBinContent(idx, mHMC->GetBinContent(idx) - total_unc_down[i]);
+        hMC_TotalSyst_down->SetBinContent(idx, mHMC->GetBinContent(idx) - (total_unc_down[i]/2.));
+        hMC_TotalSyst_down->SetBinError(idx, total_unc_down[i]/2.);
+    }
+
+    hRat_TotalSyst_up = (TH1D*)mVHData[0]->Clone("mRatSyst_up");
+    hRat_TotalSyst_up->Divide(hMC_TotalSyst_up_noPlot);
+
+    hRat_TotalSyst_down = (TH1D*)mVHData[0]->Clone("mRatSyst_down");
+    hRat_TotalSyst_down->Divide(hMC_TotalSyst_down_noPlot);
+
 }
 
 inline
@@ -365,6 +487,9 @@ void Comparison::default_options(TCanvas* c1)
   mDataDrawOpt = "E";
   mSignalDrawOpt = "HIST";
   mVerbose = false;
+  mDoSystBand = false;
+
+  mSystColor = kGray+2;
 }
 
 inline
@@ -384,6 +509,8 @@ void Comparison::plot1D(int idx)
   set_main_pad(mMainPad, mLog); 
   compute_limits(mCustomXRange, mCustomYRange);
   compute_flow(mXBinRange);
+  if (mDoSystBand)
+      calculate_systematics();
   draw_main_histograms();
   set_histogram_options(mColor1, mColor2);
   annotate_plot();
@@ -594,13 +721,31 @@ void Comparison::compute_flow(vector<int> xBinRange)
       double underflowMC = mHMC->Integral(0, mXBinRange[0]-1);
       if (mUnderFlow) mHMC->AddBinContent(mXBinRange[0], underflowMC);
       for (int i=0; i<mVHData.size(); i++) {
-	double overflowData = mVHData[i]->Integral(mXBinRange[1]+1, nBins+1);
-	mVHData[i]->AddBinContent(mXBinRange[1], overflowData);
-	if (!mUnderFlow) continue;
-	double underflowData = mVHData[i]->Integral(0, mXBinRange[0]-1);
-	mVHData[i]->AddBinContent(mXBinRange[0], underflowData);
+    	double overflowData = mVHData[i]->Integral(mXBinRange[1]+1, nBins+1);
+	    mVHData[i]->AddBinContent(mXBinRange[1], overflowData);
+	    if (!mUnderFlow) continue;
+	    double underflowData = mVHData[i]->Integral(0, mXBinRange[0]-1);
+	    mVHData[i]->AddBinContent(mXBinRange[0], underflowData);
       }
     }
+
+    if (mVHMCSyst_up.size() > 0) {
+      for (int i = 0; i < mVHMCSyst_up.size(); i++) {
+        double overflow_up = mVHMCSyst_up[i]->Integral(mXBinRange[1]+1, nBins+1);
+        double overflow_down = mVHMCSyst_down[i]->Integral(mXBinRange[1]+1, nBins+1);
+        double underflow_up = mVHMCSyst_up[i]->Integral(0, mXBinRange[0]-1);
+        double underflow_down = mVHMCSyst_down[i]->Integral(0, mXBinRange[0]-1);
+        
+        mVHMCSyst_up[i]->AddBinContent(mXBinRange[1], overflow_up);
+        mVHMCSyst_down[i]->AddBinContent(mXBinRange[1], overflow_down);
+
+        if (!mUnderFlow)    continue;
+
+        mVHMCSyst_up[i]->AddBinContent(mXBinRange[0], underflow_up);
+        mVHMCSyst_down[i]->AddBinContent(mXBinRange[0], underflow_down);
+      }
+    }
+
   }
   if (mVHMC.size() > 0)
     mHMC->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
@@ -745,7 +890,7 @@ void Comparison::draw_main_histograms()
       if (mVHMC[i]->GetBinContent(25) > 0) nEventsBkgMgg += mVHMC[i]->GetBinContent(25);
       if (mVHMC[i]->GetBinContent(26) > 0) nEventsBkgMgg += mVHMC[i]->GetBinContent(26);
     }
-    cout << "m_gg 120-130 sig/bkg: " << nEventsSigMgg/nEventsBkgMgg << endl;
+    //cout << "m_gg 120-130 sig/bkg: " << nEventsSigMgg/nEventsBkgMgg << endl;
   }
   if (!mScaled) {
     mHMC->Scale(mScale);
@@ -778,8 +923,25 @@ void Comparison::draw_main_histograms()
     else
      mVHData[i]->Draw("SAME, " + mDataDrawOpt);
   }
+
   if (!mBothData) mStack->Draw("SAME, HIST");
   else mHMC->Draw("SAME, E");
+
+  if (mDoSystBand) {
+    hMC_TotalSyst_up->SetFillStyle(3144);
+    hMC_TotalSyst_up->SetFillColorAlpha(mSystColor, 0.5);
+    hMC_TotalSyst_up->SetMarkerColor(mSystColor);
+    hMC_TotalSyst_up->SetMarkerSize(0.);
+    hMC_TotalSyst_up->SetLineColor(mSystColor);
+    hMC_TotalSyst_up->Draw("E2, SAME");
+    hMC_TotalSyst_down->SetFillStyle(3144);
+    hMC_TotalSyst_down->SetFillColorAlpha(mSystColor, 0.5);
+    hMC_TotalSyst_down->SetMarkerColor(mSystColor);
+    hMC_TotalSyst_down->SetMarkerSize(0.);
+    hMC_TotalSyst_down->SetLineColor(mSystColor);
+    hMC_TotalSyst_down->Draw("E2, SAME");
+  }
+
   //mStack->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
   //mStack->SetMinimum(mYLimRange[0]);
   //mStack->SetMinimum(mYLimRange[0]);
@@ -1036,7 +1198,7 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
   mVHRat[0]->SetLineColor(dataColors[0]);
   mVHRat[0]->SetFillColor(dataColors[0]);
 
-  mVHRat[0]->Draw("e1x0");
+  mVHRat[0]->Draw("e1");
   //for (int i = 0; i < mVHRat[0]->GetNbinsX(); i++)
   //  cout << "Bin " << i + 1 << ": " << mVHRat[0]->GetBinContent(i+1) << endl; 
   mVHRat[0]->GetXaxis()->SetLabelOffset();
@@ -1051,8 +1213,49 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
     mVHRat[i]->SetFillColor(dataColors[i]);
     mVHRat[i]->SetLineColor(dataColors[i]);
     mVHRat[i]->SetStats(0);
-    mVHRat[i]->Draw("e1x0, same");
+    mVHRat[i]->Draw("e1, same");
   }
+
+  if (mDoSystBand) {
+    for (int i = 0; i < (mXBinRange[1] - mXBinRange[0]) + 3; i++) {
+      int idx = mXBinRange[0] + (i - 1);
+
+      double central_value_up = (mVHRat[0]->GetBinContent(idx) + hRat_TotalSyst_up->GetBinContent(idx)) / 2.;
+      double unc_up = (abs(hMC_TotalSyst_up_noPlot->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx)) / 2.;
+      //double unc_up = abs(mVHRat[0]->GetBinContent(i) - hRat_TotalSyst_up->GetBinContent(i)) / 2.;
+      hRat_TotalSyst_up->SetBinContent(idx, 1 + (unc_up));
+      //hRat_TotalSyst_up->SetBinContent(idx, central_value_up);
+      hRat_TotalSyst_up->SetBinError(idx, unc_up);
+
+      double central_value_down = (mVHRat[0]->GetBinContent(idx) + hRat_TotalSyst_down->GetBinContent(idx)) / 2.;
+      double unc_down = (abs(hMC_TotalSyst_down_noPlot->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx)) / 2.;
+      //double unc_down = abs(mVHRat[0]->GetBinContent(idx) - hRat_TotalSyst_down->GetBinContent(idx)) / 2.;
+      hRat_TotalSyst_down->SetBinContent(idx, 1 - (unc_down));
+      //hRat_TotalSyst_down->SetBinContent(idx, central_value_down);
+      hRat_TotalSyst_down->SetBinError(idx, unc_down);
+    }
+
+    hRat_TotalSyst_up->SetFillStyle(3144);
+    hRat_TotalSyst_up->SetFillColorAlpha(mSystColor, 0.5);
+    hRat_TotalSyst_up->SetMarkerColor(mSystColor);
+    hRat_TotalSyst_up->SetMarkerSize(0.);
+    hRat_TotalSyst_up->SetLineColor(mSystColor);
+    hRat_TotalSyst_up->Draw("E2, SAME");
+
+    hRat_TotalSyst_down->SetFillStyle(3144);
+    hRat_TotalSyst_down->SetFillColorAlpha(mSystColor, 0.5);
+    hRat_TotalSyst_down->SetMarkerColor(mSystColor);
+    hRat_TotalSyst_down->SetMarkerSize(0.);
+    hRat_TotalSyst_down->SetLineColor(mSystColor);
+    hRat_TotalSyst_down->Draw("E2, SAME");
+
+    TLegend* legend = new TLegend(0.14, 0.38, 0.34, 0.48);
+    legend->AddEntry(hRat_TotalSyst_up, "Stat. Unc.", "f");
+    legend->SetBorderSize(0);
+    legend->Draw("SAME");
+
+  }
+
 
 }
 
