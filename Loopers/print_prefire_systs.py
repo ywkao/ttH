@@ -5,7 +5,7 @@ srs = ["0", "1", "2", "3"]
 #channels = ["LEP"]
 channels = ["HAD", "LEP"]
 # ggH_hgg qqH_hgg ttH_hgg ZH_lep_hgg WH_lep_hgg WH_had_hgg ZH_had_hgg bbH_hgg tHq_hgg tHW_hgg bkg_mass
-procs = ["ggH", "ttH", "VBF", "VH", "VH", "VH", "VH", "", "THQ", "THW", ""]
+procs = ["ggH", "VBF", "ttH", "VH", "VH", "VH", "VH", "", "THQ", "THW", ""]
 
 results = {}
 
