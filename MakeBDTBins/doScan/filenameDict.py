@@ -1,8 +1,19 @@
 namedict = \
 {
+        ## use for pre-approval
+        "TTHHadronicTag":"/hadoop/cms/store/user/smay/ttH/FinalFitTrees/ttHHadronic__v3.10_8Oct2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root",
+        "TTHLeptonicTag":"/hadoop/cms/store/user/smay/ttH/FinalFitTrees/ttHLeptonic__v3.10_8Oct2019_RunII_MVA_Presel_addDNNs_FinalFitTree.root",
+        #"TTHHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic__v3.3_1Oct2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root",
+        #"TTHLeptonicTag":"/home/users/sjmay/ttH/MVAs/ttHLeptonic__v3.3_1Oct2019_RunII_MVA_Presel_addDNNs_FinalFitTree.root",
+        #"TTHHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic__v3.6_29Sep2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root",
+        #"TTHLeptonicTag":"/home/users/sjmay/ttH/MVAs/ttHLeptonic__v3.6_29Sep2019_RunII_MVA_Presel_addDNNs_FinalFitTree.root",
+
+        #"TTHHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic__v3.3_23Sep2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root",
+        #"TTHLeptonicTag":"/home/users/sjmay/ttH/MVAs/ttHLeptonic__v3.3_23Sep2019_RunII_MVA_Presel_addDNNs_FinalFitTree.root",
+
         ## use TH in training
-        "TTHHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.7_19Jun2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_addYear_FinalFitTree.root",
-        "TTHLeptonicTag":"/home/users/sjmay/ttH/MVAs/ttHLeptonic__v1.7_19Jun2019_RunII_MVA_Presel_addDNN_addYear_FinalFitTree.root",
+        #"TTHHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.7_19Jun2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_addYear_FinalFitTree.root",
+        #"TTHLeptonicTag":"/home/users/sjmay/ttH/MVAs/ttHLeptonic__v1.7_19Jun2019_RunII_MVA_Presel_addDNN_addYear_FinalFitTree.root",
 
         ## used for presentation at June 13th, TH not in training
         # "TTHHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic__v1.6_28May2019_RunII_MVA_Presel_impute_addDNNs_addTopTag_FinalFitTree.root",
@@ -34,9 +45,10 @@ namedict = \
         #ttHLeptonic_v1.7_4Jul2019_scaleByXs_multi_hct_FinalFitTree.root
         #ttHLeptonic_v1.7_4Jul2019_scaleByXs_multi_hut_FinalFitTree.root
         #"FCNCHCTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_multi_impute_hct_EqualClassWeights_FinalFitTree.root",
+        #"FCNCHCTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_multi_impute_hct_FinalFitTree.root",
         #
         #Binary:
-        "FCNCHCTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_impute_hct_FinalFitTree.root"
+        #"FCNCHCTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_impute_hct_FinalFitTree.root"
         #"FCNCHUTHadronicTag":"/home/users/sjmay/ttH/MVAs/ttHHadronic_v1.7_4Jul2019_scaleByXs_impute_hut_FinalFitTree.root"
         #ttHLeptonic_v1.7_4Jul2019_scaleByXs_hct_FinalFitTree.root
         #ttHLeptonic_v1.7_4Jul2019_scaleByXs_hut_FinalFitTree.root
