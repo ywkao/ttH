@@ -82,17 +82,29 @@ class BabyMaker {
     float	top_tag_score_;
 
     float       lep_pt_;
-    float 	lep_eta_;
+    float 	    lep_eta_;
 
-    float	n_lep_loose_;
+    float       ele1_pt_;
+    float       ele1_eta_;
+    float       ele1_phi_;
+    float       ele1_energy_;
+    float       n_ele_;
+
+    float       muon1_pt_;
+    float       muon1_eta_;
+    float       muon1_phi_;
+    float       muon1_energy_;
+    float       n_muons_;
+
+    float	    n_lep_loose_;
     float       n_lep_medium_;
     float       n_lep_tight_;
 
-    float	muon1_mini_iso_;
-    float	muon2_mini_iso_;
+    float	    muon1_mini_iso_;
+    float	    muon2_mini_iso_;
 
     float      	jet1_pt_;
-    float	jet1_eta_;
+    float	    jet1_eta_;
     float       jet1_btag_;
     float      	jet2_pt_;
     float      	jet2_eta_;
@@ -109,6 +121,19 @@ class BabyMaker {
     float      	jet6_pt_;
     float      	jet6_eta_;
     float      	jet6_btag_;
+
+    float       jet1_phi_;
+    float       jet1_energy_;
+    float       jet2_phi_;
+    float       jet2_energy_;
+    float       jet3_phi_;
+    float       jet3_energy_;
+    float       jet4_phi_;
+    float       jet4_energy_;
+    float       jet5_phi_;
+    float       jet5_energy_;
+    float       jet6_phi_;
+    float       jet6_energy_; 
 
     float      	lead_pT_;
     float      	sublead_pT_;
@@ -129,7 +154,7 @@ class BabyMaker {
     float       dipho_pt_;
     float       dipho_pt_over_mass_;
     float       met_;
-    float	log_met_;
+    float	    log_met_;
     float       met_phi_; 
 
     float	helicity_angle_;
@@ -189,6 +214,18 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("lep_pt_"               , &lep_pt_          );
   BabyTree_->Branch("lep_eta_"               , &lep_eta_          );
 
+  BabyTree_->Branch("ele1_pt_"               , &ele1_pt_        );
+  BabyTree_->Branch("ele1_eta_"               , &ele1_eta_        );
+  BabyTree_->Branch("ele1_phi_"               , &ele1_phi_        );
+  BabyTree_->Branch("ele1_energy_"               , &ele1_energy_        );
+  BabyTree_->Branch("n_ele_"                    , &n_ele_       );
+
+  BabyTree_->Branch("muon1_pt_"               , &muon1_pt_        );
+  BabyTree_->Branch("muon1_eta_"               , &muon1_eta_        );
+  BabyTree_->Branch("muon1_phi_"               , &muon1_phi_        );
+  BabyTree_->Branch("muon1_energy_"               , &muon1_energy_        );
+  BabyTree_->Branch("n_muons_"                    , &n_muons_       );
+
   BabyTree_->Branch("n_lep_loose_"               , &n_lep_loose_          );
   BabyTree_->Branch("n_lep_medium_"               , &n_lep_medium_          );
   BabyTree_->Branch("n_lep_tight_"               , &n_lep_tight_          );
@@ -216,6 +253,19 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("jet6_pt_"            , &jet6_pt_   );
   BabyTree_->Branch("jet6_eta_"            , &jet6_eta_ );
   BabyTree_->Branch("jet6_btag_"            , &jet6_btag_ );
+
+  BabyTree_->Branch("jet1_phi_"             , &jet1_phi_ );
+  BabyTree_->Branch("jet1_energy_"         , &jet1_energy_ );
+  BabyTree_->Branch("jet2_phi_"             , &jet2_phi_ );
+  BabyTree_->Branch("jet2_energy_"         , &jet2_energy_ );
+  BabyTree_->Branch("jet3_phi_"             , &jet3_phi_ );
+  BabyTree_->Branch("jet3_energy_"         , &jet3_energy_ );
+  BabyTree_->Branch("jet4_phi_"             , &jet4_phi_ );
+  BabyTree_->Branch("jet4_energy_"         , &jet4_energy_ );
+  BabyTree_->Branch("jet5_phi_"             , &jet5_phi_ );
+  BabyTree_->Branch("jet5_energy_"         , &jet5_energy_ );
+  BabyTree_->Branch("jet6_phi_"             , &jet6_phi_ );
+  BabyTree_->Branch("jet6_energy_"         , &jet6_energy_ ); 
 
   BabyTree_->Branch("lead_pT_"         , &lead_pT_      );
   BabyTree_->Branch("sublead_pT_"      , &sublead_pT_   );

@@ -80,6 +80,7 @@ def get_samples_from_catalogs(catalogs):
             with open(dataset, "r") as f_in:
                 info = json.load(f_in)
                 for sample in info.keys():
+                    #print sample
                     if skip_samples(sample):
                         continue
                     sample_name = sample.split("/")[1]

@@ -292,6 +292,13 @@ inline void Process::add_2D_histogram(TString name, int nBinsX, double xLow, dou
 
 inline void Process::fill_histogram(TString name, double value, double weight, int genLeptonId, int genPhotonId, int genPhotonDetailId, int photonLocationId, int mvaCategoryId)
 {
+  std::map<TString, int>::iterator it;
+  it = mMap.find(name);
+  if (it == mMap.end()) {
+    cout << "Did not match this hist: " << name << endl;
+    return;
+  }
+  
   int idx = mMap.find(name)->second;
   mH[idx]->Fill(value, weight);
 

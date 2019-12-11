@@ -41,18 +41,20 @@ for channel in channels:
             yield_upPrefire = hist_upPrefire.Integral()
             yield_downPrefire = hist_downPrefire.Integral()
 
-            print "%s, proc: %s" % (key, proc)
-            print "Yield (no prefire): %.6f" % yield_noPrefire
-            print "Yield (nominal prefire): %.6f" % yield_nominalPrefire
-            print "Yield (up prefire): %.6f" % yield_upPrefire
-            print "Yield (down prefire): %.6f" % yield_downPrefire
+            #print "%s, proc: %s" % (key, proc)
+            if proc == "ttH":
+                print "%s, Prefire Inefficiency: %.6f" % (key, 1 - (yield_nominalPrefire / yield_noPrefire))
+            #print "Yield (no prefire): %.6f" % yield_noPrefire
+            #print "Yield (nominal prefire): %.6f" % yield_nominalPrefire
+            #print "Yield (up prefire): %.6f" % yield_upPrefire
+            #print "Yield (down prefire): %.6f" % yield_downPrefire
 
 
             A = yield_upPrefire / yield_nominalPrefire
             B = yield_downPrefire / yield_nominalPrefire
-            print "Unc: %.6f" % (A/B)
+            #print "Unc: %.6f" % (A/B)
             unc = A / B
-            result.append(unc)
+            result.append("%.6f/%.6f" % (A, B))
 
         results[key] = result
 

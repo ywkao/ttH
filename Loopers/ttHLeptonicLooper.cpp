@@ -40,6 +40,16 @@ int main(int argc, char* argv[]) {
   TString mYear = argc <= 7 ? "" : argv[7];
   TString idx = argc <= 8 ? "" : argv[8];
 
+  TString syst = argc <= 9 ? "" : argv[9];
+  bool do_syst;
+  if (syst == "")
+    do_syst = false;
+  else
+    do_syst = true; 
+
+  TString l1_prefire = argc <= 10 ? "" : argv[10];
+  cout << "Using l1_prefire option: " << l1_prefire << endl;
+
   if (file == "all") {
     if (year.Contains("RunII")) {
       if (year == "RunII") {
@@ -68,5 +78,5 @@ int main(int argc, char* argv[]) {
   else
     ch->Add(file);
 
-  ScanChain(ch, tag, year, ext, xml_file, bkg_options, mYear, idx);
+  ScanChain(ch, tag, year, ext, xml_file, bkg_options, do_syst, l1_prefire, mYear, idx);
 }

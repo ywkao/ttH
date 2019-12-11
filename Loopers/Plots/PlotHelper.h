@@ -22,6 +22,7 @@
 #include "TStyle.h"
 #include "TLegend.h"
 #include "TLine.h"
+#include "TArrow.h"
 #include "TPad.h"
 #include "TLatex.h"
 #include "TFrame.h"
@@ -45,7 +46,7 @@ class Comparison
     Comparison(TCanvas* c1, vector<TH1D*> hData);
     ~Comparison();
 
-    void plot(int idx, bool compare = true);
+    void plot(int idx, bool compare = true); 
 
     // Setters
     void set_filename(string filename) { mFilename = filename; }
@@ -76,10 +77,22 @@ class Comparison
     void set_data_drawOpt(TString drawOpt) {mDataDrawOpt = drawOpt;}
     void set_stack_order(vector<int> vOrder) {mCustomStackOrder = true; mVOrder = vOrder;}
     void set_lower_lim(double value) {mCustomLowerLimit = true; mLowerLimit = value;}
+    void set_no_ratio() { mRatio = false; }
+    void add_paper_info(TString channel) {mPaperInfo = true; mChannel = channel;}
+    void set_paper_style() { mPaperStyle = true; }
+    void set_no_legend() { mDrawMainLegend = false; }
 
     void give_hlines(vector<double> vHLines) {mVHLines = vHLines;}
     void give_vlines(vector<double> vVLines) {mVVLines = vVLines;}
+    void give_vlines_dotted(vector<double> vVLines) {mVVLines_dotted = vVLines;}
+    void give_vshade(vector<double> vShade)  {mVShade = vShade;}
     void give_info(TString info) {mVInfo.push_back(info); }
+
+    void set_pad_coords(double x1, double x2, double y1, double y2) { mCustomPad = true; mPadX1 = x1; mPadX2 = x2; mPadY1 = y1; mPadY2 = y2; }
+    void suppress_x_label() { mSuppressXLabel = true; }
+    void suppress_top() { mSuppressTop = true; }
+    void skip_signal() { mSkipSignal = true; }
+    void skip_cp() { mSkipCP = true; }
 
   private:
     void default_options(TCanvas* c1);
@@ -130,10 +143,12 @@ class Comparison
     TH1D* hMC_StatUnc_down;
     TH1D* hRat_StatUnc_up;
     TH1D* hRat_StatUnc_down; 
+
     int mSystColor;
     int mStatColor;
 
     THStack* mStack;
+    THStack* mStack2;
 
     TH2D* mH2DData;
     TH2D* mH2DMC;
@@ -141,6 +156,9 @@ class Comparison
     TString m2DDrawOpt;
     TString mDataDrawOpt;
     TString mSignalDrawOpt;
+
+    bool mPaperInfo;
+    TString mChannel;
 
     bool m2D;
     bool mMultipleData;
@@ -161,6 +179,8 @@ class Comparison
 
     vector<double> mVHLines;
     vector<double> mVVLines;
+    vector<double> mVVLines_dotted;
+    vector<double> mVShade;
 
     TString mXLabel;
     TString mYLabel;
@@ -168,6 +188,7 @@ class Comparison
     TString mRatLabel;
     vector<TString> mVInfo;
     vector<TString> mVLegendLabels;
+    bool mDrawMainLegend;
 
     bool mVerbose;
 
@@ -191,7 +212,21 @@ class Comparison
 
     const double topSpace = 0.45;
     const double botSpace = 0.05;
-    const double fs = 0.04;
+    const double fs = 0.0475;
+    const double fs_paper = 0.055;
+
+    bool mCustomPad;
+    double mPadX1;
+    double mPadX2;
+    double mPadY1;
+    double mPadY2;
+
+    bool mSuppressXLabel;
+    bool mSuppressTop;
+    bool mPaperStyle;
+
+    bool mSkipSignal;
+    bool mSkipCP;
 };
 
 
@@ -501,7 +536,7 @@ void Comparison::default_options(TCanvas* c1)
 
   mXLabel = "";
   mYLabel = "Events";
-  mYLabelFontSize = 0.04;
+  mYLabelFontSize = 0.06;
   mRatLabel = "#frac{2017 Data}{2016 Data}";
   mRatUseData = true;
 
@@ -512,6 +547,19 @@ void Comparison::default_options(TCanvas* c1)
 
   mSystColor = kRed;
   mStatColor = kGray+2;
+
+  mRatio = true;
+  mPaperInfo = false;
+
+  mPaperStyle = false;
+
+  mCustomPad = false;
+  mSuppressXLabel = false;
+  mSuppressTop = false;
+
+  mDrawMainLegend = true;
+  mSkipSignal = false;
+  mSkipCP = false;
 }
 
 inline
@@ -528,7 +576,7 @@ void Comparison::plot(int idx, bool compare)
 inline
 void Comparison::plot1D(int idx)
 {
-  set_main_pad(mMainPad, mLog); 
+  set_main_pad(mMainPad, mLog, mRatio); 
   compute_limits(mCustomXRange, mCustomYRange);
   compute_flow(mXBinRange);
   if (mDoSystBand)
@@ -536,9 +584,12 @@ void Comparison::plot1D(int idx)
   draw_main_histograms();
   set_histogram_options(mColor1, mColor2);
   annotate_plot();
-  set_rat_pad(mRatPad);
-  make_rat_histogram(mVHData[0], mHMC);
-  print(idx);
+  if (mRatio) {
+    set_rat_pad(mRatPad);
+    make_rat_histogram(mVHData[0], mHMC);
+  }
+  if (!mCustomPad)
+     print(idx);
 }
 
 inline
@@ -550,7 +601,8 @@ void Comparison::plotNoCompare(int idx)
   draw_histograms();
   //set_histogram_options(mColor1, mColor2);
   annotate_plot();
-  print(idx);
+  if (!mCustomPad)
+      print(idx);
 
 }
 
@@ -586,16 +638,27 @@ inline
 void Comparison::set_main_pad(TPad* mainPad, bool log, bool rat)
 {
   mCanvas->cd();
-  if (rat) {
+  if (mCustomPad) {
+    cout << "Setting custom pad limits" << endl;
+    mainPad = new TPad("p_main", "p_main", mPadX1, mPadY1, mPadX2, mPadY2);
+    if (mSuppressTop)
+        mainPad->SetBottomMargin(0.1);
+    else
+        mainPad->SetBottomMargin(0.02);
+  }
+  else if (rat) {
     mainPad = new TPad("p_main", "p_main", 0.0, 0.3, 1.0, 1.0);
     mainPad->SetBottomMargin(0.02);
   }
   else {
-    mainPad = new TPad("p_main", "p_main", 0.0, 0.0, 1.0, 1.0);
+    mainPad = new TPad("p_main", "p_main", 0.0, 0.05, 1.0, 1.0);
     mainPad->SetBottomMargin(0.1);
   }
   mainPad->SetRightMargin(0.07);
-  mainPad->SetTopMargin(0.08);
+  if (mSuppressTop) 
+      mainPad->SetTopMargin(0.02);
+  else
+      mainPad->SetTopMargin(0.08);
   mainPad->SetLeftMargin(0.12);
   mainPad->Draw();
   mainPad->cd();
@@ -782,18 +845,8 @@ void Comparison::compute_flow(vector<int> xBinRange)
 inline
 void Comparison::set_histogram_options(int color1, int color2)
 {
-  /*
-  mHMC->SetFillColor(mColor1);
-  mHMC->SetLineColor(mColor1);
-  mHMC->SetMarkerColor(mColor1);
-  if (mBothData) mHMC->SetMarkerStyle(20);
-  mHMC->GetYaxis()->SetTitle(mYLabel);
-  mHMC->GetYaxis()->SetTitleSize(mYLabelFontSize);
-  mHMC->GetYaxis()->SetTitleOffset(1.2);
-  if (!mLog) mHMC->GetYaxis()->SetTitleOffset(1.6);
-  mHMC->GetXaxis()->SetLabelOffset(999);
-  mHMC->GetXaxis()->SetLabelSize(0);
-  */
+  if (!mPaperStyle)
+    mYLabelFontSize = 0.05;
 
   for (int i=0; i<mVHData.size(); i++) {
     mVHData[i]->SetMarkerStyle(20);
@@ -803,10 +856,19 @@ void Comparison::set_histogram_options(int color1, int color2)
     mVHData[i]->SetMarkerSize(1.25);
     mVHData[i]->GetYaxis()->SetTitle(mYLabel);
     mVHData[i]->GetYaxis()->SetTitleSize(mYLabelFontSize);
-    mVHData[i]->GetYaxis()->SetTitleOffset(1.2);
-    if (!mVHMC.empty()) {
+    mVHData[i]->GetYaxis()->SetTitleOffset(1.015 * mVHData[i]->GetYaxis()->GetTitleOffset());
+    if (mPaperStyle)
+      mVHData[i]->GetYaxis()->SetLabelSize(0.05);
+    if ((!mVHMC.empty() && mRatio) || mSuppressXLabel) {
       mVHData[i]->GetXaxis()->SetLabelOffset(999);
       mVHData[i]->GetXaxis()->SetLabelSize(0);
+    }
+    else if (!mRatio) {
+      mVHData[i]->GetXaxis()->SetLabelSize(0.05);
+      mVHData[i]->GetXaxis()->SetTitle(mXLabel);
+      mVHData[i]->GetXaxis()->SetTitleOffset(0.88);
+      mVHData[i]->GetXaxis()->SetTitleSize(0.053);
+      //mVHData[i]->GetXaxis()->SetLabelOffset();
     }
   }
 
@@ -834,13 +896,28 @@ void Comparison::set_histogram_options(int color1, int color2)
     mVHMC[i]->GetYaxis()->SetTitleSize(mYLabelFontSize);
     mVHMC[i]->GetYaxis()->SetTitleOffset(1.2);
     if (!mLog) mVHMC[i]->GetYaxis()->SetTitleOffset(1.6);
-    mVHMC[i]->GetXaxis()->SetLabelOffset(999);
-    mVHMC[i]->GetXaxis()->SetLabelSize(0);
+    if (mRatio) {
+      mVHMC[i]->GetXaxis()->SetLabelOffset(999);
+      mVHMC[i]->GetXaxis()->SetLabelSize(0);
+    }
+    else {
+      mVHMC[i]->GetXaxis()->SetTitle(mXLabel);
+      mVHMC[i]->GetXaxis()->SetTitleOffset();
+      mVHMC[i]->GetXaxis()->SetTitleSize(0.13);
+      mVHMC[i]->GetXaxis()->SetLabelOffset();
+    }
   }
-  if (mVHMC.size() > 0) {
+  if (mVHMC.size() > 0 && mRatio) {
     mStack->GetXaxis()->SetLabelOffset(999);
     mStack->GetXaxis()->SetLabelSize(0);
   }
+  else if (!mRatio) {
+    mStack->GetXaxis()->SetTitle(mXLabel);
+    mStack->GetXaxis()->SetTitleOffset();
+    mStack->GetXaxis()->SetTitleSize(0.13);
+    mStack->GetXaxis()->SetLabelOffset();
+  }
+
 
   vector<int> vColorsSignal = {kBlack, kRed, kOrange, kMagenta, kMagenta+10}; 
   for (int i=0; i<mVHSignal.size(); i++) {
@@ -853,8 +930,16 @@ void Comparison::set_histogram_options(int color1, int color2)
     mVHSignal[i]->GetYaxis()->SetTitleOffset(1.2);
     if (!mLog) mVHSignal[i]->GetYaxis()->SetTitleOffset(1.6);
     mVHSignal[i]->SetLineWidth(3);
-    mVHSignal[i]->GetXaxis()->SetLabelOffset(999);
-    mVHSignal[i]->GetXaxis()->SetLabelSize(0);
+    if (mRatio) {
+      mVHSignal[i]->GetXaxis()->SetLabelOffset(999);
+      mVHSignal[i]->GetXaxis()->SetLabelSize(0);
+    }
+    else {
+      mVHSignal[i]->GetXaxis()->SetTitle(mXLabel);
+      mVHSignal[i]->GetXaxis()->SetTitleOffset();
+      mVHSignal[i]->GetXaxis()->SetTitleSize(0.13);
+      mVHSignal[i]->GetXaxis()->SetLabelOffset();
+    }
   }
 
 
@@ -885,8 +970,8 @@ void Comparison::draw_histograms()
   }
   mVHData[0]->GetXaxis()->SetTitle(mXLabel);
   mVHData[0]->GetYaxis()->SetTitle(mYLabel);
-  //mVHData[0]->GetXaxis()->SetTitleOffset(1.1);
-  //mVHData[0]->GetXaxis()->SetTitleSize(0.12); 
+  mVHData[0]->GetXaxis()->SetTitleOffset(1.1);
+  mVHData[0]->GetXaxis()->SetTitleSize(0.13); 
 }
 
 inline
@@ -938,9 +1023,9 @@ void Comparison::draw_main_histograms()
 
   for (int i=0; i<mVHData.size(); i++) { 
     if (i == 0) {
-     mVHData[i]->Draw(mDataDrawOpt);
-     mVHData[i]->SetMinimum(mYLimRange[0]);
-     mVHData[i]->SetMaximum(mYLimRange[1]);
+      mVHData[i]->Draw(mDataDrawOpt);
+      mVHData[i]->SetMinimum(mYLimRange[0]);
+      mVHData[i]->SetMaximum(mYLimRange[1]);
     }
     else
      mVHData[i]->Draw("SAME, " + mDataDrawOpt);
@@ -975,6 +1060,27 @@ void Comparison::draw_main_histograms()
     hMC_StatUnc_down->SetMarkerSize(0.);
     hMC_StatUnc_down->SetLineColor(mStatColor);
     hMC_StatUnc_down->Draw("E2, SAME");
+  }
+
+  if (mVShade.size() > 0) {
+    TH1D* hShade = new TH1D("hShade", "", 1000, 0, 10);//(TH1D*)mHMC->Clone("shade");
+    hShade->SetFillColorAlpha(kGray+1, 0.25);
+    hShade->SetMarkerSize(0.);
+    hShade->SetMarkerColor(kGray+1);
+    hShade->SetLineColor(kGray+1);
+    hShade->SetLineWidth(0.);
+    //hShade->SetFillStyle(3004);
+    for (unsigned int i = 0; i < hShade->GetNbinsX(); i++) {
+        if (hShade->GetXaxis()->GetBinCenter(i) > mVShade[0] && hShade->GetXaxis()->GetBinCenter(i) < mVShade[1]) {
+            hShade->SetBinContent(i, mYLimRange[0]);
+            hShade->SetBinError(i, 99999999999.);
+        }
+        else {
+            hShade->SetBinContent(i, 0.00000001);
+            hShade->SetBinError(i, 0.);
+        }
+    }
+    hShade->Draw("E2,SAME");
   }
 
   //mStack->GetXaxis()->SetRange(mXBinRange[0],mXBinRange[1]);
@@ -1119,23 +1225,36 @@ void Comparison::draw_2D_histograms(int idx)
 inline
 void Comparison::annotate_plot()
 {
-  TLatex* cms = new TLatex(0.15, 0.93, "CMS Preliminary");
-  cms->SetTextSize(fs);
-  cms->SetNDC(kTRUE);
-  cms->Draw("SAME");
+
+  TLatex* cms;
+  if (mPaperStyle) {
+    cms  = new TLatex(0.12, 0.935, "CMS");
+    cms->SetTextSize(0.075);
+  }
+  else {
+    cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Supplementary}}");
+    cms->SetTextSize(0.05);
+  }
+  cms->SetNDC();
+  if (!mSuppressTop)
+      cms->Draw("SAME");
 
   TLatex* lumi;
   if (mLumi != -1) {
-    TString lumiText = Form("%.1f",mLumi);
-    lumiText += " fb^{-1} (13 TeV)";
-    lumi = new TLatex(0.66, 0.93, lumiText.Data());
-    lumi->SetTextSize(fs);
-    lumi->SetNDC(kTRUE);
-    lumi->Draw("SAME");
+    TString lumiText = Form("#bf{%.1f fb^{-1} (13#scale[0.75]{ }TeV)}", mLumi);
+    double xlumi = mPaperStyle ? 0.575 : 0.59;
+    lumi = new TLatex(xlumi, 0.935, lumiText.Data());
+    if (mPaperStyle)
+        lumi->SetTextSize(0.0725);
+    else
+        lumi->SetTextSize(0.05);
+    lumi->SetNDC();
+    if (!mSuppressTop)
+        lumi->Draw("SAME");
   }  
   else {
     lumi = new TLatex(0.73, 0.93, "(13 TeV)");
-    lumi->SetTextSize(fs);
+    lumi->SetTextSize(0.055);
     lumi->SetNDC(kTRUE);
     lumi->Draw("SAME");
   }
@@ -1143,29 +1262,38 @@ void Comparison::annotate_plot()
   vector<TLatex*> t(mVInfo.size());
   for(int i=0; i<mVInfo.size(); i++) {
     double j = i;
-    j *= 0.05;
+    j *= 0.06;
     t[i] = new TLatex(0.15, 0.85-j, mVInfo[i]);
     t[i]->SetTextSize(fs);
     t[i]->SetNDC(kTRUE);
     t[i]->Draw("SAME");
   }
 
+  //TLatex* xLabel = new TLatex(0.7, 0.01, mXLabel);
+  //xLabel->SetTextSize(fs);
+  //xLabel->SetNDC();
+  //if (!mRatio)
+  //  xLabel->Draw("SAME");
+
+  TLegend* l1;
   if (mVLegendLabels.size() > 0) {
     double j = mVHData.size()*0.05;
-    TLegend* l1;
     if (mVHMC.empty())
       l1 = new TLegend(0.6, 0.75, 0.92, 0.89);
     else if (mVLegendLabels.size() > 5) {
-      l1 = new TLegend(0.5, 0.7-(j/2), 0.92, 0.89);
+      l1 = new TLegend(0.55, 0.65-(j/2), 0.92, 0.91);
       l1->SetNColumns(2);
     }
     else 
       l1 = new TLegend(0.6, 0.75-j, 0.92, 0.89);
     for (int i=0; i<mVHData.size(); i++)
       l1->AddEntry(mVHData[i], mVLegendLabels[i], "lep");
-    for (int i=0; i<mVHSignal.size(); i++)
-      l1->AddEntry(mVHSignal[i], mVLegendLabels[i+mVHData.size()], "f");
+    if (!mSkipSignal) {
+      for (int i=0; i<mVHSignal.size(); i++)
+        l1->AddEntry(mVHSignal[i], mVLegendLabels[i+mVHData.size()], "f");
+    }
     int idxMC = mVHData.size() + mVHSignal.size();
+    //int idxMC = mSkipSignal ? mVHData.size() : mVHData.size() + mVHSignal.size();
     for (int i=0; i<mVHMC.size(); i++) {
       if (!mBothData) l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC+i], "f");
       else l1->AddEntry(mVHMC[i], mVLegendLabels[idxMC], "lep");
@@ -1176,7 +1304,8 @@ void Comparison::annotate_plot()
     if (mVLegendLabels.size() > 7)
       l1->SetNColumns(2);
     l1->SetBorderSize(0);
-    l1->Draw("SAME");
+    //if (mDrawMainLegend)
+    //  l1->Draw("SAME");
   }
 
   vector<TLine*> vLH(mVHLines.size());
@@ -1189,13 +1318,88 @@ void Comparison::annotate_plot()
     vLH[i]->Draw("SAME");
   }
   vector<TLine*> vLV(mVVLines.size());
+  vector<TLatex*> vPaperInfo;
+  vector<double> vPaperCoords_had = { 0.59, 0.6925, 0.805, 0.865 }; 
+  vector<double> vPaperCoords_lep = { 0.525, 0.655, 0.735, 0.8475 }; 
+  vector<double> vPaperCoords = mChannel == "Had" ? vPaperCoords_had : vPaperCoords_lep;
+  double yCoord_had = 0.49;
+  double yCoord_lep = mPaperStyle ? 0.76 : 0.50;
+  double yCoord = mChannel == "Had" ? yCoord_had : yCoord_lep;
   for (int i=0; i<mVVLines.size(); i++) {
-    vLV[i] = new TLine(mVVLines[i], mYLimRange[0], mVVLines[i], exp(log(mYLimRange[1])/2.));
+    vLV[i] = new TLine(mVVLines[i], mYLimRange[0], mVVLines[i], exp(log(mYLimRange[1]))); //exp(log(mYLimRange[1])/2.0));
     vLV[i]->SetLineWidth(2);
     vLV[i]->SetLineStyle(2);
     vLV[i]->Draw("SAME");
+    if (mPaperInfo) {
+      vPaperInfo.push_back(new TLatex(vPaperCoords[i], yCoord, mChannel + " " + to_string(mVVLines.size() - i)));
+      vPaperInfo[i]->SetTextSize(fs*1.0);
+      vPaperInfo[i]->SetNDC(kTRUE);
+      vPaperInfo[i]->SetTextAngle(90);
+      vPaperInfo[i]->Draw("SAME");
+    }
+
+    if (mPaperInfo && !mSkipCP) {
+      double x, y;
+      int cp_bin1(1), cp_bin2(2);
+      if (mChannel != "Had") {
+        cp_bin1 += 2;
+        cp_bin2 += 2;
+      }
+      TString cp1 = "#color[1]{CP " + to_string(cp_bin1) + "}";
+      TString cp2 = "#color[1]{CP " + to_string(cp_bin2) + "}";
+      if (mChannel == "Had") {
+        x = 0.74;
+        y = 0.35;
+      }
+      else {
+        x = 0.655;
+        y = mPaperStyle ? 0.57 : 0.37;
+      }
+      double offset = mChannel == "Had" ? 0.04 : 0.055;
+      TLatex* lcp1 = new TLatex(x - offset, y, cp2);
+      TLatex* lcp2 = new TLatex(x + 0.015, y, cp1);
+      lcp1->SetTextSize(fs*1.0);
+      lcp1->SetNDC(kTRUE);
+      
+      lcp1->SetTextAngle(90);
+      lcp1->Draw("SAME");
+
+      lcp2->SetTextSize(fs*1.0); 
+      lcp2->SetNDC(kTRUE);
+      
+      lcp2->SetTextAngle(90);
+      lcp2->Draw("SAME");
+
+    }
+
   }
 
+  vector<TLine*> vLV_dotted(mVVLines_dotted.size());
+  for (int i = 0; i < mVVLines_dotted.size(); i++) {
+    if (mSkipCP)
+        continue;
+    if (mChannel == "Had")
+        vLV_dotted[i] = new TLine(mVVLines_dotted[i], mYLimRange[0], mVVLines_dotted[i], exp(log(mYLimRange[1])/2.15));
+    else if (mChannel == "Lep" && mPaperStyle)
+        vLV_dotted[i] = new TLine(mVVLines_dotted[i], mYLimRange[0], mVVLines_dotted[i], exp(log(mYLimRange[1])/1.6));
+    else
+        vLV_dotted[i] = new TLine(mVVLines_dotted[i], mYLimRange[0], mVVLines_dotted[i], exp(log(mYLimRange[1])/2.15));
+    vLV_dotted[i]->SetLineWidth(3);
+    vLV_dotted[i]->SetLineStyle(9);
+    //vLV_dotted[i]->SetLineColor(4);
+    vLV_dotted[i]->Draw("SAME");
+
+    double y_h = mChannel == "Had" ? exp(log(mYLimRange[1])/2.15) : (mChannel == "Lep" && mPaperStyle ? exp(log(mYLimRange[1])/1.6) : exp(log(mYLimRange[1])/2.15));
+    double factor = mChannel == "Had" ? 8./5. : 1;
+    TArrow* hline = new TArrow(mVVLines_dotted[i] - (0.8*factor), y_h, mVVLines_dotted[i] + (0.8*factor*1.1), y_h, 0.02, "<|>");
+    hline->SetLineWidth(3);
+    hline->SetLineStyle(9);
+    hline->Draw();
+
+  }
+
+  if (mDrawMainLegend)
+      l1->Draw("SAME");
 }
 
 inline
@@ -1213,7 +1417,6 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
   else
     mVHRat[0]->GetYaxis()->SetRangeUser(0.0,2.0);
   mVHRat[0]->GetYaxis()->SetLabelSize(0.08);
-  mVHRat[0]->GetXaxis()->SetLabelSize(0.08);
   mVHRat[0]->GetYaxis()->SetNdivisions(5);
 
   mVHRat[0]->GetYaxis()->SetTitle(mRatLabel);
@@ -1223,7 +1426,7 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
 
   mVHRat[0]->GetXaxis()->SetTitle(mXLabel);
   mVHRat[0]->GetXaxis()->SetTitleOffset(1.1);
-  mVHRat[0]->GetXaxis()->SetTitleSize(0.12);
+  mVHRat[0]->GetXaxis()->SetTitleSize(0.13);
 
   mVHRat[0]->SetMarkerStyle(20);
   //mVHRat[0]->SetMarkerSize(1);
@@ -1237,7 +1440,7 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
   //for (int i = 0; i < mVHRat[0]->GetNbinsX(); i++)
   //  cout << "Bin " << i + 1 << ": " << mVHRat[0]->GetBinContent(i+1) << endl; 
   mVHRat[0]->GetXaxis()->SetLabelOffset();
-  mVHRat[0]->GetXaxis()->SetLabelSize(0.07);
+  mVHRat[0]->GetXaxis()->SetLabelSize(0.08);
 
   for (int i=1; i<mVHData.size(); i++) {
     TString idx = Form("%d", i);
@@ -1257,23 +1460,44 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
 
       double central_value_up = (mVHRat[0]->GetBinContent(idx) + hRat_TotalSyst_up->GetBinContent(idx)) / 2.;
       double unc_up = (abs(hMC_TotalSyst_up_noPlot->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx)) / 2.;
+
+      if (mHMC->GetBinContent(idx) == 0.)
+          unc_up = 0.;
+
       hRat_TotalSyst_up->SetBinContent(idx, 1 + (unc_up));
       hRat_TotalSyst_up->SetBinError(idx, unc_up);
 
       double central_value_down = (mVHRat[0]->GetBinContent(idx) + hRat_TotalSyst_down->GetBinContent(idx)) / 2.;
       double unc_down = (abs(hMC_TotalSyst_down_noPlot->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx)) / 2.;
+
+      if (mHMC->GetBinContent(idx) == 0.)
+          unc_down = 0.; 
+
       hRat_TotalSyst_down->SetBinContent(idx, 1 - (unc_down));
       hRat_TotalSyst_down->SetBinError(idx, unc_down);
 
       double stat_unc_up = (abs(hMC_StatUnc_up->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx));
       double stat_unc_down = (abs(hMC_StatUnc_down->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx));
 
-      hRat_StatUnc_up->SetBinContent(idx, 1 + (unc_up));
-      hRat_StatUnc_up->SetBinError(idx, unc_up);
+      if (mHMC->GetBinContent(idx) == 0.) {
+        stat_unc_up = 0.;
+        stat_unc_down = 0.;
+      }
 
-      hRat_StatUnc_down->SetBinContent(idx, 1 - (unc_down));
-      hRat_StatUnc_down->SetBinError(idx, unc_down);
+      hRat_StatUnc_up->SetBinContent(idx, 1 + (stat_unc_up));
+      hRat_StatUnc_up->SetBinError(idx, stat_unc_up);
+
+      hRat_StatUnc_down->SetBinContent(idx, 1 - (stat_unc_down));
+      hRat_StatUnc_down->SetBinError(idx, stat_unc_down);
+
     }
+
+
+    TLegend* legend = new TLegend(0.14, 0.37, 0.44, 0.49);
+    legend->AddEntry(hRat_StatUnc_up, "Stat. Unc.", "f");
+    legend->AddEntry(hRat_TotalSyst_up, "Stat. + Syst. Unc.", "f");
+    legend->SetBorderSize(0);
+    legend->Draw("SAME"); 
 
     hRat_TotalSyst_up->SetFillStyle(3144);
     hRat_TotalSyst_up->SetFillColorAlpha(mSystColor, 0.5);
@@ -1303,13 +1527,10 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
     hRat_StatUnc_down->SetLineColor(mStatColor);
     hRat_StatUnc_down->Draw("E2, SAME");
 
-    TLegend* legend = new TLegend(0.14, 0.38, 0.34, 0.48);
-    legend->AddEntry(hRat_StatUnc_up, "Stat. Unc.", "f");
-    legend->AddEntry(hRat_TotalSyst_up, "Stat. + Syst. Unc.", "f");
-    legend->SetBorderSize(0);
-    legend->Draw("SAME");
-
   }
+  
+  for (int i=0; i<mVHData.size(); i++) 
+    mVHRat[i]->Draw("e1, same");
 
 
 }

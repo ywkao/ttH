@@ -203,3 +203,193 @@ Submitting ttH Babies version v1.8 using skims in /hadoop/cms/store/user/smay/tt
 
 Date: 2019-08-08 12:37:54.890217 
 Submitting ttH Babies version test_workflow_8Aug2019 using skims in /hadoop/cms/store/user/smay/ttH/MicroAOD/RunII and commit 832ca8de2b0bbc654fc3f9fed8ac9c27ccda0a2b of tth_dev_runII branch of flashgg
+
+Date: 2019-09-17 11:42:04.357666 
+Submitting ttH Babies version v2.1 using central microAOD and commit 43790fd50f6a58f5822247a153f51005c26d2628 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-18 14:55:08.471447 
+Submitting ttH Babies version v2.2 using central microAOD and commit 85e314e56023c5176de1cee5402212dcee62b6a6 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-18 16:29:08.395570 
+Submitting ttH Babies version v2.2 using central microAOD and commit 85e314e56023c5176de1cee5402212dcee62b6a6 of tth_dev_runII_v2 branch of flashgg
+
+# Note: in v2.3, e-veto is inverted and psv is hard-coded to 0
+Date: 2019-09-18 17:16:05.823389 
+Submitting ttH Babies version v2.3_ttZ using central microAOD and commit 42d264dd9765fd0ba741f15fefa9a6f8b6ac28ae of tth_dev_runII_v2 branch of flashgg
+
+# Note: in v2.4, e-veto and psv are restored to normal and MET filters are removed
+Date: 2019-09-18 17:53:30.266207 
+Submitting ttH Babies version v2.4 using central microAOD and commit b10adee6cc41b169860b11351dd478f583b916d4 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 11:24:42.267100 
+Submitting ttH Babies version v3.1 using central microAOD and commit b10adee6cc41b169860b11351dd478f583b916d4 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 11:26:37.945779 
+Submitting ttH Babies version v3.1 using central microAOD and commit b10adee6cc41b169860b11351dd478f583b916d4 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 11:27:17.658333 
+Submitting ttH Babies version v3.1 using central microAOD and commit b10adee6cc41b169860b11351dd478f583b916d4 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 11:30:49.980022 
+Submitting ttH Babies version v3.1 using central microAOD and commit b10adee6cc41b169860b11351dd478f583b916d4 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 13:04:06.963053 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:07:54.092328 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:11:53.483554 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:14:17.941631 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:20:20.896070 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:29:35.143428 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:31:54.215125 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:33:18.981087 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:42:32.692919 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:45:02.721464 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:49:32.557858 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:54:11.595386 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:55:06.420909 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 17:58:05.653266 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 18:08:14.121988 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 18:09:12.620941 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 18:32:14.509782 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 18:33:18.187924 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 18:47:32.293906 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 18:52:59.265210 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 19:00:54.579272 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 19:05:16.326946 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 19:09:56.959235 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 19:16:06.735664 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 19:16:20.328912 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-19 19:24:46.596675 
+Submitting ttH Babies version v3.2 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-20 12:01:01.991743 
+Submitting ttH Babies version v3.3 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-20 13:17:06.263366 
+Submitting ttH Babies version v3.3 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-20 13:26:34.266059 
+Submitting ttH Babies version v3.3 using central microAOD and commit 0fb10dee25f5145f8badb2c3f12a049978b65d95 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-22 15:07:01.342797 
+Submitting ttH Babies version v3.4 using central microAOD and commit c982e82769c6584d0cc016c64b5e567ef7e19e73 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-22 15:15:30.378967 
+Submitting ttH Babies version v3.4 using central microAOD and commit c982e82769c6584d0cc016c64b5e567ef7e19e73 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-23 15:12:51.281207 
+Submitting ttH Babies version v3.5 using central microAOD and commit 87fd2ebd3f993ba1ff10cdcd364545595b21bee8 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-09-28 07:31:11.668849 
+Submitting ttH Babies version v3.6 using central microAOD and commit 85e314e56023c5176de1cee5402212dcee62b6a6 of tth_dev_runII_v2 branch of flashgg
+
+# Note in v3.7, using Pho ID corrections with bug fix (and MET filters applied)
+Date: 2019-10-01 08:40:08.432968 
+Submitting ttH Babies version v3.7 using central microAOD and commit cf733b7506b96f6338f7503ea86f56722f2dc130 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-01 18:18:33.435945 
+Submitting ttH Babies version v3.8 using central microAOD and commit 98596aa2f34a6069c574b043b98d340d0b82b7e6 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-02 11:36:48.242273 
+Submitting ttH Babies version v3.9_ttZ using central microAOD and commit 93d4526c689f83a36bbde8868f70acba154e6656 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-03 08:03:35.798462 
+Submitting ttH Babies version v3.10 using central microAOD and commit 79390ccdc86b7e6bc3ee852f431bea6d6d58a29b of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-08 14:15:36.943130 
+Submitting ttH Babies version v3.11 using central microAOD and commit f94d53a7d5eae1350daefc1314860291b666b02a of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-08 14:27:27.920117 
+Submitting ttH Babies version v4.1 using central microAOD and commit f94d53a7d5eae1350daefc1314860291b666b02a of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-08 14:45:56.968965 
+Submitting ttH Babies version v4.1 using central microAOD and commit f94d53a7d5eae1350daefc1314860291b666b02a of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-09 12:14:33.433417 
+Submitting ttH Babies version v4.1 using central microAOD and commit 1a921c219c283acb6bc83babed4e1bb9076a0fb7 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-09 12:46:08.004554 
+Submitting ttH Babies version v4.2 using central microAOD and commit 1a921c219c283acb6bc83babed4e1bb9076a0fb7 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-09 13:38:56.231133 
+Submitting ttH Babies version v4.3 using central microAOD and commit f90bcd8dd7eadd9cb30da21e60f71d8d2bfe60e2 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-09 14:02:14.804316 
+Submitting ttH Babies version v4.4_ttZ using central microAOD and commit 52f38e35b330be8fba9d5aeb760a203e5d255d03 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-11 10:16:29.243260 
+Submitting ttH Babies version v4.5 using central microAOD and commit 7b3e72fe4ebfc3fb0c684d748dd986f57ae9ede0 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-11 10:23:36.769797 
+Submitting ttH Babies version v4.5 using central microAOD and commit 7b3e72fe4ebfc3fb0c684d748dd986f57ae9ede0 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-13 13:10:33.707528 
+Submitting ttH Babies version v4.6 using central microAOD and commit 7b3e72fe4ebfc3fb0c684d748dd986f57ae9ede0 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-16 14:01:30.861983 
+Submitting ttH Babies version v4.7_ttZ using central microAOD and commit 667e7d2abe051e6f6d3318988d4b855e6b75a2f7 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-16 16:51:48.430486 
+Submitting ttH Babies version v4.8 using central microAOD and commit 94d8ff05380a29fa545858dc77dcd2dfe5004e2f of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-21 16:35:37.254324 
+Submitting ttH Babies version v4.9 using central microAOD and commit 94d8ff05380a29fa545858dc77dcd2dfe5004e2f of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-22 14:21:12.297554 
+Submitting ttH Babies version v4.10 using central microAOD and commit 9b29d07bf68b9142d96f9e9cb78e45e546f1fc49 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-10-22 16:21:38.922595 
+Submitting ttH Babies version v4.11 using central microAOD and commit 9b29d07bf68b9142d96f9e9cb78e45e546f1fc49 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2019-12-03 14:37:53.392089 
+Submitting ttH Babies version v4.12_ttZ using central microAOD and commit 65a19a7380fdaca0d82320d7123ac1a43d587fcc of tth_dev_runII_v2 branch of flashgg
+

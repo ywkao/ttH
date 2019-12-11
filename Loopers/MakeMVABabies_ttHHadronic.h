@@ -105,6 +105,29 @@ class BabyMaker {
     float       jet6_pt_;
     float       jet6_eta_;
     float       jet6_btag_;
+    float       jet7_pt_;
+    float       jet7_eta_;
+    float       jet7_btag_;
+    float       jet8_pt_;
+    float       jet8_eta_;
+    float       jet8_btag_; 
+
+    float       jet1_phi_;
+    float       jet1_energy_;
+    float       jet2_phi_;
+    float       jet2_energy_;
+    float       jet3_phi_;
+    float       jet3_energy_;
+    float       jet4_phi_;
+    float       jet4_energy_;
+    float       jet5_phi_;
+    float       jet5_energy_;
+    float       jet6_phi_;
+    float       jet6_energy_;
+    float       jet7_phi_;
+    float       jet7_energy_;
+    float       jet8_phi_;
+    float       jet8_energy_;
 
     float       lead_pT_;
     float       sublead_pT_;
@@ -219,6 +242,29 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("jet6_pt_"            , &jet6_pt_   );
   BabyTree_->Branch("jet6_eta_"            , &jet6_eta_ );
   BabyTree_->Branch("jet6_btag_"            , &jet6_btag_ );
+  BabyTree_->Branch("jet7_pt_"            , &jet7_pt_   );
+  BabyTree_->Branch("jet7_eta_"            , &jet7_eta_ );
+  BabyTree_->Branch("jet7_btag_"            , &jet7_btag_ );
+  BabyTree_->Branch("jet8_pt_"            , &jet8_pt_   );
+  BabyTree_->Branch("jet8_eta_"            , &jet8_eta_ );
+  BabyTree_->Branch("jet8_btag_"            , &jet8_btag_ );
+
+  BabyTree_->Branch("jet1_phi_"             , &jet1_phi_ );
+  BabyTree_->Branch("jet1_energy_"         , &jet1_energy_ );
+  BabyTree_->Branch("jet2_phi_"             , &jet2_phi_ );
+  BabyTree_->Branch("jet2_energy_"         , &jet2_energy_ );
+  BabyTree_->Branch("jet3_phi_"             , &jet3_phi_ );
+  BabyTree_->Branch("jet3_energy_"         , &jet3_energy_ );
+  BabyTree_->Branch("jet4_phi_"             , &jet4_phi_ );
+  BabyTree_->Branch("jet4_energy_"         , &jet4_energy_ );
+  BabyTree_->Branch("jet5_phi_"             , &jet5_phi_ );
+  BabyTree_->Branch("jet5_energy_"         , &jet5_energy_ );
+  BabyTree_->Branch("jet6_phi_"             , &jet6_phi_ );
+  BabyTree_->Branch("jet6_energy_"         , &jet6_energy_ );
+  BabyTree_->Branch("jet7_phi_"             , &jet7_phi_ );
+  BabyTree_->Branch("jet7_energy_"         , &jet7_energy_ );
+  BabyTree_->Branch("jet8_phi_"             , &jet8_phi_ );
+  BabyTree_->Branch("jet8_energy_"         , &jet8_energy_ );
  
   BabyTree_->Branch("lead_pT_"         , &lead_pT_      );
   BabyTree_->Branch("sublead_pT_"      , &sublead_pT_   );

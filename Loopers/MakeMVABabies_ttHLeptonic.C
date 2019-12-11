@@ -324,7 +324,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
 
       // Variable definitions
-      tth_runII_mva_ = tthMVA();
+      tth_runII_mva_ = tthMVA_RunII();
 
       year_ = mYear == "2016" ? 2016 : (mYear == "2017" ? 2017 : (mYear == "2018" ? 2018 : -1));
 
@@ -334,6 +334,18 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       lep_pt_ = leps[0].Pt();
       lep_eta_ = leps[0].Eta();
+
+      ele1_pt_  = electrons.size() > 0 ? electrons[0].Pt()  : -999;
+      ele1_eta_ = electrons.size() > 0 ? electrons[0].Eta() : -999;
+      ele1_phi_ = electrons.size() > 0 ? electrons[0].Phi() : -999;
+      ele1_energy_ = electrons.size() > 0 ? electrons[0].E() : -999;
+      n_ele_ = electrons.size();
+
+      muon1_pt_  = muons.size() > 0 ? muons[0].Pt()  : -999;
+      muon1_eta_ = muons.size() > 0 ? muons[0].Eta() : -999;
+      muon1_phi_ = muons.size() > 0 ? muons[0].Phi() : -999;
+      muon1_energy_ = muons.size() > 0 ? muons[0].E() : -999;
+      n_muons_ = muons.size(); 
 
       //n_lep_loose_ = nElecLoose() + nMuonLoose();
       //n_lep_medium_ = nElecMedium() + nMuonMedium();
@@ -371,6 +383,19 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       jet6_pt_   = njets_ >= 6 ? jets[5].Pt()   : -999;
       jet6_eta_  = njets_ >= 6 ? jets[5].Eta()  : -999;
       jet6_btag_ = njets_ >= 6 ? btag_scores[5] : -999;
+
+      jet1_phi_     = njets_ >= 1 ? jets[0].Phi() : -999;
+      jet1_energy_  = njets_ >= 1 ? jets[0].E()   : -999;
+      jet2_phi_     = njets_ >= 2 ? jets[1].Phi() : -999;
+      jet2_energy_  = njets_ >= 2 ? jets[1].E()   : -999;
+      jet3_phi_     = njets_ >= 3 ? jets[2].Phi() : -999;
+      jet3_energy_  = njets_ >= 3 ? jets[2].E()   : -999;
+      jet4_phi_     = njets_ >= 4 ? jets[3].Phi() : -999;
+      jet4_energy_  = njets_ >= 4 ? jets[3].E()   : -999;
+      jet5_phi_     = njets_ >= 5 ? jets[4].Phi() : -999;
+      jet5_energy_  = njets_ >= 5 ? jets[4].E()   : -999;
+      jet6_phi_     = njets_ >= 6 ? jets[5].Phi() : -999;
+      jet6_energy_  = njets_ >= 6 ? jets[5].E()   : -999; 
 
       lead_pT_ = leadPt();
       sublead_pT_ = subleadPt();

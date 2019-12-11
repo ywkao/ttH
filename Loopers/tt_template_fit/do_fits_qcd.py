@@ -12,6 +12,7 @@ def find_jet_bin(jet_bin):
   return jet_bin + 1
 
 def combine_hists(hist1, hist2, name, jet_bin, overflow):
+  print name
   target_hist = ROOT.TH1D(name, "", hist1.GetNbinsX() + hist2.GetNbinsX(), 0, 1)
   jet_bin_number = find_jet_bin(jet_bin)
   for i in range(hist1.GetNbinsX()):
@@ -44,10 +45,10 @@ hist_names = ["hPhotonMinIDMVA_NJets", "hPhotonMaxIDMVA_NJets"]
 #  hist_names = ["hPhotonMinIDMVA_fine", "hPhotonMaxIDMVA_fine"]
 
 templates_dict = { "data" : [["Data"], ""], 
-		"pp" : [["DiPhoton"], "GenPhoton_2"], 
-		"fp" : [["GammaJets"], "GenPhoton_1"],
+		"pp" : [["DiPhoton"], ""], 
+		"fp" : [["GammaJets"], ""],
 		#"fp" : [["GammaJets_Madgraph"], "GenPhoton_1"], 
-		"ff" : [["QCD"], "GenPhoton_0"], 
+		"ff" : [["QCD"], ""], 
 		"bkg" : [["TTGG", "DY", "TTGJets", "VG", "TTJets"], ""] 
 }
 

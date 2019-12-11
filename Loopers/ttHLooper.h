@@ -26,13 +26,14 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "VH"));
   v.push_back(new Process(f, "GammaJets_Madgraph"));
   v.push_back(new Process(f, "QCD_GammaJets_imputed"));
-  v.push_back(new Process(f, "TTV"));
+  v.push_back(new Process(f, "TTZ"));
   v.push_back(new Process(f, "VV"));
   v.push_back(new Process(f, "tV"));
   v.push_back(new Process(f, "TT_FCNC_hut"));
   v.push_back(new Process(f, "TT_FCNC_hct"));
   v.push_back(new Process(f, "ST_FCNC_hut"));
   v.push_back(new Process(f, "ST_FCNC_hct"));
+  v.push_back(new Process(f, "TTW"));
  //v.push_back(new Process
 
   return v;
@@ -47,11 +48,12 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
   for (unsigned int j = 0; j < syst_labels.size(); j++) {
       for (int i = 0; i < v.size(); i++) {
         v[i]->add_histogram("h" + syst_labels[j] + "Mass", 50, 0, 250);
-        v[i]->add_histogram("h" + syst_labels[j] + "Mass_PassPtToM", 40, 100, 180);
-        v[i]->add_histogram("h" + syst_labels[j] + "Mass_FailPtToM", 40, 100, 180);
-        v[i]->add_histogram("h" + syst_labels[j] + "Mass_PassPtToM_AfterBDTCut", 40, 100, 180);
-        v[i]->add_histogram("h" + syst_labels[j] + "Mass_FailPtToM_AfterBDTCut", 40, 100, 180);
-        v[i]->add_histogram("h" + syst_labels[j] + "MassAN", 80, 100, 180);
+        v[i]->add_histogram("h" + syst_labels[j] + "Mass_v2", 50, 0, 250);
+        //v[i]->add_histogram("h" + syst_labels[j] + "Mass_PassPtToM", 40, 100, 180);
+        //v[i]->add_histogram("h" + syst_labels[j] + "Mass_FailPtToM", 40, 100, 180);
+        //v[i]->add_histogram("h" + syst_labels[j] + "Mass_PassPtToM_AfterBDTCut", 40, 100, 180);
+        //v[i]->add_histogram("h" + syst_labels[j] + "Mass_FailPtToM_AfterBDTCut", 40, 100, 180);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MassAN", 80, 100, 180);
         v[i]->add_histogram("h" + syst_labels[j] + "Rapidity", 25, -3, 3);
         v[i]->add_histogram("h" + syst_labels[j] + "DiphotonSumPt", 25, 0, 1000);
         v[i]->add_histogram("h" + syst_labels[j] + "DiphotonCosPhi", 25, -1, 1);
@@ -59,19 +61,19 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "MetPt", 25, 0, 200);
         v[i]->add_histogram("h" + syst_labels[j] + "HT", 50, 0, 5000);
         v[i]->add_histogram("h" + syst_labels[j] + "MT", 50, 0, 500);
-        v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolution", 250, 0, 0.1);
-        v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionLowMVA", 25, 0, 0.1);
-        v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionMedMVA", 25, 0, 0.1);
-        v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionHighMVA", 25, 0, 0.1);
-        v[i]->add_histogram("h" + syst_labels[j] + "MassTop1", 100, 0, 500);
-        v[i]->add_histogram("h" + syst_labels[j] + "MassTop2", 100, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolution", 250, 0, 0.1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionLowMVA", 25, 0, 0.1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionMedMVA", 25, 0, 0.1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionHighMVA", 25, 0, 0.1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MassTop1", 100, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MassTop2", 100, 0, 500);
 
-        v[i]->add_histogram("h" + syst_labels[j] + "MassTop_Hq_1", 100, 0, 500);
-        v[i]->add_histogram("h" + syst_labels[j] + "MassTop_Hq_2", 100, 0, 500);
-        v[i]->add_histogram("h" + syst_labels[j] + "MassTop_qqq_1", 100, 0, 500);
-        v[i]->add_histogram("h" + syst_labels[j] + "MassTop_qqq_2", 100, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MassTop_Hq_1", 100, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MassTop_Hq_2", 100, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MassTop_qqq_1", 100, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MassTop_qqq_2", 100, 0, 500);
 
-        v[i]->add_histogram("h" + syst_labels[j] + "GJet_BDT", 100, 0, 1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "GJet_BDT", 100, 0, 1);
 
         v[i]->add_histogram("h" + syst_labels[j] + "NJets", 16, -0.5, 15.5);
         v[i]->add_histogram("h" + syst_labels[j] + "NbLoose", 16, -0.5, 15.5);
@@ -96,27 +98,27 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "Jet5BTag", 25, 0, 1);  
         v[i]->add_histogram("h" + syst_labels[j] + "Jet6BTag", 25, 0, 1);  
 
-        v[i]->add_histogram("h" + syst_labels[j] + "bJet1pT", 25, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "bJet1pT", 25, 0, 500);
         //v[i]->add_histogram("h" + syst_labels[j] + "bJet1Eta", 25, -3, 3);
-        v[i]->add_histogram("h" + syst_labels[j] + "bJet2pT", 25, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "bJet2pT", 25, 0, 500);
         //v[i]->add_histogram("h" + syst_labels[j] + "bJet2Eta", 50, -3, 3);    
 
         v[i]->add_histogram("h" + syst_labels[j] + "PtHiggs", 25, 0, 400);
         v[i]->add_histogram("h" + syst_labels[j] + "PhotonDeltaR", 25, 0, 6); 
         v[i]->add_histogram("h" + syst_labels[j] + "DiphotonPtOverMass", 30, 0, 3);
 
-        v[i]->add_histogram("h" + syst_labels[j] + "MinDrDiphoJet", 25, 0, 6);
-        v[i]->add_histogram("h" + syst_labels[j] + "DijetClosestWMass", 25, 0, 50);
-        v[i]->add_histogram("h" + syst_labels[j] + "DijetMass", 50, 0, 500);
-        v[i]->add_histogram("h" + syst_labels[j] + "DeltaRDiphoW", 25, 0, 6);
-        v[i]->add_histogram("h" + syst_labels[j] + "DeltaRDiphoLep", 25, 0, 6);
-        v[i]->add_histogram("h" + syst_labels[j] + "DeltaRDiphoTop", 25, 0, 6);
-        v[i]->add_histogram("h" + syst_labels[j] + "TopPt", 25, 0, 400);
-        v[i]->add_histogram("h" + syst_labels[j] + "TopMass", 25, 0, 400);
-        v[i]->add_histogram("h" + syst_labels[j] + "TopEta", 25, -3, 3);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MinDrDiphoJet", 25, 0, 6);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DijetClosestWMass", 25, 0, 50);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DijetMass", 50, 0, 500);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DeltaRDiphoW", 25, 0, 6);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DeltaRDiphoLep", 25, 0, 6);
+        //v[i]->add_histogram("h" + syst_labels[j] + "DeltaRDiphoTop", 25, 0, 6);
+        //v[i]->add_histogram("h" + syst_labels[j] + "TopPt", 25, 0, 400);
+        //v[i]->add_histogram("h" + syst_labels[j] + "TopMass", 25, 0, 400);
+        //v[i]->add_histogram("h" + syst_labels[j] + "TopEta", 25, -3, 3);
 
-        v[i]->add_histogram("h" + syst_labels[j] + "LeadMinDr", 25, 0, 6);
-        v[i]->add_histogram("h" + syst_labels[j] + "SubleadMinDr", 25, 0, 6);
+        //v[i]->add_histogram("h" + syst_labels[j] + "LeadMinDr", 25, 0, 6);
+        //v[i]->add_histogram("h" + syst_labels[j] + "SubleadMinDr", 25, 0, 6);
         
         v[i]->add_histogram("h" + syst_labels[j] + "AbsCosHelicity", 10, 0, 1);
 
@@ -150,13 +152,13 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
 
 
         // Min/Max ID photon
-        v[i]->add_histogram("h" + syst_labels[j] + "MinIDPhotonPt", 25, 0, 350);
-        v[i]->add_histogram("h" + syst_labels[j] + "MinIDPhotonEta", 25, -3, 3);
-        v[i]->add_histogram("h" + syst_labels[j] + "MaxIDPhotonPt", 25, 0, 350);
-        v[i]->add_histogram("h" + syst_labels[j] + "MaxIDPhotonEta", 25, -3, 3);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MinIDPhotonPt", 25, 0, 350);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MinIDPhotonEta", 25, -3, 3);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MaxIDPhotonPt", 25, 0, 350);
+        //v[i]->add_histogram("h" + syst_labels[j] + "MaxIDPhotonEta", 25, -3, 3);
 
-        v[i]->add_histogram("h" + syst_labels[j] + "PhotonPtRatio", 50, 0.0, 2.0);
-        v[i]->add_histogram("h" + syst_labels[j] + "PhotonDeltaRGen", 50, 0, 0.15);
+        //v[i]->add_histogram("h" + syst_labels[j] + "PhotonPtRatio", 50, 0.0, 2.0);
+        //v[i]->add_histogram("h" + syst_labels[j] + "PhotonDeltaRGen", 50, 0, 0.15);
 
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA", 50, -1, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII", 50, 0, 1);
@@ -166,6 +168,9 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_ttZ_v3", 12, 0, 10);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_ttZ_v4", 10, 0, 10);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_ttZ_v5", 15, 0, 10);
+        v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_bounded", 25, 0, 1);
+        v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_bounded_v2", 12, 0, 1);
+        
 
         v[i]->add_histogram("h" + syst_labels[j] + "MaxBTag", 50, 0, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "SecondMaxBTag", 50, 0, 1);  
@@ -183,24 +188,25 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_coarse_entries", 5, -1, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_coarse_entries", 5, -1, 1);
 
-        v[i]->add_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NJets5+", 10, -1, 1);
-        v[i]->add_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NJets5+", 10, -1, 1);
-        v[i]->add_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NJets7+", 10, -1, 1);
-        v[i]->add_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NJets7+", 10, -1, 1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NJets5+", 10, -1, 1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NJets5+", 10, -1, 1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NJets7+", 10, -1, 1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NJets7+", 10, -1, 1);
 
-        v[i]->add_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_coarse_0b", 5, -1, 1);
-        v[i]->add_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_coarse_0b", 5, -1, 1);
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5); 
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5);
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5);
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5); 
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NTightLeps", 30, -1, 1, 3, -0.5, 2.5);
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NTightLeps", 30, -1, 1, 3, -0.5, 2.5);
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NTightLeps_entries", 30, -1, 1, 3, -0.5, 2.5);
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NTightLeps_entries", 30, -1, 1, 3, -0.5, 2.5);
+        //v[i]->add_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_coarse_0b", 5, -1, 1);
+        //v[i]->add_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_coarse_0b", 5, -1, 1);
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5); 
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NJets", 30, -1, 1, 16, -0.5, 15.5);
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5);
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NJets_entries", 30, -1, 1, 16, -0.5, 15.5); 
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NTightLeps", 30, -1, 1, 3, -0.5, 2.5);
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NTightLeps", 30, -1, 1, 3, -0.5, 2.5);
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_NTightLeps_entries", 30, -1, 1, 3, -0.5, 2.5);
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMinIDMVA_NTightLeps_entries", 30, -1, 1, 3, -0.5, 2.5);
 
-        v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_MinIDMVA", 20, -1, 1, 20, -1, 1);
+        //v[i]->add_2D_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA_MinIDMVA", 20, -1, 1, 20, -1, 1);
 
+        /*
         // Correlation with IDMVA
         v[i]->add_histogram("h" + syst_labels[j] + "FakePhotonIDMVA", 40, -1, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "PromptPhotonIDMVA", 40, -1, 1);
@@ -305,10 +311,16 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "PhotonEta_failEVeto", 10, -3, 3);
         v[i]->add_histogram("h" + syst_labels[j] + "PhotonEta_passBothVeto", 10, -3, 3);
         v[i]->add_histogram("h" + syst_labels[j] + "PhotonEta_failBothVeto", 10, -3, 3); 
+        */
+
+        v[i]->add_histogram("h" + syst_labels[j] + "LeptonPt", 25, 0, 200);
+        v[i]->add_histogram("h" + syst_labels[j] + "LeptonEta", 25, -3, 3);
+
+        v[i]->add_histogram("h" + syst_labels[j] + "MuonMiniIsolation", 10, 0, 0.25);
 
         v[i]->add_histogram("h" + syst_labels[j] + "TopTagger_score", 20, -1, 1);
-        v[i]->add_histogram("h" + syst_labels[j] + "TopTagger_topMass", 40, 0, 400);
-        v[i]->add_histogram("h" + syst_labels[j] + "TopTagger_WMass", 20, 0, 200);
+        //v[i]->add_histogram("h" + syst_labels[j] + "TopTagger_topMass", 40, 0, 400);
+        //v[i]->add_histogram("h" + syst_labels[j] + "TopTagger_WMass", 20, 0, 200);
 
         v[i]->add_histogram("h" + syst_labels[j] + "NLepLoose", 3, -0.5, 2.5);
         v[i]->add_histogram("h" + syst_labels[j] + "NLepMedium", 3, -0.5, 2.5);
@@ -386,7 +398,7 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
   else if (currentFileTitle.Contains("GJets_HT"))
     return 17;
   // 18 is imputed QCD/GJets
-  else if (currentFileTitle.Contains("TTZ") || currentFileTitle.Contains("TTW"))
+  else if (currentFileTitle.Contains("TTZ"))
     return 19;
   else if (currentFileTitle.Contains("WW") || currentFileTitle.Contains("WZ") || currentFileTitle.Contains("ZZ"))
     return 20;
@@ -400,6 +412,8 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
     return 24;
   else if (currentFileTitle.Contains("ST_FCNC") && currentFileTitle.Contains("hct") )
     return 25;
+  else if (currentFileTitle.Contains("TTW"))
+    return 26;
   else {
     cout << "File does not fit into one of the background categories." << endl;
     return -1;
@@ -408,94 +422,115 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
 
 const std::vector<TString> independent_systematic_collections =
 {
-    "MvaShiftDown01Sigma",
-    "SigmaEOverEShiftDown01Sigma",
-    "MaterialCentralBarrelDown01Sigma",
-    "MaterialOuterBarrelDown01Sigma",
-    "MaterialForwardDown01Sigma",
-    "FNUFEBDown01Sigma",
-    "FNUFEEDown01Sigma",
-    "MCScaleGain6EBDown01Sigma",
-    "MCScaleGain1EBDown01Sigma",
-    "ShowerShapeHighR9EBDown01Sigma",
-    "MCScaleHighR9EBDown01Sigma",
-    "MCSmearHighR9EBRhoDown01Sigma",
-    "MCSmearHighR9EBPhiDown01Sigma",
-    "ShowerShapeHighR9EEDown01Sigma",
-    "MCScaleHighR9EEDown01Sigma",
-    "MCSmearHighR9EERhoDown01Sigma",
-    "MCSmearHighR9EEPhiDown01Sigma",
-    "ShowerShapeLowR9EBDown01Sigma",
-    "MCScaleLowR9EBDown01Sigma",
-    "MCSmearLowR9EBRhoDown01Sigma",
-    "MCSmearLowR9EBPhiDown01Sigma",
-    "ShowerShapeLowR9EEDown01Sigma",
-    "MCScaleLowR9EEDown01Sigma",
-    "MCSmearLowR9EERhoDown01Sigma",
-    "MCSmearLowR9EEPhiDown01Sigma",
-    "JECDown01Sigma",
-    "JERDown01Sigma",
-    "PUJIDShiftDown01Sigma",
-    "metJecUncertaintyDown01Sigma",
-    "metJerUncertaintyDown01Sigma",
-    "metPhoUncertaintyDown01Sigma",
-    "metUncUncertaintyDown01Sigma",
-    "MvaShiftUp01Sigma",
-    "SigmaEOverEShiftUp01Sigma",
-    "MaterialCentralBarrelUp01Sigma",
-    "MaterialOuterBarrelUp01Sigma",
-    "MaterialForwardUp01Sigma",
-    "FNUFEBUp01Sigma",
-    "FNUFEEUp01Sigma",
-    "MCScaleGain6EBUp01Sigma",
-    "MCScaleGain1EBUp01Sigma",
-    "ShowerShapeHighR9EBUp01Sigma",
-    "MCScaleHighR9EBUp01Sigma",
-    "MCSmearHighR9EBRhoUp01Sigma",
-    "MCSmearHighR9EBPhiUp01Sigma",
-    "ShowerShapeHighR9EEUp01Sigma",
-    "MCScaleHighR9EEUp01Sigma",
-    "MCSmearHighR9EERhoUp01Sigma",
-    "MCSmearHighR9EEPhiUp01Sigma",
-    "ShowerShapeLowR9EBUp01Sigma",
-    "MCScaleLowR9EBUp01Sigma",
-    "MCSmearLowR9EBRhoUp01Sigma",
-    "MCSmearLowR9EBPhiUp01Sigma",
-    "ShowerShapeLowR9EEUp01Sigma",
-    "MCScaleLowR9EEUp01Sigma",
-    "MCSmearLowR9EERhoUp01Sigma",
-    "MCSmearLowR9EEPhiUp01Sigma",
-    "JECUp01Sigma",
-    "JERUp01Sigma",
-    "PUJIDShiftUp01Sigma",
-    "metJecUncertaintyUp01Sigma",
-    "metJerUncertaintyUp01Sigma",
-    "metPhoUncertaintyUp01Sigma",
-    "metUncUncertaintyUp01Sigma", 
+    "",
+    /*
+    "MvaShiftDown01sigma",
+    "SigmaEOverEShiftDown01sigma",
+    "MaterialCentralBarrelDown01sigma",
+    "MaterialOuterBarrelDown01sigma",
+    "MaterialForwardDown01sigma",
+    "FNUFEBDown01sigma",
+    "FNUFEEDown01sigma",
+    "MCScaleGain6EBDown01sigma",
+    "MCScaleGain1EBDown01sigma",
+    "ShowerShapeHighR9EBDown01sigma",
+    "MCScaleHighR9EBDown01sigma",
+    "MCSmearHighR9EBRhoDown01sigma",
+    "MCSmearHighR9EBPhiDown01sigma",
+    "ShowerShapeHighR9EEDown01sigma",
+    "MCScaleHighR9EEDown01sigma",
+    "MCSmearHighR9EERhoDown01sigma",
+    "MCSmearHighR9EEPhiDown01sigma",
+    "ShowerShapeLowR9EBDown01sigma",
+    "MCScaleLowR9EBDown01sigma",
+    "MCSmearLowR9EBRhoDown01sigma",
+    "MCSmearLowR9EBPhiDown01sigma",
+    "ShowerShapeLowR9EEDown01sigma",
+    "MCScaleLowR9EEDown01sigma",
+    "MCSmearLowR9EERhoDown01sigma",
+    "MCSmearLowR9EEPhiDown01sigma",
+    "JECDown01sigma",
+    "JERDown01sigma",
+    "PUJIDShiftDown01sigma",
+    "metJecUncertaintyDown01sigma",
+    "metJerUncertaintyDown01sigma",
+    "metPhoUncertaintyDown01sigma",
+    "metUncUncertaintyDown01sigma",
+    "MvaShiftUp01sigma",
+    "SigmaEOverEShiftUp01sigma",
+    "MaterialCentralBarrelUp01sigma",
+    "MaterialOuterBarrelUp01sigma",
+    "MaterialForwardUp01sigma",
+    "FNUFEBUp01sigma",
+    "FNUFEEUp01sigma",
+    "MCScaleGain6EBUp01sigma",
+    "MCScaleGain1EBUp01sigma",
+    "ShowerShapeHighR9EBUp01sigma",
+    "MCScaleHighR9EBUp01sigma",
+    "MCSmearHighR9EBRhoUp01sigma",
+    "MCSmearHighR9EBPhiUp01sigma",
+    "ShowerShapeHighR9EEUp01sigma",
+    "MCScaleHighR9EEUp01sigma",
+    "MCSmearHighR9EERhoUp01sigma",
+    "MCSmearHighR9EEPhiUp01sigma",
+    "ShowerShapeLowR9EBUp01sigma",
+    "MCScaleLowR9EBUp01sigma",
+    "MCSmearLowR9EBRhoUp01sigma",
+    "MCSmearLowR9EBPhiUp01sigma",
+    "ShowerShapeLowR9EEUp01sigma",
+    "MCScaleLowR9EEUp01sigma",
+    "MCSmearLowR9EERhoUp01sigma",
+    "MCSmearLowR9EEPhiUp01sigma",
+    "JECUp01sigma",
+    "JERUp01sigma",
+    "PUJIDShiftUp01sigma",
+    "metJecUncertaintyUp01sigma",
+    "metJerUncertaintyUp01sigma",
+    "metPhoUncertaintyUp01sigma",
+    "metUncUncertaintyUp01sigma", 
+    */
+    "JECDown01sigma",
+    "JECUp01sigma",
+    "MvaShiftDown01sigma",
+    "MvaShiftUp01sigma",
+    "MCSmearHighR9EBPhiDown01sigma",
+    "MCSmearHighR9EBPhiUp01sigma",
+    "MCSmearLowR9EBPhiDown01sigma",
+    "MCSmearLowR9EBPhiUp01sigma",
+    "JERDown01sigma",
+    "JERUp01sigma",
 };
 
 const std::vector<TString> weight_systematics = 
 {
-    "UnmatchedPUWeightDown01Sigma",
-    "MvaLinearSystDown01Sigma",
-    "LooseMvaSFDown01Sigma",
-    "PreselSFDown01Sigma",
-    "electronVetoSFDown01Sigma",
-    "TriggerWeightDown01Sigma",
-    "FracRVWeightDown01Sigma",
-    "ElectronWeightDown01Sigma",
-    "JetBTagCutWeightDown01Sigma",
-    "JetBTagReshapeWeightDown01Sigma",
-    "UnmatchedPUWeightUp01Sigma",
-    "MvaLinearSystUp01Sigma",
-    "LooseMvaSFUp01Sigma",
-    "PreselSFUp01Sigma",
-    "electronVetoSFUp01Sigma",
-    "TriggerWeightUp01Sigma",
-    "FracRVWeightUp01Sigma",
-    "ElectronWeightUp01Sigma",
-    "JetBTagCutWeightUp01Sigma",
-    "JetBTagReshapeWeightUp01Sigma",
+    /*
+    "UnmatchedPUWeightDown01sigma",
+    "MvaLinearSystDown01sigma",
+    "LooseMvaSFDown01sigma",
+    "PreselSFDown01sigma",
+    "electronVetoSFDown01sigma",
+    "TriggerWeightDown01sigma",
+    "FracRVWeightDown01sigma",
+    "ElectronWeightDown01sigma",
+    "JetBTagCutWeightDown01sigma",
+    "JetBTagReshapeWeightDown01sigma",
+    "UnmatchedPUWeightUp01sigma",
+    "MvaLinearSystUp01sigma",
+    "LooseMvaSFUp01sigma",
+    "PreselSFUp01sigma",
+    "electronVetoSFUp01sigma",
+    "TriggerWeightUp01sigma",
+    "FracRVWeightUp01sigma",
+    "ElectronWeightUp01sigma",
+    "JetBTagCutWeightUp01sigma",
+    "JetBTagReshapeWeightUp01sigma",
+    */
+    "JetBTagReshapeWeightDown01sigma",
+    "JetBTagReshapeWeightUp01sigma",
+    "PreselSFDown01sigma",
+    "PreselSFUp01sigma",
+    "electronVetoSFDown01sigma",
+    "electronVetoSFUp01sigma",
 };
 
 int multiclassifier_label(TString currentFileTitle, int genPhotonId, bool fcnc = false) {

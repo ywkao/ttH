@@ -45,6 +45,7 @@ eval `scramv1 runtime -sh`
 #ls -atlrh MicroAOD/data
 
 echo "[wrapper] attempting to build"
+cd $CMSSW_BASE
 scramv1 b ProjectRename
 scram b -j1
 eval `scramv1 runtime -sh`
@@ -53,6 +54,7 @@ pip install --user htcondor
 #export PYTHONPATH=$PYTHONPATH:$CMSSW_BASE/src/flashgg/Taggers/test/
 
 # Create tag file
+sed -i 's/MaxObjectWeightException = cms.double(10.),/MaxObjectWeightException = cms.double(13.),/g' Taggers/python/flashggTagSorter_cfi.py
 echo "[wrapper `date +\"%Y%m%d %k:%M:%S\"`] running: cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} ${ARGS}"
 cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} ${ARGS}
 

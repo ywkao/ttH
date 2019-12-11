@@ -17,12 +17,14 @@ parser.add_argument("--bkg_options", help = "how to treat bkg", type=str, defaul
 parser.add_argument("--years", help = "which years to run for", type=str, default="2016,2017,2018")
 parser.add_argument("--fcnc", help = "run babymaker with fcnc as signal, ttH as bkg", action="store_true")
 parser.add_argument("--do_systematics", help = "loop over independent collections for systematics bands in data/MC plots", action="store_true")
+parser.add_argument("--l1_prefire", help = "undo, vary up or vary down l1 prefire weight", type=str, default="")
 args = parser.parse_args()
 
 if args.fcnc:
   args.tag += "_FCNC"
 
 babies_2016 = [
+    "TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1",
     # Data
     "DoubleEG_Run2016B-17Jul2018_ver2-v1",
     "DoubleEG_Run2016C-17Jul2018-v1",
@@ -111,7 +113,6 @@ babies_2016 = [
     "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2",
     "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2",
     "TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2",
-    "TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1",
     "TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2",
 
     # V + X
@@ -366,6 +367,11 @@ def little_babies(baby):
 command_list = []
 idx = 0
 
+if args.do_systematics:
+    syst = "DO_SYST"
+else:
+    syst = ""
+
 # MVA BabyMaker
 if args.babymaker:
   if "2016" in args.years:
@@ -389,20 +395,20 @@ else:
   if "2016" in args.years:
     for baby in babies_2016:
       for little_baby in little_babies(baby):
-        command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2016", "_" + str(idx))) 
+        command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2016", "_" + str(idx), syst, args.l1_prefire)) 
         idx += 1
   if "2017" in args.years:
     for baby in babies_2017:
       for little_baby in little_babies(baby):
-        command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2017", "_" + str(idx)))    
+        command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2017", "_" + str(idx), syst, args.l1_prefire))    
         idx += 1
   if "2018" in args.years:
     for baby in babies_2018:
       for little_baby in little_babies(baby):
-        command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2018", "_" + str(idx)))    
+        command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2018", "_" + str(idx), syst, args.l1_prefire))    
         idx += 1
 
-nPar = 24
+nPar = 8
 parallel_utils.submit_jobs(command_list, nPar)
 
 if args.babymaker:
@@ -426,7 +432,7 @@ if args.babymaker:
   master = "MVABaby_ttH%s_%s.root" % (args.channel, args.tag)
 else:
   master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag)
-os.system('/usr/bin/ionice -c2 -n7 hadd -f -k -j 2 %s %s' % (master, target))
+os.system('/usr/bin/ionice -c2 -n7 hadd -f -k -j 4 %s %s' % (master, target))
 
 
 # Cleanup

@@ -225,6 +225,7 @@ def train_bdt(config, invert=False):
 
   if "n_round" not in list(config.keys()): 
     n_round = 300 if args.channel == "Hadronic" else 150
+    #n_round = 10
     if "FCNC" in args.input:
       n_round = 150
       if args.multi:
@@ -457,6 +458,8 @@ def train_bdt(config, invert=False):
   plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
   estimate_za = True
+  use_tth_runII_mva = False
+  use_tth_2017_mva = False
   if estimate_za:
     n_quantiles = 30
 
@@ -469,7 +472,18 @@ def train_bdt(config, invert=False):
         signal_mva_scores["bdt_score_%d" % i] = reverse*ks_test.logical_vector(pred_test[:,i], y_test, 1) # factor of -1 so that we cut *below* certain values, as these are background probabilities, not signal
         bkg_mva_scores["bdt_score_%d" % i] = reverse*ks_test.logical_vector(pred_test[:,i], y_test, 0)
         data_mva_scores["bdt_score_%d" % i] = reverse*pred_data[:,i]
+    elif use_tth_runII_mva:
+      print "Using RunII MVA from flashgg"
+      signal_mva_scores = {"bdt_score" : ks_test.logical_vector(tth_runII_mva_validation, y_test, 1)}
+      bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(tth_runII_mva_validation, y_test, 0)}
+      data_mva_scores = {"bdt_score" : tth_runII_mva_data}
+    elif use_tth_2017_mva:
+      print "Using 2017 ttH PAS MVA"
+      signal_mva_scores = {"bdt_score" : ks_test.logical_vector(tth_2017_reference_mva_validation, y_test, 1)}
+      bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(tth_2017_reference_mva_validation, y_test, 0)}
+      data_mva_scores = {"bdt_score" : tth_2017_reference_mva_data}
     else:
+      print "Using the MVA we just trained"
       signal_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 1)}
       bkg_mva_scores = {"bdt_score" : ks_test.logical_vector(pred_test, y_test, 0)}
       data_mva_scores = {"bdt_score" : pred_data}

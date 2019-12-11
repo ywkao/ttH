@@ -198,7 +198,11 @@ if do_dnn:
   for dnn_model in dnn_models:
     with open(dnn_model, "r") as f_in:
       model = json.load(f_in)
+
     dnn_features_data = dnn_helper.DNN_Features(name = 'data', global_features = utils.create_array(features_data, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features_data["objects_"]), model["preprocess_scheme"]))
+    #print dnn_features_data.global_features
+    #print dnn_features_data.objects
+    #print dnn_features_data.features
     dnn_features_validation = dnn_helper.DNN_Features(name = 'validation', global_features = utils.create_array(features_validation, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features_validation["objects_"]), model["preprocess_scheme"]))
     dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = utils.create_array(features_final_fit, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features_final_fit["objects_"]), model["preprocess_scheme"]))
     dnn_features_train = dnn_helper.DNN_Features(name = 'train', global_features = utils.create_array(features, dnn_features, model["preprocess_scheme"], True), objects = utils.preprocess_array(utils.pad_array(features["objects_"]), model["preprocess_scheme"]))
@@ -206,7 +210,7 @@ if do_dnn:
     dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, metadata = model, weights_file = "dnn_weights/" + model["weights"], train_mode = False)
     #dnn.predict()
     #dnn_predictions.append([dnn.predictions["train"], dnn.predictions["validation"], dnn.predictions["data"]])
-    dnn_predictions.append(dnn.predict())
+    dnn_predictions.append(dnn.predict(debug=True))
     feature_names.append("dnn_score_%d" % i)
     i += 1 
 

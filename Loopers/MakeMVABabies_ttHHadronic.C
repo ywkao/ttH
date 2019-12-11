@@ -560,6 +560,29 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       jet6_pt_   = njets_ >= 6 ? jets[5].Pt()   : -999;
       jet6_eta_  = njets_ >= 6 ? jets[5].Eta()  : -999;
       jet6_btag_ = njets_ >= 6 ? btag_scores[5] : -999;
+      jet7_pt_   = njets_ >= 7 ? jets[6].Pt()   : -999;
+      jet7_eta_  = njets_ >= 7 ? jets[6].Eta()  : -999;
+      jet7_btag_ = njets_ >= 7 ? btag_scores[6] : -999;
+      jet8_pt_   = njets_ >= 8 ? jets[7].Pt()   : -999;
+      jet8_eta_  = njets_ >= 8 ? jets[7].Eta()  : -999;
+      jet8_btag_ = njets_ >= 8 ? btag_scores[7] : -999; 
+
+      jet1_phi_     = njets_ >= 1 ? jets[0].Phi() : -999;
+      jet1_energy_  = njets_ >= 1 ? jets[0].E()   : -999;
+      jet2_phi_     = njets_ >= 2 ? jets[1].Phi() : -999;
+      jet2_energy_  = njets_ >= 2 ? jets[1].E()   : -999;
+      jet3_phi_     = njets_ >= 3 ? jets[2].Phi() : -999;
+      jet3_energy_  = njets_ >= 3 ? jets[2].E()   : -999;
+      jet4_phi_     = njets_ >= 4 ? jets[3].Phi() : -999;
+      jet4_energy_  = njets_ >= 4 ? jets[3].E()   : -999;
+      jet5_phi_     = njets_ >= 5 ? jets[4].Phi() : -999;
+      jet5_energy_  = njets_ >= 5 ? jets[4].E()   : -999;
+      jet6_phi_     = njets_ >= 6 ? jets[5].Phi() : -999;
+      jet6_energy_  = njets_ >= 6 ? jets[5].E()   : -999;
+      jet7_phi_     = njets_ >= 7 ? jets[6].Phi() : -999;
+      jet7_energy_  = njets_ >= 7 ? jets[6].E()   : -999;
+      jet8_phi_     = njets_ >= 8 ? jets[7].Phi() : -999;
+      jet8_energy_  = njets_ >= 8 ? jets[7].E()   : -999;
 
       lead_pT_ = leadPt();
       sublead_pT_ = subleadPt();

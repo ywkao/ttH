@@ -126,7 +126,14 @@ class DNN_Helper:
   #    self.features_train.global_features = utils.oversample(self.features_train.global_features, oversample_indices)
   #    self.features_train.objects = utils.oversample(self.features_train.objects, oversample_indices)
 
-  def predict(self):
+  def predict(self, debug=False):
+    #for i in range(len(self.features_final_fit.global_features)):
+    #    print i
+    #    for j in range(len(self.features_final_fit.global_features[i])):
+    #        print "Global features %d: %.6f" % (j, self.features_final_fit.global_features[i][j])
+    #    for j in range(len(self.features_final_fit.objects[i])):
+    #        for k in range(len(self.features_final_fit.objects[i][j])):
+    #            print "Object feature %d, %d: %.6f" % (j, k, self.features_final_fit.objects[i][j][k]) 
     self.predictions["train"] = self.model.predict(self.features_train.features, self.batch_size).flatten()
     self.predictions["validation"] = self.model.predict(self.features_validation.features, self.batch_size).flatten()
     self.predictions["data"] = self.model.predict(self.features_data.features, self.batch_size).flatten()
@@ -134,6 +141,8 @@ class DNN_Helper:
       self.predictions["final_fit"] = []
     else:
       self.predictions["final_fit"] = self.model.predict(self.features_final_fit.features, self.batch_size).flatten()
+      for i in range(len(self.features_final_fit.global_features)):
+          print "DNN Score %d: %.6f" % (i, self.predictions["final_fit"][i])
     return [self.predictions["train"], self.predictions["validation"], self.predictions["data"], self.predictions["final_fit"]]
 
   def train(self, n_epochs, n_batch):

@@ -107,7 +107,7 @@ bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, float mva_v
   }
 
   else if (tag == "ttHHadronic_RunII_MVA_Presel") {
-    if (mass() < 100) 					return false;
+    if (mass() < 100 || mass() > 180) 	return false;
     if (n_jets() < 3)					return false;
     if (nb_loose() < 1)					return false;
     if (minIDMVA_ < min_photon_ID_presel_cut)		return false;

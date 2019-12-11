@@ -37,7 +37,7 @@ old_files = glob.glob(destination + "/*.root")
 if len(old_files) > 0:
   os.system("rm %s/*.root" % destination)
 
-nPar = 20
+nPar = 1
 command_list = []
 
 for dir in dirs:
@@ -51,7 +51,7 @@ for dir in dirs:
   name = dir.split("/")[-1]
   if not os.path.isdir(destination + name):
     os.system("mkdir %s" % destination + name)
-  
+
   command = "addHistos %s %s %d %d" % (destination + name + "/merged_ntuple", dir + "/merged_ntuple", len(files), nPar)
   print(command)
   command_list.append(command)
