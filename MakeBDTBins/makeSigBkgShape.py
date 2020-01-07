@@ -221,12 +221,15 @@ def GetBkgPdf(events, tag, savename, savepath, modelpath, maxInHist):
     w.factory("ExtendPdf:"+tag+"_ext("+tag+", nevt[100,0,10000000], 'full')")
 
     #w.pdf(tag).fitTo(events, RooFit.Range("SL,SU"), RooFit.Minos())
+    #w.pdf(tag+"_ext").fitTo(events, RooFit.Extended(True), RooFit.PrintLevel(-1))
     w.pdf(tag+"_ext").fitTo(events, RooFit.Range("SL,SU"),RooFit.Extended(True), RooFit.PrintLevel(-1))
 
     frame = w.var("CMS_hgg_mass").frame()
 
     #events.Print()
-    #events.plotOn(frame, RooFit.Cut("mRegion==mRegion::Sideband"), RooFit.Binning(80))
+#    events.plotOn(frame,RooFit.Binning(nBins),RooFit.CutRange("SL"));
+#    events.plotOn(frame,RooFit.Binning(nBins),RooFit.CutRange("SU"));
+#    events.plotOn(frame,RooFit.Binning(nBins),RooFit.Invisible(), RooFit.MarkerColor(0));
     events.plotOn(frame, RooFit.Binning(nBins))
 
     #w.pdf(tag).plotOn(frame)#,RooFit.Range(100,180))
@@ -351,7 +354,7 @@ processIDMap = {"ttH_hgg":0, "ggH_hgg":14, "VBF_hgg":15, "VH_hgg":16, "THQ_hgg":
 
 modelpath = args.modelPath
 
-bkgSampleCut = "sample_id == 0 &&  process_id != 0 "
+bkgSampleCut = "sample_id == 0 &&  process_id <= 10 "
 if args.doData:
     bkgSampleCut = "sample_id == 2"
 
@@ -360,15 +363,20 @@ if args.doData:
 ### sample_id: 0 bkg, 1 sig, 2 data
 ### signal_mass_label: 0 mH125
 
-sigCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == " + str(processIDMap[process])
+#sigCut = "mass > 100 && mass < 180 && mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_category == 127 && process_id == " + str(processIDMap[process])
+sigCut = "mass > 100 && mass < 180 && global_features[7] > 0.33 && global_features[8] > 0.25 && mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_category == 127 && process_id == " + str(processIDMap[process])
 #sigCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && signal_mass_label == 0 && process_id == " + str(processIDMap[process])
 
-bkgCut = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
+bkgCut = "global_features[7] > 0.33 && global_features[8] > 0.25 && mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 180)) "
+#bkgCut = " mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
+
+#bkgCut = "global_features[7] > 0.33 && global_features[8] > 0.25 && mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
 #bkgCut = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && " + bkgSampleCut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) "
 
 d_mgg_sig, maxInHist = GetDataset(t, sigCut, tag, savepath, False, False) # mH125
 if (process == "ggH_hgg") or (process == "VBF_hgg"):
-    sigCut2 = "mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + " && signal_mass_label == 0 && process_id == 0"
+    #sigCut2 = "mass > 100 && mass < 180 && mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + "&& signal_mass_category == 127 && process_id == 0"
+    sigCut2 = "mass > 100 && mass < 180 && global_features[7] > 0.33 && global_features[8] > 0.25 && mva_score > " + str(args.low) + " && mva_score < " + str(args.high) + "&& signal_mass_category == 127 && process_id == 0"
 #    sigCut2 = "tth_2017_reference_mva > " + str(args.low) + " && tth_2017_reference_mva < " + str(args.high) + " && signal_mass_label == 0 && process_id == 0"
     d_mgg_sig_2, maxInHist_2 = GetDataset(t, sigCut2, tag, savepath, False, False)
     GetSigPdf(d_mgg_sig_2, d_mgg_sig.sumEntries(), "hggpdfsmrel_" + process + "_" + tag, "CMS-HGG_sigfit_mva_" + process + "_" + tag, savepath, modelpath, maxInHist_2)
@@ -402,4 +410,4 @@ for i in range(len(cutBins)):
     cuts.append(cutbase + cutBins[i])
 #GetMultiDataset(t, cuts, datanameTag, debug=False)
 '''
-call('chmod -R 755 ~/public_html', shell=True)
+call('chmod -R 755 ' + savepath, shell=True)
