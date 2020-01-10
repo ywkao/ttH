@@ -142,6 +142,26 @@ def get_samples_from_catalogs(catalogs):
                 sum_of_weights += samples[sample][year][production]["weights"]
             scale1fb = (samples[sample]["xs"] * 1000.) / float(sum_of_weights) 
             samples[sample][year]["scale1fb"] = scale1fb
+
+    # Hack to include FCNC
+    with open("/home/users/sjmay/ttH/Loopers/scale1fb/scale1fb.json", "r") as f_in:
+        fcnc_samples = json.load(f_in)
+        for sample in fcnc_samples.keys():
+            if "FCNC" not in sample:
+                continue
+            else:
+                print sample
+            entry = {}
+            entry["xs"] = fcnc_samples[sample]["xs"]
+            for year in ["2016", "2017", "2018"]:
+                entry[year] = {}
+                for production in fcnc_samples[sample]["productions"]:
+                    if "RunIIFall17MiniAODv2" not in production:
+                        continue
+                    entry[year][production] = { "files" : -1, "nevents" : fcnc_samples[sample]["productions"][production]["n_events_tot"], "weights" : fcnc_samples[sample]["productions"][production]["sum_of_weights"] }
+                    entry[year]["scale1fb"] = fcnc_samples[sample]["scale1fb_%s" % year]
+            samples[sample] = entry
+
     return samples
 
 def summarize_samples(samples):

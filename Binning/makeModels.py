@@ -28,6 +28,7 @@ class makeModel():
         self.var = config["var"] #mass
         self.weightVar = config["weightVar"] #weight
         self.norm = -1
+        self.filename = config["filename"]
 
         self.treename = "t"
 
@@ -39,7 +40,7 @@ class makeModel():
 
     def getTreeFromFile(self):
 
-        self.filename = filenameDict.namedict[self.tag]
+        #self.filename = filenameDict.namedict[self.tag]
         self.file = ROOT.TFile.Open(self.filename)
         self.tree = self.file.Get(self.treename)
 

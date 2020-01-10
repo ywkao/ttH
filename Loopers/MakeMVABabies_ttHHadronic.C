@@ -334,7 +334,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
     TTree *tree;
-    if (currentFileTitle.Contains("v4."))
+    if (currentFileTitle.Contains("v4.") && !currentFileTitle.Contains("FCNC"))
         tree = (TTree*)file.Get("tagsDumper/trees/_13TeV_TTHHadronicTag");
     else
         tree = (TTree*)file.Get("tthHadronicTagDumper/trees/tth_13TeV_all");

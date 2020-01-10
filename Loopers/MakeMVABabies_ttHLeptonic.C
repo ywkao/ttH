@@ -3,7 +3,7 @@
 
 void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool fcnc = false, bool blind = false, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
 
-  // Benchmark
+    // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
@@ -105,10 +105,15 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
     TTree *tree;
-    if (currentFileTitle.Contains("v4."))
+    cout << "currentFileTitle: " << currentFileTitle << endl;
+    if (currentFileTitle.Contains("v4.") && !currentFileTitle.Contains("FCNC")) {
+        cout << "New tree naming convention" << endl;
         tree = (TTree*)file.Get("tagsDumper/trees/_13TeV_TTHLeptonicTag");
-    else
+        }
+    else {
+        cout << "Old tree naming convention" << endl;
         tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all"); 
+    }
     if (fast) TTreeCache::SetLearnEntries(10);
     if (fast) tree->SetCacheSize(128*1024*1024);
     cms3.Init(tree);

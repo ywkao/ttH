@@ -21,6 +21,7 @@ parser.add_argument("--use_xrdcp", help = "copy the tarball with xrdcp", action 
 parser.add_argument("--use_gridftp", help = "copy the tarball with gfal-copy", action = "store_true")
 parser.add_argument("--use_wget", help = "copy the tarball with wget, utilizing squid caches at sites", action = "store_true")
 parser.add_argument("--get_nevents", help = "write json file with n_events for each sample in catalog (don't submit jobs)", action = "store_true")
+parser.add_argument("--ttH_and_tH_only", help = "only submit jobs for ttH and tH samples", action = "store_true")
 args = parser.parse_args()
 
 job_tag = "ttH_Babies_RunII" + args.tag
@@ -42,7 +43,7 @@ if not args.soft_rerun or (args.update_tarball or args.update_executable) and no
       if not args.update_executable:
           os.system("cp package.tar.gz /hadoop/cms/store/user/smay/ttH/tarballs/%s" % tar_path)
           os.system("hadoop fs -setrep -R 30 /cms/store/user/smay/ttH/tarballs/%s" % tar_path)
-          os.system("sleep 1h")
+          #os.system("sleep 1h")
       if args.use_xrdcp:
           os.system("cp condor_exe_xrd.sh condor_exe_%s.sh" % job_tag)
       elif args.use_gridftp:
@@ -110,6 +111,9 @@ blacklist = ["SingleElectron", "Box1BJet", "Box2BJets", "GJet_Pt", "ZH_HtoGG", "
 def skip(sample):
     if any([x in sample for x in blacklist]):
         return True
+    if args.ttH_and_tH_only:
+        if not ("ttHJetToGG" in sample or "ttHToGG" in sample or "THQ" in sample or "THW" in sample):
+            return True
     return False
 
 class file:

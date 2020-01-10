@@ -161,10 +161,10 @@ features_final_fit = root_numpy.tree2array(tree, branches = branches, selection 
 
 
 # Scale ttH training weights
-if args.fcnc_hut or args.fcnc_hct:
-    for i in range(len(features["process_id_"])):
-        if features["process_id_"][i] == 0: # scale ttH by 1/7 bc we use 7 mass points in training
-            features["evt_weight_"][i] *= 1.0/7.0
+#if args.fcnc_hut or args.fcnc_hct:
+#    for i in range(len(features["process_id_"])):
+#        if features["process_id_"][i] == 0: # scale ttH by 1/7 bc we use 7 mass points in training
+#            features["evt_weight_"][i] *= 1.0/7.0
 
 if args.sideband:
   handicap = ""

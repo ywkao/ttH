@@ -14,12 +14,18 @@ import parallel_utils
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--tag", help = "tag to distinguish this optimization", type=str, default = "test")
-parser.add_argument("--nCores", help = "number of cores to use", type=int, default = 12)
 parser.add_argument("--channel", help = "leptonic or hadronic", type=str, default = "TTHHadronicTag")
+parser.add_argument("--file", help = "path to final fit tree", type=str)
+
+parser.add_argument("--nCores", help = "number of cores to use", type=int, default = 12)
 parser.add_argument("--nPoints", help = "number of different cuts to try", type=int, default = 100)
+parser.add_argument("--nBins", help = "number of bins", type=int, default = 2)
+
 parser.add_argument("--resonant_bkgs", help = "processes to consider for resonant background (csv list)", type=str, default = "ggH")
 parser.add_argument("--signal", help = "process to consider for signal", default = "ttH")
-parser.add_argument("--nBins", help = "number of bins", type=int, default = 2)
+
+parser.add_argument("--limit", help = "calculate limit instead of significance", action = "store_true")
+
 args = parser.parse_args()
 
 process_dict = { "ttH" : [0], "ggH" : [14], "FCNC_Hut" : [22,24], "FCNC_Hct" : [23,25] }
@@ -40,7 +46,7 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
         # Make signal model
         signals = args.signal.split(",") + args.resonant_bkgs.split(",")
         for signal in signals:
-            sigModelConfig = { "var" : "mass", "weightVar" : "weight", "plotpath" : scanConfig["plotpath"], "modelpath" : scanConfig["modelpath"] }
+            sigModelConfig = { "var" : "mass", "weightVar" : "weight", "plotpath" : scanConfig["plotpath"], "modelpath" : scanConfig["modelpath"], "filename" : scanConfig["filename"]}
             sigModelConfig["savename"] = "CMS-HGG_sigfit_mva_" + signal + "_hgg_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
             sigModelConfig["tag"] = "hggpdfsmrel_" + signal + "_hgg_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
             processSelection = "("
@@ -50,7 +56,12 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
                     processSelection += ")"
                 else:
                     processSelection += " || "
-            sigModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && " + processSelection + " && signal_mass_category == 127"
+            sigModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && " + processSelection
+            if "FCNC" not in args.signal.split(",")[0]: # this is ttH, we use M127 for optimization
+                signal_sample_selection = " && signal_mass_category == 127"
+            else: # this is FCNC, use M125
+                signal_sample_selection = " && ((process_id >= 22 && process_id <= 25) || (signal_mass_label == 0 && signal_mass_category == 125))" # accept all FCNC events, only M125 Madgraph (not Powheg) for all other SM Higgs
+            sigModelConfig["selection"] += signal_sample_selection
             print "\n[BINNING_SCRIPT_INFO] Making signal model with selection %s" % sigModelConfig["selection"]
             print "\n[BINNING_SCRIPT_INFO] Saving as %s" % "CMS-HGG_sigfit_mva_" + signal + "_hgg_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
             print "\n\n"
@@ -59,8 +70,8 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
             model.makeSignalModel("wsig_13TeV", {"replaceNorm":False, "norm_in":-1, "fixParameters":True})
 
         # Make background model
-        bkgModelConfig = { "var" : "mass", "weightVar" : "weight", "plotpath" : scanConfig["plotpath"], "modelpath" : scanConfig["modelpath"] }
-        bkgModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) && sample_id == 0 && process_id <= 10"
+        bkgModelConfig = { "var" : "mass", "weightVar" : "weight", "plotpath" : scanConfig["plotpath"], "modelpath" : scanConfig["modelpath"], "filename" : scanConfig["filename"] }
+        bkgModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) && sample_id == 0 && (process_id == 1 || process_id == 2 || process_id == 3 || process_id == 5 || process_id == 6 || process_id == 7 || process_id == 9 || process_id == 13 || process_id == 18 || process_id == 19 || process_id == 20 || process_id == 21 || process_id == 26)"
         bkgModelConfig["savename"] = "CMS-HGG_bkg_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
         bkgModelConfig["tag"] = "CMS_hgg_bkgshape_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
 
@@ -78,17 +89,22 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
         bkgList.append(bkg + "_hgg")
 
     card = makeCards(scanConfig["modelpath"], "CMS-HGG_mva_13TeV_datacard_" + str(idx) + ".txt")
-    tagList = [(tag + "_%d" % x) for x in range(nBins)] 
+    tagList = [(scanConfig["tag"] + "_%d" % x) for x in range(nBins)] 
+    print "tagList is", tagList, "\n\n\n\n"
     card.WriteCard(sigList, bkgList, tagList, "_" + str(idx))
 
-    combineConfig = { "combineOption" : "Significance --significance ", "combineOutName" : "sig_" + str(idx), "cardName" : "CMS-HGG_mva_13TeV_datacard_" + str(idx) + ".txt", "outtxtName" : "sig_" + str(idx) + ".txt", "grepContent" : "\"Significance\"" }
+    if args.limit:
+        combineOption = "AsymptoticLimits -m 125 "
+    else:
+        combineOption = "Significance --significance "
+    combineConfig = { "combineOption" : combineOption, "combineOutName" : "sig_" + str(idx), "cardName" : "CMS-HGG_mva_13TeV_datacard_" + str(idx) + ".txt", "outtxtName" : "sig_" + str(idx) + ".txt", "grepContent" : "\"Significance\"" }
 
     significance = float(scanner.runCombine(combineConfig))
-    print "[BINNING_SCRIPT_INFO] Significance for cut combo %d is %.6f" % (idx, significance)
+    print "[BINNING_SCRIPT_INFO] %s for cut combo %d is %.6f" % ("Significance" if not args.limit else "Limit", idx, significance)
 
     for cut in cuts:
         cut = float(cut)
-    result = { "mva_cuts" : [str(cut) for cut in cuts], "significance" : significance }
+    result = { "mva_cuts" : [str(cut) for cut in cuts], ("limit" if args.limit else "significance") : significance }
 
     results[idx] = result
     print results
@@ -151,7 +167,8 @@ postFix = "fcnc_test"
 tag = "TTHHadronicTag"
 # setup scan
 scanConfig= {\
-"tag":tag,
+"tag" : args.channel,
+"filename" : args.file,
 #"selection":"global_features[7] > 0.33 && global_features[8] > 0.25 && signal_mass_category == 127 && mass > 100 && mass < 180 && mva_score < " + str(highCut)+ "&& mva_score > " + str(lowCut),
 #"selection" : "mass > 100 && mass < 180 && mva_score < " + str(highCut)+ " && mva_score > " + str(lowCut),
 "selection" : "mass > 100 && mass < 180",

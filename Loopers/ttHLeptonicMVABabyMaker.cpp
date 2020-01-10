@@ -20,15 +20,15 @@ int main(int argc, char* argv[]) {
   else
     cout << "Did not recognize background treatment option" << endl;
 
+  TString file = argc <= 5 ? "all" : argv[5];
+  TString mYear = argc <= 6 ? "" : argv[6];
+  TString idx = argc <= 7 ? "" : argv[7]; 
+
   TChain *ch;
-  if (ext.Contains("v4."))
+  if (ext.Contains("v4.") && !file.Contains("FCNC"))
     ch = new TChain("tagsDumper/trees/_13TeV_TTHLeptonicTag");
   else
     ch = new TChain("tthLeptonicTagDumper/trees/tth_13TeV_all"); 
-
-  TString file = argc <= 5 ? "all" : argv[5];
-  TString mYear = argc <= 6 ? "" : argv[6];
-  TString idx = argc <= 7 ? "" : argv[7];
 
   TString fcnc = argc <= 8 ? "" : argv[8];
   bool fcnc_ = fcnc == "FCNC";

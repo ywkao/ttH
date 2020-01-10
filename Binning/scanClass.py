@@ -30,6 +30,7 @@ class scanClass():
         self.combineEnv = config["combineEnv"]
         self.var = config["var"]
         self.weightVar = config["weightVar"]
+        self.filename = config["filename"]
         #/home/users/hmei/flashggFinalFit/CMSSW_7_4_7/src/
 
         self.treename = "t"
@@ -38,7 +39,7 @@ class scanClass():
 
     def getTree(self):
 
-        self.filename = filenameDict.namedict[self.tag]
+        #self.filename = filenameDict.namedict[self.tag]
         self.file = ROOT.TFile.Open(self.filename)
         self.tree = self.file.Get(self.treename)
         return self.tree
@@ -114,7 +115,10 @@ class scanClass():
         subprocess.call(["./%s" % combineCmdFileName.split("/")[-1]])
         #os.system("./%s" % combineCmdFileName.split("/")[-1])
 
-        significance = os.popen('grep "Significance:" %s | awk "{print $2}"' % (self.modelpath + outtxtName)).read().split(" ")[-1]
+        if "Significance" in combineOption:
+            significance = os.popen('grep "Significance:" %s | awk "{print $2}"' % (self.modelpath + outtxtName)).read().split(" ")[-1]
+        elif "AsymptoticLimits" in combineOption:
+            significance = os.popen('grep "Expected 50.0" %s | awk "{print $2}"' % (self.modelpath + outtxtName)).read().split(" ")[-1]
         return significance
 
         #subprocess.call("echo " + cmdCombine + " > " + self.modelpath + "combineCmd_" + combineOutName + ".sh")
