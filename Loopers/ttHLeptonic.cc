@@ -13,8 +13,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (jet_pt6_branch) jet_pt6_branch->SetAddress(&jet_pt6_);
   jet_phi12_branch = tree->GetBranch("jet_phi12");
   if (jet_phi12_branch) jet_phi12_branch->SetAddress(&jet_phi12_);
-  sublead_hoe_branch = tree->GetBranch("sublead_hoe");
-  if (sublead_hoe_branch) sublead_hoe_branch->SetAddress(&sublead_hoe_);
+  lead_MomID_branch = tree->GetBranch("lead_MomID");
+  if (lead_MomID_branch) lead_MomID_branch->SetAddress(&lead_MomID_);
   sublead_SimpleMomStatus_branch = tree->GetBranch("sublead_SimpleMomStatus");
   if (sublead_SimpleMomStatus_branch) sublead_SimpleMomStatus_branch->SetAddress(&sublead_SimpleMomStatus_);
   jet_bdiscriminant10_branch = tree->GetBranch("jet_bdiscriminant10");
@@ -63,6 +63,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (leadPtGen_branch) leadPtGen_branch->SetAddress(&leadPtGen_);
   sublead_Pythia_branch = tree->GetBranch("sublead_Pythia");
   if (sublead_Pythia_branch) sublead_Pythia_branch->SetAddress(&sublead_Pythia_);
+  dZ_branch = tree->GetBranch("dZ");
+  if (dZ_branch) dZ_branch->SetAddress(&dZ_);
   jet_energy8_branch = tree->GetBranch("jet_energy8");
   if (jet_energy8_branch) jet_energy8_branch->SetAddress(&jet_energy8_);
   sublead_closest_gen_Pt_branch = tree->GetBranch("sublead_closest_gen_Pt");
@@ -119,6 +121,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (nGoodMusFromTau_branch) nGoodMusFromTau_branch->SetAddress(&nGoodMusFromTau_);
   ele1_pt_branch = tree->GetBranch("ele1_pt");
   if (ele1_pt_branch) ele1_pt_branch->SetAddress(&ele1_pt_);
+  jet_phi14_branch = tree->GetBranch("jet_phi14");
+  if (jet_phi14_branch) jet_phi14_branch->SetAddress(&jet_phi14_);
   ElectronWeightDown01sigma_branch = tree->GetBranch("ElectronWeightDown01sigma");
   if (ElectronWeightDown01sigma_branch) ElectronWeightDown01sigma_branch->SetAddress(&ElectronWeightDown01sigma_);
   jet_bdiscriminant14_branch = tree->GetBranch("jet_bdiscriminant14");
@@ -187,6 +191,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (lead_PassFrix_branch) lead_PassFrix_branch->SetAddress(&lead_PassFrix_);
   jet_cdiscriminant6_branch = tree->GetBranch("jet_cdiscriminant6");
   if (jet_cdiscriminant6_branch) jet_cdiscriminant6_branch->SetAddress(&jet_cdiscriminant6_);
+  ele1_charge_branch = tree->GetBranch("ele1_charge");
+  if (ele1_charge_branch) ele1_charge_branch->SetAddress(&ele1_charge_);
   jet_bbdiscriminant11_branch = tree->GetBranch("jet_bbdiscriminant11");
   if (jet_bbdiscriminant11_branch) jet_bbdiscriminant11_branch->SetAddress(&jet_bbdiscriminant11_);
   PreselSFUp01sigma_branch = tree->GetBranch("PreselSFUp01sigma");
@@ -195,8 +201,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (jet_cdiscriminant2_branch) jet_cdiscriminant2_branch->SetAddress(&jet_cdiscriminant2_);
   jet_udsgdiscriminant6_branch = tree->GetBranch("jet_udsgdiscriminant6");
   if (jet_udsgdiscriminant6_branch) jet_udsgdiscriminant6_branch->SetAddress(&jet_udsgdiscriminant6_);
-  lead_MomID_branch = tree->GetBranch("lead_MomID");
-  if (lead_MomID_branch) lead_MomID_branch->SetAddress(&lead_MomID_);
+  sublead_hoe_branch = tree->GetBranch("sublead_hoe");
+  if (sublead_hoe_branch) sublead_hoe_branch->SetAddress(&sublead_hoe_);
   muonSubleadIso_branch = tree->GetBranch("muonSubleadIso");
   if (muonSubleadIso_branch) muonSubleadIso_branch->SetAddress(&muonSubleadIso_);
   leadR9_branch = tree->GetBranch("leadR9");
@@ -263,6 +269,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (jet_bbdiscriminant7_branch) jet_bbdiscriminant7_branch->SetAddress(&jet_bbdiscriminant7_);
   jet_bbdiscriminant9_branch = tree->GetBranch("jet_bbdiscriminant9");
   if (jet_bbdiscriminant9_branch) jet_bbdiscriminant9_branch->SetAddress(&jet_bbdiscriminant9_);
+  muon2_charge_branch = tree->GetBranch("muon2_charge");
+  if (muon2_charge_branch) muon2_charge_branch->SetAddress(&muon2_charge_);
   FracRVNvtxWeightUp01sigma_branch = tree->GetBranch("FracRVNvtxWeightUp01sigma");
   if (FracRVNvtxWeightUp01sigma_branch) FracRVNvtxWeightUp01sigma_branch->SetAddress(&FracRVNvtxWeightUp01sigma_);
   ele1_energy_branch = tree->GetBranch("ele1_energy");
@@ -281,6 +289,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (jet_bbdiscriminant12_branch) jet_bbdiscriminant12_branch->SetAddress(&jet_bbdiscriminant12_);
   n_ele_branch = tree->GetBranch("n_ele");
   if (n_ele_branch) n_ele_branch->SetAddress(&n_ele_);
+  muon1_charge_branch = tree->GetBranch("muon1_charge");
+  if (muon1_charge_branch) muon1_charge_branch->SetAddress(&muon1_charge_);
   jet_phi15_branch = tree->GetBranch("jet_phi15");
   if (jet_phi15_branch) jet_phi15_branch->SetAddress(&jet_phi15_);
   jet_eta5_branch = tree->GetBranch("jet_eta5");
@@ -423,6 +433,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (jet_eta8_branch) jet_eta8_branch->SetAddress(&jet_eta8_);
   CMS_hgg_mass_branch = tree->GetBranch("CMS_hgg_mass");
   if (CMS_hgg_mass_branch) CMS_hgg_mass_branch->SetAddress(&CMS_hgg_mass_);
+  centralObjectWeight_branch = tree->GetBranch("centralObjectWeight");
+  if (centralObjectWeight_branch) centralObjectWeight_branch->SetAddress(&centralObjectWeight_);
   jet_bbdiscriminant2_branch = tree->GetBranch("jet_bbdiscriminant2");
   if (jet_bbdiscriminant2_branch) jet_bbdiscriminant2_branch->SetAddress(&jet_bbdiscriminant2_);
   jet_eta11_branch = tree->GetBranch("jet_eta11");
@@ -439,8 +451,8 @@ void ttHLeptonic::Init(TTree *tree) {
   if (sublead_PassFrix_branch) sublead_PassFrix_branch->SetAddress(&sublead_PassFrix_);
   ele1_phi_branch = tree->GetBranch("ele1_phi");
   if (ele1_phi_branch) ele1_phi_branch->SetAddress(&ele1_phi_);
-  jet_phi14_branch = tree->GetBranch("jet_phi14");
-  if (jet_phi14_branch) jet_phi14_branch->SetAddress(&jet_phi14_);
+  ele2_charge_branch = tree->GetBranch("ele2_charge");
+  if (ele2_charge_branch) ele2_charge_branch->SetAddress(&ele2_charge_);
   jet_bdiscriminant15_branch = tree->GetBranch("jet_bdiscriminant15");
   if (jet_bdiscriminant15_branch) jet_bdiscriminant15_branch->SetAddress(&jet_bdiscriminant15_);
   jet_phi9_branch = tree->GetBranch("jet_phi9");
@@ -554,7 +566,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   weight_isLoaded = false;
   jet_pt6_isLoaded = false;
   jet_phi12_isLoaded = false;
-  sublead_hoe_isLoaded = false;
+  lead_MomID_isLoaded = false;
   sublead_SimpleMomStatus_isLoaded = false;
   jet_bdiscriminant10_isLoaded = false;
   jet_pt1_isLoaded = false;
@@ -579,6 +591,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   sublead_photon_type_isLoaded = false;
   leadPtGen_isLoaded = false;
   sublead_Pythia_isLoaded = false;
+  dZ_isLoaded = false;
   jet_energy8_isLoaded = false;
   sublead_closest_gen_Pt_isLoaded = false;
   jet_cdiscriminant12_isLoaded = false;
@@ -607,6 +620,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   lead_Pythia_isLoaded = false;
   nGoodMusFromTau_isLoaded = false;
   ele1_pt_isLoaded = false;
+  jet_phi14_isLoaded = false;
   ElectronWeightDown01sigma_isLoaded = false;
   jet_bdiscriminant14_isLoaded = false;
   jet_pt9_isLoaded = false;
@@ -641,11 +655,12 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   lead_Mad_isLoaded = false;
   lead_PassFrix_isLoaded = false;
   jet_cdiscriminant6_isLoaded = false;
+  ele1_charge_isLoaded = false;
   jet_bbdiscriminant11_isLoaded = false;
   PreselSFUp01sigma_isLoaded = false;
   jet_cdiscriminant2_isLoaded = false;
   jet_udsgdiscriminant6_isLoaded = false;
-  lead_MomID_isLoaded = false;
+  sublead_hoe_isLoaded = false;
   muonSubleadIso_isLoaded = false;
   leadR9_isLoaded = false;
   dipho_cosphi_isLoaded = false;
@@ -679,6 +694,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   jet_eta9_isLoaded = false;
   jet_bbdiscriminant7_isLoaded = false;
   jet_bbdiscriminant9_isLoaded = false;
+  muon2_charge_isLoaded = false;
   FracRVNvtxWeightUp01sigma_isLoaded = false;
   ele1_energy_isLoaded = false;
   nMuonMedium_isLoaded = false;
@@ -688,6 +704,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   nGoodTaus_isLoaded = false;
   jet_bbdiscriminant12_isLoaded = false;
   n_ele_isLoaded = false;
+  muon1_charge_isLoaded = false;
   jet_phi15_isLoaded = false;
   jet_eta5_isLoaded = false;
   subleadEt_isLoaded = false;
@@ -759,6 +776,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   jet_phi10_isLoaded = false;
   jet_eta8_isLoaded = false;
   CMS_hgg_mass_isLoaded = false;
+  centralObjectWeight_isLoaded = false;
   jet_bbdiscriminant2_isLoaded = false;
   jet_eta11_isLoaded = false;
   nMuonLoose_isLoaded = false;
@@ -767,7 +785,7 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
   jet_energy9_isLoaded = false;
   sublead_PassFrix_isLoaded = false;
   ele1_phi_isLoaded = false;
-  jet_phi14_isLoaded = false;
+  ele2_charge_isLoaded = false;
   jet_bdiscriminant15_isLoaded = false;
   jet_phi9_isLoaded = false;
   jet_energy13_isLoaded = false;
@@ -827,7 +845,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (weight_branch != 0) weight();
   if (jet_pt6_branch != 0) jet_pt6();
   if (jet_phi12_branch != 0) jet_phi12();
-  if (sublead_hoe_branch != 0) sublead_hoe();
+  if (lead_MomID_branch != 0) lead_MomID();
   if (sublead_SimpleMomStatus_branch != 0) sublead_SimpleMomStatus();
   if (jet_bdiscriminant10_branch != 0) jet_bdiscriminant10();
   if (jet_pt1_branch != 0) jet_pt1();
@@ -852,6 +870,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (sublead_photon_type_branch != 0) sublead_photon_type();
   if (leadPtGen_branch != 0) leadPtGen();
   if (sublead_Pythia_branch != 0) sublead_Pythia();
+  if (dZ_branch != 0) dZ();
   if (jet_energy8_branch != 0) jet_energy8();
   if (sublead_closest_gen_Pt_branch != 0) sublead_closest_gen_Pt();
   if (jet_cdiscriminant12_branch != 0) jet_cdiscriminant12();
@@ -880,6 +899,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (lead_Pythia_branch != 0) lead_Pythia();
   if (nGoodMusFromTau_branch != 0) nGoodMusFromTau();
   if (ele1_pt_branch != 0) ele1_pt();
+  if (jet_phi14_branch != 0) jet_phi14();
   if (ElectronWeightDown01sigma_branch != 0) ElectronWeightDown01sigma();
   if (jet_bdiscriminant14_branch != 0) jet_bdiscriminant14();
   if (jet_pt9_branch != 0) jet_pt9();
@@ -914,11 +934,12 @@ void ttHLeptonic::LoadAllBranches() {
   if (lead_Mad_branch != 0) lead_Mad();
   if (lead_PassFrix_branch != 0) lead_PassFrix();
   if (jet_cdiscriminant6_branch != 0) jet_cdiscriminant6();
+  if (ele1_charge_branch != 0) ele1_charge();
   if (jet_bbdiscriminant11_branch != 0) jet_bbdiscriminant11();
   if (PreselSFUp01sigma_branch != 0) PreselSFUp01sigma();
   if (jet_cdiscriminant2_branch != 0) jet_cdiscriminant2();
   if (jet_udsgdiscriminant6_branch != 0) jet_udsgdiscriminant6();
-  if (lead_MomID_branch != 0) lead_MomID();
+  if (sublead_hoe_branch != 0) sublead_hoe();
   if (muonSubleadIso_branch != 0) muonSubleadIso();
   if (leadR9_branch != 0) leadR9();
   if (dipho_cosphi_branch != 0) dipho_cosphi();
@@ -952,6 +973,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (jet_eta9_branch != 0) jet_eta9();
   if (jet_bbdiscriminant7_branch != 0) jet_bbdiscriminant7();
   if (jet_bbdiscriminant9_branch != 0) jet_bbdiscriminant9();
+  if (muon2_charge_branch != 0) muon2_charge();
   if (FracRVNvtxWeightUp01sigma_branch != 0) FracRVNvtxWeightUp01sigma();
   if (ele1_energy_branch != 0) ele1_energy();
   if (nMuonMedium_branch != 0) nMuonMedium();
@@ -961,6 +983,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (nGoodTaus_branch != 0) nGoodTaus();
   if (jet_bbdiscriminant12_branch != 0) jet_bbdiscriminant12();
   if (n_ele_branch != 0) n_ele();
+  if (muon1_charge_branch != 0) muon1_charge();
   if (jet_phi15_branch != 0) jet_phi15();
   if (jet_eta5_branch != 0) jet_eta5();
   if (subleadEt_branch != 0) subleadEt();
@@ -1032,6 +1055,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (jet_phi10_branch != 0) jet_phi10();
   if (jet_eta8_branch != 0) jet_eta8();
   if (CMS_hgg_mass_branch != 0) CMS_hgg_mass();
+  if (centralObjectWeight_branch != 0) centralObjectWeight();
   if (jet_bbdiscriminant2_branch != 0) jet_bbdiscriminant2();
   if (jet_eta11_branch != 0) jet_eta11();
   if (nMuonLoose_branch != 0) nMuonLoose();
@@ -1040,7 +1064,7 @@ void ttHLeptonic::LoadAllBranches() {
   if (jet_energy9_branch != 0) jet_energy9();
   if (sublead_PassFrix_branch != 0) sublead_PassFrix();
   if (ele1_phi_branch != 0) ele1_phi();
-  if (jet_phi14_branch != 0) jet_phi14();
+  if (ele2_charge_branch != 0) ele2_charge();
   if (jet_bdiscriminant15_branch != 0) jet_bdiscriminant15();
   if (jet_phi9_branch != 0) jet_phi9();
   if (jet_energy13_branch != 0) jet_energy13();
@@ -1146,17 +1170,17 @@ const float &ttHLeptonic::jet_phi12() {
   return jet_phi12_;
 }
 
-const float &ttHLeptonic::sublead_hoe() {
-  if (not sublead_hoe_isLoaded) {
-    if (sublead_hoe_branch != 0) {
-      sublead_hoe_branch->GetEntry(index);
+const float &ttHLeptonic::lead_MomID() {
+  if (not lead_MomID_isLoaded) {
+    if (lead_MomID_branch != 0) {
+      lead_MomID_branch->GetEntry(index);
     } else {
-      printf("branch sublead_hoe_branch does not exist!\n");
+      printf("branch lead_MomID_branch does not exist!\n");
       exit(1);
     }
-    sublead_hoe_isLoaded = true;
+    lead_MomID_isLoaded = true;
   }
-  return sublead_hoe_;
+  return lead_MomID_;
 }
 
 const float &ttHLeptonic::sublead_SimpleMomStatus() {
@@ -1469,6 +1493,19 @@ const float &ttHLeptonic::sublead_Pythia() {
     sublead_Pythia_isLoaded = true;
   }
   return sublead_Pythia_;
+}
+
+const float &ttHLeptonic::dZ() {
+  if (not dZ_isLoaded) {
+    if (dZ_branch != 0) {
+      dZ_branch->GetEntry(index);
+    } else {
+      printf("branch dZ_branch does not exist!\n");
+      exit(1);
+    }
+    dZ_isLoaded = true;
+  }
+  return dZ_;
 }
 
 const float &ttHLeptonic::jet_energy8() {
@@ -1833,6 +1870,19 @@ const float &ttHLeptonic::ele1_pt() {
     ele1_pt_isLoaded = true;
   }
   return ele1_pt_;
+}
+
+const float &ttHLeptonic::jet_phi14() {
+  if (not jet_phi14_isLoaded) {
+    if (jet_phi14_branch != 0) {
+      jet_phi14_branch->GetEntry(index);
+    } else {
+      printf("branch jet_phi14_branch does not exist!\n");
+      exit(1);
+    }
+    jet_phi14_isLoaded = true;
+  }
+  return jet_phi14_;
 }
 
 const float &ttHLeptonic::ElectronWeightDown01sigma() {
@@ -2277,6 +2327,19 @@ const float &ttHLeptonic::jet_cdiscriminant6() {
   return jet_cdiscriminant6_;
 }
 
+const float &ttHLeptonic::ele1_charge() {
+  if (not ele1_charge_isLoaded) {
+    if (ele1_charge_branch != 0) {
+      ele1_charge_branch->GetEntry(index);
+    } else {
+      printf("branch ele1_charge_branch does not exist!\n");
+      exit(1);
+    }
+    ele1_charge_isLoaded = true;
+  }
+  return ele1_charge_;
+}
+
 const float &ttHLeptonic::jet_bbdiscriminant11() {
   if (not jet_bbdiscriminant11_isLoaded) {
     if (jet_bbdiscriminant11_branch != 0) {
@@ -2329,17 +2392,17 @@ const float &ttHLeptonic::jet_udsgdiscriminant6() {
   return jet_udsgdiscriminant6_;
 }
 
-const float &ttHLeptonic::lead_MomID() {
-  if (not lead_MomID_isLoaded) {
-    if (lead_MomID_branch != 0) {
-      lead_MomID_branch->GetEntry(index);
+const float &ttHLeptonic::sublead_hoe() {
+  if (not sublead_hoe_isLoaded) {
+    if (sublead_hoe_branch != 0) {
+      sublead_hoe_branch->GetEntry(index);
     } else {
-      printf("branch lead_MomID_branch does not exist!\n");
+      printf("branch sublead_hoe_branch does not exist!\n");
       exit(1);
     }
-    lead_MomID_isLoaded = true;
+    sublead_hoe_isLoaded = true;
   }
-  return lead_MomID_;
+  return sublead_hoe_;
 }
 
 const float &ttHLeptonic::muonSubleadIso() {
@@ -2771,6 +2834,19 @@ const float &ttHLeptonic::jet_bbdiscriminant9() {
   return jet_bbdiscriminant9_;
 }
 
+const float &ttHLeptonic::muon2_charge() {
+  if (not muon2_charge_isLoaded) {
+    if (muon2_charge_branch != 0) {
+      muon2_charge_branch->GetEntry(index);
+    } else {
+      printf("branch muon2_charge_branch does not exist!\n");
+      exit(1);
+    }
+    muon2_charge_isLoaded = true;
+  }
+  return muon2_charge_;
+}
+
 const float &ttHLeptonic::FracRVNvtxWeightUp01sigma() {
   if (not FracRVNvtxWeightUp01sigma_isLoaded) {
     if (FracRVNvtxWeightUp01sigma_branch != 0) {
@@ -2886,6 +2962,19 @@ const float &ttHLeptonic::n_ele() {
     n_ele_isLoaded = true;
   }
   return n_ele_;
+}
+
+const float &ttHLeptonic::muon1_charge() {
+  if (not muon1_charge_isLoaded) {
+    if (muon1_charge_branch != 0) {
+      muon1_charge_branch->GetEntry(index);
+    } else {
+      printf("branch muon1_charge_branch does not exist!\n");
+      exit(1);
+    }
+    muon1_charge_isLoaded = true;
+  }
+  return muon1_charge_;
 }
 
 const float &ttHLeptonic::jet_phi15() {
@@ -3811,6 +3900,19 @@ const float &ttHLeptonic::CMS_hgg_mass() {
   return CMS_hgg_mass_;
 }
 
+const float &ttHLeptonic::centralObjectWeight() {
+  if (not centralObjectWeight_isLoaded) {
+    if (centralObjectWeight_branch != 0) {
+      centralObjectWeight_branch->GetEntry(index);
+    } else {
+      printf("branch centralObjectWeight_branch does not exist!\n");
+      exit(1);
+    }
+    centralObjectWeight_isLoaded = true;
+  }
+  return centralObjectWeight_;
+}
+
 const float &ttHLeptonic::jet_bbdiscriminant2() {
   if (not jet_bbdiscriminant2_isLoaded) {
     if (jet_bbdiscriminant2_branch != 0) {
@@ -3915,17 +4017,17 @@ const float &ttHLeptonic::ele1_phi() {
   return ele1_phi_;
 }
 
-const float &ttHLeptonic::jet_phi14() {
-  if (not jet_phi14_isLoaded) {
-    if (jet_phi14_branch != 0) {
-      jet_phi14_branch->GetEntry(index);
+const float &ttHLeptonic::ele2_charge() {
+  if (not ele2_charge_isLoaded) {
+    if (ele2_charge_branch != 0) {
+      ele2_charge_branch->GetEntry(index);
     } else {
-      printf("branch jet_phi14_branch does not exist!\n");
+      printf("branch ele2_charge_branch does not exist!\n");
       exit(1);
     }
-    jet_phi14_isLoaded = true;
+    ele2_charge_isLoaded = true;
   }
-  return jet_phi14_;
+  return ele2_charge_;
 }
 
 const float &ttHLeptonic::jet_bdiscriminant15() {
@@ -4618,7 +4720,7 @@ const int &candidate_id() { return cms3.candidate_id(); }
 const float &weight() { return cms3.weight(); }
 const float &jet_pt6() { return cms3.jet_pt6(); }
 const float &jet_phi12() { return cms3.jet_phi12(); }
-const float &sublead_hoe() { return cms3.sublead_hoe(); }
+const float &lead_MomID() { return cms3.lead_MomID(); }
 const float &sublead_SimpleMomStatus() { return cms3.sublead_SimpleMomStatus(); }
 const float &jet_bdiscriminant10() { return cms3.jet_bdiscriminant10(); }
 const float &jet_pt1() { return cms3.jet_pt1(); }
@@ -4643,6 +4745,7 @@ const float &jet_udsgdiscriminant13() { return cms3.jet_udsgdiscriminant13(); }
 const float &sublead_photon_type() { return cms3.sublead_photon_type(); }
 const float &leadPtGen() { return cms3.leadPtGen(); }
 const float &sublead_Pythia() { return cms3.sublead_Pythia(); }
+const float &dZ() { return cms3.dZ(); }
 const float &jet_energy8() { return cms3.jet_energy8(); }
 const float &sublead_closest_gen_Pt() { return cms3.sublead_closest_gen_Pt(); }
 const float &jet_cdiscriminant12() { return cms3.jet_cdiscriminant12(); }
@@ -4671,6 +4774,7 @@ const float &sublead_closest_gen_dR() { return cms3.sublead_closest_gen_dR(); }
 const float &lead_Pythia() { return cms3.lead_Pythia(); }
 const float &nGoodMusFromTau() { return cms3.nGoodMusFromTau(); }
 const float &ele1_pt() { return cms3.ele1_pt(); }
+const float &jet_phi14() { return cms3.jet_phi14(); }
 const float &ElectronWeightDown01sigma() { return cms3.ElectronWeightDown01sigma(); }
 const float &jet_bdiscriminant14() { return cms3.jet_bdiscriminant14(); }
 const float &jet_pt9() { return cms3.jet_pt9(); }
@@ -4705,11 +4809,12 @@ const float &jet_energy3() { return cms3.jet_energy3(); }
 const float &lead_Mad() { return cms3.lead_Mad(); }
 const float &lead_PassFrix() { return cms3.lead_PassFrix(); }
 const float &jet_cdiscriminant6() { return cms3.jet_cdiscriminant6(); }
+const float &ele1_charge() { return cms3.ele1_charge(); }
 const float &jet_bbdiscriminant11() { return cms3.jet_bbdiscriminant11(); }
 const float &PreselSFUp01sigma() { return cms3.PreselSFUp01sigma(); }
 const float &jet_cdiscriminant2() { return cms3.jet_cdiscriminant2(); }
 const float &jet_udsgdiscriminant6() { return cms3.jet_udsgdiscriminant6(); }
-const float &lead_MomID() { return cms3.lead_MomID(); }
+const float &sublead_hoe() { return cms3.sublead_hoe(); }
 const float &muonSubleadIso() { return cms3.muonSubleadIso(); }
 const float &leadR9() { return cms3.leadR9(); }
 const float &dipho_cosphi() { return cms3.dipho_cosphi(); }
@@ -4743,6 +4848,7 @@ const float &muon1_energy() { return cms3.muon1_energy(); }
 const float &jet_eta9() { return cms3.jet_eta9(); }
 const float &jet_bbdiscriminant7() { return cms3.jet_bbdiscriminant7(); }
 const float &jet_bbdiscriminant9() { return cms3.jet_bbdiscriminant9(); }
+const float &muon2_charge() { return cms3.muon2_charge(); }
 const float &FracRVNvtxWeightUp01sigma() { return cms3.FracRVNvtxWeightUp01sigma(); }
 const float &ele1_energy() { return cms3.ele1_energy(); }
 const float &nMuonMedium() { return cms3.nMuonMedium(); }
@@ -4752,6 +4858,7 @@ const float &jet_energy12() { return cms3.jet_energy12(); }
 const float &nGoodTaus() { return cms3.nGoodTaus(); }
 const float &jet_bbdiscriminant12() { return cms3.jet_bbdiscriminant12(); }
 const float &n_ele() { return cms3.n_ele(); }
+const float &muon1_charge() { return cms3.muon1_charge(); }
 const float &jet_phi15() { return cms3.jet_phi15(); }
 const float &jet_eta5() { return cms3.jet_eta5(); }
 const float &subleadEt() { return cms3.subleadEt(); }
@@ -4823,6 +4930,7 @@ const float &topTag_score() { return cms3.topTag_score(); }
 const float &jet_phi10() { return cms3.jet_phi10(); }
 const float &jet_eta8() { return cms3.jet_eta8(); }
 const float &CMS_hgg_mass() { return cms3.CMS_hgg_mass(); }
+const float &centralObjectWeight() { return cms3.centralObjectWeight(); }
 const float &jet_bbdiscriminant2() { return cms3.jet_bbdiscriminant2(); }
 const float &jet_eta11() { return cms3.jet_eta11(); }
 const float &nMuonLoose() { return cms3.nMuonLoose(); }
@@ -4831,7 +4939,7 @@ const float &FracRVWeightDown01sigma() { return cms3.FracRVWeightDown01sigma(); 
 const float &jet_energy9() { return cms3.jet_energy9(); }
 const float &sublead_PassFrix() { return cms3.sublead_PassFrix(); }
 const float &ele1_phi() { return cms3.ele1_phi(); }
-const float &jet_phi14() { return cms3.jet_phi14(); }
+const float &ele2_charge() { return cms3.ele2_charge(); }
 const float &jet_bdiscriminant15() { return cms3.jet_bdiscriminant15(); }
 const float &jet_phi9() { return cms3.jet_phi9(); }
 const float &jet_energy13() { return cms3.jet_energy13(); }

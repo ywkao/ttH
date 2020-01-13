@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/smay/ttH/TGJets_TuneCP5_13TeV_amcatnlo_madspin_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v2_ttH_Babies_RunIIv4.11/merged_ntuple_1.root", "tagsDumper/trees/_13TeV_TTHLeptonicTag", "ttHLeptonic", "tas", "cms3")
+// makeCMS3ClassFiles("../BabyMaker/CMSSW_10_5_0/src/flashgg/merged_ntuple.root", "tagsDumper/trees/_13TeV_TTHLeptonicTag", "ttHLeptonic", "tas", "cms3")
 
 #ifndef ttHLeptonic_H
 #define ttHLeptonic_H
@@ -34,9 +34,9 @@ class ttHLeptonic {
   float    jet_phi12_;
   TBranch *jet_phi12_branch;
   bool     jet_phi12_isLoaded;
-  float    sublead_hoe_;
-  TBranch *sublead_hoe_branch;
-  bool     sublead_hoe_isLoaded;
+  float    lead_MomID_;
+  TBranch *lead_MomID_branch;
+  bool     lead_MomID_isLoaded;
   float    sublead_SimpleMomStatus_;
   TBranch *sublead_SimpleMomStatus_branch;
   bool     sublead_SimpleMomStatus_isLoaded;
@@ -109,6 +109,9 @@ class ttHLeptonic {
   float    sublead_Pythia_;
   TBranch *sublead_Pythia_branch;
   bool     sublead_Pythia_isLoaded;
+  float    dZ_;
+  TBranch *dZ_branch;
+  bool     dZ_isLoaded;
   float    jet_energy8_;
   TBranch *jet_energy8_branch;
   bool     jet_energy8_isLoaded;
@@ -193,6 +196,9 @@ class ttHLeptonic {
   float    ele1_pt_;
   TBranch *ele1_pt_branch;
   bool     ele1_pt_isLoaded;
+  float    jet_phi14_;
+  TBranch *jet_phi14_branch;
+  bool     jet_phi14_isLoaded;
   float    ElectronWeightDown01sigma_;
   TBranch *ElectronWeightDown01sigma_branch;
   bool     ElectronWeightDown01sigma_isLoaded;
@@ -295,6 +301,9 @@ class ttHLeptonic {
   float    jet_cdiscriminant6_;
   TBranch *jet_cdiscriminant6_branch;
   bool     jet_cdiscriminant6_isLoaded;
+  float    ele1_charge_;
+  TBranch *ele1_charge_branch;
+  bool     ele1_charge_isLoaded;
   float    jet_bbdiscriminant11_;
   TBranch *jet_bbdiscriminant11_branch;
   bool     jet_bbdiscriminant11_isLoaded;
@@ -307,9 +316,9 @@ class ttHLeptonic {
   float    jet_udsgdiscriminant6_;
   TBranch *jet_udsgdiscriminant6_branch;
   bool     jet_udsgdiscriminant6_isLoaded;
-  float    lead_MomID_;
-  TBranch *lead_MomID_branch;
-  bool     lead_MomID_isLoaded;
+  float    sublead_hoe_;
+  TBranch *sublead_hoe_branch;
+  bool     sublead_hoe_isLoaded;
   float    muonSubleadIso_;
   TBranch *muonSubleadIso_branch;
   bool     muonSubleadIso_isLoaded;
@@ -409,6 +418,9 @@ class ttHLeptonic {
   float    jet_bbdiscriminant9_;
   TBranch *jet_bbdiscriminant9_branch;
   bool     jet_bbdiscriminant9_isLoaded;
+  float    muon2_charge_;
+  TBranch *muon2_charge_branch;
+  bool     muon2_charge_isLoaded;
   float    FracRVNvtxWeightUp01sigma_;
   TBranch *FracRVNvtxWeightUp01sigma_branch;
   bool     FracRVNvtxWeightUp01sigma_isLoaded;
@@ -436,6 +448,9 @@ class ttHLeptonic {
   float    n_ele_;
   TBranch *n_ele_branch;
   bool     n_ele_isLoaded;
+  float    muon1_charge_;
+  TBranch *muon1_charge_branch;
+  bool     muon1_charge_isLoaded;
   float    jet_phi15_;
   TBranch *jet_phi15_branch;
   bool     jet_phi15_isLoaded;
@@ -649,6 +664,9 @@ class ttHLeptonic {
   float    CMS_hgg_mass_;
   TBranch *CMS_hgg_mass_branch;
   bool     CMS_hgg_mass_isLoaded;
+  float    centralObjectWeight_;
+  TBranch *centralObjectWeight_branch;
+  bool     centralObjectWeight_isLoaded;
   float    jet_bbdiscriminant2_;
   TBranch *jet_bbdiscriminant2_branch;
   bool     jet_bbdiscriminant2_isLoaded;
@@ -673,9 +691,9 @@ class ttHLeptonic {
   float    ele1_phi_;
   TBranch *ele1_phi_branch;
   bool     ele1_phi_isLoaded;
-  float    jet_phi14_;
-  TBranch *jet_phi14_branch;
-  bool     jet_phi14_isLoaded;
+  float    ele2_charge_;
+  TBranch *ele2_charge_branch;
+  bool     ele2_charge_isLoaded;
   float    jet_bdiscriminant15_;
   TBranch *jet_bdiscriminant15_branch;
   bool     jet_bdiscriminant15_isLoaded;
@@ -837,7 +855,7 @@ void LoadAllBranches();
   const float &weight();
   const float &jet_pt6();
   const float &jet_phi12();
-  const float &sublead_hoe();
+  const float &lead_MomID();
   const float &sublead_SimpleMomStatus();
   const float &jet_bdiscriminant10();
   const float &jet_pt1();
@@ -862,6 +880,7 @@ void LoadAllBranches();
   const float &sublead_photon_type();
   const float &leadPtGen();
   const float &sublead_Pythia();
+  const float &dZ();
   const float &jet_energy8();
   const float &sublead_closest_gen_Pt();
   const float &jet_cdiscriminant12();
@@ -890,6 +909,7 @@ void LoadAllBranches();
   const float &lead_Pythia();
   const float &nGoodMusFromTau();
   const float &ele1_pt();
+  const float &jet_phi14();
   const float &ElectronWeightDown01sigma();
   const float &jet_bdiscriminant14();
   const float &jet_pt9();
@@ -924,11 +944,12 @@ void LoadAllBranches();
   const float &lead_Mad();
   const float &lead_PassFrix();
   const float &jet_cdiscriminant6();
+  const float &ele1_charge();
   const float &jet_bbdiscriminant11();
   const float &PreselSFUp01sigma();
   const float &jet_cdiscriminant2();
   const float &jet_udsgdiscriminant6();
-  const float &lead_MomID();
+  const float &sublead_hoe();
   const float &muonSubleadIso();
   const float &leadR9();
   const float &dipho_cosphi();
@@ -962,6 +983,7 @@ void LoadAllBranches();
   const float &jet_eta9();
   const float &jet_bbdiscriminant7();
   const float &jet_bbdiscriminant9();
+  const float &muon2_charge();
   const float &FracRVNvtxWeightUp01sigma();
   const float &ele1_energy();
   const float &nMuonMedium();
@@ -971,6 +993,7 @@ void LoadAllBranches();
   const float &nGoodTaus();
   const float &jet_bbdiscriminant12();
   const float &n_ele();
+  const float &muon1_charge();
   const float &jet_phi15();
   const float &jet_eta5();
   const float &subleadEt();
@@ -1042,6 +1065,7 @@ void LoadAllBranches();
   const float &jet_phi10();
   const float &jet_eta8();
   const float &CMS_hgg_mass();
+  const float &centralObjectWeight();
   const float &jet_bbdiscriminant2();
   const float &jet_eta11();
   const float &nMuonLoose();
@@ -1050,7 +1074,7 @@ void LoadAllBranches();
   const float &jet_energy9();
   const float &sublead_PassFrix();
   const float &ele1_phi();
-  const float &jet_phi14();
+  const float &ele2_charge();
   const float &jet_bdiscriminant15();
   const float &jet_phi9();
   const float &jet_energy13();
@@ -1115,7 +1139,7 @@ namespace tas {
   const float &weight();
   const float &jet_pt6();
   const float &jet_phi12();
-  const float &sublead_hoe();
+  const float &lead_MomID();
   const float &sublead_SimpleMomStatus();
   const float &jet_bdiscriminant10();
   const float &jet_pt1();
@@ -1140,6 +1164,7 @@ namespace tas {
   const float &sublead_photon_type();
   const float &leadPtGen();
   const float &sublead_Pythia();
+  const float &dZ();
   const float &jet_energy8();
   const float &sublead_closest_gen_Pt();
   const float &jet_cdiscriminant12();
@@ -1168,6 +1193,7 @@ namespace tas {
   const float &lead_Pythia();
   const float &nGoodMusFromTau();
   const float &ele1_pt();
+  const float &jet_phi14();
   const float &ElectronWeightDown01sigma();
   const float &jet_bdiscriminant14();
   const float &jet_pt9();
@@ -1202,11 +1228,12 @@ namespace tas {
   const float &lead_Mad();
   const float &lead_PassFrix();
   const float &jet_cdiscriminant6();
+  const float &ele1_charge();
   const float &jet_bbdiscriminant11();
   const float &PreselSFUp01sigma();
   const float &jet_cdiscriminant2();
   const float &jet_udsgdiscriminant6();
-  const float &lead_MomID();
+  const float &sublead_hoe();
   const float &muonSubleadIso();
   const float &leadR9();
   const float &dipho_cosphi();
@@ -1240,6 +1267,7 @@ namespace tas {
   const float &jet_eta9();
   const float &jet_bbdiscriminant7();
   const float &jet_bbdiscriminant9();
+  const float &muon2_charge();
   const float &FracRVNvtxWeightUp01sigma();
   const float &ele1_energy();
   const float &nMuonMedium();
@@ -1249,6 +1277,7 @@ namespace tas {
   const float &nGoodTaus();
   const float &jet_bbdiscriminant12();
   const float &n_ele();
+  const float &muon1_charge();
   const float &jet_phi15();
   const float &jet_eta5();
   const float &subleadEt();
@@ -1320,6 +1349,7 @@ namespace tas {
   const float &jet_phi10();
   const float &jet_eta8();
   const float &CMS_hgg_mass();
+  const float &centralObjectWeight();
   const float &jet_bbdiscriminant2();
   const float &jet_eta11();
   const float &nMuonLoose();
@@ -1328,7 +1358,7 @@ namespace tas {
   const float &jet_energy9();
   const float &sublead_PassFrix();
   const float &ele1_phi();
-  const float &jet_phi14();
+  const float &ele2_charge();
   const float &jet_bdiscriminant15();
   const float &jet_phi9();
   const float &jet_energy13();
