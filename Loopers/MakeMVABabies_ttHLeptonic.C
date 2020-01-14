@@ -352,6 +352,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       muon1_energy_ = muons.size() > 0 ? muons[0].E() : -999;
       n_muons_ = muons.size(); 
 
+      vector<float> lepton_charges;
+      if (currentFileTitle.Contains("ttH_vs_tH"))
+          lepton_charges = calculate_lepton_charges();
+      else
+          lepton_charges = {0,0};
+      lep1_charge_ = lepton_charges[0];
+      lep2_charge_ = lepton_charges[1];
+
       //n_lep_loose_ = nElecLoose() + nMuonLoose();
       //n_lep_medium_ = nElecMedium() + nMuonMedium();
       //n_lep_tight_ = nElecTight() + nMuonTight();
@@ -434,7 +442,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       sublead_sigmaEtoE_ = sublead_sigmaEoE(); 
 
       if (do_tth_ttPP_mva)
-	tth_ttPP_mva_ = convert_tmva_to_prob(tth_ttPP_mva->EvaluateMVA( "BDT" ));
+        tth_ttPP_mva_ = convert_tmva_to_prob(tth_ttPP_mva->EvaluateMVA( "BDT" ));
 
       vector<vector<float>> jet_objects = make_jet_objects(year, diphoton, false);
       vector<vector<float>> lep_objects = make_lep_objects(electrons, muons, diphoton, false);
@@ -443,6 +451,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       jets_ = sort_objects(jet_objects);
       leptons_ = sort_objects(lep_objects);
       objects_ = sort_objects(all_objects);
+
+      vector<float> forward_jet = calculate_forward_jets(jets_, max1_btag_);
+      forward_jet_pt_ = forward_jet[0];
+      forward_jet_eta_ = forward_jet[1]; 
 
       FillBabyNtuple();
 

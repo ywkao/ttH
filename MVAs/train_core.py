@@ -457,7 +457,7 @@ def train_bdt(config, invert=False):
   plt.legend(loc='lower right')
   plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
-  estimate_za = True
+  estimate_za = False
   use_tth_runII_mva = False
   use_tth_2017_mva = False
   if estimate_za:
@@ -496,8 +496,8 @@ def train_bdt(config, invert=False):
     bkg_njets = ks_test.logical_vector(njets_validation, y_test, 0)
 
     signal_weights = ks_test.logical_vector(weights_validation, y_test, 1)
-    if args.channel == "Leptonic" and "FCNC" in args.input:
-      signal_weights *= 1./1.53 # to account for bug in MC sample where W->lv decays don't include taus
+    #if args.channel == "Leptonic" and "FCNC" in args.input:
+    #  signal_weights *= 1./1.53 # to account for bug in MC sample where W->lv decays don't include taus
     bkg_weights = ks_test.logical_vector(weights_validation, y_test, 0)
    
     bkg_process_id = ks_test.logical_vector(process_id_validation, y_test, 0)

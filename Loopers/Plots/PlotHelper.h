@@ -1241,8 +1241,8 @@ void Comparison::annotate_plot()
 
   TLatex* lumi;
   if (mLumi != -1) {
-    TString lumiText = Form("#bf{%.1f fb^{-1} (13#scale[0.75]{ }TeV)}", mLumi);
-    double xlumi = mPaperStyle ? 0.575 : 0.59;
+    TString lumiText = Form("#bf{%.0f fb^{-1} (13#scale[0.75]{ }TeV)}", mLumi);
+    double xlumi = mPaperStyle ? 0.61 : 0.59;
     lumi = new TLatex(xlumi, 0.935, lumiText.Data());
     if (mPaperStyle)
         lumi->SetTextSize(0.0725);

@@ -97,7 +97,7 @@ if [ "$CMSSW_VER" = "105X" ]; then
   #INPUTFILENAMES='root://cms-xrd-global.cern.ch//store/user/spigazzi/flashgg/Era2016_RR-17Jul2018_v2/legacyRun2FullV1/DoubleEG/Era2016_RR-17Jul2018_v2-legacyRun2FullV1-v0-Run2016H-17Jul2018-v1/190605_221534/0000/myMicroAODOutputFile_451.root'
   INPUTFILENAMES='file:/home/users/sjmay/ttH/BabyMaker/microAOD_ttHJetToGG_M125_2018.root'
   #INPUTFILENAMES='file:/home/users/sjmay/ttH/BabyMaker/microAOD_ttGG_2018.root'
-  cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} "MetaData/data/MetaConditions/Era2018_RR-17Sep2018_v1.json" "2000"
+  cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} "MetaData/data/MetaConditions/Era2018_RR-17Sep2018_v1.json" "100"
 fi
 
 

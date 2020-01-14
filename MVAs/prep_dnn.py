@@ -42,6 +42,9 @@ if args.channel == "Hadronic":
 elif args.channel == "Leptonic":
   feature_names += ["n_lep_tight_", "leptons_", "jets_"]
 
+if args.signal == "ttH" and args.backgrounds == "tH":
+  feature_names += ["lep1_charge_", "lep2_charge_", "forward_jet_eta_", "forward_jet_pt_"]
+
 if args.do_top_tag:
   top_tag_features = ["top_tag_score_"]
   #top_tag_features = ["top_tag_score_", "top_tag_mass_", "top_tag_pt_", "top_tag_eta_", "top_tag_phi_"]

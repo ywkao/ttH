@@ -65,6 +65,9 @@ if args.add_year:
 if (args.fcnc_hut or args.fcnc_hct) and args.channel == "Hadronic" and not args.no_mass_constraint:
   feature_names += ["m_ggj_", "m_jjj_"]
 
+if args.ttH_vs_tH:
+  feature_names += ["lep1_charge_", "lep2_charge_", "forward_jet_eta_", "forward_jet_pt_"]
+
 to_remove = []
 if args.channel == "Leptonic":
   feature_names += ["lep_pt_", "lep_eta_", "n_lep_tight_"]

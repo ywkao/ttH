@@ -76,8 +76,8 @@ class makeModel():
         norm = d_mgg.sumEntries()
         if replaceNorm:
             norm = norm_in
-        if ("FCNC" in self.tag) and ("Leptonic" in self.tag):
-            norm = norm*1/1.527
+        #if ("FCNC" in self.tag) and ("Leptonic" in self.tag):
+        #    norm = norm*1/1.527
         if norm <= 0:
             norm = 1e-09
         #norm = norm*2 # this is because we are only using half of the mc not used in training for optimization

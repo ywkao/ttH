@@ -96,6 +96,12 @@ class BabyMaker {
     float       muon1_energy_;
     float       n_muons_;
 
+    float       lep1_charge_;
+    float       lep2_charge_;
+
+    float       forward_jet_pt_;
+    float       forward_jet_eta_;
+
     float	    n_lep_loose_;
     float       n_lep_medium_;
     float       n_lep_tight_;
@@ -213,6 +219,12 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("lep_pt_"               , &lep_pt_          );
   BabyTree_->Branch("lep_eta_"               , &lep_eta_          );
+
+  BabyTree_->Branch("lep1_charge_"               , &lep1_charge_          );
+  BabyTree_->Branch("lep2_charge_"               , &lep2_charge_          );
+ 
+  BabyTree_->Branch("forward_jet_pt_"               , &forward_jet_pt_          );
+  BabyTree_->Branch("forward_jet_eta_"               , &forward_jet_eta_          );
 
   BabyTree_->Branch("ele1_pt_"               , &ele1_pt_        );
   BabyTree_->Branch("ele1_eta_"               , &ele1_eta_        );

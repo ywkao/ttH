@@ -18,6 +18,7 @@ parser.add_argument("--years", help = "which years to run for", type=str, defaul
 parser.add_argument("--fcnc", help = "run babymaker with fcnc as signal, ttH as bkg", action="store_true")
 parser.add_argument("--do_systematics", help = "loop over independent collections for systematics bands in data/MC plots", action="store_true")
 parser.add_argument("--l1_prefire", help = "undo, vary up or vary down l1 prefire weight", type=str, default="")
+parser.add_argument("--ttH_vs_tH", help = "only loop over tH and ttH samples", action="store_true")
 args = parser.parse_args()
 
 if args.fcnc:
@@ -371,6 +372,11 @@ babies_2018 = [
     "TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2",
     "TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2",
 ]
+
+if args.ttH_vs_tH:
+    babies_2016 = [baby for baby in babies_2016 if ("ttHToGG" in baby or "ttHJetToGG" in baby or "THQ" in baby or "THW" in baby or "DoubleEG" in baby or "EGamma" in baby)]
+    babies_2017 = [baby for baby in babies_2017 if ("ttHToGG" in baby or "ttHJetToGG" in baby or "THQ" in baby or "THW" in baby or "DoubleEG" in baby or "EGamma" in baby)]
+    babies_2018 = [baby for baby in babies_2018 if ("ttHToGG" in baby or "ttHJetToGG" in baby or "THQ" in baby or "THW" in baby or "DoubleEG" in baby or "EGamma" in baby)]
 
 def full_path(baby):
   full_path_baby = "/home/users/sjmay/ttH/Loopers/merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"

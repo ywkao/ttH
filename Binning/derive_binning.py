@@ -71,7 +71,7 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
 
         # Make background model
         bkgModelConfig = { "var" : "mass", "weightVar" : "weight", "plotpath" : scanConfig["plotpath"], "modelpath" : scanConfig["modelpath"], "filename" : scanConfig["filename"] }
-        bkgModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && ((mass > 100 && mass < 120) || ( mass > 130 && mass < 180)) && sample_id == 0 && (process_id == 1 || process_id == 2 || process_id == 3 || process_id == 5 || process_id == 6 || process_id == 7 || process_id == 9 || process_id == 13 || process_id == 18 || process_id == 19 || process_id == 20 || process_id == 21 || process_id == 26)"
+        bkgModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && sample_id == 0 && (process_id == 1 || process_id == 2 || process_id == 3 || process_id == 5 || process_id == 6 || process_id == 7 || process_id == 9 || process_id == 13 || process_id == 18 || process_id == 19 || process_id == 20 || process_id == 21 || process_id == 26)"
         bkgModelConfig["savename"] = "CMS-HGG_bkg_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
         bkgModelConfig["tag"] = "CMS_hgg_bkgshape_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
 
@@ -178,8 +178,8 @@ scanConfig= {\
 #"modelpath":"/home/users/hmei/ttH/MakeBDTBins/doScan/models/ttH_"+postFix+"_"+date+"/",
 #"plotpath":"/home/users/hmei/public_html/2019/"+date+"_ttH_"+postFix+"/",
 #"combineEnv":"/home/users/hmei/CMSSW_7_4_7/src/",
-"modelpath" : "/home/users/sjmay/ttH/Binning/models/ttH_"+postFix+"_"+date+"/",
-"plotpath" : "/home/users/sjmay/public_html/ttH/Binning/"+date+"_ttH_"+postFix+"/",
+"modelpath" : "/home/users/sjmay/ttH/Binning/models/" + args.tag + "/",
+"plotpath" : "/home/users/sjmay/public_html/ttH/Binning/" + args.tag + "/",
 "combineEnv" : "/home/users/sjmay/ttH/Binning/CMSSW_10_2_13/src",
 "var":"mass",
 "weightVar":"weight",

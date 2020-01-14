@@ -351,6 +351,45 @@ vector<TLorentzVector> make_mus() {
   return vMus;
 }
 
+vector<float> calculate_lepton_charges() {
+  vector<float> vCharges;
+
+  if (ele1_pt() > muon1_pt())
+    vCharges.push_back(ele1_charge());
+  else 
+    vCharges.push_back(muon1_charge());
+
+  if ((ele1_pt() > 0 && ele2_pt() > 0) || (muon1_pt() > 0 && muon2_pt() > 0) || (ele1_pt() > 0 && muon1_pt() > 0)) { // have at least 2 leps
+    if (ele2_pt() > muon1_pt())
+      vCharges.push_back(ele2_charge());
+    else if (muon2_pt() > ele1_pt())
+      vCharges.push_back(muon2_charge());
+    else
+      vCharges.push_back(ele1_pt() > muon1_pt() ? muon1_charge() : ele1_charge());
+  }
+  else
+    vCharges.push_back(0);
+
+  return vCharges;
+
+}
+
+vector<float> calculate_forward_jets(vector<vector<float>> jets, float max1_btag) {
+    float forward_jet_pt = -1;
+    float forward_jet_eta = 0.0;
+
+    for (unsigned int i = 0; i < jets.size(); i++) {
+      if (jets[i][4] >= max1_btag && jets.size() > 1) // forward jet can't be the b jet (but this only makes sense if theres more than 1 jet)
+        continue;
+      if (abs(jets[i][1]) > forward_jet_eta) {
+        forward_jet_pt = jets[i][0];
+        forward_jet_eta = abs(jets[i][1]);
+      }
+    }
+    vector<float> forward_jet = {forward_jet_pt, forward_jet_eta};
+    return forward_jet;
+}
+
 vector<vector<float>> sort_objects(vector<vector<float>> unordered_objects) { // sorts physics objects by pT
   vector<vector<float>> ordered_objects;
 
