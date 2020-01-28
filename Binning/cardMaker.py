@@ -24,6 +24,8 @@ class makeCards():
         self.wsNames = []
         self.modelNames = []
 
+        self.path = savepath
+
     def WriteBasicNum(self, nChannel, nSig, nBkg, nNuisance=0):
 
         if nChannel == -1:

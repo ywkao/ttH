@@ -396,3 +396,9 @@ Submitting ttH Babies version v4.12_ttZ using central microAOD and commit 65a19a
 Date: 2020-01-09 10:39:09.378406 
 Submitting ttH Babies version v4.14_ttH_vs_tH using central microAOD and commit e0bec9f11eaf9d3ae64ba5c8541e5985bc48c87b of tth_dev_runII_v2 branch of flashgg
 
+Date: 2020-01-16 10:23:55.966696 
+Submitting ttH Babies version v4.15 using central microAOD and commit 80a97a5e59e7dee6e9edf14986a20df5c819b695 of tth_dev_runII_v2 branch of flashgg
+
+Date: 2020-01-21 10:47:09.037251 
+Submitting ttH Babies version v4.16_ttZ using central microAOD and commit 1d2fa6843aba960e1992560b147ce2e2231f9fc5 of tth_dev_runII_v2 branch of flashgg
+

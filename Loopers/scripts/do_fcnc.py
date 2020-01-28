@@ -14,20 +14,26 @@ args = parser.parse_args()
 
 #bdt_lep = "../MVAs/Leptonic_4June2019_v1.7_FCNC_bdt.xml"
 #bdt_had = "../MVAs/Hadronic_12June2019_v1.7_impute_FCNC_bdt.xml"
-bdt_lep_hut = "../MVAs/Leptonic_v1.7_27Jun2019_FCNC_SingleBDT_hut__bdt.xml"
-bdt_lep_hct = "../MVAs/Leptonic_v1.7_27Jun2019_FCNC_SingleBDT_hct__bdt.xml"
-bdt_had_hut = "../MVAs/Hadronic_v1.7_27Jun2019_FCNC_SingleBDT_impute_hut__bdt.xml"
-bdt_had_hct = "../MVAs/Hadronic_v1.7_27Jun2019_FCNC_SingleBDT_impute_hct__bdt.xml"
+
+#bdt_lep_hut = "../MVAs/Leptonic_v1.7_27Jun2019_FCNC_SingleBDT_hut__bdt.xml"
+#bdt_lep_hct = "../MVAs/Leptonic_v1.7_27Jun2019_FCNC_SingleBDT_hct__bdt.xml"
+#bdt_had_hut = "../MVAs/Hadronic_v1.7_27Jun2019_FCNC_SingleBDT_impute_hut__bdt.xml"
+#bdt_had_hct = "../MVAs/Hadronic_v1.7_27Jun2019_FCNC_SingleBDT_impute_hct__bdt.xml"
+
+bdt_lep_hut = "../MVAs/Leptonic_v4.11_14Jan2020_hut__bdt.xml"
+bdt_lep_hct = "../MVAs/Leptonic_v4.11_14Jan2020_hct__bdt.xml"
+bdt_had_hut = "../MVAs/Hadronic_v4.11_14Jan2020_impute_hut__bdt.xml"
+bdt_had_hct = "../MVAs/Hadronic_v4.11_14Jan2020_impute_hct__bdt.xml"
 
 os.chdir("../")
 
 do_looping = True
 if do_looping:
   # Loopers
-  #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hut_BDT", bdt_lep_hut))
-  #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_veryLoose" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hut_BDT", bdt_had_hut))
-  #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hct_BDT", bdt_lep_hct))
-  #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel_veryLoose" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hct_BDT", bdt_had_hct))
+  #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hut_BDT", bdt_lep_hut))
+  parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hut_BDT", bdt_had_hut))
+  parallel_utils.run('python looper_wrapper.py --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hct_BDT", bdt_lep_hct))
+  parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_impute_hct_BDT", bdt_had_hct))
 
   # Loopers, signal regions
   #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "FCNC_Leptonic_Hut_RunII_SR_Inclusive" --bkg_options "none" --years "2017" --bdt "%s"' % (args.baby_version, args.tag + "_hut_BDT", bdt_lep_hut))
@@ -37,8 +43,11 @@ if do_looping:
 
   # Data/MC Plots
   os.chdir("Plots")
-  #parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Leptonic|Loose MVA Presel." --signals "ttH|TT_FCNC_hut|TT_FCNC_hct|ST_FCNC_hut|ST_FCNC_hct" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG"' % ("ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" % args.tag))
-  #parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Hadronic|Loose MVA Presel.|ttH weights x100" --signals "ttH|TT_FCNC_hut|TT_FCNC_hct|ST_FCNC_hut|ST_FCNC_hct" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG"' % ("ttHHadronic_RunII_MVA_Presel_veryLoose_%s_histogramsRunII.root" % (args.tag + "_impute")))
+  #parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Leptonic|Loose MVA Presel." --signals "TT_FCNC_hut|ST_FCNC_hut" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG"' % ("ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_hut_BDT_FCNC")))
+  parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Leptonic|Loose MVA Presel." --signals "TT_FCNC_hct|ST_FCNC_hct" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG"' % ("ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_hct_BDT_FCNC")))
+  
+  parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Hadronic|Loose MVA Presel." --signals "TT_FCNC_hut|ST_FCNC_hut" --backgrounds "DiPhoton|QCD_GammaJets_imputed|TTGG|TTGJets|TTJets|VG"' % ("ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_impute_hut_BDT_FCNC")))
+  parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Hadronic|Loose MVA Presel." --signals "TT_FCNC_hct|ST_FCNC_hct" --backgrounds "DiPhoton|QCD_GammaJets_imputed|TTGG|TTGJets|TTJets|VG"' % ("ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_impute_hct_BDT_FCNC")))
 
   os.chdir("../")
 
@@ -54,7 +63,7 @@ if do_mvas:
   #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_hut"' % (args.tag))
   #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_hut"' % (args.tag + "_impute")) 
   #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hct --tag "_hct"' % (args.tag))
-  command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_hct"' % (args.tag + "_impute"))
+  #command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_hct"' % (args.tag + "_impute"))
   parallel_utils.submit_jobs(command_list, 4)
 
 
@@ -66,7 +75,7 @@ if do_mvas:
   #parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_hut.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag, args.tag + "_hut"))
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hut.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hut"))
   #parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_hct.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag, args.tag + "_hct"))
-  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hct.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hct")) 
+  #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hct.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hct")) 
 
   # MVA Training, no mass constraint
   #parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_hut_no_mass_constraint.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute", args.tag + "_impute_hut_no_mass_constraint"))

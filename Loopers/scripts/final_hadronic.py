@@ -14,7 +14,8 @@ bdt = "none"
 
 os.chdir("../")
 
-plot_types = ["std", "std_linear", "std_shape", "std_shape_sig_vs_data"]
+#plot_types = ["std", "std_linear", "std_shape", "std_shape_sig_vs_data", "std_2016", "std_2017", "std_2018"]
+plot_types = ["std"]
 
 derive_fake_shape = False
 if derive_fake_shape:
@@ -66,7 +67,7 @@ if do_imputing:
         parallel_utils.run('python plot_wrapper.py --input_file "../ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" --backgrounds "DiPhoton|GammaJets|QCD|TTGG|TTGJets|TTJets|DY|VG|TGamma|TTV|VV|tV" --signals "ttH" --plot_type "%s" --plot_labels "ttH Hadronic|Loose MVA Presel."' % (args.tag + "_scale_diphoton", plot_type))
     os.chdir("../")
 
-do_ttZ = True
+do_ttZ = False
 if do_ttZ:
     #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_ttZ_CR" --bkg_options "impute" --bdt "none"' % (args.baby_version, args.tag + "_impute"))
     os.chdir("Plots")
@@ -154,7 +155,7 @@ if do_l1_prefire:
         parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_SR_%s" --bkg_options "impute" --bdt "none" --l1_prefire ""' % (args.baby_version, args.tag + "_impute", str(sr)))
         
 
-do_paper_plots = False
+do_paper_plots = True
 if do_paper_plots:
     os.chdir("../Loopers/")
     #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --bdt "none" --do_systematics' % (args.baby_version, args.tag + "_impute"))

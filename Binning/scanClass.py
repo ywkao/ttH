@@ -67,12 +67,12 @@ class scanClass():
 
         subprocess.call(pathCmd, shell=True)
 
-    def quantiles_to_mva_score(self, n_quantiles, mvaName):
+    def quantiles_to_mva_score(self, n_quantiles, mvaName, selection = ""):
         # for given selection, return mva_scores corresponding to each quantile in n_quantiles
 
         # get a numpy array from tree
         print self.selection
-        mva_scores = (root_numpy.tree2array(self.getTree(), branches = [mvaName], selection = self.selection))
+        mva_scores = (root_numpy.tree2array(self.getTree(), branches = [mvaName], selection = self.selection + selection))
 
         sorted_mva = numpy.flip(numpy.sort(mva_scores), 0)
         quantiles = []
@@ -99,7 +99,7 @@ class scanClass():
         cmdCombine = "#!/bin/sh\n\ncd " + self.combineEnv + "; pwd; eval `scramv1 runtime -sh`; cd -;"
         cmdCombine += "cd " + self.modelpath + ";"
         #cmdCombine += "ls;"
-        cmdCombine += "combine -M " + combineOption + " -n " + combineOutName + " " + cardName + " -t -1 --expectSignal=1 > " + self.modelpath + outtxtName + ";"
+        cmdCombine += "combine -M " + combineOption + " -n " + combineOutName + " " + cardName + " -t -1 --expectSignal=0 > " + self.modelpath + outtxtName + ";"
 
         print cmdCombine
         #os.system(cmdCombine)

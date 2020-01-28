@@ -28,7 +28,7 @@ parser.add_argument("--limit", help = "calculate limit instead of significance",
 
 args = parser.parse_args()
 
-process_dict = { "ttH" : [0], "ggH" : [14], "FCNC_Hut" : [22,24], "FCNC_Hct" : [23,25] }
+process_dict = { "ttH" : [0], "ggH" : [14], "FCNC_Hut" : [22,24], "FCNC_Hct" : [23,25], "tH" : [11,12] }
 
 def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
     tree = scanner.getTree()
@@ -104,7 +104,7 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
 
     for cut in cuts:
         cut = float(cut)
-    result = { "mva_cuts" : [str(cut) for cut in cuts], ("limit" if args.limit else "significance") : significance }
+    result = { "mva_cuts" : [str(cut) for cut in cuts], ("limit" if args.limit else "significance") : significance , "datacard" : scanConfig["modelpath"] + combineConfig["cardName"] }
 
     results[idx] = result
     print results
@@ -119,8 +119,16 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
     #return significance
 
 
-def calculate_cut_combos(nBins, nPoints, scanner, scanConfig):
-    mvaScores = scanner.quantiles_to_mva_score(nPoints, scanConfig["mvaName"])
+def calculate_cut_combos(nBins, nPoints, scanner, scanConfig, signal):
+    processSelection = " && ("
+    for j in range(len(process_dict[signal])):
+        processSelection += "process_id == " + str(process_dict[signal][j])
+        if j == (len(process_dict[signal]) - 1):
+            processSelection += ")"
+        else:
+            processSelection += " || "
+    
+    mvaScores = scanner.quantiles_to_mva_score(nPoints, scanConfig["mvaName"], processSelection)
     cut_combos_unformatted = list(itertools.combinations(mvaScores, nBins)) 
     cut_combos = []
 
@@ -190,7 +198,7 @@ scanConfig= {\
 testScan = scanClass(scanConfig)
 testScan.cleanDir()
 
-calculate_cut_combos(args.nBins, args.nPoints, testScan, scanConfig)
+calculate_cut_combos(args.nBins, args.nPoints, testScan, scanConfig, args.signal)
 
 #useNCores = 20
 #nJobsPerCore =5

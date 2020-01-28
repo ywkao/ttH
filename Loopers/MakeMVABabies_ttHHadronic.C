@@ -385,6 +385,32 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
+    double btag_norm_correction = 1.;
+
+    if (!isData && btag_norm_correction == 1.) {
+        double integral_no_btag = 0.;
+        double integral_w_btag =  0.;
+        for (unsigned int event = 0; event < nEventsTree; ++event) {
+            if (fast) tree->LoadTree(event);
+            cms3.GetEntry(event);
+            ++nEventsTotal;
+
+            ttHHadronic::progress( nEventsTotal, nEventsChain );
+
+            if (!passes_btag_rescale_selection())       continue;
+
+            double weight_no_btag = weight() / weight_JetBTagWeight();
+
+            if (!(isnan(weight_no_btag) || isinf(weight_no_btag))) {
+                integral_no_btag += weight_no_btag;
+                integral_w_btag += weight();
+            }
+        }
+        btag_norm_correction = integral_no_btag / integral_w_btag;
+        cout << "btag_normalization_factor: " << btag_norm_correction << endl;
+    }
+
+    nEventsTotal = 0;
   
 
     for (unsigned int event = 0; event < nEventsTree; ++event) {

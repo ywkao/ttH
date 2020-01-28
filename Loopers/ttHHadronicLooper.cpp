@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 
 
   TChain *ch; 
-  if (ext.Contains("v4.")) {
+  if (ext.Contains("v4.") && !file.Contains("FCNC")) {
     ch = new TChain("tagsDumper/trees/_13TeV_TTHHadronicTag");
     cout << "Using new tree naming convention" << endl;
   }  

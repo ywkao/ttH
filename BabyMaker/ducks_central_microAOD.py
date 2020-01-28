@@ -139,6 +139,8 @@ while True:
                     continue
                 dataset = sample + "_" + production
                 files = samples[sample][year][production]["files"]
+                if files == -1:
+                    continue
                 files = [file(name=x) for x in files]
                 metis_sample = Sample(dataset = dataset, files = files) 
                 metis_sample.info["nevts"] = 0

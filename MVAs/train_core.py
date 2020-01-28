@@ -118,6 +118,8 @@ def train_bdt(config, invert=False):
   objects_final_fit = utils.load_array(f, 'objects_final_fit')
   tth_runII_mva_final_fit = utils.load_array(f, 'tth_runII_mva_final_fit')
 
+  print global_dnn_features.shape, global_dnn_features_validation.shape, global_dnn_features_data.shape, global_dnn_features_final_fit.shape
+
   num_multi_class = 3#len(numpy.unique(multi_label, return_index = True))
 
   train_frac = 1.0 # use this fraction of data for training, use 1-train_frac for testing
@@ -273,8 +275,8 @@ def train_bdt(config, invert=False):
       dnn_features_final_fit = dnn_helper.DNN_Features(name = 'final_fit', global_features = global_dnn_features_final_fit, objects = objects_final_fit)
       with open(args.reference_mva, "r") as f_in:
         metadata = json.load(f_in)
-      dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, metadata = metadata, weights_file = "dnn_weights/" + metadata["weights"])
-      dnn.predict()
+      dnn = dnn_helper.DNN_Helper(features_validation = dnn_features_validation, features_train = dnn_features_train, features_data = dnn_features_data, features_final_fit = dnn_features_final_fit, metadata = metadata, weights_file = "dnn_weights/" + metadata["weights"], train_mode = False)
+      dnn.predict(debug=True)
       pred_ref_train = dnn.predictions["train"]
       pred_ref_test = dnn.predictions["validation"]
       pred_ref_data = dnn.predictions["data"]
@@ -383,6 +385,10 @@ def train_bdt(config, invert=False):
   tree_process_id = numpy.concatenate((process_id, process_id_validation, process_id_data, process_id_final_fit))
   tree_year = numpy.concatenate((year, year_validation, year_data, year_final_fit))
   tree_global_features = numpy.concatenate((global_features, global_features_validation, global_features_data, global_features_final_fit))
+
+  if ".json" in args.reference_mva:
+      tree_dnn_features = numpy.concatenate((global_dnn_features, global_dnn_features_validation, global_dnn_features_data, global_dnn_features_final_fit))
+
   training_feature_names = [training_feature_names for i in range(len(label))]
   training_feature_names_validation = [training_feature_names for i in range(len(label_validation))]
   training_feature_names_data = [training_feature_names for i in range(len(label_data))]
@@ -404,9 +410,14 @@ def train_bdt(config, invert=False):
   tree_process_id = tree_process_id.astype(numpy.int64)
   tree_year = tree_year.astype(numpy.int64)
   tree_global_features = tree_global_features.astype(numpy.float64)
-  #tree_training_feature_names = tree_training_feature_names.astype(numpy.string_)
+  if ".json" in args.reference_mva:
+      tree_dnn_features = tree_dnn_features.astype(numpy.float64)
+#tree_training_feature_names = tree_training_feature_names.astype(numpy.string_)
 
   dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "signal_mass_category" : tree_signal_mass_category, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features, "tth_runII_mva" : tree_tth_runII_mva}#, "training_feature_names" : tree_training_feature_names}
+
+  if ".json" in args.reference_mva:
+      dict["dnn_global_features"] = tree_dnn_features
 
   if args.multi:
     tree_bdt_score = []
@@ -428,8 +439,6 @@ def train_bdt(config, invert=False):
   tree_utils.numpy_to_tree(dict, "ttH%s_%s_FinalFitTree.root" % (args.channel, args.tag))
 
   ### Make diagnostic plots ###
-  import matplotlib
-  matplotlib.use('Agg')
   import matplotlib.pyplot as plt
 
   # variable importance #

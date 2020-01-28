@@ -170,7 +170,8 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_ttZ_v5", 15, 0, 10);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_bounded", 25, 0, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_bounded_v2", 12, 0, 1);
-        
+
+        v[i]->add_histogram("h" + syst_labels[j] + "MVA_transf", 15, 0, 10);        
 
         v[i]->add_histogram("h" + syst_labels[j] + "MaxBTag", 50, 0, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "SecondMaxBTag", 50, 0, 1);  
@@ -726,6 +727,14 @@ double scale_fcnc(TString currentFileTitle) {
     return br_tToHc_limit / br_tToHq_assumed;
   */
   return 1.0; 
+}
+
+double scale_fcnc_to_atlas_limit(TString currentFileTitle) {
+  if (currentFileTitle.Contains("eta_hut"))
+    return br_tToHu_limit / br_tToHq_assumed;
+  else if (currentFileTitle.Contains("eta_hct"))
+    return br_tToHc_limit / br_tToHq_assumed;
+  return 1.0;
 }
 
 double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel, bool fcnc = false) {

@@ -14,7 +14,7 @@ def numpy_to_tree(dict, file_name, tree_name = "t"): # dict should contain {"bra
 
   branches = {}
   for branch in list(dict.keys()):
-    if branch == "global_features":
+    if branch == "global_features" or branch == "dnn_global_features":
       b = numpy.empty((1, len(dict[branch][0])), dtype = "float32")
       branches[branch] = b
       t.Branch(branch, branches[branch], "%s[%d]/F" % (branch, len(dict[branch][0])))
@@ -25,7 +25,7 @@ def numpy_to_tree(dict, file_name, tree_name = "t"): # dict should contain {"bra
 
   for i in range(n_events):
     for branch in list(dict.keys()):
-      if branch == "global_features":
+      if branch == "global_features" or branch == "dnn_global_features":
         for j in range(len(dict[branch][i])):
           branches[branch][0][j] = dict[branch][i][j]
       else:

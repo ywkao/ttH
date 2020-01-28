@@ -159,6 +159,7 @@ const std::vector<TString> syst_ext = {
     "JetBTagCutWeight",
     "JetBTagReshapeWeight",
     */
+
     "MvaShift",
     "JEC",
     "JetBTagReshapeWeight",
@@ -216,7 +217,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       hSig = {hSig_TTH, hSig_FCNC_hut, hSig_FCNC_hct};	
     }
     else {
-      vLegendLabels = {year + "Data"};
+      vLegendLabels = {year + " Data"};
       for (int i = 0; i < vSigs.size(); i++) {
 	    vLegendLabels.push_back(mLabels.find(vSigs[i])->second);
         hSig.push_back((TH1D*)file->Get(hist_name + "_" + vSigs[i] + extension));
@@ -262,7 +263,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     for (unsigned int i = 0; i < vBkgs.size(); i++) {
       if (vBkgs[i] == "Other") {
         syst_bkgs.push_back("TGamma");
-        syst_bkgs.push_back("TTV");
+        syst_bkgs.push_back("TTW");
+        syst_bkgs.push_back("TTZ");
         syst_bkgs.push_back("VV");
         syst_bkgs.push_back("tV");
         syst_bkgs.push_back("DY");
@@ -287,7 +289,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         syst_bkgs.push_back(vBkgs[i]);
     }
 
-    int n_systs = syst_ext.size();
+    int n_systs = doSyst? syst_ext.size(): 0;
     for (int i = 0; i < n_systs; i++) {
       for (int j = 0; j < syst_bkgs.size(); j++) {
         TString syst_hist_name_up = "h" + syst_ext[i] + "Up01sigma" + hist_name(1,hist_name.Length());
@@ -1080,19 +1082,24 @@ int main(int argc, char* argv[])
     vInfo.erase(vInfo.end() - 2, vInfo.end());
     */
 
-    make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    
-    make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_ttGG", "DNN Score (t#bar{t}H vs. t#bar{t} + #gamma#gamma)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    if (tag == "Hadronic")
-       make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_dipho", "DNN Score (t#bar{t}H vs. #gamma#gamma + jets)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio); 
 
-    make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ_v2", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ_v3", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ_v4", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ_v5", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    make_plot(c3, vFiles[i], vNames[i], "htthMVA_RunII_transf", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, false);
-    //make_plot(c3, vFiles[i], vNames[i], "htthMVA_RunII_transf_bounded_v2", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, false);
+    if (!(file_path.Contains("hct") || file_path.Contains("hut"))) {
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        
+        make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_ttGG", "DNN Score (t#bar{t}H vs. t#bar{t} + #gamma#gamma)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        if (tag == "Hadronic")
+           make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_dipho", "DNN Score (t#bar{t}H vs. #gamma#gamma + jets)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio); 
+
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ_v2", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ_v3", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ_v4", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_ttZ_v5", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c3, vFiles[i], vNames[i], "htthMVA_RunII_transf", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, false);
+        //make_plot(c3, vFiles[i], vNames[i], "htthMVA_RunII_transf_bounded_v2", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, false);
+    }
+    if (file_path.Contains("hct") || file_path.Contains("hut")) 
+        make_plot(c1, vFiles[i], vNames[i], "hMVA_transf", "MVA Score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst);
     make_plot(c1, vFiles[i], vNames[i], "hRho", "Rho", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, vSigs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
   }

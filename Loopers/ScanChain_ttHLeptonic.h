@@ -51,6 +51,11 @@ bool pass_2017_mva_presel() {
   return true;
 }
 
+bool passes_btag_rescale_selection() {
+    if (n_jets() < 1)   return false;
+    return true;
+}
+
 bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, int n_lep_medium, int n_lep_tight, float mva_value = -1, float m_gl_lead = 999, float m_gl_sublead = 999) {
 
   if (tag == "ttHLeptonic_RunII_ttZ_CR") {

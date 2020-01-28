@@ -58,6 +58,11 @@ bool pass_2017_mva_presel() {
   return true;
 }
 
+bool passes_btag_rescale_selection() {
+    if (n_jets() < 3)   return false;
+    return true;
+}
+
 bool passes_selection(TString tag, float minIDMVA_, float maxIDMVA_, float mva_value = -1) {
 
   if (tag == "ttHHadronic_RunII_ttZ_CR") {

@@ -24,7 +24,7 @@ if do_looping:
         parallel_utils.run('python plot_wrapper.py --input_file "../ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG|DY|TGamma|TTV|VV|tV" --signals "ttH" --plot_type "%s" --plot_labels "ttH Leptonic|Loose MVA Presel."' % (args.tag, plot_type))
     os.chdir("../")
 
-do_ttZ = True
+do_ttZ = False
 if do_ttZ:
     #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_ttZ_CR" --bkg_options "none" --bdt "none"' % (args.baby_version, args.tag))
     os.chdir("Plots")
@@ -97,10 +97,10 @@ if do_l1_prefire:
         parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_SR_%s" --bkg_options "none" --bdt "none" --l1_prefire "down"' % (args.baby_version, args.tag + "_L1PrefireDown", str(sr)))
         parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_SR_%s" --bkg_options "none" --bdt "none" --l1_prefire ""' % (args.baby_version, args.tag + "", str(sr)))
 
-do_paper_plots = False
+do_paper_plots = True
 if do_paper_plots:
     os.chdir("../Loopers/")
-    #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --bdt "none" --do_systematics' % (args.baby_version, args.tag))
+    parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --bdt "none" --do_systematics' % (args.baby_version, args.tag))
     os.chdir("Plots")
-    for plot_type in plot_types:
-        parallel_utils.run('python plot_wrapper.py --input_file "../ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG|Other" --signals "ttH" --plot_type "%s" --plot_labels ""' % (args.tag, plot_type))
+    #for plot_type in plot_types:
+    #    parallel_utils.run('python plot_wrapper.py --input_file "../ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG|Other" --signals "ttH" --plot_type "%s" --plot_labels ""' % (args.tag, plot_type))

@@ -187,6 +187,10 @@ dnn_predictions = []
 dnn_features = ["lead_eta_", "sublead_eta_", "lead_phi_", "sublead_phi_", "leadptoM_", "subleadptoM_", "maxIDMVA_", "minIDMVA_", "log_met_", "met_phi_", "leadPSV_", "subleadPSV_", "dipho_rapidity_", "dipho_pt_over_mass_", "dipho_delta_R", "max1_btag_", "max2_btag_", "njets_"]
 if args.channel == "Leptonic":
     dnn_features += ["n_lep_tight_"]
+
+if args.ttH_vs_tH:
+    dnn_features += ["lep1_charge_", "lep2_charge_", "forward_jet_eta_", "forward_jet_pt_"]
+
 #if args.do_top_tag:
 #    dnn_features += ["top_tag_score_"]
 if (args.fcnc_hut or args.fcnc_hct) and args.channel == "Hadronic" and not args.no_mass_constraint:

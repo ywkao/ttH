@@ -207,9 +207,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
       mYear = (currentFileTitle.Contains("Run2016") || currentFileTitle.Contains("RunIISummer16")) ? "2016" : ((currentFileTitle.Contains("Run2017") || currentFileTitle.Contains("RunIIFall17")) ? "2017" : ((currentFileTitle.Contains("Run2018") || currentFileTitle.Contains("RunIIAutumn18")) ? "2018" : "no_year")); 
 
     if (isSignal) {
-      if (categorize_signal_sample(currentFileTitle) != 0)
+      if (categorize_signal_sample(currentFileTitle) != 0 && !currentFileTitle.Contains("FCNC"))
         continue;
-      if (currentFileTitle.Contains("M120") || currentFileTitle.Contains("M130"))
+      if ((currentFileTitle.Contains("M120") || currentFileTitle.Contains("M130")) && !currentFileTitle.Contains("FCNC"))
         continue; 
     }
 
@@ -242,6 +242,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
     // Set json file
     set_json(mYear);
 
+    double btag_norm_correction = 1.;
 
     // Loop over each tree
     for (unsigned int i = 0; i < independent_systematic_collections.size(); i++) {
@@ -263,8 +264,15 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
             syst_ext = independent_systematic_collections[i];
             if (syst_ext != "")
                 syst_ext = "_" + syst_ext;
-            cout << "Grabbing this tree: " << "tagsDumper/trees/_13TeV_TTHLeptonicTag" + syst_ext << endl;
-            TTree *tree = (TTree*)file.Get("tagsDumper/trees/_13TeV_TTHLeptonicTag" + syst_ext);
+            TTree *tree; 
+            if (currentFileTitle.Contains("v4.") && !currentFileTitle.Contains("FCNC")) {
+                cout << "Grabbing this tree: " << "tagsDumper/trees/_13TeV_TTHLeptonicTag" + syst_ext << endl;
+                tree = (TTree*)file.Get("tagsDumper/trees/_13TeV_TTHLeptonicTag" + syst_ext);
+            }
+            else {
+                cout << "Grabbing this tree: tthLeptonicTagDumper/trees/tth_13TeV_all" << endl;
+                tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all");
+            }
             if (fast) tree->SetCacheSize(128*1024*1024);
             cms3.Init(tree);
 
@@ -277,6 +285,32 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
             unsigned int nEventsTree = tree->GetEntriesFast();
             nEventsChain = nEventsTree;
             nEventsTotal = 0;
+
+            if (!isData && btag_norm_correction == 1.) {
+                double integral_no_btag = 0.;
+                double integral_w_btag =  0.;
+                for (unsigned int event = 0; event < nEventsTree; ++event) {
+                    if (fast) tree->LoadTree(event);
+                    cms3.GetEntry(event);
+                    ++nEventsTotal;
+
+                    ttHLeptonic::progress( nEventsTotal, nEventsChain );
+
+                    if (!passes_btag_rescale_selection())       continue;
+
+                    double weight_no_btag = weight() / weight_JetBTagWeight();
+
+                    if (!(isnan(weight_no_btag) || isinf(weight_no_btag))) {
+                        integral_no_btag += weight_no_btag;
+                        integral_w_btag += weight();
+                    }
+                }
+                btag_norm_correction = integral_no_btag / integral_w_btag;
+                cout << "btag_normalization_factor: " << btag_norm_correction << endl;
+            }
+
+            nEventsTotal = 0; 
+
             for (unsigned int event = 0; event < nEventsTree; ++event) {
 
               // Get Event Content
@@ -467,6 +501,9 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               if (currentFileTitle.Contains("FCNC"))
                 evt_weight *= scale_fcnc(currentFileTitle);
 
+              if (currentFileTitle.Contains("FCNC"))
+                evt_weight *= scale_fcnc_to_atlas_limit(currentFileTitle);
+
               // Blinded region 
               if (isData && processId != 18 && blind && mass() > 120 && mass() < 130)        continue;
 
@@ -551,7 +588,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               // Skip blinded region for MC after filling mass histogram
               if (!isSignal && !isData && blind && mass() > 120 && mass() < 130)     continue;
 
-              vProcess[processId]->fill_histogram("h" + syst_ext + "DNNScore_ttH_vs_ttGG", dnn_score_ttgg(), evt_weight, vId);
+              if (!currentFileTitle.Contains("FCNC"))
+                vProcess[processId]->fill_histogram("h" + syst_ext + "DNNScore_ttH_vs_ttGG", dnn_score_ttgg(), evt_weight, vId);
 
               //double dipho_mass_resolution = 0.5* pow((pow(lead_sigmaEoE(),2) + pow(sublead_sigmaEoE(),2)), 0.5);
               //vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonMassResolution", dipho_mass_resolution, evt_weight, vId);
@@ -615,15 +653,19 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
               //vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII", tthMVA_RunII(), evt_weight, vId);
               //vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf", -log(1-tthMVA_RunII()), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII", tthMVA(), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf", -log(1-tthMVA()), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ", -log(1-tthMVA()), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v2", -log(1-tthMVA_RunII()), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v3", -log(1-tthMVA_RunII()), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v4", -log(1-tthMVA_RunII()), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v5", -log(1-tthMVA_RunII()), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_bounded", -log(1-tthMVA_RunII())/5., evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_bounded_v2", -log(1-tthMVA_RunII())/5., evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MVA_transf", -log(1 - mva_value), evt_weight, vId);
+
+              if (!currentFileTitle.Contains("FCNC")) {
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII", tthMVA(), evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf", -log(1-tthMVA()), evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ", -log(1-tthMVA()), evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v2", -log(1-tthMVA_RunII()), evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v3", -log(1-tthMVA_RunII()), evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v4", -log(1-tthMVA_RunII()), evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v5", -log(1-tthMVA_RunII()), evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_bounded", -log(1-tthMVA_RunII())/5., evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_bounded_v2", -log(1-tthMVA_RunII())/5., evt_weight, vId);
+              }
               //vProcess[processId]->fill_histogram("h" + syst_ext + "LeptonicMVA", mva_value, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "Rapidity", dipho_rapidity(), evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "DiphotonSumPt", dipho_sumpt(), evt_weight, vId);
