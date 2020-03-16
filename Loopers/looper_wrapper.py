@@ -1,7 +1,7 @@
 import sys, os
 import glob
 
-sys.path.append("~/Utilities")
+sys.path.append("../Utilities")
 
 import parallel_utils
 
