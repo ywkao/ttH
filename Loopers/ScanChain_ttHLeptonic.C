@@ -286,6 +286,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
             nEventsChain = nEventsTree;
             nEventsTotal = 0;
 
+            /*
             if (!isData && btag_norm_correction == 1.) {
                 double integral_no_btag = 0.;
                 double integral_w_btag =  0.;
@@ -308,6 +309,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                 btag_norm_correction = integral_no_btag / integral_w_btag;
                 cout << "btag_normalization_factor: " << btag_norm_correction << endl;
             }
+            */
 
             nEventsTotal = 0; 
 
