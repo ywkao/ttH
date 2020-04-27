@@ -1,4 +1,5 @@
 import ROOT
+ROOT.gROOT.SetBatch(True)
 
 import sys
 #ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit.so")

@@ -15,11 +15,11 @@
 
 std::map<TString, TString> mLabels = {
 	{"DY", "Drell-Yan"}, 
-	{"DiPhoton", "#gamma#gamma + Jets"},
+	{"DiPhoton", "#gamma#gamma + jets"},
     //{"DiPhoton", "Multi-jet + #gamma#gamma"},
-    {"GammaJets", "#gamma + Jets"},
+    {"GammaJets", "#gamma + jets"},
     //{"GammaJets", "Multi-jet + #gamma"},
-    {"GammaJets_Madgraph", "#gamma + Jets (Madgraph)"},
+    {"GammaJets_Madgraph", "#gamma + jets (Madgraph)"},
 	{"QCD", "QCD"},
 	{"TTGG", "t#bar{t} + #gamma#gamma"},
 	{"TTGJets", "t#bar{t} + #gamma"},
@@ -28,11 +28,12 @@ std::map<TString, TString> mLabels = {
 	{"TTJets", "t#bar{t} + jets"}, 
 	{"THQ", "tHq"},
 	{"TGamma", "t+#gamma+Jets"},
-	{"QCD_GammaJets_imputed", "(#gamma) + Jets"},
+	{"QCD_GammaJets_imputed", "(#gamma) + jets"},
     //{"QCD_GammaJets_imputed", "Multi-jet (+ #gamma)"},
     {"TTZ", "t#bar{t}Z"},
     {"TTW", "t#bar{t}W"},
-        {"VV", "VV"},
+    {"TTW", "t#bar{t}V"},
+    {"VV", "VV"},
         {"tV", "t + V"},
 	{"ttH", "t#bar{t}H(125)"},
 	{"TT_FCNC_hut", "t#bar{t} FCNC (Hut)"},
@@ -57,7 +58,8 @@ std::map<TString, int> mColors = {
 	{"QCD_GammaJets_imputed", kCyan-9},
 	{"TTZ", kAzure+1},
     {"TTW", kRed},
-	{"tV", kPink-6},
+    {"TTV", kRed},
+    {"tV", kPink-6},
 	{"VV", kPink+6},
     {"ttH", kCyan-9}
 };
@@ -75,7 +77,8 @@ std::map<TString, TString> mLatex = {
         {"TTJets", "$t\\bar{t}$ + Jets"},
         {"TGamma", "$t + \\gamma$"},
 	{"QCD_GammaJets_imputed", "($\\gamma$) + Jets (Data Sideband)"},
-	{"TTZ", "$t\\bar{t}+Z$"},
+    {"TTV", "$t\\bar{t}+Z$"},
+    {"TTZ", "$t\\bar{t}+Z$"},
     {"TTW", "$t\\bar{t}+W$"},
         {"VV", "$VV$"},
         {"tV", "$tV$"},
@@ -226,6 +229,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     }
     for (int i = 0; i < vBkgs.size(); i++) {
       if (vBkgs[i] != "Other" && vBkgs[i] != "Other2") {
+        cout << vBkgs[i] << endl;
         hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + extension));
         vLegendLabels.push_back(mLabels.find(vBkgs[i])->second);
         vColors.push_back(mColors.find(vBkgs[i])->second);
@@ -242,7 +246,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         vLegendLabels.push_back("Other");
         vColors.push_back(kRed);
       }
-      else {
+      else if (vBkgs[i] == "Other2") {
         TH1D* hOther = (TH1D*)file->Get(hist_name + "_" + "TGamma" + extension);
         vector<TString> rares = { "TTJets", "TTGG", "TTGJets", "DiPhoton", "VV", "tV", "TTW"};
         if (output.Contains("Hadronic"))
@@ -263,8 +267,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     for (unsigned int i = 0; i < vBkgs.size(); i++) {
       if (vBkgs[i] == "Other") {
         syst_bkgs.push_back("TGamma");
-        syst_bkgs.push_back("TTW");
-        syst_bkgs.push_back("TTZ");
+        //syst_bkgs.push_back("TTW");
+        //syst_bkgs.push_back("TTZ");
+        syst_bkgs.push_back("TTV");
         syst_bkgs.push_back("VV");
         syst_bkgs.push_back("tV");
         syst_bkgs.push_back("DY");
@@ -284,6 +289,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         syst_bkgs.push_back("TTGJets");
         syst_bkgs.push_back("TTJets");
         syst_bkgs.push_back("VG");
+        syst_bkgs.push_back("TTW");
       }
       else
         syst_bkgs.push_back(vBkgs[i]);
@@ -781,7 +787,7 @@ int main(int argc, char* argv[])
   //TString file_path_ref = argv[4];
   //TString year_ref = file_path_ref.Contains("RunII") ? "2017" : file_path_ref.Contains("2018") ? "2018" : ((file_path_ref.Contains("2017") ? "2017" : "2016"));
 
-  bool doSyst = true;
+  bool doSyst = false;
   bool doRatio = true;
   bool loose_mva_cut = false; //argc > 4;
   TString mva_ext = loose_mva_cut ? "_looseMVACut" : "";
@@ -1085,7 +1091,15 @@ int main(int argc, char* argv[])
 
     if (!(file_path.Contains("hct") || file_path.Contains("hut"))) {
         make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-        
+        vInfo.push_back("");
+        vInfo[vInfo.size()-1] = "p_{T}^{#gamma#gamma} < 60 GeV";
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_low_pT", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        vInfo[vInfo.size()-1] = "60 < p_{T}^{#gamma#gamma} < 120 GeV";
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_med_pT", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        vInfo[vInfo.size()-1] = "p_{T}^{#gamma#gamma} > 120 GeV";
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_high_pT", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        vInfo[vInfo.size()-1] = "";
+
         make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_ttGG", "DNN Score (t#bar{t}H vs. t#bar{t} + #gamma#gamma)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
         if (tag == "Hadronic")
            make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_dipho", "DNN Score (t#bar{t}H vs. #gamma#gamma + jets)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio); 

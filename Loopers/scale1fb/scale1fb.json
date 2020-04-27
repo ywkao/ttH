@@ -731,7 +731,9 @@
         "scale1fb_2016": 1.9334798557522975e-06, 
         "scale1fb_2017": 1.0023801742580338e-06, 
         "scale1fb_2018": 0, 
-        "xs": 0.0038646086000000001
+        "xs_buggy": 0.0038646086000000001,
+        "xs" : 0.00253085,
+        "comment" : "xs_buggy is the true cross section but does not account for the bug in the sample where W->tau v_tau decays are not included" 
     }, 
     "ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8": {
         "br": 1.0, 
@@ -750,7 +752,9 @@
         "scale1fb_2016": 2.7998440695104583e-05, 
         "scale1fb_2017": 1.4030410978284646e-05, 
         "scale1fb_2018": 0, 
-        "xs": 0.055932065000000003
+        "xs_buggy": 0.055932065000000003,
+        "xs": 0.0366287,
+        "comment" : "xs_buggy is the true cross section but does not account for the bug in the sample where W->tau v_tau decays are not included"
     }, 
     "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1": {
         "br": 1.0, 
@@ -1262,7 +1266,9 @@
         "scale1fb_2016": 6.8318757362022481e-05, 
         "scale1fb_2017": 7.1317953458781893e-05, 
         "scale1fb_2018": 0, 
-        "xs": 0.071745147999999995
+        "xs_buggy": 0.071745147999999995,
+        "xs" : 0.0469844,
+        "comment" : "xs_buggy is the true cross section but does not account for the bug in the sample where W->tau v_tau decays are not included"
     }, 
     "TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8": {
         "br": 1.0, 
@@ -1311,7 +1317,9 @@
         "scale1fb_2016": 6.9059708315528915e-05, 
         "scale1fb_2017": 7.8511444476781723e-05, 
         "scale1fb_2018": 0, 
-        "xs": 0.071757733000000004
+        "xs": 0.071757733000000004,
+        "xs_buggy" : 0.0469926,
+        "comment" : "xs_buggy is the true cross section but does not account for the bug in the sample where W->tau v_tau decays are not included"
     }, 
     "TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8": {
         "br": 1.0, 
@@ -1360,7 +1368,9 @@
         "scale1fb_2016": 6.8023642540264656e-05, 
         "scale1fb_2017": 7.3684600366239803e-05, 
         "scale1fb_2018": 0, 
-        "xs": 0.071745147999999995
+        "xs_buggy": 0.071745147999999995,
+        "xs" : 0.0469844,
+        "comment" : "xs_buggy is the true cross section but does not account for the bug in the sample where W->tau v_tau decays are not included"
     }, 
     "TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8": {
         "br": 1.0, 
@@ -1379,7 +1389,9 @@
         "scale1fb_2016": 6.8400108475170817e-05, 
         "scale1fb_2017": 7.2846126983256836e-05, 
         "scale1fb_2018": 0, 
-        "xs": 0.071757733000000004
+        "xs_buggy": 0.071757733000000004,
+        "xs" : 0.0469926,
+        "comment" : "xs_buggy is the true cross section but does not account for the bug in the sample where W->tau v_tau decays are not included"
     }, 
     "VBFHToGG_M125_13TeV_amcatnlo_pythia8": {
         "br": 0.0022699999999999999, 

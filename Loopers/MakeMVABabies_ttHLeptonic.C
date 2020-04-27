@@ -184,6 +184,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
     double btag_norm_correction = 1.;
 
+    /*
     if (!isData && btag_norm_correction == 1.) {
         double integral_no_btag = 0.;
         double integral_w_btag =  0.;
@@ -206,6 +207,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         btag_norm_correction = integral_no_btag / integral_w_btag;
         cout << "btag_normalization_factor: " << btag_norm_correction << endl;
     }
+    */
 
     nEventsTotal = 0;
 

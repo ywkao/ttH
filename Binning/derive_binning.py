@@ -166,7 +166,7 @@ def calculate_cut_combos(nBins, nPoints, scanner, scanConfig, signal):
     with open("results_%s.json" % args.tag, "w") as f_out:
         json.dump(results.copy(), f_out, indent=4, sort_keys=True)
 
-doLow =False
+doLow = False
 lowCut = 0.0
 highCut = 1.0
 date = "20200106"

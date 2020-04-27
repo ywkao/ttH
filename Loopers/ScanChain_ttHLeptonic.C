@@ -667,6 +667,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                   vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_ttZ_v5", -log(1-tthMVA_RunII()), evt_weight, vId);
                   vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_bounded", -log(1-tthMVA_RunII())/5., evt_weight, vId);
                   vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_bounded_v2", -log(1-tthMVA_RunII())/5., evt_weight, vId);
+            
+                  if (diphoton.Pt() < 60.)
+                      vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_low_pT", -log(1-tthMVA_RunII()), evt_weight, vId);
+                  else if (diphoton.Pt() >= 60. && diphoton.Pt() < 120.)
+                      vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_med_pT", -log(1-tthMVA_RunII()), evt_weight, vId);
+                  else if (diphoton.Pt() >= 120.)
+                      vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_high_pT", -log(1-tthMVA_RunII()), evt_weight, vId); 
+
               }
               //vProcess[processId]->fill_histogram("h" + syst_ext + "LeptonicMVA", mva_value, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "Rapidity", dipho_rapidity(), evt_weight, vId);

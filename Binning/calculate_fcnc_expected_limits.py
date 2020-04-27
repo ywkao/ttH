@@ -41,7 +41,8 @@ for coupling in ["Hut", "Hct"]:
                     best_combination = results[combination].copy()
             job_dict[coupling + "_" + channel]["best_combination"] = best_combination
 
-assumed_br = 0.1441
+#assumed_br = 0.1441
+assumed_br = 1. # already factored in upstream in loopers (also have yields divided by 100)
 
 for coupling in ["Hut", "Hct"]:
     combined_card = "CMS-HGG_mva_13TeV_datacard_FCNC_" + coupling + "_" + args.tag + ".txt"
@@ -53,3 +54,6 @@ for coupling in ["Hut", "Hct"]:
     
     print "Limit for %s: BR < %.6f at 95 percent CL" % (coupling, float(limit)*assumed_br)
 
+
+with open("binning_scan_results_%s.json" % args.tag, "w") as f_out:
+    json.dump(job_dict, f_out, indent=4, sort_keys=True)

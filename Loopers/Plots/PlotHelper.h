@@ -49,7 +49,7 @@ class Comparison
     void plot(int idx, bool compare = true); 
 
     // Setters
-    void set_filename(string filename) { mFilename = filename; }
+    void set_filename(string filename) { mFilename = filename; TString f = filename; if (f.Contains("linear")) { mIndentCms = true; }}
     void set_x_bin_range(vector<int> xBinRange) { mCustomXRange = true; mXBinRange = xBinRange; }
     void set_y_bin_range(vector<int> yBinRange) { mCustomX2Range = true; mX2BinRange = yBinRange; }
     void set_y_lim_range(vector<double> yLimRange) { mCustomYRange = true; mYLimRange = yLimRange; }
@@ -224,6 +224,8 @@ class Comparison
     bool mSuppressXLabel;
     bool mSuppressTop;
     bool mPaperStyle;
+
+    bool mIndentCms;
 
     bool mSkipSignal;
     bool mSkipCP;
@@ -560,6 +562,8 @@ void Comparison::default_options(TCanvas* c1)
   mDrawMainLegend = true;
   mSkipSignal = false;
   mSkipCP = false;
+
+  mIndentCms = false;
 }
 
 inline
@@ -1231,8 +1235,15 @@ void Comparison::annotate_plot()
     cms  = new TLatex(0.12, 0.935, "CMS");
     cms->SetTextSize(0.075);
   }
+  else if (mIndentCms) {
+    cms = new TLatex(0.2, 0.935, "CMS #bf{#it{Preliminary}}");
+    cms->SetTextSize(0.05);
+  }
   else {
-    cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Supplementary}}");
+    //cms  = new TLatex(0.12, 0.935, "CMS");
+    //cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Supplementary}}");
+    //cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Preliminary}}");
+    cms = new TLatex(0.12, 0.935, "CMS");
     cms->SetTextSize(0.05);
   }
   cms->SetNDC();
@@ -1418,6 +1429,7 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
     mVHRat[0]->GetYaxis()->SetRangeUser(0.0,2.0);
   mVHRat[0]->GetYaxis()->SetLabelSize(0.08);
   mVHRat[0]->GetYaxis()->SetNdivisions(5);
+  mVHRat[0]->GetYaxis()->SetNdivisions(5);
 
   mVHRat[0]->GetYaxis()->SetTitle(mRatLabel);
   mVHRat[0]->GetYaxis()->SetTitleSize(0.08);
@@ -1493,9 +1505,11 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
     }
 
 
-    TLegend* legend = new TLegend(0.14, 0.37, 0.44, 0.49);
+    //TLegend* legend = new TLegend(0.14, 0.37, 0.44, 0.49);
+    TLegend* legend = new TLegend(0.14, 0.37, 0.64, 0.49);
     legend->AddEntry(hRat_StatUnc_up, "Stat. Unc.", "f");
     legend->AddEntry(hRat_TotalSyst_up, "Stat. + Syst. Unc.", "f");
+    legend->SetNColumns(2);
     legend->SetBorderSize(0);
     legend->Draw("SAME"); 
 

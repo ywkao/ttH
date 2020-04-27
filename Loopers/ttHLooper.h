@@ -163,6 +163,9 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA", 50, -1, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII", 50, 0, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf", 25, 0, 8);
+        v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_low_pT", 25, 0, 8);
+        v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_med_pT", 25, 0, 8);
+        v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_high_pT", 25, 0, 8);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_ttZ", 25, 0, 12);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_ttZ_v2", 18, 0, 10);
         v[i]->add_histogram("h" + syst_labels[j] + "tthMVA_RunII_transf_ttZ_v3", 12, 0, 10);
@@ -716,9 +719,23 @@ const double br_tToHq_assumed = 0.1441; // width(t->Hq|kappa_{Hqt}=1) / width^{S
 const double br_tToHc_limit = 0.0011; // from p34 of https://arxiv.org/pdf/1812.11568.pdf
 const double br_tToHu_limit = 0.0012; // ""
 
+double scale_fcnc_to_atlas_limit(TString currentFileTitle) {
+  if (currentFileTitle.Contains("eta_hut"))
+    return br_tToHu_limit / br_tToHq_assumed;
+  else if (currentFileTitle.Contains("eta_hct"))
+    return br_tToHc_limit / br_tToHq_assumed;
+  return 1.0;
+}
+
 double scale_fcnc(TString currentFileTitle) {
+  double weight = 1.;
   if (currentFileTitle.Contains("leptonic") && currentFileTitle.Contains("FCNC"))
-    return 1.0/1.527;
+    weight *= 1.0/1.527;
+  if (currentFileTitle.Contains("FCNC")) {
+    weight *= scale_fcnc_to_atlas_limit(currentFileTitle);
+    weight *= 0.01; // arbitrary scaling by 1/100 to get more accurate results from combine
+  }
+  return weight;
 
   /*
   if (currentFileTitle.Contains("eta_hut"))
@@ -726,15 +743,7 @@ double scale_fcnc(TString currentFileTitle) {
   else if (currentFileTitle.Contains("eta_hct"))
     return br_tToHc_limit / br_tToHq_assumed;
   */
-  return 1.0; 
-}
-
-double scale_fcnc_to_atlas_limit(TString currentFileTitle) {
-  if (currentFileTitle.Contains("eta_hut"))
-    return br_tToHu_limit / br_tToHq_assumed;
-  else if (currentFileTitle.Contains("eta_hct"))
-    return br_tToHc_limit / br_tToHq_assumed;
-  return 1.0;
+  //return 1.0; 
 }
 
 double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel, bool fcnc = false) {

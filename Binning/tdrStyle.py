@@ -1,4 +1,5 @@
 import sys, ROOT
+ROOT.gROOT.SetBatch(True)
 from ROOT import gStyle
 
 def setTDRStyle():
