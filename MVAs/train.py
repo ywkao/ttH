@@ -33,6 +33,8 @@ parser.add_argument("--optimization_vars", help = "csv list of additional variab
 parser.add_argument("--equal_weights", help = "set all class weights equal for multiclassification", action="store_true")
 args = parser.parse_args()
 
+print "args.input               : %s" % args.input
+
 config = {}
 config["args"] = args
 
