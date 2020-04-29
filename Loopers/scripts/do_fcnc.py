@@ -35,14 +35,14 @@ from subprocess import *
 os.chdir("../")
 do_looping = True
 if do_looping:
-  bash_command('echo Hello World! "(from do_fcnc.py)"; ' + 'pwd; ')
-  bash_command("make")
+    bash_command('echo Hello World! "(from do_fcnc.py)"; ' + 'pwd; ')
+    bash_command("make")
 
     # BabyMaker{{{
-    #parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hut_BDT"))
-    #parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hct_BDT"))
-    #parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hut_BDT"))
-    #parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hct_BDT"))
+    parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hut_BDT"))
+    parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hct_BDT"))
+    parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hut_BDT"))
+    parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hct_BDT"))
     #}}}
     # Loopers{{{
     #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hut_BDT"))
@@ -62,41 +62,81 @@ if do_looping:
 do_mvas = True
 if do_mvas:
   os.chdir("../MVAs/")
-  # MVA Prep{{{
+  # MVA Prep & Training - topTagger+chi2{{{
   command_list = []
-  command_list.append('python prep_chi2.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_chi2"' % (args.tag + "_hut_BDT"))
-  command_list.append('python prep_chi2.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hct --tag "_chi2"' % (args.tag + "_hct_BDT"))
-  command_list.append('python prep_chi2.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_chi2"' % (args.tag + "_impute_hut_BDT")) 
-  command_list.append('python prep_chi2.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_chi2"' % (args.tag + "_impute_hct_BDT"))
+  command_list.append('python prep_all.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_all"' % (args.tag + "_hut_BDT"))
+  command_list.append('python prep_all.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hct --tag "_all"' % (args.tag + "_hct_BDT"))
+  command_list.append('python prep_all.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_all"' % (args.tag + "_impute_hut_BDT")) 
+  command_list.append('python prep_all.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_all"' % (args.tag + "_impute_hct_BDT"))
   parallel_utils.submit_jobs(command_list, 4)
   print "after prep..."
-  #}}}
-  # MVA Training{{{
-  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_chi2.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hut_BDT", "_chi2" + "_hut"))
-  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_chi2.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hct_BDT", "_chi2" + "_hct"))
-  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_chi2.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hut_BDT", "_chi2" + "_impute_hut"))
-  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_chi2.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hct_BDT", "_chi2" + "_impute_hct")) 
+  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_all.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hut_BDT", "_all" + "_hut"))
+  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_all.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hct_BDT", "_all" + "_hct"))
+  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_all.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hut_BDT", "_all" + "_impute_hut"))
+  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_all.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hct_BDT", "_all" + "_impute_hct")) 
   print "after training..."
   #}}}
+#  # MVA Prep & Training - topTagger{{{
+#  command_list = []
+#  command_list.append('python prep_topTagger.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_topTagger"' % (args.tag + "_hut_BDT"))
+#  command_list.append('python prep_topTagger.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hct --tag "_topTagger"' % (args.tag + "_hct_BDT"))
+#  command_list.append('python prep_topTagger.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_topTagger"' % (args.tag + "_impute_hut_BDT")) 
+#  command_list.append('python prep_topTagger.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_topTagger"' % (args.tag + "_impute_hct_BDT"))
+#  parallel_utils.submit_jobs(command_list, 4)
+#  print "after prep..."
+#  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_topTagger.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hut_BDT", "_topTagger" + "_hut"))
+#  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_topTagger.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hct_BDT", "_topTagger" + "_hct"))
+#  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_topTagger.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hut_BDT", "_topTagger" + "_impute_hut"))
+#  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_topTagger.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hct_BDT", "_topTagger" + "_impute_hct")) 
+#  print "after training..."
+#  #}}}
+#  # MVA Prep & Training - chi2{{{
+#  command_list = []
+#  command_list.append('python prep_chi2.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_chi2"' % (args.tag + "_hut_BDT"))
+#  command_list.append('python prep_chi2.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hct --tag "_chi2"' % (args.tag + "_hct_BDT"))
+#  command_list.append('python prep_chi2.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_chi2"' % (args.tag + "_impute_hut_BDT")) 
+#  command_list.append('python prep_chi2.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_chi2"' % (args.tag + "_impute_hct_BDT"))
+#  parallel_utils.submit_jobs(command_list, 4)
+#  print "after prep..."
+#  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_chi2.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hut_BDT", "_chi2" + "_hut"))
+#  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_chi2.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hct_BDT", "_chi2" + "_hct"))
+#  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_chi2.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hut_BDT", "_chi2" + "_impute_hut"))
+#  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_chi2.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hct_BDT", "_chi2" + "_impute_hct")) 
+#  print "after training..."
+#  #}}}
+#  # MVA Prep & Training - none{{{
+#  command_list = []
+#  command_list.append('python prep_none.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_none"' % (args.tag + "_hut_BDT"))
+#  command_list.append('python prep_none.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hct --tag "_none"' % (args.tag + "_hct_BDT"))
+#  command_list.append('python prep_none.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_none"' % (args.tag + "_impute_hut_BDT")) 
+#  command_list.append('python prep_none.py --dont_train_with_dnn --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hct --tag "_none"' % (args.tag + "_impute_hct_BDT"))
+#  parallel_utils.submit_jobs(command_list, 4)
+#  print "after prep..."
+#  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_none.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hut_BDT", "_none" + "_hut"))
+#  parallel_utils.run('python train.py --input "ttHLeptonic_%s_FCNC_features_none.hdf5" --channel "Leptonic" --tag "%s" --ext ""' % (args.tag + "_hct_BDT", "_none" + "_hct"))
+#  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_none.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hut_BDT", "_none" + "_impute_hut"))
+#  parallel_utils.run('python train.py --input "ttHHadronic_%s_FCNC_features_none.hdf5" --channel "Hadronic" --tag "%s" --ext ""' % (args.tag + "_impute_hct_BDT", "_none" + "_impute_hct")) 
+#  print "after training..."
+#  #}}}
 
-  #dir = "depository_symbolicLink"
-  #bash_command("ls -ld " + dir)
-
-  #files = '%s/za_Leptonic___none_hut.npz, %s/za_Leptonic___topTagger_hut.npz, %s/za_Leptonic___chi2_hut.npz, %s/za_Leptonic___all_hut.npz' % (dir, dir, dir, dir)
+  ## make_za_comparison{{{
+  #files = 'za_Leptonic___none_hut.npz, za_Leptonic___topTagger_hut.npz, za_Leptonic___chi2_hut.npz, za_Leptonic___all_hut.npz'
   #labels = "No top taggers, ttH top tagger, quadratic equation, top tagger + quadratic equation"
   #parallel_utils.run('python make_za_comparisons.py --inputs "%s" --labels "%s" --tag "Leptonic_hut"' % (files, labels))
 
-  #files = '%s/za_Leptonic___none_hct.npz, %s/za_Leptonic___topTagger_hct.npz, %s/za_Leptonic___chi2_hct.npz, %s/za_Leptonic___all_hct.npz' % (dir, dir, dir, dir)
+  #files = 'za_Leptonic___none_hct.npz, za_Leptonic___topTagger_hct.npz, za_Leptonic___chi2_hct.npz, za_Leptonic___all_hct.npz'
   #labels = "No top taggers, ttH top tagger, quadratic equation, top tagger + quadratic equation"
   #parallel_utils.run('python make_za_comparisons.py --inputs "%s" --labels "%s" --tag "Leptonic_hct"' % (files, labels))
 
-  #files = '%s/za_Hadronic___none_impute_hut.npz, %s/za_Hadronic___topTagger_impute_hut.npz, %s/za_Hadronic___chi2_impute_hut.npz, %s/za_Hadronic___all_impute_hut.npz' % (dir, dir, dir, dir)
+  #files = 'za_Hadronic___none_impute_hut.npz, za_Hadronic___topTagger_impute_hut.npz, za_Hadronic___chi2_impute_hut.npz, za_Hadronic___all_impute_hut.npz'
   #labels = "No top taggers, ttH top tagger, chi-2 methods, top tagger + chi-2 methods"
   #parallel_utils.run('python make_za_comparisons.py --inputs "%s" --labels "%s" --tag "Hadronic_hut"' % (files, labels))
 
-  #files = '%s/za_Hadronic___none_impute_hct.npz, %s/za_Hadronic___topTagger_impute_hct.npz, %s/za_Hadronic___chi2_impute_hct.npz, %s/za_Hadronic___all_impute_hct.npz' % (dir, dir, dir, dir)
+  #files = 'za_Hadronic___none_impute_hct.npz, za_Hadronic___topTagger_impute_hct.npz, za_Hadronic___chi2_impute_hct.npz, za_Hadronic___all_impute_hct.npz'
   #labels = "No top taggers, ttH top tagger, chi-2 methods, top tagger + chi-2 methods"
   #parallel_utils.run('python make_za_comparisons.py --inputs "%s" --labels "%s" --tag "Hadronic_hct"' % (files, labels)) 
+  #}}}
+
 
 # Legacy code{{{
   # Loopers{{{
