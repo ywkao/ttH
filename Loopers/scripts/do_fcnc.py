@@ -1,17 +1,17 @@
+# vim: set fdm=marker:
+# imports, parser{{{
 import sys, os
 sys.path.append("../")
-
 import itertools
-
 import parallel_utils
 import workflow_utils
-
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--tag", help = "tag to denote with", type=str)
 parser.add_argument("--baby_version", help = "which version of babies to use", type=str)
 args = parser.parse_args()
-
+#}}}
+# bdt.xml files{{{
 #bdt_lep = "../MVAs/Leptonic_4June2019_v1.7_FCNC_bdt.xml"
 #bdt_had = "../MVAs/Hadronic_12June2019_v1.7_impute_FCNC_bdt.xml"
 
@@ -24,11 +24,18 @@ bdt_lep_hut = "../MVAs/Leptonic_v4.11_14Jan2020_hut__bdt.xml"
 bdt_lep_hct = "../MVAs/Leptonic_v4.11_14Jan2020_hct__bdt.xml"
 bdt_had_hut = "../MVAs/Hadronic_v4.11_14Jan2020_impute_hut__bdt.xml"
 bdt_had_hct = "../MVAs/Hadronic_v4.11_14Jan2020_impute_hct__bdt.xml"
+#}}}
+#def bash_command(command):{{{
+def bash_command(command):
+    p = Popen('%s' % (command), shell=True)
+    result = os.waitpid(p.pid, 0)
+#}}}
 
+from subprocess import *
 os.chdir("../")
-
 do_looping = True
 if do_looping:
+<<<<<<< HEAD
   # Loopers
   #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none"  --bdt "%s"' % (args.baby_version, args.tag + "_hut_BDT", bdt_lep_hut))
   #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute"  --bdt "%s"' % (args.baby_version, args.tag + "_impute_hut_BDT", bdt_had_hut))
@@ -54,6 +61,31 @@ if do_looping:
   # MVA BabyMaker
   #parallel_utils.run('python looper_wrapper.py --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --babymaker --fcnc' % (args.baby_version, args.tag))
   #parallel_utils.run('python looper_wrapper.py --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --babymaker --fcnc' % (args.baby_version, args.tag + "_impute"))
+=======
+    bash_command('echo Hello World! "(from do_fcnc.py)"; ' + 'pwd; ')
+    bash_command("make")
+
+    # BabyMaker{{{
+    parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hut_BDT"))
+    parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hct_BDT"))
+    parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hut_BDT"))
+    parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hct_BDT"))
+    #}}}
+    # Loopers{{{
+    #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hut_BDT"))
+    #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hut_BDT"))
+    #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2017"' % (args.baby_version, args.tag + "_hct_BDT"))
+    #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hct_BDT"))
+    #}}}
+    # Data/MC Plots{{{
+    #os.chdir("Plots")
+    #parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Leptonic|Loose MVA Presel." --signals "TT_FCNC_hut|ST_FCNC_hut" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG"' % ("ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_hut_BDT_FCNC")))
+    #parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Leptonic|Loose MVA Presel." --signals "TT_FCNC_hct|ST_FCNC_hct" --backgrounds "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG"' % ("ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_hct_BDT_FCNC")))
+    #parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Hadronic|Loose MVA Presel." --signals "TT_FCNC_hut|ST_FCNC_hut" --backgrounds "DiPhoton|QCD_GammaJets_imputed|TTGG|TTGJets|TTJets|VG"' % ("ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_impute_hut_BDT_FCNC")))
+    #parallel_utils.run('python plot_wrapper.py --input_file "../%s" --plot_type "std_2017" --plot_labels "FCNC Hadronic|Loose MVA Presel." --signals "TT_FCNC_hct|ST_FCNC_hct" --backgrounds "DiPhoton|QCD_GammaJets_imputed|TTGG|TTGJets|TTJets|VG"' % ("ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_impute_hct_BDT_FCNC")))
+    #os.chdir("../")
+    #}}}
+>>>>>>> dd68e36d52dc32a9ea20698a1283183443a6d3e7
 
 
 do_mvas = False
@@ -96,7 +128,7 @@ if do_dnns:
 do_full_mvas = False
 if do_full_mvas:
   os.chdir("../MVAs/")
-  # MVA Prep
+  # MVA Prep & Training - topTagger+chi2{{{
   command_list = []
   command_list.append('python prep.py --input "../Loopers/MVABaby_ttHLeptonic_%s_FCNC.root" --channel "Leptonic" --fcnc_hut --tag "_hut"' % (args.tag))
   command_list.append('python prep.py --input "../Loopers/MVABaby_ttHHadronic_%s_FCNC.root" --channel "Hadronic" --fcnc_hut --tag "_hut"' % (args.tag + "_impute")) 

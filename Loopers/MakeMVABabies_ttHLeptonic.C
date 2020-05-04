@@ -2,7 +2,7 @@
 #include "ScanChain_ttHLeptonic.h"
 
 void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool fcnc = false, bool blind = false, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-
+  // Init{{{
     // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
@@ -33,7 +33,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   unique_ptr<TMVA::Reader> tth_dipho_mva;
   unique_ptr<TMVA::Reader> tth_std_mva;
 
-  bool do_tth_ttPP_mva = true;
+  bool do_tth_ttPP_mva = false;
   if (do_tth_ttPP_mva) {
     tth_ttPP_mva.reset(new TMVA::Reader( "!Color:Silent" ));
 
@@ -93,13 +93,13 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     tth_ttPP_mva->AddVariable("muon1_mini_iso_", &muon1_mini_iso_);
     tth_ttPP_mva->AddVariable("muon2_mini_iso_", &muon2_mini_iso_);
 
-    tth_ttPP_mva->BookMVA("BDT", "../MVAs/Leptonic_5Apr2019_ttPP__bdt.xml");
+    tth_ttPP_mva->BookMVA("BDT", "../MVAs/Leptonic_5Apr2019_ttPP__bdt.xml");// Not Found!!
   }
-
+  //}}}
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
-
+    // file content, type of sample, year, json{{{
     // Get File Content
     TString currentFileTitle = currentFile->GetTitle();
     cout << currentFileTitle << endl;
@@ -177,14 +177,14 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
     // Set json file
     set_json(mYear);
-
+    //}}}
     // Loop over Events in current file
+    // btag norm factor{{{
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
     double btag_norm_correction = 1.;
 
-    /*
     if (!isData && btag_norm_correction == 1.) {
         double integral_no_btag = 0.;
         double integral_w_btag =  0.;
@@ -197,22 +197,21 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
             if (!passes_btag_rescale_selection())       continue;
 
-            double weight_no_btag = weight() / weight_JetBTagWeight();
+            //double weight_no_btag = weight() / weight_JetBTagWeight();
 
-            if (!(isnan(weight_no_btag) || isinf(weight_no_btag))) {
-                integral_no_btag += weight_no_btag;
-                integral_w_btag += weight();
-            }
+            //if (!(isnan(weight_no_btag) || isinf(weight_no_btag))) {
+            //    integral_no_btag += weight_no_btag;
+            //    integral_w_btag += weight();
+            //}
         }
         btag_norm_correction = integral_no_btag / integral_w_btag;
         cout << "btag_normalization_factor: " << btag_norm_correction << endl;
     }
-    */
 
     nEventsTotal = 0;
-
-
+    //}}}
     for (unsigned int event = 0; event < nEventsTree; ++event) {
+      // event content, progress, blind region, type of sample, scale weight{{{
       // Get Event Content
       if (nEventsTotal >= nEventsChain) continue;
       if (fast) tree->LoadTree(event);
@@ -286,9 +285,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
       if (!passes_selection(tag, minIDMVA_, maxIDMVA_, n_lep_medium_, n_lep_tight_)) continue;
-
-
-      // Make p4 for physics objects
+      //}}}
+      // Make p4 for physics objects{{{
       vector<TLorentzVector> jets;
       vector<double> btag_scores;
       vector<std::pair<int, double>> btag_scores_sorted;
@@ -310,9 +308,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 	objects.push_back(jets[i]);
       for (int i = 0; i < leps.size(); i++)
         objects.push_back(leps[i]);
-
-
-      // Fill histograms //
+      //}}}
+      // Fill histograms{{{
       if (!no_weights && !isData) {
 	if (year == "2016")
           evt_weight_ *= scale1fb_2016(currentFileTitle) * lumi_2016 * weight();
@@ -357,9 +354,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         else
           data_sideband_label_ = 0;
       }
-
-
+      //}}}
+      
       // Variable definitions
+      // basic, lepton{{{
       tth_runII_mva_ = tthMVA_RunII();
 
       year_ = mYear == "2016" ? 2016 : (mYear == "2017" ? 2017 : (mYear == "2018" ? 2018 : -1));
@@ -408,7 +406,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       ht_ = get_ht(jets);
       njets_ = n_jets();
       nbjets_ = nb_medium();
-
+      //}}}
+      // jets{{{
       jet1_pt_   = njets_ >= 1 ? jets[0].Pt()   : -999;
       jet1_eta_  = njets_ >= 1 ? jets[0].Eta()  : -999; 
       jet1_btag_ = njets_ >= 1 ? btag_scores[0] : -999;
@@ -440,7 +439,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       jet5_energy_  = njets_ >= 5 ? jets[4].E()   : -999;
       jet6_phi_     = njets_ >= 6 ? jets[5].Phi() : -999;
       jet6_energy_  = njets_ >= 6 ? jets[5].E()   : -999; 
-
+      //}}}
+      // photon{{{
       lead_pT_ = leadPt();
       sublead_pT_ = subleadPt();
       leadptoM_ = lead_ptoM();
@@ -471,7 +471,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       lead_sigmaEtoE_ = lead_sigmaEoE();
       sublead_sigmaEtoE_ = sublead_sigmaEoE(); 
-
+      //}}}
+      // mva score, forward jet{{{
       if (do_tth_ttPP_mva)
         tth_ttPP_mva_ = convert_tmva_to_prob(tth_ttPP_mva->EvaluateMVA( "BDT" ));
 
@@ -486,15 +487,56 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       vector<float> forward_jet = calculate_forward_jets(jets_, max1_btag_);
       forward_jet_pt_ = forward_jet[0];
       forward_jet_eta_ = forward_jet[1]; 
+      //}}}
+
+      //#quadratic equation related
+      vector<int> indices_bjet = get_bjet_indices(jets, btag_scores);
+      bool is_moreThanTwoJets_and_atLeastOneBjet = jets.size() > 2 && indices_bjet.size() > 0;
+      bool is_moreThanOneJets_and_atLeastOneBjet = jets.size() > 1 && indices_bjet.size() > 0;
+      // init reco leading lepton and MET{{{
+      TLorentzVector lepton = leps[0]; // leading lepton
+      float met_pt    = met_;
+      float met_px    = met_ * TMath::Cos(met_phi_);
+      float met_py    = met_ * TMath::Sin(met_phi_);
+      vector<double> met_info = { met_pt, met_px, met_py };
+      //double neutrino_pz = evaluate_neutrino_pz(lepton, met_info); // quadratic method
+      //}}}
+      // 4-vectors{{{
+      double neutrino_pz           = evaluate_neutrino_pz(lepton, met_info);
+      TLorentzVector reco_neutrino = derive_reco_neutrino(lepton, met_info); // quadratic method
+      TLorentzVector reco_wboson   = derive_reco_wboson(lepton, reco_neutrino);
+
+      TLorentzVector _nothing_;
+      int index_bjet_method_2      = std::max_element(btag_scores.begin(), btag_scores.end()) - btag_scores.begin();
+      TLorentzVector bjet          = is_moreThanOneJets_and_atLeastOneBjet ? jets[index_bjet_method_2]          : _nothing_;
+      TLorentzVector reco_tbw      = is_moreThanOneJets_and_atLeastOneBjet ? derive_reco_tbw(reco_wboson, bjet) : _nothing_;
+
+      int index_q                  = get_q_index_min_chi2(jets, index_bjet_method_2, diphoton);
+      TLorentzVector chi2_qjet     = is_moreThanTwoJets_and_atLeastOneBjet ? jets[index_q]                      : _nothing_;
+      TLorentzVector chi2_tqh      = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet + diphoton               : _nothing_;
+      //}}}
+      chi2_neutrino_pz_       = neutrino_pz;
+      chi2_tbw_mass_          = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.M()                            : -999.;
+      chi2_tbw_pt_            = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.Pt()                           : -999.;
+      chi2_tbw_eta_           = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.Eta()                          : -999.;
+      chi2_tbw_deltaR_dipho_  = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.DeltaR(diphoton)               : -999.;
+      chi2_qjet_pt_           = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.Pt()                          : -999.;
+      chi2_qjet_eta_          = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.Eta()                         : -999.;
+      chi2_qjet_btag_         = is_moreThanTwoJets_and_atLeastOneBjet ? btag_scores[index_q]                    : -999.;
+      chi2_qjet_deltaR_dipho_ = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.DeltaR(diphoton)              : -999.;
+      chi2_tqh_ptOverM_       = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.Pt()/chi2_tqh.M()              : -999.;
+      chi2_tqh_eta_           = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.Eta()                          : -999.;
+      chi2_tqh_deltaR_tbw_    = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(reco_tbw)               : -999.;
+      chi2_tqh_deltaR_dipho_  = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(diphoton)               : -999.;
 
       FillBabyNtuple();
-
-    }
-  
-    // Clean Up
+    }// end of event loop
+    // Clean Up{{{
     delete tree;
     file.Close();
-  }
+    //}}}
+  }// end of while loop
+  // debugging message, close, return{{{
   if (nEventsChain != nEventsTotal) {
     cout << Form( "ERROR: number of events from files (%d) is not equal to total number of events (%d)", nEventsChain, nEventsTotal ) << endl;
   }
@@ -511,4 +553,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   cout << endl;
   delete bmark;
   return;
+  //}}}
+printf("[message] MakeMVABabies_ttHLeptonic.C:: Hello Worlds\n");
 }
