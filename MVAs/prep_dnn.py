@@ -92,6 +92,7 @@ else:
 
   selection += ")"
 
+#selection_train = selection + " && ( process_id_ != 24 && process_id_ != 25 )"
 selection_train = selection
 #if "ttGG" in procs:
 #    selection_train += " && abs(evt_weight_) < 0.01" 
@@ -101,16 +102,16 @@ print("Training selection:", selection_train)
 print("Validation selection:", selection)
 
 if args.fcnc:
-    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection_train))
-    features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection))
+    features = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && signal_mass_label_ != 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, ">" if args.invert else "<", train_frac, selection_train))
+    features_validation = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && signal_mass_label_ != 0) || (label_ == 1)) && %s %s %.6f %s' % (rand_branch, "<" if args.invert else ">", train_frac, selection))
     features_final_fit = root_numpy.tree2array(tree, branches = branches, selection = '((label_ == 0 && signal_mass_label_ == 0 && rand_ < 0.01))') # dummy selection
 
-    for i in range(len(features["process_id_"])):
-        if features["process_id_"][i] == 0: # scale ttH by 1/7 bc we use 7 mass points in training
-            features["evt_weight_"][i] *= 1.0/7.0 
-        if args.ggH_treatment == "scale":
-            if features["process_id_"][i] == 14: # scale ggH by 50 to see if it helps
-                features["evt_weight_"][i] *= 1.0/50.0
+    #for i in range(len(features["process_id_"])):
+    #    if features["process_id_"][i] == 0: # scale ttH by 1/7 bc we use 7 mass points in training
+    #        features["evt_weight_"][i] *= 1.0/7.0 
+    #    if args.ggH_treatment == "scale":
+    #        if features["process_id_"][i] == 14: # scale ggH by 50 to see if it helps
+    #            features["evt_weight_"][i] *= 1.0/50.0
         #if args.ggH_treatment == "oversample":
         #    oversample_factor = 50.
         #    oversample_array = numpy.empty()

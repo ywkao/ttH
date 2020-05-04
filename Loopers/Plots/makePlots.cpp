@@ -550,16 +550,42 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       //    c->set_stack_order({6,1,4,5,0,3,2});
     }
 
+    // Hadronic
+    // Boundaries = cms.vdouble(0.986025, 0.9948537, 0.9983046, 0.9990729),
+    //                                   Boundaries_pt1 = cms.vdouble(0.97087705, 0.9878033, 0.9900327, 0.99430627),
+    //                                   Boundaries_pt2 = cms.vdouble(0.97961617, 0.9922437, 0.99585503, 0.9980591),
+    //                                   Boundaries_pt3 = cms.vdouble(0.9776608, 0.9908235, 0.9947924, 0.9986299),
+    //                                   Boundaries_pt4 = cms.vdouble(0.99397224, 0.99614656, 0.9980287, 0.9989561),
+
+    // Leptonic
+    // MVAThreshold = cms.vdouble(0.8997816, 0.95635754, 0.9725133, 0.9870608),
+    //                                   MVAThreshold_pt1 = cms.vdouble(0.8972818, 0.9608462, 0.9770001, 0.9826471),
+    //                                   MVAThreshold_pt2 = cms.vdouble(0.872559, 0.94131196),
+    //                                   MVAThreshold_pt3 = cms.vdouble(0.8220656, 0.94593006),
+    //                                   MVAThreshold_pt4 = cms.vdouble(0.8541606, 0.94937336),
+
     if (hist_name.Contains("htthMVA_RunII_transf") && !output.Contains("ttZ")) {
         vector<double> vlines;
         vector<double> cp_lines;
         if (output.Contains("Leptonic")) {
             vlines = { 0.8997816, 0.95635754, 0.9725133, 0.9870608 }; 
+            if (hist_name.Contains("low_pT"))
+                vlines = { 0.8972818, 0.9608462, 0.9770001, 0.9826471 };
+            else if (hist_name.Contains("med_pT"))
+                vlines = { 0.872559, 0.94131196 };
+            else if (hist_name.Contains("high_pT"))
+                vlines = { 0.8220656, 0.94593006 }; 
             cp_lines = { 0.9597816 };
             c->set_y_lim_range({0.333, 2*pow(10,5)});
         }
         else if (output.Contains("Hadronic")) {
             vlines = { 0.986025, 0.9948537, 0.9983046, 0.9990729 }; 
+            if (hist_name.Contains("low_pT"))
+                vlines = { 0.97087705, 0.9878033, 0.9900327, 0.99430627 }; 
+            else if (hist_name.Contains("med_pT"))
+                vlines = { 0.97961617, 0.9922437, 0.99585503, 0.9980591 }; 
+            else if (hist_name.Contains("high_pT"))
+                vlines = { 0.9776608, 0.9908235, 0.9947924, 0.9986299 }; 
             c->set_y_lim_range({0.5, pow(10,6)});
             cp_lines = { 0.99722563 };
         }
@@ -572,6 +598,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         c->give_vlines_dotted(cp_lines);
         c->give_vshade({0.,vlines[0]});
         c->add_paper_info(output.Contains("Hadronic") ? "Had" : "Lep");
+        if (hist_name.Contains("pT"))
+            c->skipCatLabels();
         c->skip_cp(); // uncomment to remove cp lines
     }
 
@@ -588,6 +616,27 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         }
         c->give_vshade({0.,vlines[0]});
         c->skip_signal();
+    }
+
+    else if (hist_name.Contains("MVA_transf")) {
+        vector<double> vlines;
+        if (output.Contains("Leptonic") && output.Contains("hut")) {
+            vlines = { 0.7507613, 0.9130082 };
+        }
+        else if (output.Contains("Leptonic") && output.Contains("hct")) {
+            vlines = { 0.6333326, 0.88421005 };
+        }
+        else if (output.Contains("Hadronic") && output.Contains("hut")) {
+            vlines = { 0.9152012, 0.96306175 };
+        }
+        else if (output.Contains("Hadronic") && output.Contains("hct")) {
+            vlines = { 0.95399004, 0.983957 };
+        }
+        for (unsigned int i = 0; i < vlines.size(); i++) {
+            vlines[i] = -log(1-vlines[i]);
+        }
+        c->give_vlines(vlines);
+        c->give_vshade({0.,vlines[0]});
     }
 
     if (hist_name.Contains("htthMVA_RunII_transf_ttZ") && output.Contains("Leptonic")) {

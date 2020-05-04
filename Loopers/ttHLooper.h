@@ -732,7 +732,7 @@ double scale_fcnc(TString currentFileTitle) {
   if (currentFileTitle.Contains("leptonic") && currentFileTitle.Contains("FCNC"))
     weight *= 1.0/1.527;
   if (currentFileTitle.Contains("FCNC")) {
-    weight *= scale_fcnc_to_atlas_limit(currentFileTitle);
+    //weight *= scale_fcnc_to_atlas_limit(currentFileTitle);
     weight *= 0.01; // arbitrary scaling by 1/100 to get more accurate results from combine
   }
   return weight;

@@ -26,6 +26,11 @@ tth_mva = validation_events["tth_runII_mva"]
 auc_bdt, unc_bdt, fpr_bdt, tpr_bdt, thresh_bdt = utils.auc_and_unc(y_test, pred_bdt, weights_test, 25)
 auc_dnn, unc_dnn, fpr_dnn, tpr_dnn, thresh_dnn = utils.auc_and_unc(y_test, pred_dnn, weights_test, 25)
 
+sig_eff, idx = utils.find_nearest(tpr_dnn, 0.75)
+print "At ttH eff of", sig_eff
+print "Have tH eff of ", fpr_dnn[idx]
+print "Cutting at score of", thresh_dnn[idx]
+
 print(auc_bdt)
 print(auc_dnn)
 

@@ -104,9 +104,11 @@ branches = list(set(branches))
 
 if args.FCNC_vs_SMHiggs:
     if args.channel == "Leptonic":
-        fcnc_sm_higgs_bkg_selection = " && (process_id_ == 0 || process_id_ == 11 || process_id_ == 12)"
+        fcnc_sm_higgs_bkg_selection_train = " && (process_id_ == 0) && (signal_mass_label_ != 0)"
+        fcnc_sm_higgs_bkg_selection_validation = " && (process_id_ == 0) && (signal_mass_label_ != 0)"
     elif args.channel == "Hadronic":
-        fcnc_sm_higgs_bkg_selection = " && (process_id_ == 0 || process_id_ == 11 || process_id_ == 14)"
+        fcnc_sm_higgs_bkg_selection_train = " && (process_id_ == 0) && (signal_mass_label_ != 0)"
+        fcnc_sm_higgs_bkg_selection_validation = " && (process_id_ == 0) && (signal_mass_label_ != 0)"
 else:
     fcnc_sm_higgs_bkg_selection =  ""
 
@@ -116,14 +118,14 @@ else:
     non_resonant_train_selection = ""
 
 if args.fcnc_hut:
-    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, non_resonant_train_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-    selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection_train, non_resonant_train_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_validation = '((label_ == 0%s%s%s) || (label_ == 1 && (process_id_ == 22 || process_id_ == 24))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection_validation, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
     selection_final_fit      = '((process_id_ == 2 && rand_ < 0.01))' # dummy selection
 
 elif args.fcnc_hct:
-    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, non_resonant_train_selection, "&& process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
-    selection_validation = '((label_ == 0%s%s%s && !(process_id_ == 0 && signal_mass_label_ != 0)) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_train      = '((label_ == 0%s%s%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection_train, non_resonant_train_selection, "&& process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, ">" if args.invert else "<", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
+    selection_validation = '((label_ == 0%s%s%s) || (label_ == 1 && (process_id_ == 23 || process_id_ == 25))) && %s %s %.6f %s' % (fcnc_sm_higgs_bkg_selection_validation, " && process_id_ == 2" if args.dipho_only else "", " && (process_id_ == 5 && abs(evt_weight_) < 0.01)" if args.ttGG_only else "", rand_branch, "<" if args.invert else ">", train_frac, "&& data_sideband_label_ == 0" if args.sideband else "")
 
     selection_final_fit      = '((process_id_ == 2 && rand_ < 0.01))' # dummy selection
 

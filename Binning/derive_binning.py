@@ -60,7 +60,7 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
             if "FCNC" not in args.signal.split(",")[0]: # this is ttH, we use M127 for optimization
                 signal_sample_selection = " && signal_mass_category == 127"
             else: # this is FCNC, use M125
-                signal_sample_selection = " && ((process_id >= 22 && process_id <= 25) || (signal_mass_label == 0 && signal_mass_category == 125))" # accept all FCNC events, only M125 Madgraph (not Powheg) for all other SM Higgs
+                signal_sample_selection = " && ((process_id >= 22 && process_id <= 25) || (signal_mass_label == 0 && signal_mass_category == 125))" # accept all FCNC events, only M125 Madgraph (not Powheg) for all other SM Higgs # FIXME
             sigModelConfig["selection"] += signal_sample_selection
             print "\n[BINNING_SCRIPT_INFO] Making signal model with selection %s" % sigModelConfig["selection"]
             print "\n[BINNING_SCRIPT_INFO] Saving as %s" % "CMS-HGG_sigfit_mva_" + signal + "_hgg_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)

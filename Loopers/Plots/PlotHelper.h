@@ -93,6 +93,7 @@ class Comparison
     void suppress_top() { mSuppressTop = true; }
     void skip_signal() { mSkipSignal = true; }
     void skip_cp() { mSkipCP = true; }
+    void skipCatLabels() { mSkipCatLabels = true; }
 
   private:
     void default_options(TCanvas* c1);
@@ -229,6 +230,8 @@ class Comparison
 
     bool mSkipSignal;
     bool mSkipCP;
+
+    bool mSkipCatLabels;
 };
 
 
@@ -564,6 +567,8 @@ void Comparison::default_options(TCanvas* c1)
   mSkipCP = false;
 
   mIndentCms = false;
+
+  mSkipCatLabels = false;
 }
 
 inline
@@ -1242,8 +1247,8 @@ void Comparison::annotate_plot()
   else {
     //cms  = new TLatex(0.12, 0.935, "CMS");
     //cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Supplementary}}");
-    //cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Preliminary}}");
-    cms = new TLatex(0.12, 0.935, "CMS");
+    cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Preliminary}}");
+    //cms = new TLatex(0.12, 0.935, "CMS");
     cms->SetTextSize(0.05);
   }
   cms->SetNDC();
@@ -1346,7 +1351,8 @@ void Comparison::annotate_plot()
       vPaperInfo[i]->SetTextSize(fs*1.0);
       vPaperInfo[i]->SetNDC(kTRUE);
       vPaperInfo[i]->SetTextAngle(90);
-      vPaperInfo[i]->Draw("SAME");
+      if (!mSkipCatLabels)
+        vPaperInfo[i]->Draw("SAME");
     }
 
     if (mPaperInfo && !mSkipCP) {

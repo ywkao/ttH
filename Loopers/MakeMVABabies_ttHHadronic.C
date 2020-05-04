@@ -693,7 +693,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       top_candidates_11_ = top_candidates_[10] > 0 ? log(top_candidates_[10]) : -9;
       top_candidates_12_ = top_candidates_[11] > 0 ? log(top_candidates_[11]) : -9;
 
-      const float oversample_ggh = 81.;
+      const float oversample_ggh = 1.;
       const float oversample_tth = 1.;
       float oversample;
       if (fcnc) {
