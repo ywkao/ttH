@@ -52,7 +52,7 @@ def train_bdt(config, invert=False):
   lumi = utils.load_array(f, 'lumi')
   process_id = utils.load_array(f, 'process_id')
   year = utils.load_array(f, 'year')
-  objects = utils.load_array(f, 'objects')
+  #objects = utils.load_array(f, 'objects')
   tth_runII_mva = utils.load_array(f, 'tth_runII_mva')
 
   if args.sideband:
@@ -79,7 +79,7 @@ def train_bdt(config, invert=False):
   lumi_validation = utils.load_array(f, 'lumi_validation')
   process_id_validation = utils.load_array(f, 'process_id_validation')
   year_validation = utils.load_array(f, 'year_validation')
-  objects_validation = utils.load_array(f, 'objects_validation')
+  #objects_validation = utils.load_array(f, 'objects_validation')
   tth_runII_mva_validation = utils.load_array(f, 'tth_runII_mva_validation')
 
   global_features_data = utils.load_array(f, 'global_data')
@@ -97,7 +97,7 @@ def train_bdt(config, invert=False):
   lumi_data = utils.load_array(f, 'lumi_data')
   process_id_data = utils.load_array(f, 'process_id_data')
   year_data = utils.load_array(f, 'year_data')
-  objects_data = utils.load_array(f, 'objects_data')
+  #objects_data = utils.load_array(f, 'objects_data')
   tth_runII_mva_data = utils.load_array(f, 'tth_runII_mva_data')
 
   global_features_final_fit = utils.load_array(f, 'global_final_fit')
@@ -115,7 +115,7 @@ def train_bdt(config, invert=False):
   lumi_final_fit = utils.load_array(f, 'lumi_final_fit')
   process_id_final_fit = utils.load_array(f, 'process_id_final_fit')
   year_final_fit = utils.load_array(f, 'year_final_fit')
-  objects_final_fit = utils.load_array(f, 'objects_final_fit')
+  #objects_final_fit = utils.load_array(f, 'objects_final_fit')
   tth_runII_mva_final_fit = utils.load_array(f, 'tth_runII_mva_final_fit')
 
   print global_dnn_features.shape, global_dnn_features_validation.shape, global_dnn_features_data.shape, global_dnn_features_final_fit.shape
@@ -466,7 +466,7 @@ def train_bdt(config, invert=False):
   plt.legend(loc='lower right')
   plt.savefig('roc' + args.channel + '.pdf', bbox_inches='tight')
 
-  estimate_za = False
+  estimate_za = True 
   use_tth_runII_mva = False
   use_tth_2017_mva = False
   if estimate_za:

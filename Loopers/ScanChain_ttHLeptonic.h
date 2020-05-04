@@ -291,6 +291,114 @@ double get_lep_pt(double &lep_eta) {
   }
 }
 
+//#quadratic equation related
+//--------------------------------------------------//
+const double w_boson_mass = 80.379;
+const double top_quark_mass = 173.;
+//get_bjet_indices{{{
+double pfDeepCSVJetTags_loose  = 0.1522;
+vector<int> get_bjet_indices(vector<TLorentzVector> Jets, vector<double> btag_scores)
+{
+    vector<int> indices;
+    for(size_t i=0; i!=Jets.size(); ++i)
+    {
+        double btag_score = btag_scores[i];
+        if(btag_score >= pfDeepCSVJetTags_loose) indices.push_back(i);
+    }
+    return indices;
+}
+//}}}
+//double evaluate_neutrino_pz(TLorentzVector lepton, vector<double> met_info){{{
+double evaluate_neutrino_pz(TLorentzVector lepton, vector<double> met_info)
+{
+    float met_pt = met_info[0];
+    float met_px = met_info[1];
+    float met_py = met_info[2];
+
+    float lepton_px = lepton.Px();
+    float lepton_py = lepton.Py();
+    float lepton_pz = lepton.Pz();
+    float lepton_energy = lepton.E();
+    float coefficient_factor = ( w_boson_mass*w_boson_mass + 2*lepton_px*met_px + 2*lepton_py*met_py ) / (2.*lepton_energy);
+    float coefficient_A = 1. - (lepton_pz*lepton_pz)/(lepton_energy*lepton_energy);
+    float coefficient_B = 2.*coefficient_factor*lepton_pz/lepton_energy;
+    float coefficient_C = met_pt*met_pt - coefficient_factor*coefficient_factor;
+    float coefficient_D = coefficient_B*coefficient_B - 4.*coefficient_A*coefficient_C;
+    
+    float met_pz_solution_1 = 0.0;
+    float met_pz_solution_2 = 0.0;
+
+    if(coefficient_D < 0){
+        met_pz_solution_1 = coefficient_B / (2.*coefficient_A);
+        met_pz_solution_2 = coefficient_B / (2.*coefficient_A);
+    } else{
+        met_pz_solution_1 = (coefficient_B + TMath::Sqrt(coefficient_D))/(2.*coefficient_A);
+        met_pz_solution_2 = (coefficient_B - TMath::Sqrt(coefficient_D))/(2.*coefficient_A);
+    }
+    //ordering
+    float larger_pz  = (abs(met_pz_solution_1) > abs(met_pz_solution_2) ) ? met_pz_solution_1 : met_pz_solution_2;
+    float smaller_pz = (abs(met_pz_solution_1) < abs(met_pz_solution_2) ) ? met_pz_solution_1 : met_pz_solution_2;
+    met_pz_solution_1 = larger_pz;
+    met_pz_solution_2 = smaller_pz;
+
+    return met_pz_solution_2;
+}
+//}}}
+//TLorentzVector derive_reco_neutrino(TLorentzVector lepton, vector<double> met_info){{{
+TLorentzVector derive_reco_neutrino(TLorentzVector lepton, vector<double> met_info)
+{
+    double neutrino_pz = evaluate_neutrino_pz(lepton, met_info);
+    double met_pt = met_info[0];
+    double met_px = met_info[1];
+    double met_py = met_info[2];
+    double neutrino_energy = TMath::Sqrt(met_pt*met_pt + neutrino_pz*neutrino_pz);
+
+    TLorentzVector reco_neutrino;
+    reco_neutrino.SetPxPyPzE( met_px, met_py, neutrino_pz, neutrino_energy );
+    return reco_neutrino;
+}
+//}}}
+//TLorentzVector derive_reco_wboson(TLorentzVector lepton, TLorentzVector reco_neutrino){{{
+TLorentzVector derive_reco_wboson(TLorentzVector lepton, TLorentzVector reco_neutrino)
+{
+    TLorentzVector reco_wboson = reco_neutrino + lepton;
+    return reco_wboson;
+}
+//}}}
+//TLorentzVector derive_reco_tbw(TLorentzVector reco_wboson, TLorentzVector bjet){{{
+TLorentzVector derive_reco_tbw(TLorentzVector reco_wboson, TLorentzVector bjet)
+{
+    TLorentzVector reco_tbw = reco_wboson + bjet;
+    return reco_tbw;
+}
+//}}}
+//int get_q_index_min_chi2(std::vector<TLorentzVector> Jets, int index_bjet, TLorentzVector diphoton){{{
+int get_q_index_min_chi2(std::vector<TLorentzVector> Jets, int index_bjet, TLorentzVector diphoton)
+{
+    std::vector<int> indices;
+    std::vector<double> top_fcnh_chi2;
+    for(std::size_t i=0; i!=Jets.size(); ++i){
+        if(i==index_bjet) continue; //skip the selected jets for bjet
+        TLorentzVector top_fcnh_tmp = diphoton + Jets[i];
+        double chi2 = (top_fcnh_tmp.M() - top_quark_mass) * (top_fcnh_tmp.M() - top_quark_mass);
+        indices.push_back(i);
+        top_fcnh_chi2.push_back(chi2);
+        //printf("[check-ywk] q = ");
+        //printf("%d, " , i);
+        //printf("chi2 = %7.3f\n", chi2);
+    }
+
+    int min_index =  std::min_element(top_fcnh_chi2.begin(), top_fcnh_chi2.end()) - top_fcnh_chi2.begin();
+    //double min    = *std::min_element(top_fcnh_chi2.begin(), top_fcnh_chi2.end());
+    //printf("[check-ywk] min: q = ");
+    //printf("%d, " , indices[min_index]);
+    //printf("chi2 = %7.3f\n", top_fcnh_chi2[min_index]);
+
+    int result = Jets.size() > 1 ? indices[min_index] : -1;
+    return result;
+}
+//}}}
+//--------------------------------------------------//
 
 // have to use these ugly functions to make vectors of 4-vectors bc can only store floats in flashgg dumper
 TLorentzVector make_lead_photon() {

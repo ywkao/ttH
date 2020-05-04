@@ -5,7 +5,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--inputs", help = "csv list of which .npz files to consider", type=str)
 parser.add_argument("--labels", help = "csv list of labels for each .npz file", type=str)
 parser.add_argument("--ylim", help = "csv list of ylim", type=str)
+parser.add_argument("--tag", help = "tag to denote with", type=str)
 args = parser.parse_args()
+
+print "------------------------------------------------------------"
+print "Hello World! (from MVAs/make_za_comparisons.py)"
+print "------------------------------------------------------------"
+print "args.inputs               : %s" % args.inputs
+print "args.labels               : %s" % args.labels
+print "args.ylim                 : %s" % args.ylim
+print "args.tag                 : %s" % args.tag
+print "------------------------------------------------------------"
 
 inputs = (args.inputs.replace(" ","")).split(",")
 labels = args.labels.split(",")
@@ -14,6 +24,7 @@ colors = ["black", "red", "blue", "green", "orange"]
 
 files = []
 for input in inputs:
+  print input
   files.append(numpy.load(input))
 
 import matplotlib
@@ -39,7 +50,7 @@ if args.ylim:
   ylim = args.ylim.split(",")
   plt.ylim([float(ylim[0]), float(ylim[1])])
 
-plt.savefig('za_comparison_mc.pdf')
+plt.savefig('za_comparison_mc_%s.pdf' % (args.tag))
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
@@ -60,6 +71,4 @@ if args.ylim:
   ylim = args.ylim.split(",")
   plt.ylim([float(ylim[0]), float(ylim[1])])
 
-plt.savefig('za_comparison_data.pdf') 
-
-
+plt.savefig('za_comparison_data_%s.pdf' % (args.tag))
