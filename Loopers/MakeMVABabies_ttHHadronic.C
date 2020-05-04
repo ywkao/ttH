@@ -502,7 +502,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       //}}} 
       // Scale FCNC to current best observed limit (ATLAS 2016 combination){{{
       if (currentFileTitle.Contains("FCNC"))
-        evt_weight_ *= scale_fcnc(currentFileTitle);
+        evt_weight_ *= scale_fcnc(currentFileTitle, true);
 
       if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
       if (!passes_selection(tag, minIDMVA_, maxIDMVA_)) continue;

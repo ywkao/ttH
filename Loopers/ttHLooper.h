@@ -727,23 +727,14 @@ double scale_fcnc_to_atlas_limit(TString currentFileTitle) {
   return 1.0;
 }
 
-double scale_fcnc(TString currentFileTitle) {
+double scale_fcnc(TString currentFileTitle, bool scale_more = false) {
   double weight = 1.;
   if (currentFileTitle.Contains("leptonic") && currentFileTitle.Contains("FCNC"))
     weight *= 1.0/1.527;
-  if (currentFileTitle.Contains("FCNC")) {
-    //weight *= scale_fcnc_to_atlas_limit(currentFileTitle);
+  if (scale_more && currentFileTitle.Contains("FCNC")) {
     weight *= 0.01; // arbitrary scaling by 1/100 to get more accurate results from combine
   }
   return weight;
-
-  /*
-  if (currentFileTitle.Contains("eta_hut"))
-    return br_tToHu_limit / br_tToHq_assumed;
-  else if (currentFileTitle.Contains("eta_hct"))
-    return br_tToHc_limit / br_tToHq_assumed;
-  */
-  //return 1.0; 
 }
 
 double scale_bkg(TString currentFileTitle, TString bkg_options, int processId, TString channel, bool fcnc = false) {

@@ -275,7 +275,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       // Scale FCNC to current best observed limit (ATLAS 2016 combination)
       if (currentFileTitle.Contains("FCNC"))
-        evt_weight_ *= scale_fcnc(currentFileTitle);  
+        evt_weight_ *= scale_fcnc(currentFileTitle, true);  
 
       // Blinded region
       if (isData && process_id_ != 18 && blind && mass() > 120 && mass() < 130)  continue;
