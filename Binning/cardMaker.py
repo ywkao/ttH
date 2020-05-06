@@ -8,7 +8,7 @@ import sys
 
 class makeCards():
 
-    def __init__(self, savepath, cardname, config=0):
+    def __init__(self, savepath, cardname, config={}):
 
         self.cardname = savepath + "/" + cardname #"CMS-HGG_mva_13TeV_datacard.txt"
         print self.cardname
@@ -26,6 +26,11 @@ class makeCards():
         self.modelNames = []
 
         self.path = savepath
+
+        if "sm_higgs_unc" in config.keys():
+            self.sm_higgs_unc = config["sm_higgs_unc"]
+        else:
+            self.sm_higgs_unc = 0.0001
 
     def WriteBasicNum(self, nChannel, nSig, nBkg, nNuisance=0):
 
@@ -102,7 +107,10 @@ class makeCards():
         rate_l4 = ""
 
         lumi_l5 = ""
-        ttH_l6 = ""
+        sm_higgs_l6 = ""
+
+        sm_higgs_unc = self.sm_higgs_unc
+
 
         for tag in tagList:
             for i in range(len(processes)):
@@ -116,10 +124,11 @@ class makeCards():
                 else:
                     lumi_l5 += "1.025 "
 
-                #if processes[i] == "ttH_hgg":
-                #    ttH_l6 += "0.8/1.2 "
-                #else:
-                #    ttH_l6 += "- "
+                if processes[i] == "sm_higgs_hgg":
+                    sm_higgs_l6 += "%.3f/%.3f" % (1 - sm_higgs_unc, 1 + sm_higgs_unc)
+                else:
+                    sm_higgs_l6 += "- "
+
 
         bin_l1 = "bin " + bin_l1 + "\n"
         process_l2 = "process " + process_l2 + "\n"
@@ -127,6 +136,7 @@ class makeCards():
         rate_l4 = "rate " + rate_l4 + "\n"
 
         lumi_l5 = "lumi_13TeV lnN " + lumi_l5 + "\n"
+        sm_higgs_l6 = "sm_higgs_xs lnN " + sm_higgs_l6 + "\n"
         #ttH_l6 = "ttH_xs lnN " + ttH_l6 + "\n"
 
         self.txtfile.write(bin_l1)
@@ -135,7 +145,7 @@ class makeCards():
         self.txtfile.write(rate_l4)
         self.txtfile.write("------------\n")
         self.txtfile.write(lumi_l5)
-        self.txtfile.write(ttH_l6)
+        self.txtfile.write(sm_higgs_l6)
 
     def WriteCard(self, sigList, bkgList, tagList, postFix):
 

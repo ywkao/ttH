@@ -118,9 +118,15 @@ class scanClass():
 
         if "Significance" in combineOption:
             significance = os.popen('grep "Significance:" %s | awk "{print $2}"' % (self.modelpath + outtxtName)).read().split(" ")[-1]
+            sig_up1sigma = 0
+            sig_down1sigma = 0
+
         elif "AsymptoticLimits" in combineOption:
             significance = os.popen('grep "Expected 50.0" %s | awk "{print $2}"' % (self.modelpath + outtxtName)).read().split(" ")[-1]
-        return significance
+            sig_up1sigma = os.popen('grep "Expected 84.0" %s | awk "{print $2}"' % (self.modelpath + outtxtName)).read().split(" ")[-1]
+            sig_down1sigma = os.popen('grep "Expected 16.0" %s | awk "{print $2}"' % (self.modelpath + outtxtName)).read().split(" ")[-1]
+
+        return float(significance), float(sig_up1sigma), float(sig_down1sigma)
 
         #subprocess.call("echo " + cmdCombine + " > " + self.modelpath + "combineCmd_" + combineOutName + ".sh")
         #subprocess.call("source " + self.modelpath + "combineCmd_" + combineOutName + ".sh", shell=True)#
