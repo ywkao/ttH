@@ -76,6 +76,40 @@ def preprocess_array(y, dict_):
 def oversample(array, indices):
   return numpy.array([array[i] for i in indices])
 
+def performance_metrics(y, pred, sample_weight, n_bootstrap, interp = 100):
+    fpr, tpr, auc = calc_auc(y, pred, sample_weight)
+    fprs = [fpr]
+    tprs = [tpr]
+    aucs = [auc]
+
+    n_points = len(y)
+    for i in range(n_bootstrap):
+        bootstrap_indices = numpy.random.randint(0, n_points, n_points)
+        bootstrap_label = y[bootstrap_indices]
+        bootstrap_pred = pred[bootstrap_indices]
+        bootstrap_weights = sample_weight[bootstrap_indices]
+        fpr_b, tpr_b, auc_b = calc_auc(bootstrap_label, bootstrap_pred, bootstrap_weights)
+        fprs.append(fpr_b)
+        tprs.append(tpr_b)
+        aucs.append(auc_b)
+
+    unc = numpy.std(auc)
+    tpr_mean = numpy.mean(tprs, axis=0)
+    tpr_unc = numpy.std(tprs, axis=0)
+    fpr_mean = numpy.mean(fprs, axis=0)
+
+    return auc, unc, fpr_mean, tpr_mean, tpr_unc
+
+def calc_auc(y, pred, sample_weight, interp = 100):
+    fpr, tpr, thresh = metrics.roc_curve(y, pred, pos_label = 1, sample_weight = sample_weight)
+
+    fpr_interp = numpy.linspace(0, 1, interp)
+    tpr_interp = numpy.interp(fpr_interp, fpr, tpr)
+
+    auc_ = metrics.auc(fpr, tpr, reorder=True)
+
+    return fpr_interp, tpr_interp, auc_
+
 def auc_and_unc(label, pred, sample_weight, n_bootstraps):
   fpr, tpr, thresh = metrics.roc_curve(label, pred, pos_label = 1, sample_weight = sample_weight)
   auc = metrics.auc(fpr, tpr, reorder=True)
@@ -123,9 +157,12 @@ def shuffle(x, y, weights):
   return x, y, weights
 
 def load_array(file, name):
-  array = file[name]
-  array = numpy.asarray(array)
-  return array
+  if name in file.keys():
+    array = file[name]
+    array = numpy.asarray(array)
+    return array
+  else:
+    return []
 
 def find_nearest(array,value):
     val = numpy.ones_like(array)*value
