@@ -68,9 +68,12 @@ class makeModel():
 
         h_mgg = ROOT.TH1F("h_mgg", "h_mgg", 320, 100, 180)
         h_mgg.Sumw2()
-        self.tree.Project(h_mgg.GetName(), self.var, self.weightVar + "*(" + self.selection + ")")
+
+        #print("[MAKEMODELS] Info: h_mgg name: %s, var: %s, weightVar: %s, selection: %s" % (h_mgg.GetName(), self.var, self.weightVar, self.selection))
+
+        self.tree.Project(h_mgg.GetName(), self.var, self.weightVar + "*2.0*(" + self.selection + ")")
         d_mgg = ROOT.RooDataHist("roohist_data_mass_" + self.tag, "", ROOT.RooArgList(w.var(rooVar)), h_mgg, 1)
-        print "bin dataset", h_mgg.Integral(), d_mgg.sumEntries(), d_mgg.numEntries()
+        #print "bin dataset", h_mgg.Integral(), d_mgg.sumEntries(), d_mgg.numEntries()
         #return 1
 
         # normalization
@@ -147,6 +150,8 @@ class makeModel():
 
         w.writeToFile(self.modelpath + "/" + self.savename + ".root")
 
+        return norm
+
     def makeBackgroundModel(self, workspaceName, datasetTag):
 
         rooVar = "CMS_hgg_mass"
@@ -157,9 +162,12 @@ class makeModel():
 
         h_mgg = ROOT.TH1F("h_mgg", "h_mgg", 320, 100, 180)
         h_mgg.Sumw2()
-        self.tree.Project(h_mgg.GetName(), self.var, self.weightVar + "*(" + self.selection + ")")
+
+        print("[MAKEMODELS] Info: h_mgg name: %s, var: %s, weightVar: %s, selection: %s" % (h_mgg.GetName(), self.var, self.weightVar, self.selection))
+
+        self.tree.Project(h_mgg.GetName(), self.var, self.weightVar + "*2.0*(" + self.selection + ")") # multiply by 2 because we are only using half of the mc not used in training for optimization
         d_mgg = ROOT.RooDataHist("roohist_data_mass_" + datasetTag, "", ROOT.RooArgList(w.var(rooVar)), h_mgg, 1)
-        #print "bin dataset", h_gg.Integral(), d_mgg_bin.sumEntries(), d_mgg_bin.numEntries()
+        print "bin dataset", h_mgg.Integral(), d_mgg.sumEntries(), d_mgg.numEntries()
 
         # normalization
         norm = d_mgg.sumEntries()
@@ -171,7 +179,7 @@ class makeModel():
         w.var(rooVar).setRange("blind",120,130)
 
         # pdf
-        w.factory("Exponential:"+self.tag+"(" + rooVar + ", tau[-2,-10,0])")
+        w.factory("Exponential:"+self.tag+"(" + rooVar + ", tau[-0.027,-10,0])")
         w.factory("ExtendPdf:"+self.tag+"_ext("+self.tag+", nevt[100,0,10000000], 'full')")
 
         # fit
@@ -213,13 +221,21 @@ class makeModel():
         #l=ROOT.RooArgSet(w.var("CMS_hgg_mass"))
         #frac = w.pdf(tag).createIntegral(l,l,"blind")
         #print "frac", frac.getVal()
+
+
         #norm = norm/(1-frac.getVal())
+
         nEvt = w.var("nevt").getVal()
+
+        if nEvt < 0.01:
+            nEvt = norm
+
         w.factory(self.tag+"_norm["+str(nEvt)+",0,"+str(3*nEvt)+"]")
-        #print nEvt
 
         getattr(w,'import')(d_mgg, ROOT.RooCmdArg())
         w.writeToFile(self.modelpath + "/" + self.savename + ".root")
 
         from subprocess import call
         call("echo " + str(nEvt) + " > " + self.modelpath + "/" + self.savename + "_nbkg.txt" , shell=True)
+
+        return nEvt * (6./80.), nEvt # nEvt under higgs mass window, total number

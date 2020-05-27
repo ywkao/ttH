@@ -21,7 +21,7 @@ command_list = []
 
 for unc in sm_higgs_unc:
     unc_str = str(int(unc*100))
-    command_base = 'python derive_binning_Nd.py --channel "FCNC%s" --file "%s" --mvas "MVAS" --nPoints "NPOINTS" --nBins 1 --signal "FCNC_%s" --limit --tag "FCNC_%s_%s_simple_DIMd_unc%s_6May2020" --sm_higgs_unc %.6f' % (args.channel, tree, args.coupling, args.channel, args.coupling, unc_str, unc)
+    command_base = 'python derive_binning_Nd.py --channel "FCNC%s" --file "%s" --mvas "MVAS" --nPoints "NPOINTS" --nBins 1 --signal "FCNC_%s" --limit --tag "FCNC_%s_%s_simple_DIMd_unc%s_11May2020" --sm_higgs_unc %.6f' % (args.channel, tree, args.coupling, args.channel, args.coupling, unc_str, unc)
     
     command_1d = command_base.replace("MVAS", "mva_score").replace("NPOINTS", args.nPoints).replace("DIM", "1")
     command_2d = command_base.replace("MVAS", "mva_nonres_score,mva_smhiggs_score").replace("NPOINTS", args.nPoints).replace("DIM", "2")
@@ -50,21 +50,31 @@ def get_best_limit(file):
         best_lim = 999
         best_lim_up = 999
         best_lim_down = 999
+
+        full_info = {}
+
         for combo, info in result.items():
             if info["limit"] < best_lim:
+                if info["limit"] == 1.: # weird issue with fit...
+                    continue
                 best_lim = info["limit"]
                 best_lim_up = info["up1sigma"]
                 best_lim_down = info["down1sigma"]
+                full_info = { combo : info }
 
-    return best_lim, best_lim_up, best_lim_down
+    return best_lim, best_lim_up, best_lim_down, full_info
 
 for unc in sm_higgs_unc:
     unc_str = str(int(unc*100))
-    results_1d = "results_FCNC_%s_%s_simple_1d_unc%s_6May2020.json" % (args.channel, args.coupling, unc_str)
-    results_2d = "results_FCNC_%s_%s_simple_2d_unc%s_6May2020.json" % (args.channel, args.coupling, unc_str)
+    results_1d = "results_FCNC_%s_%s_simple_1d_unc%s_11May2020.json" % (args.channel, args.coupling, unc_str)
+    results_2d = "results_FCNC_%s_%s_simple_2d_unc%s_11May2020.json" % (args.channel, args.coupling, unc_str)
 
-    lim1d, lim1d_up, lim1d_down = get_best_limit(results_1d)
-    lim2d, lim2d_up, lim2d_down = get_best_limit(results_2d)
+    lim1d, lim1d_up, lim1d_down, info_1d = get_best_limit(results_1d)
+    lim2d, lim2d_up, lim2d_down, info_2d = get_best_limit(results_2d)
+
+    print "Best limit 1d", results_1d, lim1d, info_1d
+    print "Best limit 2d", results_2d, lim2d, info_2d
+
 
     best_limit_1d.append(lim1d)
     best_limit_1d_up.append(lim1d_up)
@@ -74,7 +84,7 @@ for unc in sm_higgs_unc:
     best_limit_2d_up.append(lim2d_up)
     best_limit_2d_down.append(lim2d_down)
 
-best_limit = min(best_limit_1d + best_limit_2d)
+best_limit = min(best_limit_1d)
 
 best_limit_1d = numpy.array(best_limit_1d)
 best_limit_1d_up = numpy.array(best_limit_1d_up)
@@ -93,6 +103,13 @@ best_limit_2d_down *= 1./best_limit
 unc_1d = [ best_limit_1d - best_limit_1d_down, best_limit_1d_up - best_limit_1d ]
 unc_2d = [ best_limit_2d - best_limit_2d_down, best_limit_2d_up - best_limit_2d ]
 
+
+#if args.channel == "Hadronic" and args.coupling == "Hut":
+#    sm_higgs_unc = sm_higgs_unc[:-1]
+     
+
+print "1d", best_limit_1d
+print "2d", best_limit_2d
 
 import matplotlib
 matplotlib.use('Agg')

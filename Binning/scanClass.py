@@ -43,6 +43,8 @@ class scanClass():
         #self.filename = filenameDict.namedict[self.tag]
         self.file = ROOT.TFile.Open(self.filename)
         self.tree = self.file.Get(self.treename)
+        if not self.tree:
+            print "[scanClass.py] BAD TREE!"
         return self.tree
 
     def getEfficiency(self, cut_denominator, cut_numerator):
@@ -72,7 +74,9 @@ class scanClass():
         # for given selection, return mva_scores corresponding to each quantile in n_quantiles
 
         # get a numpy array from tree
-        print self.selection
+        print("[SCANCLASS] Calculating quantile -> mva score function for %s with %d quantiles" % (mvaName, n_quantiles))
+        print("[SCANCLASS]", self.selection + selection)
+        print("[SCANCLASS]", [mvaName])
         mva_scores = (root_numpy.tree2array(self.getTree(), branches = [mvaName], selection = self.selection + selection))
 
         sorted_mva = numpy.flip(numpy.sort(mva_scores), 0)
@@ -83,7 +87,7 @@ class scanClass():
             quantiles.append(float(i+1) / float(n_quantiles))
             mva.append(sorted_mva[idx])
         #print mva
-        return mva
+        return mva, quantiles
 
 
     def runCombine(self, config):
@@ -95,7 +99,7 @@ class scanClass():
         combineOutName = config["combineOutName"]
         cardName = config["cardName"]
         outtxtName = config["outtxtName"]
-        grepContent = config["grepContent"]
+        #grepContent = config["grepContent"]
 
         cmdCombine = "#!/bin/sh\n\ncd " + self.combineEnv + "; pwd; eval `scramv1 runtime -sh`; cd -;"
         cmdCombine += "cd " + self.modelpath + ";"

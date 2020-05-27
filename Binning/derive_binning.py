@@ -17,18 +17,27 @@ parser.add_argument("--tag", help = "tag to distinguish this optimization", type
 parser.add_argument("--channel", help = "leptonic or hadronic", type=str, default = "TTHHadronicTag")
 parser.add_argument("--file", help = "path to final fit tree", type=str)
 
+parser.add_argument("--mvas", help = "list of mva branches to perform Nd optimization with", type=str, default = "mva_score")
+
 parser.add_argument("--nCores", help = "number of cores to use", type=int, default = 12)
 parser.add_argument("--nPoints", help = "number of different cuts to try", type=int, default = 100)
 parser.add_argument("--nBins", help = "number of bins", type=int, default = 2)
 
-parser.add_argument("--resonant_bkgs", help = "processes to consider for resonant background (csv list)", type=str, default = "ggH")
+parser.add_argument("--resonant_bkgs", help = "processes to consider for resonant background (csv list)", type=str, default = "sm_higgs")
 parser.add_argument("--signal", help = "process to consider for signal", default = "ttH")
 
 parser.add_argument("--limit", help = "calculate limit instead of significance", action = "store_true")
 
 args = parser.parse_args()
 
-process_dict = { "ttH" : [0], "ggH" : [14], "FCNC_Hut" : [22,24], "FCNC_Hct" : [23,25], "tH" : [11,12] }
+process_dict = { 
+    "ttH" : [0],
+    "ggH" : [14],
+    "FCNC_Hut" : [22,24],
+    "FCNC_Hct" : [23,25], 
+    "tH" : [11,12],
+    "sm_higgs" : [0,11,12,14,15,16],
+}
 
 def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
     tree = scanner.getTree()
@@ -41,7 +50,14 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
         # MVA score cut
         cut = "mva_score > " + str(cuts[i])
         if not (i == (nBins - 1)):
-            cut += " && mva_score < " + str(cuts[i+1])
+            cut += " && mva_score < " + str(cuts[i+1]) 
+
+        #cut_string = ""
+        #for mva_name, cut in zip(mvas, cuts):
+        #    cut_string += " ( %s > " + str(cut[i])
+        #    if not (i == (nBins - 1)):
+        #        cut_string += " && %s < " + str(cut[i+1])
+        #    cut_string += " ) &&"
 
         # Make signal model
         signals = args.signal.split(",") + args.resonant_bkgs.split(",")
@@ -57,9 +73,9 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
                 else:
                     processSelection += " || "
             sigModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && " + processSelection
-            if "FCNC" not in args.signal.split(",")[0]: # this is ttH, we use M127 for optimization
+            if "FCNC" not in args.signal.split(",")[0]: # this is the ttH analysis, we use M127 for optimization
                 signal_sample_selection = " && signal_mass_category == 127"
-            else: # this is FCNC, use M125
+            else: # this is FCNC, use M125 since we don't have other mass points for FCNC
                 signal_sample_selection = " && ((process_id >= 22 && process_id <= 25) || (signal_mass_label == 0 && signal_mass_category == 125))" # accept all FCNC events, only M125 Madgraph (not Powheg) for all other SM Higgs # FIXME
             sigModelConfig["selection"] += signal_sample_selection
             print "\n[BINNING_SCRIPT_INFO] Making signal model with selection %s" % sigModelConfig["selection"]
@@ -71,7 +87,7 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
 
         # Make background model
         bkgModelConfig = { "var" : "mass", "weightVar" : "weight", "plotpath" : scanConfig["plotpath"], "modelpath" : scanConfig["modelpath"], "filename" : scanConfig["filename"] }
-        bkgModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && sample_id == 0 && (process_id == 1 || process_id == 2 || process_id == 3 || process_id == 5 || process_id == 6 || process_id == 7 || process_id == 9 || process_id == 13 || process_id == 18 || process_id == 19 || process_id == 20 || process_id == 21 || process_id == 26)"
+        bkgModelConfig["selection"] = scanConfig["selection"] + " && " + cut + " && (process_id == 1 || process_id == 2 || process_id == 3 || process_id == 5 || process_id == 6 || process_id == 7 || process_id == 9 || process_id == 13 || process_id == 18 || process_id == 19 || process_id == 20 || process_id == 21 || process_id == 26)"
         bkgModelConfig["savename"] = "CMS-HGG_bkg_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
         bkgModelConfig["tag"] = "CMS_hgg_bkgshape_" + scanConfig["tag"] + "_" + str(i) + "_" + str(idx)
 
@@ -109,15 +125,6 @@ def calculate_bins_significance(idx, scanConfig, scanner, cuts, results):
     results[idx] = result
     print results
     return
-    #return significance
-    #os.chdir(scanConfig["modelpath"])
-    #os.system("chmod u+x %s" % "combineCmd_sig_" + str(idx) + ".sh")
-    #os.system("./%s" % "combineCmd_sig_" + str(idx) + ".sh")
-    #os.chdir("~/ttH/Binning/")
-
-    #significance = os.popen('grep "Significance:" %s | awk "{print $2}"' % (self.modelpath + outtxtName)).read().strip()
-    #return significance
-
 
 def calculate_cut_combos(nBins, nPoints, scanner, scanConfig, signal):
     processSelection = " && ("
@@ -171,44 +178,22 @@ lowCut = 0.0
 highCut = 1.0
 date = "20200106"
 postFix = "fcnc_test"
-#tag = "TTHLeptonicTag"
 tag = "TTHHadronicTag"
 # setup scan
 scanConfig= {\
 "tag" : args.channel,
 "filename" : args.file,
-#"selection":"global_features[7] > 0.33 && global_features[8] > 0.25 && signal_mass_category == 127 && mass > 100 && mass < 180 && mva_score < " + str(highCut)+ "&& mva_score > " + str(lowCut),
-#"selection" : "mass > 100 && mass < 180 && mva_score < " + str(highCut)+ " && mva_score > " + str(lowCut),
 "selection" : "mass > 100 && mass < 180",
-#"selection":"global_features[7] > 0.33 && global_features[8] > 0.25 && signal_mass_category == 127 && mass > 100 && mass < 180 && mva_score < " + str(highCut)+ "&& mva_score > " + str(lowCut),
-#"selection":"global_features[7] > 0.33 && global_features[8] > 0.25 && train_id == 1 && signal_mass_category == 127 && mass > 100 && mass < 180 && mva_score < " + str(highCut)+ "&& mva_score > " + str(lowCut),
 "sigName":"ttH_hgg",
-#"modelpath":"/home/users/hmei/ttH/MakeBDTBins/doScan/models/ttH_"+postFix+"_"+date+"/",
-#"plotpath":"/home/users/hmei/public_html/2019/"+date+"_ttH_"+postFix+"/",
-#"combineEnv":"/home/users/hmei/CMSSW_7_4_7/src/",
 "modelpath" : "/home/users/sjmay/ttH/Binning/models/" + args.tag + "/",
 "plotpath" : "/home/users/sjmay/public_html/ttH/Binning/" + args.tag + "/",
 "combineEnv" : "/home/users/sjmay/ttH/Binning/CMSSW_10_2_13/src",
 "var":"mass",
 "weightVar":"weight",
 "mvaName":"mva_score"
-#"mvaName":"mva_score"
 }
 
 testScan = scanClass(scanConfig)
 testScan.cleanDir()
 
 calculate_cut_combos(args.nBins, args.nPoints, testScan, scanConfig, args.signal)
-
-#useNCores = 20
-#nJobsPerCore =5
-#jobs = []
-#for i in range(useNCores):
-#    lowIndex = nJobsPerCore*i
-#    highIndex = nJobsPerCore*(i+1)
-#    p = multiprocessing.Process(target=doAllFits_oneCore, args=(lowIndex, highIndex, scanConfig, lowCut, highCut))
-#    jobs.append(p)
-#    p.start()
-#
-#doAllFits(100, scanConfig, lowCut, highCut)
-#subprocess.call('chmod -R 755 ' + scanConfig["plotpath"], shell=True)

@@ -125,7 +125,7 @@ class makeCards():
                     lumi_l5 += "1.025 "
 
                 if processes[i] == "sm_higgs_hgg":
-                    sm_higgs_l6 += "%.3f/%.3f" % (1 - sm_higgs_unc, 1 + sm_higgs_unc)
+                    sm_higgs_l6 += "%.3f/%.3f " % (1 - sm_higgs_unc, 1 + sm_higgs_unc)
                 else:
                     sm_higgs_l6 += "- "
 

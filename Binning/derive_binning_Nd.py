@@ -149,6 +149,7 @@ def calculate_cut_combos(nBins, nPoints, scanner, scanConfig, signal):
     mva_cuts = {}
 
     for mva in scanConfig["mvaName"]:
+        print mva
         mvaScores = scanner.quantiles_to_mva_score(nPoints, mva, processSelection)
         cut_combos_unformatted = list(itertools.combinations(mvaScores, nBins)) 
         cut_combos = []
