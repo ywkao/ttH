@@ -5,7 +5,7 @@ import numpy
 import glob
 import datetime
 
-from metis.Sample import Sample
+from metis.Sample import Sample, DirectorySample
 from metis.CondorTask import CondorTask
 from metis.StatsParser import StatsParser
 
@@ -22,6 +22,7 @@ parser.add_argument("--use_gridftp", help = "copy the tarball with gfal-copy", a
 parser.add_argument("--use_wget", help = "copy the tarball with wget, utilizing squid caches at sites", action = "store_true")
 parser.add_argument("--get_nevents", help = "write json file with n_events for each sample in catalog (don't submit jobs)", action = "store_true")
 parser.add_argument("--ttH_and_tH_only", help = "only submit jobs for ttH and tH samples", action = "store_true")
+parser.add_argument("--local_only", help = "only submit jobs for local microAOD samples", action = "store_true")
 args = parser.parse_args()
 
 job_tag = "ttH_Babies_RunII" + args.tag
@@ -29,7 +30,7 @@ exec_path = "condor_exe.sh"
 tar_path = "package_%s.tar.gz" % job_tag if (args.use_xrdcp or args.use_gridftp or args.use_wget) else "package.tar.gz"
 hadoop_path = "ttH"
 
-cmssw_ver = "CMSSW_10_5_0"
+cmssw_ver = "CMSSW_10_6_8"
 
 if not args.soft_rerun or (args.update_tarball or args.update_executable) and not args.get_nevents:
   if not (args.update_tarball or args.update_executable):
@@ -37,7 +38,7 @@ if not args.soft_rerun or (args.update_tarball or args.update_executable) and no
 
   if not args.update_executable: # if we aren't updating the executable, that means we're either doing a first run or updating tarball
       os.system("rm package.tar.gz")
-      os.system("XZ_OPT='-9e -T24' tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' --exclude *MicroAOD/BatchSubmit/* --exclude *MetaData/data/Era201*/*.json --exclude '*Taggers/data/DNN_models/*' --exclude '*Taggers/data/*dijet*' --exclude '*76X*.root' --exclude '*76X*.xml' --exclude '*Taggers/data/DNN_models/*' --exclude '*Taggers/data/HHTagger/*' --exclude '*Taggers/data/ttHKiller/*' -f package.tar.gz %s" % cmssw_ver)
+      os.system("XZ_OPT='-3e -T24' tar -Jc --exclude='.git' --exclude='my*.root' --exclude='*.tar*' --exclude='merged_ntuple*.root' --exclude='*.out' --exclude='*.err' --exclude='*.log' --exclude *MicroAOD/BatchSubmit/* --exclude *MetaData/data/Era201*/*.json --exclude '*Taggers/data/DNN_models/*' --exclude '*Taggers/data/*dijet*' --exclude '*76X*.root' --exclude '*76X*.xml' --exclude '*Taggers/data/DNN_models/*' --exclude '*Taggers/data/HHTagger/*' --exclude '*Taggers/data/ttHKiller/*' -f package.tar.gz %s" % cmssw_ver)
 
   if args.use_xrdcp or args.use_gridftp or args.use_wget:
       if not args.update_executable:
@@ -124,51 +125,84 @@ class file:
     def get_nevents(self):
         return 1
 
+local_samples = {
+        "tHq_JHUCPEven" : { "location" : "/hadoop/cms/store/user/smay/ttH/tH_CP_Samples/JHUSample_tHq_cpeven_2017_microAOD_v1.1_20May2020/", "fpo" : 5, "year" : "2017"},
+        "tHq_JHUCPOdd" : { "location" : "/hadoop/cms/store/user/smay/ttH/tH_CP_Samples/JHUSample_tHq_cpodd_2017_microAOD_v1.1_20May2020/", "fpo" : 5, "year" : "2017"},
+        "tHq_JHUCPkm" : { "location" : "/hadoop/cms/store/user/smay/ttH/tH_CP_Samples//JHUSample_tHq_cp_k0_2017_microAOD_v1.1_20May2020/", "fpo" : 5, "year" : "2017"},
+        "tHq_JHUCPk0" : { "location" : "/hadoop/cms/store/user/smay/ttH/tH_CP_Samples//JHUSample_tHq_cp_km_2017_microAOD_v1.1_20May2020/", "fpo" : 5, "year" : "2017"},
+        #"tHq_" : { "location" : "/hadoop/cms/store/user/hmei/miniaod_runII/JHUSample_tHq_km_2017_20200525_STEP4_v1/
+}
+
 total_summary = {}
 first_run = False
 while True:
     allcomplete = True
-    for sample in samples.keys():
-        if skip(sample):
-            continue
-        for year in samples[sample].keys():
-            if year == "xs" or year == "-1":
+    for sample, info in local_samples.items():
+        dataset = sample
+        year = info["year"]
+        metis_sample = DirectorySample(dataset = dataset, location = info["location"]) 
+
+        task = CondorTask(
+                sample = metis_sample,
+                open_dataset = False,
+                flush = True,
+                files_per_output = info["fpo"],
+                output_name = "merged_ntuple.root",
+                tag = job_tag,
+                cmssw_version = cmssw_ver,
+                executable = "condor_exe_%s.sh" % job_tag if (args.use_xrdcp or args.use_gridftp or args.use_wget) else "condor_exe.sh",
+                tarfile = "empty" if (args.use_xrdcp or args.use_gridftp or args.use_wget) else tar_path,
+                condor_submit_params = {"sites" : "T2_US_UCSD"},
+                special_dir = hadoop_path,
+                arguments = conds_dict[year]
+        )
+        task.process()
+        if not task.complete():
+            allcomplete = False
+        total_summary[dataset] = task.get_task_summary()
+
+    if not args.local_only:
+        for sample in samples.keys():
+            if skip(sample):
                 continue
-            for production in samples[sample][year].keys():
-                if production == "scale1fb":
+            for year in samples[sample].keys():
+                if year == "xs" or year == "-1":
                     continue
-                dataset = sample + "_" + production
-                files = samples[sample][year][production]["files"]
-                if files == -1:
-                    continue
-                files = [file(name=x) for x in files]
-                metis_sample = Sample(dataset = dataset, files = files) 
-                metis_sample.info["nevts"] = 0
-                #print "Task for %s, %s, %s" % (sample, year, production)
-                #print "Files: "
-                #print metis_sample.get_files()
-                #print "FPO: %d for sample: %s" % (fpo(sample), sample)
-                task = CondorTask(
-                        sample = metis_sample,
-                        open_dataset = False,
-                        flush = True,
-                        files_per_output = fpo(sample),
-                        output_name = "merged_ntuple.root",
-                        tag = job_tag,
-                        cmssw_version = cmssw_ver,
-                        executable = "condor_exe_%s.sh" % job_tag if (args.use_xrdcp or args.use_gridftp or args.use_wget) else "condor_exe.sh",
-                        tarfile = "empty" if (args.use_xrdcp or args.use_gridftp or args.use_wget) else tar_path,
-                        condor_submit_params = {"sites" : "T2_US_UCSD"} if (args.use_wget) else {"sites" : "T2_US_UCSD,T2_US_CALTECH,T2_US_MIT,T2_US_WISCONSIN,T2_US_Nebraska,T2_US_Purdue,T2_US_Vanderbilt,T2_US_Florida"},
-                        special_dir = hadoop_path,
-                        arguments = conds_dict[year]
-                )
-                task.process()
-                if not task.complete():
-                    allcomplete = False
-                total_summary[dataset] = task.get_task_summary()
-                if first_run:
-                    print "Sleeping 30s to space out jobs"
-                    os.system("sleep 30s")
+                for production in samples[sample][year].keys():
+                    if production == "scale1fb":
+                        continue
+                    dataset = sample + "_" + production
+                    files = samples[sample][year][production]["files"]
+                    if files == -1:
+                        continue
+                    files = [file(name=x) for x in files]
+                    metis_sample = Sample(dataset = dataset, files = files) 
+                    metis_sample.info["nevts"] = 0
+                    #print "Task for %s, %s, %s" % (sample, year, production)
+                    #print "Files: "
+                    #print metis_sample.get_files()
+                    #print "FPO: %d for sample: %s" % (fpo(sample), sample)
+                    task = CondorTask(
+                            sample = metis_sample,
+                            open_dataset = False,
+                            flush = True,
+                            files_per_output = fpo(sample),
+                            output_name = "merged_ntuple.root",
+                            tag = job_tag,
+                            cmssw_version = cmssw_ver,
+                            executable = "condor_exe_%s.sh" % job_tag if (args.use_xrdcp or args.use_gridftp or args.use_wget) else "condor_exe.sh",
+                            tarfile = "empty" if (args.use_xrdcp or args.use_gridftp or args.use_wget) else tar_path,
+                            condor_submit_params = {"sites" : "T2_US_UCSD"} if (args.use_wget) else {"sites" : "T2_US_UCSD,T2_US_CALTECH,T2_US_MIT,T2_US_WISCONSIN,T2_US_Nebraska,T2_US_Purdue,T2_US_Vanderbilt,T2_US_Florida"},
+                            special_dir = hadoop_path,
+                            arguments = conds_dict[year]
+                    )
+                    task.process()
+                    if not task.complete():
+                        allcomplete = False
+                    total_summary[dataset] = task.get_task_summary()
+                    if first_run:
+                        print "Sleeping 30s to space out jobs"
+                        os.system("sleep 30s")
     StatsParser(data=total_summary, webdir="~/public_html/dump/ttH_BabyMaker_v2_%s/" % job_tag).do()
     os.system("chmod -R 755 ~/public_html/dump/ttH_BabyMaker_v2_%s" % job_tag)
     if allcomplete:

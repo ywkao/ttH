@@ -1,5 +1,5 @@
-export SCRAM_ARCH=slc6_amd64_gcc530
-source /cvmfs/cms.cern.ch/cmsset_default.sh
+#export SCRAM_ARCH=slc6_amd64_gcc530
+#source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 if (( $# < 1 )); then
   echo "Please provide CMSSW version to setup ('80X' for 2016 or '94X' for 2017)"
@@ -95,11 +95,20 @@ if [ "$CMSSW_VER" = "105X" ]; then
   #INPUTFILENAMES='file:/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_RunII/test_skim_1.root'
   #INPUTFILENAMES='file:/hadoop/cms/store/user/smay/ttH/MicroAOD/RunII/ttHiggs0Mf05ph0ToGG_M125_13TeV_JHUGenV7011_pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_RunII/test_skim_13.root'
   #INPUTFILENAMES='root://cms-xrd-global.cern.ch//store/user/spigazzi/flashgg/Era2016_RR-17Jul2018_v2/legacyRun2FullV1/DoubleEG/Era2016_RR-17Jul2018_v2-legacyRun2FullV1-v0-Run2016H-17Jul2018-v1/190605_221534/0000/myMicroAODOutputFile_451.root'
-  INPUTFILENAMES='file:/home/users/sjmay/ttH/BabyMaker/microAOD_ttHJetToGG_M125_2018.root'
+  #INPUTFILENAMES='file:/home/users/sjmay/ttH/BabyMaker/microAOD_ttHJetToGG_M125_2018.root'
   #INPUTFILENAMES='file:/home/users/sjmay/ttH/BabyMaker/microAOD_ttGG_2018.root'
-  cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} "MetaData/data/MetaConditions/Era2018_RR-17Sep2018_v1.json" "10000"
+  INPUTFILENAMES='file:/home/users/sjmay/ttH/FCNC_Workspaces/CMSSW_10_6_1_patch2/src/flashgg/myMicroAODOutputFile.root'
+  cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} "MetaData/data/MetaConditions/Era2018_RR-17Sep2018_v1.json" "100"
 fi
 
+if [ "$CMSSW_VER" = "106X" ]; then
+    export SCRAM_ARCH=slc7_amd64_gcc700
+    cd CMSSW_10_6_8/src/flashgg
+    cmsenv
+
+    INPUTFILENAMES='file:/home/users/sjmay/ttH/FCNC_Workspaces/CMSSW_10_6_1_patch2/src/flashgg/myMicroAODOutputFile.root'
+    cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES} "MetaData/data/MetaConditions/Era2018_RR-17Sep2018_v1.json" "100"
+fi
 
 # Actually run the test
 #cmsRun Taggers/test/ttH_TagAndDump.py ${INPUTFILENAMES}
