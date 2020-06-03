@@ -2,6 +2,7 @@ import os, sys
 import multiprocessing
 from json import JSONEncoder
 import json
+import math
 
 import tensorflow
 import keras
@@ -81,14 +82,16 @@ class Guided_Optimizer():
                                 'nthread' : 12, 
                             })
 
+        self.modelpath = "/home/users/sjmay/ttH/Binning/models/" + self.tag
+        self.plotpath = "/home/users/sjmay/public_html/ttH/Binning/" + self.tag
         self.scanConfig = kwargs.get('scanConfig', { "tag" : self.channel,
                                                      "filename" : self.input,
                                                      "selection" : "",
                                                      "sigName" : self.signal[0] + "_hgg",
                                                      "var" : "mass",
                                                      "weightVar" : "weight",
-                                                     "modelpath" : "/home/users/sjmay/ttH/Binning/models/" + self.tag,
-                                                     "plotpath" : "/home/users/sjmay/public_html/ttH/Binning/" + self.tag,
+                                                     "modelpath" : self.modelpath,
+                                                     "plotpath" : self.plotpath, 
                                                      "combineEnv" : "/home/users/sjmay/ttH/Binning/CMSSW_10_2_13/src",
                                                     })
 
@@ -185,8 +188,6 @@ class Guided_Optimizer():
                 self.results[dim][n_bin][strategy][field] = numpy.array(results[field])
             else:
                 self.results[dim][n_bin][strategy][field] = numpy.concatenate([self.results[dim][n_bin][strategy][field], numpy.array(results[field])])
-            #self.results[dim][n_bin][strategy][field] += results[field]
-            #self.results[dim][n_bin][strategy][field] = numpy.concatenateresults[field]
         
         for field in ["eff", "sample_mean", "sample_std", "sample_best", "accuracy"]:
             self.results[dim][n_bin][strategy][field].append(results[field])
@@ -207,8 +208,8 @@ class Guided_Optimizer():
 
     def initialize(self, mvas, n_bin): # randomly sample initial_points points to get initial training/testing set
         # Set up scanClass
-        self.scanConfig["modelpath"] = self.scanConfig["modelpath"] + "_%dd_%dbin/" % (len(mvas), n_bin)
-        self.scanConfig["plotpath"] = self.scanConfig["plotpath"] + "_%dd_%dbin/" % (len(mvas), n_bin)
+        self.scanConfig["modelpath"] = self.modelpath + "_%dd_%dbin/" % (len(mvas), n_bin)
+        self.scanConfig["plotpath"] = self.plotpath + "_%dd_%dbin/" % (len(mvas), n_bin)
         self.scanner = scanClass(self.scanConfig)
         self.scanner.cleanDir()
 
@@ -302,11 +303,8 @@ class Guided_Optimizer():
     def train_bdt(self, X, y):
         X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = 0.8)
 
-        #X_train = X_train.reshape(-1,1)        
-        #X_test = X_test.reshape(-1,1)        
-
-        X_train = pandas.DataFrame(data = X_train)#, columns = [str(i) for i in range(len(X[0]))])
-        X_test = pandas.DataFrame(data = X_test)#, columns = [str(i) for i in range(len(X[0]))])
+        X_train = pandas.DataFrame(data = X_train)
+        X_test = pandas.DataFrame(data = X_test)
 
         eval_list = [(X_test, y_test)]
         self.bdt.fit(X_train, y_train, early_stopping_rounds=5, eval_metric='mae', eval_set = eval_list)
@@ -324,9 +322,6 @@ class Guided_Optimizer():
 
         return percent_error_std 
         
-            
-
-
     def train_dnn(self, X, y): # train dnn with early stopping
         X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = 0.8)
 
@@ -363,7 +358,6 @@ class Guided_Optimizer():
 
         exp_limits = self.calculate_expected_limits(X, mvas, n_bin)
 
-        #y = exp_limits[:]["exp_lim"][0]
         X_ = []
         y = []
         for lim in exp_limits:
@@ -415,15 +409,73 @@ class Guided_Optimizer():
     def reasonable_effs(self, effs):
         if effs[0] < 0.1:
             return False # don't accept SRs with signal eff less than 5%
-        if effs[-1] > 0.8: # don't accept SRs with the lowest signal eff defined by a cut that has more than 80% efficiency on signal
+        if effs[-1] > 0.9: # don't accept SRs with the lowest signal eff defined by a cut that has more than 80% efficiency on signal
             return False
         if len(effs) > 1:
             for i in range(len(effs)-1):
-                if (effs[i+1] - effs[i]) < 0.05:
+                if (effs[i+1] - effs[i]) < 0.1:
                     return False
         return True
 
+    def generate_effs(self, n):
+        effs = []
+        for i in range(n):
+            if len(effs) == 0:
+                effs.append(numpy.random.uniform(0.1, 0.9 - (n*0.1)))
+            else:
+                effs.append(numpy.random.uniform(effs[-1] + 0.1, 0.9 - ((n-i) * 0.1)))
+        return effs
+
+    def generate_effs_2d(self, n):
+        min_eff = 0.1
+
+        effs_x = []
+        effs_y = []
+
+        for i in range(n):
+            mag = numpy.random.uniform(0.1, 0.9 - (n*0.1))
+            if len(effs_x) == 0:
+                angle = numpy.random.uniform(0.0, 3.14159 / 2.)
+            else:
+                angle = numpy.random.uniform(-3.14159 / 2, 3.14159)
+
+            delta_x = max(0, mag * math.cos(angle))
+            delta_y = max(0, mag * math.sin(angle))
+
+            print delta_x, delta_y
+
+            if len(effs_x) == 0:
+                effs_x.append(min_eff + delta_x)
+                effs_y.append(min_eff + delta_y)
+
+            else:
+                effs_x.append(effs_x[-1] + delta_x)
+                effs_y.append(effs_y[-1] + delta_y)
+
+        return effs_x + effs_y
+
     def generate_random_cut_combos(self, N_combos, mvas, n_bin):
+        if self.verbose:
+            print("[GUIDED_OPTIMIZER] Calculating random cut combos for %d bins with mvas" % n_bin, mvas)
+
+        X = []
+
+        for i in range(N_combos):
+            if len(mvas) == 1:
+                effs_list = self.generate_effs(n_bin)
+                cuts_list = self.convert_eff_to_cut(mvas[0], effs_list)
+            elif len(mvas) == 2:
+                effs_list = self.generate_effs_2d(n_bin)
+                cuts_list = self.convert_eff_to_cut(mvas[0], effs_list[:n_bin]) + self.convert_eff_to_cut(mvas[1], effs_list[n_bin:]) 
+            if self.verbose:
+                if i < 10:
+                    print("[GUIDED_OPTIMIZER] the %d-th cut combo is " % i, cuts_list, " corresponding to effs of ", effs_list)
+
+            X.append(cuts_list)
+
+        return X
+
+    def generate_random_cut_combos_old(self, N_combos, mvas, n_bin):
         if self.verbose:
             print("[GUIDED_OPTIMIZER] Calculating random cut combos for %d bins with mvas" % n_bin, mvas)
         
@@ -434,7 +486,7 @@ class Guided_Optimizer():
             for mva in mvas:
                 reasonable = False
                 while not reasonable:
-                    effs = list(numpy.sort(numpy.random.rand(n_bin)))
+                    effs = self.generate_effs(n_bin)
                     reasonable = self.reasonable_effs(effs)
                 if len(effs_list) > 0:
                     effs_list += effs
@@ -478,6 +530,9 @@ class Guided_Optimizer():
                 print("[GUIDED OPTIMIZER] Point: ", X[i], " prediction: %.3f, probability to accept point: %.3f" % (pred[i], prob[i]))
 
         accept_idx = numpy.nonzero(prob > numpy.random.rand(len(X)))[0]
+        if len(accept_idx) == 0:
+            print("[GUIDED OPTIMIZER] No accepted points, doubling all probabilities")
+            prob *= 2
         print accept_idx
 
         X = numpy.array(X)
@@ -494,10 +549,7 @@ class Guided_Optimizer():
     def calculate_probs(self, pred):
         pred_normalized = pred * (1./self.current_best_lim)
 
-        #prob = (1./pred_normalized) * numpy.exp( -(pred_normalized - 1) / (self.percent_error))
         prob = numpy.exp( -(pred_normalized - 1) / (self.percent_error))
-        #max_prob = max(prob)
-        #prob *= 1./max_prob # scale highest probability up to 1
 
         for i in range(len(prob)):
             if prob[i] > 1.:
@@ -562,8 +614,8 @@ class Guided_Optimizer():
             sel = sel[:-3] # remove trailing "&& "
             if i > 0:
                 sel += " && "
-                for j in range(len(mvas)):
-                    sel += "%s < %.6f && " % (mvas[j], point[(j*n_bin) + (i - 1)])
+                for k in range(i):
+                    sel += "!(%s) && " % selection[k]
             sel = sel[:-3] # remove trailing "&& "
             selection.append(sel)
 
@@ -585,8 +637,6 @@ class Guided_Optimizer():
     def calculate_expected_limit(self, selection, idx, m_point, temp_results):
         yields = {}
         for i in range(len(selection)):
-            #sr_too_small = False # require at least 15 expected events in [100,180] GeV region from nonres bkg MC
-            
             bin = "Bin_%d" % i
             yields[bin] = {}
             for process in self.signal + self.resonant_bkgs:
@@ -641,12 +691,12 @@ class Guided_Optimizer():
                 "outtxtName" : "sig_" + str(idx) + ".txt",
         }
 
-        exp_lim, exp_lim_up1sigma, exp_lim_down1sigma = self.scanner.runCombine(combineConfig)
+        exp_lim, exp_lim_up1sigma, exp_lim_down1sigma, exp_lim_up2sigma, exp_lim_down2sigma = self.scanner.runCombine(combineConfig)
 
         result = {
            "idx" : idx,
            "x" : [float(x) for x in m_point],
-           "exp_lim" : [exp_lim, exp_lim_up1sigma, exp_lim_down1sigma],
+           "exp_lim" : [exp_lim, exp_lim_up1sigma, exp_lim_down1sigma, exp_lim_up2sigma, exp_lim_down2sigma],
            "selection" : selection,
            "yields" : yields
         }
@@ -655,10 +705,5 @@ class Guided_Optimizer():
 
         if self.verbose:
             print("[GUIDED OPTIMIZER]", result)
-            #print("[GUIDED OPTIMIZER] Finished testing %d-th combo in epoch" % idx)
-            #print("[GUIDED OPTIMIZER] With %d bins, here is the info for each bin:" % len(selection)) 
-            #for i in range(len(selection)):
-            #    print("[GUIDED OPTIMIZER] Bin %d: signal = %.2f, sm_higgs = %.2f, background = %.2f" % (i, result["yields"]["Bin_%d" % i][self.signal[0]], result["yields"]["Bin_%d" % i][self.resonant_bkgs[0]], result["yields"]["Bin_%d" % i]["bkg"]))
-            #print("[GUIDED OPTIMIZER] Giving an expected limit of %.2f" % result["exp_lim"][0])
 
         return

@@ -25,28 +25,14 @@ optimizer = guided_optimizer.Guided_Optimizer(
 
                 sm_higgs_unc = args.sm_higgs_unc,
 
-                n_bins = [1,2,3,4],
-                #mvas = { "1d" : ["mva_score"] },
-                mvas = { "2d" : ["mva_smhiggs_score", "mva_nonres_score"] },
-                #mvas = { "1d" : ["mva_score"], "2d" : ["mva_smhiggs_score", "mva_nonres_score"] },
-                #strategies = ['guided'],
-                strategies = ['guided', 'random'],
+                n_bins = [1,2,3,4,5],
+                mvas = { "1d" : ["mva_score"], "2d" : ["mva_smhiggs_score", "mva_nonres_score"] },
+                strategies = ['guided'],
                
-                initial_points = 240,
-                points_per_epoch = 240,
-                n_epochs = 5,
+                initial_points = 48,
+                points_per_epoch = 48,
+                n_epochs = 10,
                 verbose = True
 )
 
 optimizer.optimize()
-
-#for dim, mvas in optimizer.mvas.items():
-#    for bin in optimizer.n_bins:
-#        bin = str(bin)
-#        x = numpy.arange(len(results[dim][bin]["guided"]["sample_mean"]))
-#        y1 = results[dim][bin]["guided"]["sample_mean"]
-#        y1_unc = results[dim][bin]["guided"]["sample_std"]
-#        y2 = results[dim][bin]["guided"]["sample_best"]
-#
-#        print dim, mvas, bin, x, y1, y1_unc, y2
-

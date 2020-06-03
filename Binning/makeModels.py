@@ -161,6 +161,7 @@ class makeModel():
         w.factory("MH[125]")
 
         h_mgg = ROOT.TH1F("h_mgg", "h_mgg", 320, 100, 180)
+        #h_mgg = ROOT.TH1F("h_mgg", "h_mgg", 8, 100, 180)
         h_mgg.Sumw2()
 
         print("[MAKEMODELS] Info: h_mgg name: %s, var: %s, weightVar: %s, selection: %s" % (h_mgg.GetName(), self.var, self.weightVar, self.selection))
@@ -179,11 +180,17 @@ class makeModel():
         w.var(rooVar).setRange("blind",120,130)
 
         # pdf
-        w.factory("Exponential:"+self.tag+"(" + rooVar + ", tau[-0.027,-10,0])")
+        #if norm >= 15.:
+        #    print "[MAKE_BACKGROUND_MODEL] At least 10 events in sideband (%.2f), fitting exponential" % norm 
+        w.factory("Exponential:"+self.tag+"(" + rooVar + ", tau[-0.027,-0.02,-0.04])")
+        #else:
+        #    print "[MAKE_BACKGROUND_MODEL] Less than 10 events in sideband (%.2f), fixing decay of exponential to -0.027" % norm
+        #    w.factory("Exponential:"+self.tag+"(" + rooVar + ", tau[-0.027,-0.027,-0.027])")
         w.factory("ExtendPdf:"+self.tag+"_ext("+self.tag+", nevt[100,0,10000000], 'full')")
 
         # fit
         w.pdf(self.tag+"_ext").fitTo(d_mgg, ROOT.RooFit.Range("SL,SU"), ROOT.RooFit.Extended(True), ROOT.RooFit.PrintLevel(-1))
+        #w.pdf(self.tag+"_ext").fitTo(d_mgg, ROOT.RooFit.Range("SL,SU"), ROOT.RooFit.Extended(True), ROOT.RooFit.PrintLevel(-1))
 
         frame = w.var(rooVar).frame()
         d_mgg.plotOn(frame, ROOT.RooFit.Binning(80))
@@ -227,8 +234,8 @@ class makeModel():
 
         nEvt = w.var("nevt").getVal()
 
-        if nEvt < 0.01:
-            nEvt = norm
+        #if nEvt < 0.01:
+        #    nEvt = norm
 
         w.factory(self.tag+"_norm["+str(nEvt)+",0,"+str(3*nEvt)+"]")
 
