@@ -43,7 +43,7 @@ with open("cross_sections_flashgg.json") as json_file:
   for sample, sample_info in scale1fb.iteritems():
     for key, info in cross_sections.iteritems():
       if key == sample and sample in cross_sections.keys():
-	copy_entry(info, sample_info, "xs")
+        copy_entry(info, sample_info, "xs")
         copy_entry(info, sample_info, "br")
         copy_entry(info, sample_info, "filter_eff")
 	sample_info["matched_xs"] = True
@@ -60,6 +60,7 @@ years = {
 		"2017" : "RunIIFall17MiniAODv2",
 		"2018" : "RunIIAutumn18MiniAOD",
 	}
+
 for year, year_info in years.iteritems():
   for sample, sample_info in scale1fb.iteritems():
     sum_of_weights = 0

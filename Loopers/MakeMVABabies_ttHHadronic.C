@@ -398,6 +398,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
+    /*
     double btag_norm_correction = 1.;
 
     if (!isData && btag_norm_correction == 1.) {
@@ -422,6 +423,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
         btag_norm_correction = integral_no_btag / integral_w_btag;
         cout << "btag_normalization_factor: " << btag_norm_correction << endl;
     }
+    */
 
     nEventsTotal = 0;
     //}}}
@@ -500,7 +502,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       // Scale bkg weight{{{
       evt_weight_ *= scale_bkg(currentFileTitle, bkg_options, process_id_, "Hadronic", fcnc);
       //}}} 
-      // Scale FCNC to current best observed limit (ATLAS 2016 combination){{{
+      // Scale FCNC by arbitrary scaling (better results with combine) 
       if (currentFileTitle.Contains("FCNC"))
         evt_weight_ *= scale_fcnc(currentFileTitle, true);
 
@@ -521,6 +523,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       multi_label_ = multiclassifier_label(currentFileTitle, genPhotonId, fcnc);
       signal_mass_label_ = categorize_signal_sample(currentFileTitle);
       signal_mass_category_ = categorize_signal_mass_label(currentFileTitle);
+
+      if ((signal_mass_category_ == 120 || signal_mass_category_ == 125 || signal_mass_category_ == 130) && signal_mass_label_ == 0)
+          evt_weight_ *= 2.; // account for test/validation splits
 
       tth_2017_reference_mva_ = tthMVA();
 

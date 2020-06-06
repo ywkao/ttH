@@ -500,8 +500,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Leptonic");
 
               // Scale FCNC to current best observed limit (ATLAS 2016 combination)
-              if (currentFileTitle.Contains("FCNC"))
-                evt_weight *= scale_fcnc(currentFileTitle);
+              //if (currentFileTitle.Contains("FCNC"))
+              //  evt_weight *= scale_fcnc(currentFileTitle);
 
               if (currentFileTitle.Contains("FCNC"))
                 evt_weight *= scale_fcnc_to_atlas_limit(currentFileTitle);
@@ -672,8 +672,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                       vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_low_pT", -log(1-tthMVA_RunII()), evt_weight, vId);
                   else if (diphoton.Pt() >= 60. && diphoton.Pt() < 120.)
                       vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_med_pT", -log(1-tthMVA_RunII()), evt_weight, vId);
-                  else if (diphoton.Pt() >= 120.)
+                  else if (diphoton.Pt() >= 120. && diphoton.Pt() < 200.)
                       vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_high_pT", -log(1-tthMVA_RunII()), evt_weight, vId); 
+                  else if (diphoton.Pt() >= 200.)
+                      vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA_RunII_transf_Vhigh_pT", -log(1-tthMVA_RunII()), evt_weight, vId);
 
               }
               //vProcess[processId]->fill_histogram("h" + syst_ext + "LeptonicMVA", mva_value, evt_weight, vId);

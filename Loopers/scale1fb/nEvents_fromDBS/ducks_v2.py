@@ -1,6 +1,7 @@
 import time
 import itertools
 import json
+import glob
 
 from metis.Sample import DBSSample
 from metis.CMSSWTask import CMSSWTask
@@ -9,6 +10,7 @@ from metis.StatsParser import StatsParser
 import os, sys
 
 import ROOT as r
+r.gROOT.SetBatch(True)
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -17,8 +19,9 @@ args = parser.parse_args()
 
 
 if args.runII:
-  base_path = "/home/users/sjmay/ttH/BabyMaker/CMSSW_10_5_0_old/src/flashgg/MicroAOD/BatchSubmit/"
-  input_jsons = [base_path + "datasets_RunIISummer16.json", base_path + "datasets_RunIIFall17.json", base_path + "datasets_RunIIAutumn18.json"]
+  base_path = "/home/users/sjmay/ttH/FCNC_Workspaces/CMSSW_10_6_1_patch2/src/flashgg/MicroAOD/BatchSubmit/"
+  #base_path = "/home/users/sjmay/ttH/BabyMaker/CMSSW_10_5_0_old/src/flashgg/MicroAOD/BatchSubmit/"
+  input_jsons = [base_path + "datasets_RunIISummer16_22May2020.json", base_path + "datasets_RunIIFall17_22May2020.json", base_path + "datasets_RunIIAutumn18_22May2020.json"]
   output_json = "sum_of_weights_runII.json"
 else:
   input_jsons = ["datasets_RunIISummer16.json", "datasets_RunIIFall17.json"] 
@@ -27,14 +30,17 @@ else:
 with open(output_json, "r") as f_in:
   mc_samples = json.load(f_in)
 
-def get_sum_of_weights(files):
+def get_sum_of_weights(files, dbs=True):
   sum = 0
   idx = 0
   for file in files:
     idx += 1
     print ("checking file %d / %d" % (idx, len(files)))
     sys.stdout.write("\033[F")
-    f = r.TFile.Open("root://cmsxrootd.fnal.gov//" + file.get_name())
+    if dbs:
+        f = r.TFile.Open("root://cmsxrootd.fnal.gov//" + file.get_name())
+    else:
+        f = r.TFile.Open(file)
     if not f:
       print "bad file: %s" % file.get_name()
       return -(10**12)
@@ -111,5 +117,28 @@ for key, dict in mc_samples.iteritems():
   with open(output_json, "w") as f_out:
     json.dump(mc_samples, f_out, indent=4, sort_keys=True)
 
-#for key, dict in mc_samples.iteritems():
-#  print "%s   has   %d events" % (key, dict["n_events_tot"])
+local_sets = [
+        "/hadoop/cms/store/user/smay/miniaod_runII/TT_T2HJ_HAD_HUT_2018_20200522_v1_STEP4_v1/",
+        "/hadoop/cms/store/user/smay/miniaod_runII/ST_HAD_HCT_2016_20200522_v1_STEP4_v1/",
+        "/hadoop/cms/store/user/smay/miniaod_runII/ST_HAD_HUT_2016_20200522_v1_STEP4_v1/",
+        "/hadoop/cms/store/user/hmei/miniaod_runII/TT_aT2HJ_HAD_HCT_2018_20200522_v1_STEP4_v1/",
+        "/hadoop/cms/store/user/hmei/miniaod_runII/TT_T2HJ_HAD_HCT_2018_20200522_v1_STEP4_v1/",
+        "/hadoop/cms/store/user/hmei/miniaod_runII/TT_aT2HJ_HAD_HUT_2018_20200522_v1_STEP4_v1/",
+]
+
+events_per_private_miniaod = 200
+
+for ds in local_sets:
+    dataset = ds.split("/")[-2]
+    if dataset in mc_samples.keys():
+        print "%s already found in samples list\n" % dataset
+        continue
+    else:
+        print "Adding %s to list of mc samples\n" % dataset
+        mc_samples[sample] = { "n_events_tot" : -1, "sum_of_weights" : 0 }
+        files = glob.glob(ds + "/*.root")
+        mc_samples[sample]["n_events_tot"] = events_per_private_miniaod * len(files)
+        mc_samples[sample]["sum_of_weights"] = get_sum_of_weights(files, False)
+
+    with open(output_json, "w") as f_out:
+        json.dump(mc_samples, f_out, indent=4, sort_keys=True)
