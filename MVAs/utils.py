@@ -76,7 +76,7 @@ def preprocess_array(y, dict_):
 def oversample(array, indices):
   return numpy.array([array[i] for i in indices])
 
-def performance_metrics(y, pred, sample_weight, n_bootstrap, interp = 100):
+def performance_metrics(y, pred, sample_weight, n_bootstrap, interp = 500):
     fpr, tpr, auc = calc_auc(y, pred, sample_weight)
     fprs = [fpr]
     tprs = [tpr]

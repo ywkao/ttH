@@ -30,6 +30,7 @@ ax1 = fig.add_subplot(111)
 
 #signal_effs = [0.68, 0.69, 0.7, 0.71]
 signal_effs = [0.25, 0.5, 0.9, 0.99]
+#signal_effs = [0.2, 0.45, 0.9, 0.99]
 #signal_effs = [0.95, 0.97, 0.98, 0.99]
 
 effs = {}
@@ -52,10 +53,10 @@ for i in range(len(files)):
   auc = metrics.auc(fpr, tpr, reorder=True)
   effs[labels[i]] = { "fpr" : fprs, "tpr" : tprs, "auc" : auc }
 
-  ax1.plot(fpr, tpr, label = labels[i] + " \t[AUC = %.3f]" % (auc), color = colors[i])
+  ax1.plot(fpr, tpr, label = labels[i] + " [AUC = %.3f]" % (auc), color = colors[i])
   if "tpr_unc_test" in files[i].files:
       tpr_unc = files[i]["tpr_unc_test"]
-      ax1.fill_between(fpr, tpr - (tpr_unc/2.), tpr + (tpr_unc/2.), color = colors[i], alpha = 0.25)
+      ax1.fill_between(fpr, tpr - 1*(tpr_unc/2.), tpr + 1*(tpr_unc/2.), color = colors[i], alpha = 0.25)
 
 
 plt.ylim(0,1)

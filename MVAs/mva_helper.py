@@ -101,6 +101,7 @@ class MVA_Manager():
 
         all_branches = default_branches + ["label", "train_id"] 
         for aux in all_branches:
+            print aux
             a = self.append_arrays(aux)
             if aux == "label" or aux == "train_id":
                 tree_name = aux

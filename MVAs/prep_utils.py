@@ -42,16 +42,16 @@ def selection(signal, bkg, type):
 
     if type == 0: # train
         set = "Training"
-        sel_string += " && rand_ > 0.5" #" && (signal_mass_label_ != 0)"
+        sel_string += " (label_ == 1 && evt_ % 3 == 0) || (label_ == 0 && (signal_mass_label_ == 1 || signal_mass_label_ == 2)) || (label_ == 0 && signal_mass_label_ == -1 && evt_ % 2 == 0) "
     elif type == 1: # validation
         set = "Testing"
-        sel_string += " && rand_ < 0.5 && (signal_mass_category_ == 125 || signal_mass_category_ == -1)"
+        sel_string += " (label_ == 1 && evt_ % 3 == 1) || (label_ == 0 && (signal_mass_category_ == 125) && evt_ % 2 == 0) || (label_ == 0 && signal_mass_label_ == -1 && evt_ % 2 == 1) " 
     elif type == 2: # data
         set = "Data"
         sel_string = "label_ == 2"
     elif type == 3: # final fit
         set = "Final Fit"
-        sel_string = " label_ == 2 && rand_ < 0.01" # dummy selection to prevent crashes later
+        sel_string = " (label_ == 1 && evt_ % 3 == 2) || (label_ == 0 && (signal_mass_category_ == 120 || signal_mass_category_ == 125 || signal_mass_category_ == 130) && evt_ % 2 == 1) " 
 
     print "[prep_utils.py] selection for %s set: %s" % (set, sel_string)
 
