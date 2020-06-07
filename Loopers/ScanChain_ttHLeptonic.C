@@ -786,6 +786,63 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_coarse_entries", minID, 1, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_coarse_entries", maxID, 1, vId);
 
+              float met_phi_ = MetPhi();
+
+              vector<int> indices_bjet = get_bjet_indices(jets, btag_scores);
+              bool is_moreThanTwoJets_and_atLeastOneBjet = jets.size() > 2 && indices_bjet.size() > 0;
+              bool is_moreThanOneJets_and_atLeastOneBjet = jets.size() > 1 && indices_bjet.size() > 0;
+              // init reco leading lepton and MET{{{
+              TLorentzVector lepton = leps[0]; // leading lepton
+              float met_pt    = met_;
+              float met_px    = met_ * TMath::Cos(met_phi_);
+              float met_py    = met_ * TMath::Sin(met_phi_);
+              vector<double> met_info = { met_pt, met_px, met_py };
+              //double neutrino_pz = evaluate_neutrino_pz(lepton, met_info); // quadratic method
+              //}}}
+              // 4-vectors{{{
+              double neutrino_pz           = evaluate_neutrino_pz(lepton, met_info);
+              TLorentzVector reco_neutrino = derive_reco_neutrino(lepton, met_info); // quadratic method
+              TLorentzVector reco_wboson   = derive_reco_wboson(lepton, reco_neutrino);
+
+              TLorentzVector _nothing_;
+              int index_bjet_method_2      = std::max_element(btag_scores.begin(), btag_scores.end()) - btag_scores.begin();
+              TLorentzVector bjet          = is_moreThanOneJets_and_atLeastOneBjet ? jets[index_bjet_method_2]          : _nothing_;
+              TLorentzVector reco_tbw      = is_moreThanOneJets_and_atLeastOneBjet ? derive_reco_tbw(reco_wboson, bjet) : _nothing_;
+
+              int index_q                  = get_q_index_min_chi2(jets, index_bjet_method_2, diphoton);
+              TLorentzVector chi2_qjet     = is_moreThanTwoJets_and_atLeastOneBjet ? jets[index_q]                      : _nothing_;
+              TLorentzVector chi2_tqh      = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet + diphoton               : _nothing_;
+              //}}}
+              float chi2_neutrino_pz_       = neutrino_pz;
+              float chi2_tbw_mass_          = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.M()                            : -999.;
+              float chi2_tbw_pt_            = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.Pt()                           : -999.;
+              float chi2_tbw_eta_           = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.Eta()                          : -999.;
+              float chi2_tbw_deltaR_dipho_  = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.DeltaR(diphoton)               : -999.;
+              float chi2_qjet_pt_           = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.Pt()                          : -999.;
+              float chi2_qjet_eta_          = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.Eta()                         : -999.;
+              float chi2_qjet_btag_         = is_moreThanTwoJets_and_atLeastOneBjet ? btag_scores[index_q]                    : -999.;
+              float chi2_qjet_deltaR_dipho_ = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.DeltaR(diphoton)              : -999.;
+              float chi2_tqh_ptOverM_       = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.Pt()/chi2_tqh.M()              : -999.;
+              float chi2_tqh_eta_           = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.Eta()                          : -999.;
+              float chi2_tqh_deltaR_tbw_    = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(reco_tbw)               : -999.;
+              float chi2_tqh_deltaR_dipho_  = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(diphoton)               : -999.;
+ 
+              if (is_moreThanOneJets_and_atLeastOneBjet) {
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_neutrino_pz", chi2_neutrino_pz_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tbw_mass", chi2_tbw_mass_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tbw_pt", chi2_tbw_pt_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tbw_eta", chi2_tbw_eta_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tbw_deltaR_dipho", chi2_tbw_deltaR_dipho_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_qjet_pt", chi2_qjet_pt_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_qjet_eta", chi2_qjet_eta_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_qjet_btag", chi2_qjet_btag_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_qjet_deltaR_dipho", chi2_qjet_deltaR_dipho_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tqh_eta", chi2_tqh_ptOverM_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tqh_deltaR_tbw", chi2_tqh_eta_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tqh_deltaR_dipho", chi2_tqh_deltaR_tbw_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_neutrino_pz", chi2_tqh_deltaR_dipho_, evt_weight, vId);
+              }
+
               /*
               if (njets_ >= 5)
                 vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMaxIDMVA_NJets5+", maxID, evt_weight, vId);

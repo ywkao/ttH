@@ -236,11 +236,11 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       }
       else if (vBkgs[i] == "Other") {
         TH1D* hOther = (TH1D*)file->Get(hist_name + "_" + "DY" + extension);
-        vector<TString> rares = { "TGamma", "TTV", "VV", "tV"};
-        //if (output.Contains("Hadronic"))
-        //    rares.push_back("VG");
+        //vector<TString> rares = { "TGamma", "TTV", "VV", "tV"};
+        vector<TString> rares = { "TGamma", "TTW", "TTZ", "VV", "tV"};
         for (unsigned int i = 0; i < rares.size(); i++) {
-          hOther->Add((TH1D*)file->Get(hist_name + "_" + rares[i] + extension));
+            cout << rares[i] << endl;
+            hOther->Add((TH1D*)file->Get(hist_name + "_" + rares[i] + extension));
         }
         hBkg.push_back(hOther);
         vLegendLabels.push_back("Other");
@@ -267,9 +267,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     for (unsigned int i = 0; i < vBkgs.size(); i++) {
       if (vBkgs[i] == "Other") {
         syst_bkgs.push_back("TGamma");
-        //syst_bkgs.push_back("TTW");
-        //syst_bkgs.push_back("TTZ");
-        syst_bkgs.push_back("TTV");
+        syst_bkgs.push_back("TTW");
+        syst_bkgs.push_back("TTZ");
+        //syst_bkgs.push_back("TTV");
         syst_bkgs.push_back("VV");
         syst_bkgs.push_back("tV");
         syst_bkgs.push_back("DY");
@@ -568,24 +568,33 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         vector<double> vlines;
         vector<double> cp_lines;
         if (output.Contains("Leptonic")) {
-            vlines = { 0.8997816, 0.95635754, 0.9725133, 0.9870608 }; 
+            //vlines = { 0.8997816, 0.95635754, 0.9725133, 0.9870608 }; // hig-19-013 
+            vlines = { 0.822 }; // hig-19-015 lowest boundary
             if (hist_name.Contains("low_pT"))
                 vlines = { 0.8972818, 0.9608462, 0.9770001, 0.9826471 };
             else if (hist_name.Contains("med_pT"))
                 vlines = { 0.872559, 0.94131196 };
+            else if (hist_name.Contains("Vhigh_pT"))
+                vlines = { 0.854, 0.949 };
             else if (hist_name.Contains("high_pT"))
                 vlines = { 0.8220656, 0.94593006 }; 
             cp_lines = { 0.9597816 };
             c->set_y_lim_range({0.333, 2*pow(10,5)});
         }
         else if (output.Contains("Hadronic")) {
-            vlines = { 0.986025, 0.9948537, 0.9983046, 0.9990729 }; 
+            //vlines = { 0.986025, 0.9948537, 0.9983046, 0.9990729 }; // hig-19-013 
+            vlines = { 0.709 };
             if (hist_name.Contains("low_pT"))
-                vlines = { 0.97087705, 0.9878033, 0.9900327, 0.99430627 }; 
+                vlines = { 0.709, 0.878, 0.900, 0.943 };
+                //vlines = { 0.97087705, 0.9878033, 0.9900327, 0.99430627 }; 
             else if (hist_name.Contains("med_pT"))
-                vlines = { 0.97961617, 0.9922437, 0.99585503, 0.9980591 }; 
+                vlines = { 0.796, 0.922, 0.958, 0.980 };
+                //vlines = { 0.97961617, 0.9922437, 0.99585503, 0.9980591 }; 
+            else if (hist_name.Contains("Vhigh_pT"))
+                vlines = { 0.939, 0.961, 0.980, 0.989 };
             else if (hist_name.Contains("high_pT"))
-                vlines = { 0.9776608, 0.9908235, 0.9947924, 0.9986299 }; 
+                vlines = { 0.776, 0.908, 0.947, 0.986 };
+                //vlines = { 0.9776608, 0.9908235, 0.9947924, 0.9986299 }; 
             c->set_y_lim_range({0.5, pow(10,6)});
             cp_lines = { 0.99722563 };
         }
@@ -594,22 +603,27 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         }
         for (unsigned int i = 0; i < cp_lines.size(); i++)
             cp_lines[i] = -log(1-cp_lines[i]);
-        c->give_vlines(vlines);
-        c->give_vlines_dotted(cp_lines);
+
+        if (hist_name.Contains("pT")) {
+            c->give_vlines(vlines);
+            c->give_vlines_dotted(cp_lines);
+        }
         c->give_vshade({0.,vlines[0]});
         c->add_paper_info(output.Contains("Hadronic") ? "Had" : "Lep");
-        if (hist_name.Contains("pT"))
-            c->skipCatLabels();
+        //if (hist_name.Contains("pT"))
+        c->skipCatLabels();
         c->skip_cp(); // uncomment to remove cp lines
     }
 
     else if (hist_name.Contains("htthMVA_RunII_transf") && hist_name.Contains("ttZ")) {
         vector<double> vlines;
         if (output.Contains("Leptonic")) {
-            vlines = { 0.8997816, 0.95635754, 0.9725133, 0.9870608 };
+            //vlines = { 0.8997816, 0.95635754, 0.9725133, 0.9870608 }; // hig-19-013
+            vlines = { 0.822 }; // hig-19-015
         }
         else if (output.Contains("Hadronic")) {
-            vlines = { 0.986025, 0.9948537, 0.9983046, 0.9990729 };
+            //vlines = { 0.986025, 0.9948537, 0.9983046, 0.9990729 }; // hig-19-013
+            vlines = { 0.709 };
         }
         for (unsigned int i = 0; i < vlines.size(); i++) {
             vlines[i] = -log(1-vlines[i]);
@@ -836,7 +850,7 @@ int main(int argc, char* argv[])
   //TString file_path_ref = argv[4];
   //TString year_ref = file_path_ref.Contains("RunII") ? "2017" : file_path_ref.Contains("2018") ? "2018" : ((file_path_ref.Contains("2017") ? "2017" : "2016"));
 
-  bool doSyst = false;
+  bool doSyst = true;
   bool doRatio = true;
   bool loose_mva_cut = false; //argc > 4;
   TString mva_ext = loose_mva_cut ? "_looseMVACut" : "";
@@ -861,9 +875,9 @@ int main(int argc, char* argv[])
   vector<TString> vSigs = {"ttH"};
   vector<TString> vBkgs;
   if (type == "std" || type == "shape" || type == "std_linear") { 
-    vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
+    vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "TTZ", "TTW", "VV", "tV"};
     if (file_path.Contains("impute"))
-      vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "VV", "tV"};
+      vBkgs = {"DiPhoton", "QCD_GammaJets_imputed", "TTGG", "TTGJets", "TTJets", "DY", "VG", "TGamma", "TTV", "TTZ", "TTW", "VV", "tV"};
   }
   else if (type == "individual_shape") {
     vBkgs = {"DiPhoton", "GammaJets", "TTGG", "TTGJets"};
@@ -1145,8 +1159,11 @@ int main(int argc, char* argv[])
         make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_low_pT", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
         vInfo[vInfo.size()-1] = "60 < p_{T}^{#gamma#gamma} < 120 GeV";
         make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_med_pT", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-        vInfo[vInfo.size()-1] = "p_{T}^{#gamma#gamma} > 120 GeV";
+        vInfo[vInfo.size()-1] = "120 < p_{T}^{#gamma#gamma} < 200 GeV";
         make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_high_pT", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        vInfo[vInfo.size()-1] = "p_{T}^{#gamma#gamma} > 200 GeV";
+        make_plot(c1, vFiles[i], vNames[i], "htthMVA_RunII_transf_Vhigh_pT", "BDT-bkg", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+
         vInfo[vInfo.size()-1] = "";
 
         make_plot(c1, vFiles[i], vNames[i], "hDNNScore_ttH_vs_ttGG", "DNN Score (t#bar{t}H vs. t#bar{t} + #gamma#gamma)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
@@ -1163,6 +1180,49 @@ int main(int argc, char* argv[])
     }
     if (file_path.Contains("hct") || file_path.Contains("hut")) 
         make_plot(c1, vFiles[i], vNames[i], "hMVA_transf", "MVA Score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst);
+
+
+    if (tag == "Leptonic") {
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_neutrino_pz", "Neutrino p_{z} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tbw_mass", "Leptonic top mass [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tbw_pt", "Leptonic top p_{T} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tbw_eta", "Leptonic top #eta", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tbw_deltaR_dipho", "#Delta R(leptonic top, diphoton)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_qjet_pt", "Light jet p_{T} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_qjet_eta", "Light jet #eta", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_qjet_btag", "Light jet b-tag", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_qjet_deltaR_dipho", "#Delta R(light jet, diphoton)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tqh_ptOverM", "t #to qH p_{T}/m", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tqh_eta", "t #to qH #eta", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tqh_deltaR_tbw", "#Delta R(t #to qH, leptonic top)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tqh_deltaR_dipho", "#Delta R(t #to qH, diphoton)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+
+    }
+
+    if (tag == "Hadronic") {
+        make_plot(c1, vFiles[i], vNames[i], "hMassTop1", "m_{#gamma#gammaj} [GeV]", vBkgs, vSigs, 0,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hMassTop2", "m_{jjj} [GeV]", vBkgs, vSigs, 0,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tbw_mass", "Hadronic top mass [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tbw_pt", "Hadronic top p_{T} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tbw_eta", "Hadronic top #eta", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tbw_deltaR_dipho", "#Delta R(hadronic top, diphoton)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_qjet_pt", "Light jet p_{T} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_qjet_eta", "Light jet #eta", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_qjet_btag", "Light jet b-tag", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_qjet_deltaR_dipho", "#Delta R(light jet, diphoton)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tqh_ptOverM", "t #to qH p_{T}/m", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tqh_eta", "t #to qH #eta", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_tqh_deltaR_tbw", "#Delta R(t #to qH, hadronic top)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_3x3_tbw_mass", "(3x3) hadronic top mass [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_3x3_tbw_pt", "(3x3) hadronic top p_{T} [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_3x3_tbw_eta", "(3x3) hadronic top #eta", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_3x3_tbw_deltaR_dipho", "(3x3) #Delta R(hadronic top, diphoton)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_3x3_tqh_ptOverM", "(3x3) t #to qH p{T}/m", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_3x3_tqh_eta", "(3x3) t #to qH #eta", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_3x3_tqh_deltaR_tbw", "(3x3) #Delta R(t #to qH, hadronic top)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+        make_plot(c1, vFiles[i], vNames[i], "hchi2_3x3_tqh_deltaR_dipho", "(3x3) #Delta R(t #to qH, diphoton)", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    }
+
     make_plot(c1, vFiles[i], vNames[i], "hRho", "Rho", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, vSigs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
   }

@@ -548,7 +548,7 @@ void Comparison::default_options(TCanvas* c1)
   mDataDrawOpt = "E";
   mSignalDrawOpt = "HIST";
   mVerbose = false;
-  mDoSystBand = false;
+  mDoSystBand = true; // do mc stat band by default
 
   mSystColor = kRed;
   mStatColor = kGray+2;
@@ -1044,18 +1044,20 @@ void Comparison::draw_main_histograms()
   else mHMC->Draw("SAME, E");
 
   if (mDoSystBand) {
-    hMC_TotalSyst_up->SetFillStyle(3144);
-    hMC_TotalSyst_up->SetFillColorAlpha(mSystColor, 0.5);
-    hMC_TotalSyst_up->SetMarkerColor(mSystColor);
-    hMC_TotalSyst_up->SetMarkerSize(0.);
-    hMC_TotalSyst_up->SetLineColor(mSystColor);
-    hMC_TotalSyst_up->Draw("E2, SAME");
-    hMC_TotalSyst_down->SetFillStyle(3144);
-    hMC_TotalSyst_down->SetFillColorAlpha(mSystColor, 0.5);
-    hMC_TotalSyst_down->SetMarkerColor(mSystColor);
-    hMC_TotalSyst_down->SetMarkerSize(0.);
-    hMC_TotalSyst_down->SetLineColor(mSystColor);
-    hMC_TotalSyst_down->Draw("E2, SAME");
+    if (mVHMCSyst_up.size() >= 1) {
+        hMC_TotalSyst_up->SetFillStyle(3144);
+        hMC_TotalSyst_up->SetFillColorAlpha(mSystColor, 0.5);
+        hMC_TotalSyst_up->SetMarkerColor(mSystColor);
+        hMC_TotalSyst_up->SetMarkerSize(0.);
+        hMC_TotalSyst_up->SetLineColor(mSystColor);
+        hMC_TotalSyst_up->Draw("E2, SAME");
+        hMC_TotalSyst_down->SetFillStyle(3144);
+        hMC_TotalSyst_down->SetFillColorAlpha(mSystColor, 0.5);
+        hMC_TotalSyst_down->SetMarkerColor(mSystColor);
+        hMC_TotalSyst_down->SetMarkerSize(0.);
+        hMC_TotalSyst_down->SetLineColor(mSystColor);
+        hMC_TotalSyst_down->Draw("E2, SAME");
+    }
 
     hMC_StatUnc_up->SetFillStyle(3144);
     hMC_StatUnc_up->SetFillColorAlpha(mStatColor, 0.5);
@@ -1247,8 +1249,8 @@ void Comparison::annotate_plot()
   else {
     //cms  = new TLatex(0.12, 0.935, "CMS");
     //cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Supplementary}}");
-    cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Preliminary}}");
-    //cms = new TLatex(0.12, 0.935, "CMS");
+    //cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Preliminary}}");
+    cms = new TLatex(0.12, 0.935, "CMS");
     cms->SetTextSize(0.05);
   }
   cms->SetNDC();
@@ -1428,7 +1430,20 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
   else
     mVHRat.push_back((TH1D*)mVHSignal[0]->Clone("mVHRat0"));
   mVHRat[0]->SetTitle("");
+
+  //for (unsigned int i = 0; i <  mVHData[0]->GetSize() - 2; i++) {
+  //  cout << "Error before dividing: " << i << ", " << mVHRat[0]->GetBinContent(i) << " +/- " << mVHRat[0]->GetBinError(i) << endl;
+  //}  
+
   mVHRat[0]->Divide(hMC);
+  for (unsigned int i = 0; i < mVHRat[0]->GetSize(); i++) {
+    mVHRat[0]->SetBinError(i, mVHData[0]->GetBinError(i) / hMC->GetBinContent(i));
+  }
+
+  //for (unsigned int i = 0; i <  mVHRat[0]->GetSize() - 2; i++) {
+  //  cout << "Error after dividing: " << i << ", " << mVHRat[0]->GetBinContent(i) << " +/- " << mVHRat[0]->GetBinError(i) << endl;
+  //}
+
   if (mCustomRatRange)
     mVHRat[0]->GetYaxis()->SetRangeUser(mRatRange[0],mRatRange[1]);
   else
@@ -1497,9 +1512,9 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
       double stat_unc_up = (abs(hMC_StatUnc_up->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx));
       double stat_unc_down = (abs(hMC_StatUnc_down->GetBinContent(idx) - mHMC->GetBinContent(idx)) / mHMC->GetBinContent(idx));
 
-      if (mHMC->GetBinContent(idx) == 0.) {
-        stat_unc_up = 0.;
-        stat_unc_down = 0.;
+      if (mHMC->GetBinContent(idx) == 0.) { // set MC stat unc = 0 since it is already displayed in ratio error
+        stat_unc_up = 0.00000001;
+        stat_unc_down = 0.000000001;
       }
 
       hRat_StatUnc_up->SetBinContent(idx, 1 + (stat_unc_up));
@@ -1513,25 +1528,29 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
 
     //TLegend* legend = new TLegend(0.14, 0.37, 0.44, 0.49);
     TLegend* legend = new TLegend(0.14, 0.37, 0.64, 0.49);
+    //legend->AddEntry(hRat_TotalSyst_up, "Syst. Unc.", "f");
     legend->AddEntry(hRat_StatUnc_up, "Stat. Unc.", "f");
-    legend->AddEntry(hRat_TotalSyst_up, "Stat. + Syst. Unc.", "f");
+    if (mVHMCSyst_up.size() >= 1)
+        legend->AddEntry(hRat_TotalSyst_up, "Stat. + Syst. Unc.", "f");
     legend->SetNColumns(2);
     legend->SetBorderSize(0);
     legend->Draw("SAME"); 
 
-    hRat_TotalSyst_up->SetFillStyle(3144);
-    hRat_TotalSyst_up->SetFillColorAlpha(mSystColor, 0.5);
-    hRat_TotalSyst_up->SetMarkerColor(mSystColor);
-    hRat_TotalSyst_up->SetMarkerSize(0.);
-    hRat_TotalSyst_up->SetLineColor(mSystColor);
-    hRat_TotalSyst_up->Draw("E2, SAME");
+    if (mVHMCSyst_up.size() >= 1) {
+        hRat_TotalSyst_up->SetFillStyle(3144);
+        hRat_TotalSyst_up->SetFillColorAlpha(mSystColor, 0.5);
+        hRat_TotalSyst_up->SetMarkerColor(mSystColor);
+        hRat_TotalSyst_up->SetMarkerSize(0.);
+        hRat_TotalSyst_up->SetLineColor(mSystColor);
+        hRat_TotalSyst_up->Draw("E2, SAME");
 
-    hRat_TotalSyst_down->SetFillStyle(3144);
-    hRat_TotalSyst_down->SetFillColorAlpha(mSystColor, 0.5);
-    hRat_TotalSyst_down->SetMarkerColor(mSystColor);
-    hRat_TotalSyst_down->SetMarkerSize(0.);
-    hRat_TotalSyst_down->SetLineColor(mSystColor);
-    hRat_TotalSyst_down->Draw("E2, SAME");
+        hRat_TotalSyst_down->SetFillStyle(3144);
+        hRat_TotalSyst_down->SetFillColorAlpha(mSystColor, 0.5);
+        hRat_TotalSyst_down->SetMarkerColor(mSystColor);
+        hRat_TotalSyst_down->SetMarkerSize(0.);
+        hRat_TotalSyst_down->SetLineColor(mSystColor);
+        hRat_TotalSyst_down->Draw("E2, SAME");
+    }
 
     hRat_StatUnc_up->SetFillStyle(3144);
     hRat_StatUnc_up->SetFillColorAlpha(mStatColor, 0.5);
@@ -1549,9 +1568,12 @@ void Comparison::make_rat_histogram(TH1D* hData, TH1D* hMC)
 
   }
   
-  for (int i=0; i<mVHData.size(); i++) 
+  for (int i=0; i<mVHData.size(); i++) { 
+    for (unsigned int j = 0; j < mVHRat[0]->GetSize(); j++) {
+        mVHRat[i]->SetBinError(j, mVHData[i]->GetBinError(j) / hMC->GetBinContent(j));
+    } 
     mVHRat[i]->Draw("e1, same");
-
+  }
 
 }
 

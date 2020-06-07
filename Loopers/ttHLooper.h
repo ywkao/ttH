@@ -65,8 +65,8 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         //v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionLowMVA", 25, 0, 0.1);
         //v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionMedMVA", 25, 0, 0.1);
         //v[i]->add_histogram("h" + syst_labels[j] + "DiphotonMassResolutionHighMVA", 25, 0, 0.1);
-        //v[i]->add_histogram("h" + syst_labels[j] + "MassTop1", 100, 0, 500);
-        //v[i]->add_histogram("h" + syst_labels[j] + "MassTop2", 100, 0, 500);
+        v[i]->add_histogram("h" + syst_labels[j] + "MassTop1", 25, 0, 300);
+        v[i]->add_histogram("h" + syst_labels[j] + "MassTop2", 25, 0, 300);
 
         //v[i]->add_histogram("h" + syst_labels[j] + "MassTop_Hq_1", 100, 0, 500);
         //v[i]->add_histogram("h" + syst_labels[j] + "MassTop_Hq_2", 100, 0, 500);
@@ -335,6 +335,40 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "DNNScore_ttH_vs_ttGG", 50, 0, 1);
 
         v[i]->add_histogram("h" + syst_labels[j] + "Rho", 50, 0, 100);
+
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tbw_mass", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tbw_pt", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tbw_eta", 25, -3, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tbw_deltaR_dipho", 25, 0, 5);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_qjet_pt", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_qjet_eta", 25, -3, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_qjet_btag", 25, 0, 1);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_qjet_deltaR_dipho", 25, 0, 5);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tqh_ptOverM", 25, 0, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tqh_eta", 25, -3, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tqh_deltaR_tbw", 25, 0, 5);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_3x3_tbw_mass", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_3x3_tbw_pt", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_3x3_tbw_eta", 25, -3, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_3x3_tbw_deltaR_dipho", 25, 0, 5);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_3x3_tqh_ptOverM", 40, 0, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_3x3_tqh_eta", 25, -3, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_3x3_tqh_deltaR_tbw", 25, 0, 5);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_3x3_tqh_deltaR_dipho", 25, 0, 5);
+
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_neutrino_pz", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tbw_mass", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tbw_pt", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tbw_eta", 25, -3, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tbw_deltaR_dipho", 25, 0, 5);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_qjet_pt", 40, 0, 400);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_qjet_eta", 25, -3, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_qjet_btag", 25, 0, 1);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_qjet_deltaR_dipho", 25, 0, 5);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tqh_ptOverM", 25, 0, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tqh_eta", 25, -3, 3);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tqh_deltaR_tbw", 25, 0, 5);
+        v[i]->add_histogram("h" + syst_labels[j] + "chi2_tqh_deltaR_dipho", 25, 0, 5);
 
       }
   }

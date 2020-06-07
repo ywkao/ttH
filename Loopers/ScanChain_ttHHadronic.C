@@ -562,8 +562,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               vProcess[processId]->fill_histogram("h" + syst_ext + "Mass_v2", mass(), evt_weight, vId);   
 
               //vProcess[processId]->fill_histogram("h" + syst_ext + "MassAN", mass(), evt_weight, vId);
-              //vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop1", m1_, evt_weight, vId);   
-              //vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop2", m2_, evt_weight, vId);   
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop1", m1_, evt_weight, vId);   
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop2", m2_, evt_weight, vId);   
               //vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop_Hq_1", top_candidates[0], evt_weight, vId);
               //vProcess[processId]->fill_histogram("h" + syst_ext + "MassTop_Hq_2", top_candidates[6], evt_weight, vId);
 
@@ -739,6 +739,84 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_coarse", minID, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_entries", minID, 1, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_fine_entries", minID, 1, vId);
+
+
+              vector<int> _null_vector_;
+              vector<int> indices_bjet = get_bjet_indices(jets, btag_scores);
+
+              bool is_moreThanThreeJets_and_atLeastOneBjet = jets.size() > 3 && indices_bjet.size() > 0;
+              bool is_moreThanTwoJets_and_atLeastOneBjet   = jets.size() > 2 && indices_bjet.size() > 0;
+              vector<int> index_jet_chi2_modified = is_moreThanThreeJets_and_atLeastOneBjet ? get_bjjq_indices_min_chi2(jets, indices_bjet, diphoton, true) :
+                                                   (is_moreThanTwoJets_and_atLeastOneBjet   ? get_bjj_indices_min_chi2(jets, indices_bjet, true) : _null_vector_);
+              vector<int> index_jet_chi2_improved = is_moreThanThreeJets_and_atLeastOneBjet ? get_bjjq_indices_min_chi2_3x3(jets, indices_bjet, diphoton) : _null_vector_;
+
+              //values{{{
+              TLorentzVector _nothing_;
+              TLorentzVector chi2_bjet      = is_moreThanTwoJets_and_atLeastOneBjet   ? jets[index_jet_chi2_modified[0]]                : _nothing_;
+              TLorentzVector chi2_wjet1     = is_moreThanTwoJets_and_atLeastOneBjet   ? jets[index_jet_chi2_modified[1]]                : _nothing_;
+              TLorentzVector chi2_wjet2     = is_moreThanTwoJets_and_atLeastOneBjet   ? jets[index_jet_chi2_modified[2]]                : _nothing_;
+              TLorentzVector chi2_qjet      = is_moreThanThreeJets_and_atLeastOneBjet ? jets[index_jet_chi2_modified[3]]                : _nothing_;
+              TLorentzVector chi2_tbw       = is_moreThanTwoJets_and_atLeastOneBjet   ? chi2_bjet + chi2_wjet1 + chi2_wjet2             : _nothing_;
+              TLorentzVector chi2_tqh       = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_qjet + diphoton                            : _nothing_;
+
+              float chi2_tbw_mass_                = is_moreThanTwoJets_and_atLeastOneBjet   ? chi2_tbw.M()                                    : -999;
+              float chi2_tbw_pt_                  = is_moreThanTwoJets_and_atLeastOneBjet   ? chi2_tbw.Pt()                                   : -999;
+              float chi2_tbw_eta_                 = is_moreThanTwoJets_and_atLeastOneBjet   ? chi2_tbw.Eta()                                  : -999;
+              float chi2_tbw_deltaR_dipho_        = is_moreThanTwoJets_and_atLeastOneBjet   ? chi2_tbw.DeltaR(diphoton)                       : -999;
+              float chi2_qjet_pt_                 = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_qjet.Pt()                                  : -999;
+              float chi2_qjet_eta_                = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_qjet.Eta()                                 : -999;
+              float chi2_qjet_btag_               = is_moreThanThreeJets_and_atLeastOneBjet ? btag_scores[index_jet_chi2_modified[3]]         : -999;
+              float chi2_qjet_deltaR_dipho_       = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_qjet.DeltaR(diphoton)                      : -999;
+              float chi2_tqh_ptOverM_             = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_tqh.Pt()/chi2_tqh.M()                      : -999;
+              float chi2_tqh_eta_                 = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_tqh.Eta()                                  : -999;
+              float chi2_tqh_deltaR_tbw_          = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(chi2_tbw)                       : -999; 
+
+              TLorentzVector chi2_3x3_bjet  = is_moreThanThreeJets_and_atLeastOneBjet ? jets[index_jet_chi2_improved[0]]                : _nothing_;
+              TLorentzVector chi2_3x3_wjet1 = is_moreThanThreeJets_and_atLeastOneBjet ? jets[index_jet_chi2_improved[1]]                : _nothing_;
+              TLorentzVector chi2_3x3_wjet2 = is_moreThanThreeJets_and_atLeastOneBjet ? jets[index_jet_chi2_improved[2]]                : _nothing_;
+              TLorentzVector chi2_3x3_qjet  = is_moreThanThreeJets_and_atLeastOneBjet ? jets[index_jet_chi2_improved[3]]                : _nothing_;
+              TLorentzVector chi2_3x3_tbw   = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_bjet + chi2_3x3_wjet1 + chi2_3x3_wjet2 : _nothing_;
+              TLorentzVector chi2_3x3_tqh   = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_qjet + diphoton                        : _nothing_;
+
+              float chi2_3x3_tbw_mass_            = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tbw.M()                                : -999;
+              float chi2_3x3_tbw_pt_              = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tbw.Pt()                               : -999;
+              float chi2_3x3_tbw_eta_             = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tbw.Eta()                              : -999;
+              float chi2_3x3_tbw_deltaR_dipho_    = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tbw.DeltaR(diphoton)                   : -999;
+              float chi2_3x3_qjet_pt_             = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_qjet.Pt()                              : -999;
+              float chi2_3x3_qjet_eta_            = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_qjet.Eta()                             : -999;
+              float chi2_3x3_qjet_btag_           = is_moreThanThreeJets_and_atLeastOneBjet ? btag_scores[index_jet_chi2_improved[3]]         : -999;
+              float chi2_3x3_qjet_deltaR_dipho_   = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_qjet.DeltaR(diphoton)                  : -999;
+              float chi2_3x3_tqh_ptOverM_         = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tqh.Pt()/chi2_3x3_tqh.M()              : -999;
+              float chi2_3x3_tqh_eta_             = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tqh.Eta()                              : -999;
+              float chi2_3x3_tqh_deltaR_tbw_      = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tqh.DeltaR(chi2_3x3_tbw)               : -999;
+              float chi2_3x3_tqh_deltaR_dipho_    = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tqh.DeltaR(diphoton)                   : -999; 
+
+              if (is_moreThanTwoJets_and_atLeastOneBjet) {
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tbw_mass", chi2_tbw_mass_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tbw_pt", chi2_tbw_pt_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tbw_eta", chi2_tbw_eta_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tbw_deltaR_dipho", chi2_tbw_deltaR_dipho_, evt_weight, vId);
+              }
+
+              if (is_moreThanThreeJets_and_atLeastOneBjet) {
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_qjet_pt", chi2_qjet_pt_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_qjet_eta", chi2_qjet_eta_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_qjet_btag", chi2_qjet_btag_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_qjet_deltaR_dipho", chi2_qjet_deltaR_dipho_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tqh_ptOverM", chi2_tqh_ptOverM_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tqh_eta", chi2_tqh_eta_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_tqh_deltaR_tbw", chi2_tqh_deltaR_tbw_, evt_weight, vId);
+
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_3x3_tbw_mass", chi2_3x3_tbw_mass_ , evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_3x3_tbw_pt", chi2_3x3_tbw_pt_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_3x3_tbw_eta", chi2_3x3_tbw_eta_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_3x3_tbw_deltaR_dipho", chi2_3x3_tbw_deltaR_dipho_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_3x3_tqh_ptOverM", chi2_3x3_tqh_ptOverM_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_3x3_tqh_eta", chi2_3x3_tqh_eta_ , evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_3x3_tqh_deltaR_tbw", chi2_3x3_tqh_deltaR_tbw_, evt_weight, vId);
+                  vProcess[processId]->fill_histogram("h" + syst_ext + "chi2_3x3_tqh_deltaR_dipho", chi2_3x3_tqh_deltaR_dipho_, evt_weight, vId);
+              }
+
               //if (njets_ >= 5)
               //  vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonMinIDMVA_NJets5+", minID, evt_weight, vId);
               //if (njets_ >= 7)
