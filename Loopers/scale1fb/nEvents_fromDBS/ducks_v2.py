@@ -32,6 +32,7 @@ with open(output_json, "r") as f_in:
 
 def get_sum_of_weights(files, dbs=True):
   sum = 0
+  evts = 0
   idx = 0
   for file in files:
     idx += 1
@@ -52,8 +53,9 @@ def get_sum_of_weights(files, dbs=True):
     total_evts = tree.GetEntries("GenEventInfoProduct_generator__SIM.obj.weights_[0]")
     print "Mean: %.6f, total entries: %d" % (mean, total_evts)
     sum += mean * total_evts
+    evts += total_evts
     del hist
-  return sum
+  return sum, evts
 
 def get_negative_events(files):
   n_events_neg = 0
@@ -109,7 +111,7 @@ for key, dict in mc_samples.iteritems():
     n_events += file.get_nevents()
   dict["n_events_tot"] = n_events
   #dict["n_events_neg"], dict["n_events_pos"] = get_negative_events(files)
-  dict["sum_of_weights"] = get_sum_of_weights(files)
+  dict["sum_of_weights"], dummy = get_sum_of_weights(files)
   #if dict["n_events_neg"] + dict["n_events_pos"] == dict["n_events_tot"]:
     #print "%s has: \n Total events: %d \n Positive Events: %d \n Negative Events: %d \n" % (key, dict["n_events_tot"], dict["n_events_pos"], dict["n_events_neg"])
   #else:
@@ -135,10 +137,10 @@ for ds in local_sets:
         continue
     else:
         print "Adding %s to list of mc samples\n" % dataset
-        mc_samples[sample] = { "n_events_tot" : -1, "sum_of_weights" : 0 }
+        mc_samples[dataset] = { "n_events_tot" : -1, "sum_of_weights" : 0 }
         files = glob.glob(ds + "/*.root")
-        mc_samples[sample]["n_events_tot"] = events_per_private_miniaod * len(files)
-        mc_samples[sample]["sum_of_weights"] = get_sum_of_weights(files, False)
+        #mc_samples[dataset]["n_events_tot"] = events_per_private_miniaod * len(files)
+        mc_samples[dataset]["sum_of_weights"], mc_samples[dataset]["n_events_tot"] = get_sum_of_weights(files, False)
 
     with open(output_json, "w") as f_out:
         json.dump(mc_samples, f_out, indent=4, sort_keys=True)
