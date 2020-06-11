@@ -165,6 +165,20 @@ class BabyMaker {
 
     float	helicity_angle_;
 
+    //#quadratic equation related
+    float chi2_neutrino_pz_;
+    float chi2_tbw_mass_;
+    float chi2_tbw_pt_;
+    float chi2_tbw_eta_;
+    float chi2_tbw_deltaR_dipho_;
+    float chi2_qjet_pt_;
+    float chi2_qjet_eta_;
+    float chi2_qjet_btag_;
+    float chi2_qjet_deltaR_dipho_;
+    float chi2_tqh_ptOverM_;
+    float chi2_tqh_eta_;
+    float chi2_tqh_deltaR_tbw_;
+    float chi2_tqh_deltaR_dipho_;
 
 };
 
@@ -301,7 +315,20 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("met_phi_"           , &met_phi_      );
 
   BabyTree_->Branch("helicity_angle_"           , &helicity_angle_      );
- 
+  //#quadratic equation related
+  BabyTree_->Branch("chi2_neutrino_pz_", &chi2_neutrino_pz_);
+  BabyTree_->Branch("chi2_tbw_mass_", &chi2_tbw_mass_);
+  BabyTree_->Branch("chi2_tbw_pt_", &chi2_tbw_pt_);
+  BabyTree_->Branch("chi2_tbw_eta_", &chi2_tbw_eta_);
+  BabyTree_->Branch("chi2_tbw_deltaR_dipho_", &chi2_tbw_deltaR_dipho_);
+  BabyTree_->Branch("chi2_qjet_pt_", &chi2_qjet_pt_);
+  BabyTree_->Branch("chi2_qjet_eta_", &chi2_qjet_eta_);
+  BabyTree_->Branch("chi2_qjet_btag_", &chi2_qjet_btag_);
+  BabyTree_->Branch("chi2_qjet_deltaR_dipho_", &chi2_qjet_deltaR_dipho_);
+  BabyTree_->Branch("chi2_tqh_ptOverM_", &chi2_tqh_ptOverM_);
+  BabyTree_->Branch("chi2_tqh_eta_", &chi2_tqh_eta_);
+  BabyTree_->Branch("chi2_tqh_deltaR_tbw_", &chi2_tqh_deltaR_tbw_);
+  BabyTree_->Branch("chi2_tqh_deltaR_dipho_", &chi2_tqh_deltaR_dipho_);
   
 
 

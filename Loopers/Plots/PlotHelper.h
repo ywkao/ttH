@@ -6,6 +6,7 @@
 #include <tuple>
 #include <string>
 #include <algorithm>
+#include <typeinfo>
 
 // ROOT
 #include "TString.h"
@@ -40,7 +41,9 @@ class Comparison
     Comparison(TCanvas* c1, TH1D* hData, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, TH1D* hData, TH1D* hSignal, vector<TH1D*> hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData, TH1D* hSignal, vector<TH1D*> hMC);
+    //--------------------------------------------------
     Comparison(TCanvas* c1, vector<TH1D*> hData, vector<TH1D*> hSignal, vector<TH1D*> hMC);
+    //--------------------------------------------------
     Comparison(TCanvas* c1, vector<TH1D*> hData, vector<TH1D*> hSignal, vector<TH1D*> hMC, vector<TH1D*> hMCSyst_up, vector<TH1D*> hMCSyst_down);
     Comparison(TCanvas* c1, TH2D* hData, TH2D* hMC);
     Comparison(TCanvas* c1, vector<TH1D*> hData);

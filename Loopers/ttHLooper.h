@@ -717,16 +717,16 @@ const double br_tToHc_limit = 0.0011; // from p34 of https://arxiv.org/pdf/1812.
 const double br_tToHu_limit = 0.0012; // ""
 
 double scale_fcnc(TString currentFileTitle) {
+  double weight = 1.;
   if (currentFileTitle.Contains("leptonic") && currentFileTitle.Contains("FCNC"))
-    return 1.0/1.527;
+    weight = weight * 1.0/1.527;
 
-  /*
   if (currentFileTitle.Contains("eta_hut"))
-    return br_tToHu_limit / br_tToHq_assumed;
+    weight = weight * br_tToHu_limit / br_tToHq_assumed;
   else if (currentFileTitle.Contains("eta_hct"))
-    return br_tToHc_limit / br_tToHq_assumed;
-  */
-  return 1.0; 
+    weight = weight * br_tToHc_limit / br_tToHq_assumed;
+
+  return weight; 
 }
 
 double scale_fcnc_to_atlas_limit(TString currentFileTitle) {

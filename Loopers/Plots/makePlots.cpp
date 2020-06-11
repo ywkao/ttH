@@ -1,7 +1,6 @@
 #include "PlotHelper.h"
 #include <iomanip>
-
-// histogram index to sample
+// histogram index to sample{{{
 // 0: ttH
 // 1: Drell-Yan
 // 2: Gamma Gamma + Jets
@@ -12,7 +11,8 @@
 // 7: V + Gamma
 // 8: W + Jets
 // 9: TT + Jets
-
+// }}}
+//std::map<TString, TString> mLabels {{{
 std::map<TString, TString> mLabels = {
 	{"DY", "Drell-Yan"}, 
 	{"DiPhoton", "#gamma#gamma + Jets"},
@@ -40,7 +40,8 @@ std::map<TString, TString> mLabels = {
 	{"ST_FCNC_hut", "t FCNC (Hut)"},
         {"ST_FCNC_hct", "t FCNC (Hct)"}
 };
-
+//}}}
+//std::map<TString, int> mColors {{{
 std::map<TString, int> mColors = {
         {"DY", kCyan-7},
         {"DiPhoton", kBlue - 4},
@@ -61,7 +62,8 @@ std::map<TString, int> mColors = {
 	{"VV", kPink+6},
     {"ttH", kCyan-9}
 };
-
+//}}}
+//std::map<TString, TString> mLatex {{{
 std::map<TString, TString> mLatex = {
         {"DY", "Drell-Yan"},
         {"DiPhoton", "$\\gamma\\gamma$ + Jets"},
@@ -85,17 +87,17 @@ std::map<TString, TString> mLatex = {
         {"ST_FCNC_hut", "$t$ FCNC (Hut)"},
         {"ST_FCNC_hct", "$t$ FCNC (Hct)"}
 };
-
-
+//}}}
 const int nGenPhotonCats = 3;
 const int nGenLeptonCats = 6;
-
+//std::map<int, TString> mPhotons {{{
 std::map<int, TString> mPhotons = {
 	{0, "(F/F)"},
 	{1, "(F/P)"},
 	{2, "(P/P)"}
 };
-
+//}}}
+//std::map<int, TString> mLeptons {{{
 std::map<int, TString> mLeptons = {
 	{0, "(Had.)"},
 	{1, "(e)"},
@@ -104,7 +106,8 @@ std::map<int, TString> mLeptons = {
 	{4, "(ee)"},
 	{5, "(#mu#mu)"}
 };
-
+//}}}
+//std::map<int, TString> mLeptonsLatex {{{
 std::map<int, TString> mLeptonsLatex = {
         {0, "Hadronic"},
         {1, "$e$"},
@@ -113,7 +116,8 @@ std::map<int, TString> mLeptonsLatex = {
         {4, "$ee$"},
         {5, "$\\mu\\mu$"}
 };
-
+//}}}
+//const std::vector<TString> syst_ext {{{
 const std::vector<TString> syst_ext = {
     /*
     "MvaShift",
@@ -169,9 +173,10 @@ const std::vector<TString> syst_ext = {
     "PreselSF",
     "electronVetoSF",
 };
+//}}}
 
 void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, vector<TString> vSigs, int idx, TString type = "std", TString year = "2016", bool loose_mva_cut = false, TFile* file_ref = nullptr, vector<TString> vExtraInfo = {}, int yearIdx = -1, bool doSyst = false, bool doRatio = true) {
-
+  // setup{{{
   TString extension = loose_mva_cut ? "MVACategories_1" : "";
   extension = yearIdx == -1 ? "" : (yearIdx == 0 ? "Year_0" : (yearIdx == 1 ? "Year_1" : (yearIdx == 2 ? "Year_2" : "")));
 
@@ -205,7 +210,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   vector<int> vColors;
 
   TString output = output_name;
-
+  //}}}
+  //if (type.Contains("std")) {{{
   if (type.Contains("std")) {
     if (vSigs.size() == 0) { 
       vLegendLabels = {year + "Data", "ttH (M125)", "FCNC_hut", "FCNC_hct"};
@@ -224,6 +230,7 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       }
             
     }
+
     for (int i = 0; i < vBkgs.size(); i++) {
       if (vBkgs[i] != "Other" && vBkgs[i] != "Other2") {
         hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + extension));
@@ -352,7 +359,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       cout << "\\end{tabular} \\end{center}" << endl;
     }
   }
-
+  //}}}
+  //else if (type == "shape") {{{
   else if (type == "shape") {
     vLegendLabels = {"ttH (M125)"};
     for (int i = 0; i < vBkgs.size(); i++) {
@@ -361,7 +369,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       vColors.push_back(mColors.find(vBkgs[i])->second);
     }
   }
-
+  //}}}
+  //else if (type == "GJet_shape") {{{
   else if (type == "GJet_shape") {
     vLegendLabels = {"#gamma + jets (Pythia + MadGraph Reweighted)", "#gamma + jets (Madgraph)"};
     for (int i = 0; i < vBkgs.size(); i++) {
@@ -369,7 +378,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       vColors.push_back(mColors.find(vBkgs[i])->second);
     }
   }
-
+  //}}}
+  //else if (type == "individual_shape") {{{
   else if (type == "individual_shape") {
     hBkg.push_back(hSig[0]);
     vColors = {kBlack};
@@ -380,7 +390,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       vColors.push_back(mColors.find(vBkgs[i])->second);
     }
   }
-
+  //}}}
+  //else if (type =="genPhoton") {{{
   else if (type =="genPhoton") {
     vLegendLabels = {"ttH (M125)"};
     vColors = {kBlue+2, kAzure+1, kCyan-7, kYellow, kGreen -4, kTeal + 3, kRed+3, kRed, kMagenta-9};
@@ -440,7 +451,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
     }
   }
-
+  //}}}
+  //else if (type =="genLepton") {{{
   else if (type =="genLepton") {
     vLegendLabels = {"ttH (M125)"};
     vColors = {kBlue+2, kAzure+1, kCyan-7, kYellow, kGreen -4, kTeal + 3, kRed+3, kRed, kRed - 7, kMagenta-9, kOrange, kViolet+1, kOrange-9};
@@ -492,7 +504,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       cout << "\\end{tabular} \\end{center}" << endl;
     }
   }
-
+  //}}}
+  // lumi{{{
   //TString output = output_name;
   std::map<TString, double> lumi_map = {
 	{"2016", 35.9},
@@ -504,9 +517,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   double lumi = lumi_map[year];
   cout << "Lumi is " << lumi << endl;
-
   //double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9))); 
-
+  //}}}
+  //if (type.Contains("std")) {{{
   if (type.Contains("std")) {
     if (type.Contains("shape")) {
       hSig[0]->Scale(1./hSig[0]->Integral(0, hSig[0]->GetNbinsX()+1));
@@ -523,8 +536,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_y_label("Fraction of events");
     }
     else {
-      if (file_ref == nullptr && !doSyst)
+      if (file_ref == nullptr && !doSyst) {
         c = new Comparison(c1, {hData}, hSig, hBkg);
+      }
       else if (file_ref == nullptr && doSyst)
         c = new Comparison(c1, {hData}, hSig, hBkg, hBkgSystUp, hBkgSystDown);
       else {
@@ -543,7 +557,6 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       //else if (hist_name.Contains("tthMVA_RunII") && output.Contains("Leptonic"))
       //    c->set_stack_order({6,1,4,5,0,3,2});
     }
-
     if (hist_name.Contains("htthMVA_RunII_transf") && !output.Contains("ttZ")) {
         vector<double> vlines;
         vector<double> cp_lines;
@@ -607,6 +620,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_no_log();
 
   }
+  //}}}
+  //else if (type == "shape") {{{
   else if (type == "shape") {
     c = new Comparison(c1, hSig[0], hBkg);
     c->set_data_drawOpt("HIST");
@@ -615,6 +630,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_log_rat();
     c->set_rat_lim_range({0.1, 10.0});
   }
+  //}}}
+  //else if (type == "GJet_shape") {{{
   else if (type == "GJet_shape") {
     hBkg[0]->Scale(1/hBkg[0]->Integral(0, hBkg[0]->GetSize()-1));
     c = new Comparison(c1, hBkg[0], hBkg[1]);
@@ -628,6 +645,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->give_info("Pythia + MadGraph Reweighted");
     c->set_y_lim_range({0.005, 3.0});
   }
+  //}}}
+  //else if (type == "individual_shape") {{{
   else if (type == "individual_shape") {
     c = new Comparison(c1, hBkg);
     c->set_data_drawOpt("HIST");
@@ -638,11 +657,15 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     c->set_no_log();
     c->set_y_lim_range({0.0, 1.0}); 
   }
+  //}}}
+  //else {{{
   else {
     c = new Comparison(c1, hSig[0], hBkg);
     c->set_data_drawOpt("HIST");
     c->set_rat_label("#frac{Signal}{Background}");
   }
+  //}}}
+  // set hist{{{
   if (type.Contains("std") && type.Contains("shape"))
       vLegendLabels.erase(vLegendLabels.begin());
   if (type.Contains("std") && type.Contains("shape") && type.Contains("sig_vs_data")) {
@@ -658,7 +681,6 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   //double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9)));
   //c->set_lumi(lumi);
 
- 
   if ((hist_name == "hNJets" || hist_name == "hNbLoose") && !output.Contains("GJet_Reweight")) {
     if (output.Contains("ttHHadronic_2017_Presel")) {
       c->set_no_log();
@@ -734,12 +756,14 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   for (int i = 0; i < hBkg.size(); i++)
     delete hBkg[i];
   delete c;
+  //}}}
+  cout << "Hello World!" << endl;
 }
  
 
 int main(int argc, char* argv[])
 {
-  // Parse args
+  // Parse args{{{
   if (argc < 3) {
     cout << "Please provide two arguments: type of plot to make (e.g. 'std') and input file (e.g. '../ttHHadronicLoose_histograms.root')" << endl;
     return 0;
@@ -781,7 +805,7 @@ int main(int argc, char* argv[])
   //TString file_path_ref = argv[4];
   //TString year_ref = file_path_ref.Contains("RunII") ? "2017" : file_path_ref.Contains("2018") ? "2018" : ((file_path_ref.Contains("2017") ? "2017" : "2016"));
 
-  bool doSyst = true;
+  bool doSyst = false;
   bool doRatio = true;
   bool loose_mva_cut = false; //argc > 4;
   TString mva_ext = loose_mva_cut ? "_looseMVACut" : "";
@@ -855,8 +879,8 @@ int main(int argc, char* argv[])
       cout << vSigs[i] << ", ";
     cout << endl;
   }
-
-  // Style options
+  //}}}
+  // Style options{{{
   gStyle->SetOptStat(0);
   gStyle->SetPalette(kRainBow,0);
   gStyle->SetPaintTextFormat(".2f");
@@ -871,8 +895,11 @@ int main(int argc, char* argv[])
   TCanvas* c1 = new TCanvas("c1", "histos", 600, 800);
   TCanvas* c2 = new TCanvas("c2", "histos2", 800, 800);
   TCanvas* c3 = new TCanvas("c3", "histos3", 1000, 800);
-
+  //}}}
+  // Make plots{{{
   for (int i = 0; i < vFiles.size(); i++) {
+    make_plot(c1, vFiles[i], vNames[i], "hMass", "m_{#gamma#gamma} [GeV]", vBkgs, vSigs, 0,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //others{{{
     make_plot(c1, vFiles[i], vNames[i], "hMass_v2", "m_{#gamma#gamma} [GeV]", vBkgs, vSigs, 0,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hRapidity", "Y_{#gamma#gamma} [GeV^{1/2}]", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hDiphotonSumPt", "p_{T}(#gamma_{1}) + p_{T}(#gamma_{2}) [GeV]", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
@@ -1102,5 +1129,7 @@ int main(int argc, char* argv[])
         make_plot(c1, vFiles[i], vNames[i], "hMVA_transf", "MVA Score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst);
     make_plot(c1, vFiles[i], vNames[i], "hRho", "Rho", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hNVtx", "# Vertices", vBkgs, vSigs, 2,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //}}}
   }
+  //}}}
 }
