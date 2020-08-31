@@ -1,4 +1,5 @@
 #include "ScanChain_ttHHadronic.h"
+#include "ctag_reshaping/ctag_reshaping.C"
 
 int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool doSyst = false, TString l1_prefire = "", TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + idx + ".root", "RECREATE");
@@ -64,6 +65,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   float minIDMVA_;
   float max2_btag_;
   float max1_btag_;
+  float max2_ctag_; // for the purpose of storing values only;
+  float max1_ctag_; // for the purpose of storing values only;
   float dipho_delta_R;
   float njets_;
   float nbjets_;
@@ -318,6 +321,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
             nEventsTotal = 0;
 
+            double total_weight_before_ctag_reshaping = 0.;
+            double total_weight_after_ctag_reshaping = 0.;
             for (unsigned int event = 0; event < nEventsTree; ++event) {
 
               // Get Event Content
@@ -484,6 +489,20 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               btag_scores_sorted = sortVector(btag_scores);
 
               double mva_value = -999;
+
+              //--------------------- max c-tag ---------------------//
+              vector<vector<float>> jet_objects = make_jet_objects(year, diphoton, false); // don't boost jet p4 to higgs ref. frame
+              vector<double> ctag_scores;
+              vector<std::pair<int, double>> ctag_scores_sorted;
+              for(std::size_t i=0; i!=jet_objects.size(); ++i)
+              {
+                  ctag_scores.push_back(jet_objects[i][6]);
+              }
+              ctag_scores_sorted = sortVector(ctag_scores);
+
+              max2_ctag_ = ctag_scores_sorted[1].second;
+              max1_ctag_ = ctag_scores_sorted[0].second;
+              //--------------------- end of max c-tag ---------------------//
 
               max2_btag_ = btag_scores_sorted[1].second;
               max1_btag_ = btag_scores_sorted[0].second;
@@ -673,6 +692,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet2BTag", btag_scores[1], evt_weight, vId);
               if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet3BTag", btag_scores[2], evt_weight, vId);
               if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet4BTag", btag_scores[3], evt_weight, vId);
+
+              if (jet1_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet1CTag", jet1_cdiscriminant(), evt_weight, vId);
+              if (jet2_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet2CTag", jet2_cdiscriminant(), evt_weight, vId);
+              if (jet3_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet3CTag", jet3_cdiscriminant(), evt_weight, vId);
+              if (jet4_pt() != -1)      vProcess[processId]->fill_histogram("h" + syst_ext + "Jet4CTag", jet4_cdiscriminant(), evt_weight, vId);
 
               if (bjet1_pt() != -1)     vProcess[processId]->fill_histogram("h" + syst_ext + "bJet1pT", bjet1_pt(), evt_weight, vId);
               if (bjet2_pt() != -1)     vProcess[processId]->fill_histogram("h" + syst_ext + "bJet2pT", bjet2_pt(), evt_weight, vId);
@@ -864,6 +888,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               // ttH-Hadronic Specific
               vProcess[processId]->fill_histogram("h" + syst_ext + "MaxBTag", bjet1_csv(), evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxBTag", bjet2_csv(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MaxCTag", max1_ctag_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxCTag", max2_ctag_, evt_weight, vId);
 
               if (!currentFileTitle.Contains("FCNC")) {
                   vProcess[processId]->fill_histogram("h" + syst_ext + "tthMVA", tthMVA(), evt_weight, vId);
@@ -895,7 +921,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                 vProcess[processId]->fill_histogram("h" + syst_ext + "PhotonIDMVA_fake", maxID, evt_weight, vId);
               */
 
-            }
+            } // end of event loop
             cout << "Deleting tree" << endl;
             delete tree;
         }

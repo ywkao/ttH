@@ -307,6 +307,18 @@ vector<float> make_objects(vector<TLorentzVector> jets, vector<TLorentzVector> p
 }
 */
 
+double calculate_CvsL(double c_disciminant, double udsg_discriminant)
+{
+    double CvsL = c_disciminant / (c_disciminant + udsg_discriminant);
+    return CvsL;
+}
+
+double calculate_CvsB(double c_disciminant, double b_discriminant, double bb_discriminant)
+{
+    double CvsB = c_disciminant / (c_disciminant + b_discriminant + bb_discriminant);
+    return CvsB;
+}
+
 //#chi-2 related
 //--------------------------------------------------//
 //get_bjet_indices{{{

@@ -97,6 +97,10 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "Jet4BTag", 25, 0, 1);  
         v[i]->add_histogram("h" + syst_labels[j] + "Jet5BTag", 25, 0, 1);  
         v[i]->add_histogram("h" + syst_labels[j] + "Jet6BTag", 25, 0, 1);  
+        v[i]->add_histogram("h" + syst_labels[j] + "Jet1CTag", 25, 0, 1);   
+        v[i]->add_histogram("h" + syst_labels[j] + "Jet2CTag", 25, 0, 1);
+        v[i]->add_histogram("h" + syst_labels[j] + "Jet3CTag", 25, 0, 1);  
+        v[i]->add_histogram("h" + syst_labels[j] + "Jet4CTag", 25, 0, 1);  
 
         //v[i]->add_histogram("h" + syst_labels[j] + "bJet1pT", 25, 0, 500);
         //v[i]->add_histogram("h" + syst_labels[j] + "bJet1Eta", 25, -3, 3);
@@ -175,6 +179,8 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
 
         v[i]->add_histogram("h" + syst_labels[j] + "MaxBTag", 50, 0, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "SecondMaxBTag", 50, 0, 1);  
+        v[i]->add_histogram("h" + syst_labels[j] + "MaxCTag", 50, 0, 1);
+        v[i]->add_histogram("h" + syst_labels[j] + "SecondMaxCTag", 50, 0, 1);  
 
         v[i]->add_histogram("h" + syst_labels[j] + "PhotonMaxIDMVA", 10, -1, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "PhotonMinIDMVA", 10, -1, 1);
@@ -330,6 +336,9 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "DNNScore_ttH_vs_dipho", 50, 0, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "DNNScore_ttH_vs_ttGG", 50, 0, 1);
 
+        v[i]->add_histogram("h" + syst_labels[j] + "Rho", 50, 0, 100);
+
+        //---------------//
         v[i]->add_histogram("h" + syst_labels[j] + "Rho", 50, 0, 100);
 
       }

@@ -446,7 +446,9 @@ def little_babies(baby):
 #]
 ##}}}
 
-#babies_2017=["ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1"]
+#babies_2017 = [
+#            "TT_FCNC-T2HJ_aTleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3_MINIAODSIM_RunII"
+#              ]
 
 command_list = []
 idx = 0

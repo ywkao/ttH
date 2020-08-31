@@ -165,6 +165,30 @@ class BabyMaker {
 
     float	helicity_angle_;
 
+    //# Meng-Cheng's method
+    float       mc_mva_score_tt_;
+    float       mc_mva_score_st_;
+	float       LeadPho_Pt;
+	float       LeadPho_Eta;
+	float       LeadPho_Phi;
+	float       LeadPho_IDMVA;
+	float       SubleadPho_Pt;
+	float       SubleadPho_Eta;
+	float       SubleadPho_Phi;
+	float       SubleadPho_IDMVA;
+	float       bJet_Pt;
+	float       bJet_Eta;
+	float       bJet_Phi;
+	float       bJet_btag;
+	float       M1Jet_Pt;
+	float       M1Jet_Eta;
+	float       M1Jet_Phi;
+	float       M1Jet_btag;
+	float       lep_ID;
+	float       lep_Pt;
+	float       lep_Eta;
+	float       lep_Phi;
+
     //#quadratic equation related
     float chi2_neutrino_pz_;
     float chi2_tbw_mass_;
@@ -173,12 +197,21 @@ class BabyMaker {
     float chi2_tbw_deltaR_dipho_;
     float chi2_qjet_pt_;
     float chi2_qjet_eta_;
-    float chi2_qjet_btag_;
     float chi2_qjet_deltaR_dipho_;
     float chi2_tqh_ptOverM_;
     float chi2_tqh_eta_;
     float chi2_tqh_deltaR_tbw_;
     float chi2_tqh_deltaR_dipho_;
+    float chi2_bjet_btagScores_;
+    float chi2_qjet_btagScores_;
+    float chi2_bjet_ctagScores_;
+    float chi2_qjet_ctagScores_;
+    float chi2_bjet_udsgtagScores_;
+    float chi2_qjet_udsgtagScores_;
+    float chi2_bjet_CvsL_;
+    float chi2_qjet_CvsL_;
+    float chi2_bjet_CvsB_;
+    float chi2_qjet_CvsB_;
 
 };
 
@@ -315,6 +348,9 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("met_phi_"           , &met_phi_      );
 
   BabyTree_->Branch("helicity_angle_"           , &helicity_angle_      );
+    //# Meng-Cheng's method
+  BabyTree_->Branch("mc_mva_score_tt_"             , &mc_mva_score_tt_        );
+  BabyTree_->Branch("mc_mva_score_st_"             , &mc_mva_score_st_        );
   //#quadratic equation related
   BabyTree_->Branch("chi2_neutrino_pz_", &chi2_neutrino_pz_);
   BabyTree_->Branch("chi2_tbw_mass_", &chi2_tbw_mass_);
@@ -323,13 +359,21 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("chi2_tbw_deltaR_dipho_", &chi2_tbw_deltaR_dipho_);
   BabyTree_->Branch("chi2_qjet_pt_", &chi2_qjet_pt_);
   BabyTree_->Branch("chi2_qjet_eta_", &chi2_qjet_eta_);
-  BabyTree_->Branch("chi2_qjet_btag_", &chi2_qjet_btag_);
   BabyTree_->Branch("chi2_qjet_deltaR_dipho_", &chi2_qjet_deltaR_dipho_);
   BabyTree_->Branch("chi2_tqh_ptOverM_", &chi2_tqh_ptOverM_);
   BabyTree_->Branch("chi2_tqh_eta_", &chi2_tqh_eta_);
   BabyTree_->Branch("chi2_tqh_deltaR_tbw_", &chi2_tqh_deltaR_tbw_);
   BabyTree_->Branch("chi2_tqh_deltaR_dipho_", &chi2_tqh_deltaR_dipho_);
-  
+  BabyTree_->Branch("chi2_bjet_btagScores_", &chi2_bjet_btagScores_);
+  BabyTree_->Branch("chi2_qjet_btagScores_", &chi2_qjet_btagScores_);
+  BabyTree_->Branch("chi2_bjet_ctagScores_", &chi2_bjet_ctagScores_);
+  BabyTree_->Branch("chi2_qjet_ctagScores_", &chi2_qjet_ctagScores_);
+  BabyTree_->Branch("chi2_bjet_udsgtagScores_", &chi2_bjet_udsgtagScores_);
+  BabyTree_->Branch("chi2_qjet_udsgtagScores_", &chi2_qjet_udsgtagScores_);
+  BabyTree_->Branch("chi2_bjet_CvsL_", &chi2_bjet_CvsL_);
+  BabyTree_->Branch("chi2_qjet_CvsL_", &chi2_qjet_CvsL_);
+  BabyTree_->Branch("chi2_bjet_CvsB_", &chi2_bjet_CvsB_);
+  BabyTree_->Branch("chi2_qjet_CvsB_", &chi2_qjet_CvsB_);
 
 
   return;

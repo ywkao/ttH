@@ -32,6 +32,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   unique_ptr<TMVA::Reader> tth_ttPP_mva;
   unique_ptr<TMVA::Reader> tth_dipho_mva;
   unique_ptr<TMVA::Reader> tth_std_mva;
+  unique_ptr<TMVA::Reader> reader_tt; //do_meng_cheng_top_reco_mva
+  unique_ptr<TMVA::Reader> reader_st; //do_meng_cheng_top_reco_mva
 
   bool do_tth_ttPP_mva = false;
   if (do_tth_ttPP_mva) {
@@ -94,6 +96,64 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     tth_ttPP_mva->AddVariable("muon2_mini_iso_", &muon2_mini_iso_);
 
     tth_ttPP_mva->BookMVA("BDT", "../MVAs/Leptonic_5Apr2019_ttPP__bdt.xml");// Not Found!!
+  }
+  //}}}
+  //bool do_reader_tt = true;{{{
+  bool do_reader_tt = true;
+  if (do_reader_tt) {
+    reader_tt.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_tt->AddVariable("LeadPho_Pt", &LeadPho_Pt);
+	reader_tt->AddVariable("LeadPho_Eta", &LeadPho_Eta);
+	reader_tt->AddVariable("LeadPho_Phi", &LeadPho_Phi);
+	reader_tt->AddVariable("LeadPho_IDMVA", &LeadPho_IDMVA);
+	reader_tt->AddVariable("SubleadPho_Pt", &SubleadPho_Pt);
+	reader_tt->AddVariable("SubleadPho_Eta", &SubleadPho_Eta);
+	reader_tt->AddVariable("SubleadPho_Phi", &SubleadPho_Phi);
+	reader_tt->AddVariable("SubleadPho_IDMVA", &SubleadPho_IDMVA);
+	reader_tt->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_tt->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_tt->AddVariable("bJet_Phi", &bJet_Phi);
+	reader_tt->AddVariable("bJet_btag", &bJet_btag);
+	reader_tt->AddVariable("M1Jet_Pt", &M1Jet_Pt);
+	reader_tt->AddVariable("M1Jet_Eta", &M1Jet_Eta);
+	reader_tt->AddVariable("M1Jet_Phi", &M1Jet_Phi);
+	reader_tt->AddVariable("M1Jet_btag", &M1Jet_btag);
+	reader_tt->AddVariable("lep_ID", &lep_ID);
+	reader_tt->AddVariable("lep_Pt", &lep_Pt);
+	reader_tt->AddVariable("lep_Eta", &lep_Eta);
+	reader_tt->AddVariable("lep_Phi", &lep_Phi);
+
+	// Book MVA methods
+	reader_tt->BookMVA("TT_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVAreco_train/dataset/weights/TTlep_ANN_v1.weights.xml");
+  }
+  //}}}
+  //bool do_reader_st = true;{{{
+  bool do_reader_st = true;
+  if (do_reader_st) {
+    reader_st.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_st->AddVariable("LeadPho_Pt", &LeadPho_Pt);
+	reader_st->AddVariable("LeadPho_Eta", &LeadPho_Eta);
+	reader_st->AddVariable("LeadPho_Phi", &LeadPho_Phi);
+	reader_st->AddVariable("LeadPho_IDMVA", &LeadPho_IDMVA);
+	reader_st->AddVariable("SubleadPho_Pt", &SubleadPho_Pt);
+	reader_st->AddVariable("SubleadPho_Eta", &SubleadPho_Eta);
+	reader_st->AddVariable("SubleadPho_Phi", &SubleadPho_Phi);
+	reader_st->AddVariable("SubleadPho_IDMVA", &SubleadPho_IDMVA);
+	reader_st->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_st->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_st->AddVariable("bJet_Phi", &bJet_Phi);
+	reader_st->AddVariable("bJet_btag", &bJet_btag);
+	reader_st->AddVariable("lep_ID", &lep_ID);
+	reader_st->AddVariable("lep_Pt", &lep_Pt);
+	reader_st->AddVariable("lep_Eta", &lep_Eta);
+	reader_st->AddVariable("lep_Phi", &lep_Phi);
+
+	// Book MVA methods
+	reader_st->BookMVA("ST_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVAreco_train/dataset/weights/STlep_ANN_v1.weights.xml");
   }
   //}}}
 
@@ -295,6 +355,11 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       vector<TLorentzVector> electrons;
       vector<TLorentzVector> muons;
       vector<TLorentzVector> leps;
+      vector<TLorentzVector> leps_unordered;
+      // WARNING: the charges are assigned randomly for testing purpose!!
+      vector<float> electron_charges;
+      vector<float> muon_charges;
+      vector<float> lep_charges; // for meng-cheng's method
       jets = make_jets(btag_scores, year);
       btag_scores_sorted = sortVector(btag_scores);
       lead_photon = make_lead_photon();
@@ -302,6 +367,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       electrons = make_els();
       muons = make_mus();
       leps = make_leps(electrons, muons);
+      leps_unordered = make_leps_unordered(electrons, muons);
+      electron_charges = make_els_charges();
+      muon_charges = make_mus_charges();
+      lep_charges = make_lep_charges(electron_charges, muon_charges);
       TLorentzVector diphoton = lead_photon + sublead_photon;
       vector<TLorentzVector> objects;
       for (int i = 0; i < jets.size(); i++)
@@ -489,7 +558,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       forward_jet_eta_ = forward_jet[1]; 
       //}}}
 
-      //#quadratic equation related
+      //#quadratic equation related{{{
       vector<int> indices_bjet = get_bjet_indices(jets, btag_scores);
       bool is_moreThanTwoJets_and_atLeastOneBjet = jets.size() > 2 && indices_bjet.size() > 0;
       bool is_moreThanOneJets_and_atLeastOneBjet = jets.size() > 1 && indices_bjet.size() > 0;
@@ -522,12 +591,149 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       chi2_tbw_deltaR_dipho_  = is_moreThanOneJets_and_atLeastOneBjet ? reco_tbw.DeltaR(diphoton)               : -999.;
       chi2_qjet_pt_           = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.Pt()                          : -999.;
       chi2_qjet_eta_          = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.Eta()                         : -999.;
-      chi2_qjet_btag_         = is_moreThanTwoJets_and_atLeastOneBjet ? btag_scores[index_q]                    : -999.;
       chi2_qjet_deltaR_dipho_ = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_qjet.DeltaR(diphoton)              : -999.;
       chi2_tqh_ptOverM_       = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.Pt()/chi2_tqh.M()              : -999.;
       chi2_tqh_eta_           = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.Eta()                          : -999.;
       chi2_tqh_deltaR_tbw_    = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(reco_tbw)               : -999.;
       chi2_tqh_deltaR_dipho_  = is_moreThanTwoJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(diphoton)               : -999.;
+      chi2_bjet_btagScores_   = is_moreThanTwoJets_and_atLeastOneBjet ? btag_scores[index_bjet_method_2]        : -999.;
+      chi2_qjet_btagScores_   = is_moreThanTwoJets_and_atLeastOneBjet ? btag_scores[index_q]                    : -999.;
+
+      vector<double> btag_scores_;
+      vector<double> bbtag_scores_;
+      vector<double> ctag_scores_;
+      vector<double> udsgtag_scores_;
+      for(std::size_t i=0; i!=jet_objects.size(); ++i)
+      {
+          btag_scores_.push_back(jet_objects[i][4]);
+          bbtag_scores_.push_back(jet_objects[i][5]);
+          ctag_scores_.push_back(jet_objects[i][6]);
+          udsgtag_scores_.push_back(jet_objects[i][7]);
+      }
+      chi2_bjet_ctagScores_      = is_moreThanTwoJets_and_atLeastOneBjet ? ctag_scores_[index_bjet_method_2]        : -999.;
+      chi2_qjet_ctagScores_      = is_moreThanTwoJets_and_atLeastOneBjet ? ctag_scores_[index_q]                    : -999.;
+      chi2_bjet_udsgtagScores_   = is_moreThanTwoJets_and_atLeastOneBjet ? udsgtag_scores_[index_bjet_method_2]     : -999.;
+      chi2_qjet_udsgtagScores_   = is_moreThanTwoJets_and_atLeastOneBjet ? udsgtag_scores_[index_q]                 : -999.;
+      chi2_bjet_CvsL_   = is_moreThanTwoJets_and_atLeastOneBjet ? calculate_CvsL(ctag_scores_[index_bjet_method_2], udsgtag_scores_[index_bjet_method_2]) : -999.;
+      chi2_qjet_CvsL_   = is_moreThanTwoJets_and_atLeastOneBjet ? calculate_CvsL(ctag_scores_[index_q], udsgtag_scores_[index_q])                         : -999.;
+      chi2_bjet_CvsB_   = is_moreThanTwoJets_and_atLeastOneBjet ? calculate_CvsB(ctag_scores_[index_bjet_method_2], btag_scores_[index_bjet_method_2], bbtag_scores_[index_bjet_method_2]) : -999.;
+      chi2_qjet_CvsB_   = is_moreThanTwoJets_and_atLeastOneBjet ? calculate_CvsB(ctag_scores_[index_q], btag_scores_[index_q], bbtag_scores_[index_q])                         : -999.;
+      //}}}
+
+      //----- Meng-Cheng's method -----//
+      LeadPho_Pt = lead_pT_;
+      LeadPho_Eta = lead_eta_;
+      LeadPho_Phi = lead_phi_;
+      LeadPho_IDMVA = leadIDMVA_;
+      SubleadPho_Pt = sublead_pT_;
+      SubleadPho_Eta = sublead_eta_;
+      SubleadPho_Phi = sublead_phi_;
+      SubleadPho_IDMVA = subleadIDMVA_;
+
+      //!!!!! LACK LEP ID INFO !!!!!//
+      // determine jet candidates according to permutations with MVA scores
+      int nleps_ = leps.size();
+      // nested for loops for the MVA score, mc_mva_score_tt_ {{{
+      do_reader_tt = (njets_ >= 2) and (nleps_ >= 1);
+      if(do_reader_tt) {
+        int perm = -1;
+        int best_perm = -1;
+        double best_score = -999;
+        vector<int> best_indices = {-1, -1, -1};
+        vector<vector<int>> indices_collector;
+
+        // Start b-jet loop
+        for (int i=0; i<njets_; ++i) {
+        	// Start fcnc jet loop
+        	for (int j=0; j<njets_; ++j) {
+        		if (j == i) continue;
+        		// Start lep loop
+        		for (int k=0; k<nleps_; ++k) {
+
+                    bJet_Pt = jets[i].Pt();
+                    bJet_Eta = jets[i].Eta();
+                    bJet_Phi = jets[i].Phi();
+                    bJet_btag = btag_scores[i];
+                    M1Jet_Pt = jets[j].Pt();
+                    M1Jet_Eta = jets[j].Eta();
+                    M1Jet_Phi = jets[j].Phi();
+                    M1Jet_btag = btag_scores[j];
+
+                    TString type = (k < electrons.size()) ? "electron" : "muon";
+					lep_ID = obtain_lep_id(type, lep_charges[k]);
+					lep_Pt  = leps_unordered[k].Pt();
+					lep_Eta = leps_unordered[k].Eta();
+					lep_Phi = leps_unordered[k].Phi();
+                    //printf("check: %f\n", lep_ID);
+                    
+                    vector<int> indices = {i, j, k};
+                    indices_collector.push_back(indices);
+                    ++perm;
+        
+        	        double score = reader_tt->EvaluateMVA( "TT_lep_MVA" );
+        	        if (score > best_score) {
+        	        	best_score = score;
+        	        	best_perm = perm;
+        	        }
+        	        // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                    bool is_the_last_permutation = (i+1 == njets_) and (j+2 == njets_) and (k+1 == nleps_);
+        	        if (is_the_last_permutation) {
+                        mc_mva_score_tt_ = best_score;
+        	        }
+    		    } // End lep loop
+        	} // End fcnc jet loop
+        } // End b-jet loop
+      } else {
+            mc_mva_score_tt_ = -999;
+      }
+      //}}}
+      printf("\n");
+      // nested for loops for the MVA score, mc_mva_score_st_ {{{
+      do_reader_st = (njets_ >= 1) and (nleps_ >= 1);
+      if(do_reader_st) {
+          int perm = -1;
+          int best_perm = -1;
+          double best_score = -999;
+          vector<int> best_indices = {-1, -1};
+          vector<vector<int>> indices_collector;
+
+          // Start b-jet loop
+          for (int i=0; i<njets_; ++i) {
+              // Start W jet 1 loop
+              for (int k=0; k<nleps_; ++k) {
+                      
+                  bJet_Pt = jets[i].Pt();
+                  bJet_Eta = jets[i].Eta();
+                  bJet_Phi = jets[i].Phi();
+                  bJet_btag = btag_scores[i];
+
+                  TString type = (k < electrons.size()) ? "electron" : "muon";
+				  lep_ID = obtain_lep_id(type, lep_charges[k]);
+				  lep_Pt  = leps[k].Pt();
+				  lep_Eta = leps[k].Eta();
+				  lep_Phi = leps[k].Phi();
+                  
+                  vector<int> indices = {i, k};
+                  indices_collector.push_back(indices);
+                  ++perm;
+      
+      	          double score = reader_st->EvaluateMVA( "ST_lep_MVA" );
+      	          if (score > best_score) {
+      	          	best_score = score;
+      	          	best_perm = perm;
+      	          }
+      	          // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                  bool is_the_last_permutation = (i+1 == njets_) and (k+1 == nleps_);
+      	          if (is_the_last_permutation) {
+                        mc_mva_score_st_ = best_score;
+      	          }
+              } // End lep loop
+          } // End b-jet loop
+      } else {
+            mc_mva_score_st_ = -999;
+      }
+      //}}}
+
 
       FillBabyNtuple();
     }// end of event loop

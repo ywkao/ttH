@@ -12,6 +12,7 @@
 #include "TFile.h"
 #include "TROOT.h"
 #include "TTreeCache.h"
+#include "TRandom3.h" // NOTE: randomly generate charges temporarily
 
 // ttHLeptonic
 #include "ttHLeptonic.cc"
@@ -29,6 +30,8 @@
 
 using namespace std;
 using namespace tas;
+
+TRandom3 rndm(1234);
 
 const bool no_weights = false; // turn this on to train/evaluate MVA without weights
 			      // useful for determining how much of uncertainty in Z_A comes from MC samples with poor stats
@@ -291,6 +294,18 @@ double get_lep_pt(double &lep_eta) {
   }
 }
 
+double calculate_CvsL(double c_disciminant, double udsg_discriminant)
+{
+    double CvsL = c_disciminant / (c_disciminant + udsg_discriminant);
+    return CvsL;
+}
+
+double calculate_CvsB(double c_disciminant, double b_discriminant, double bb_discriminant)
+{
+    double CvsB = c_disciminant / (c_disciminant + b_discriminant + bb_discriminant);
+    return CvsB;
+}
+
 //#quadratic equation related
 //--------------------------------------------------//
 const double w_boson_mass = 80.379;
@@ -463,6 +478,73 @@ vector<TLorentzVector> make_mus() {
   }
   return vMus;
 }
+
+//----------------------------------------------------------------------------------------------------//
+//for the purpose of easier retrieving lep ID info
+vector<TLorentzVector> make_leps_unordered(vector<TLorentzVector> els, vector<TLorentzVector> mus) { 
+  vector<TLorentzVector> leps_unordered;
+  for (int i = 0; i < els.size(); i++) {
+    leps_unordered.push_back(els[i]);
+  }
+  for (int i = 0; i < mus.size(); i++) {
+    leps_unordered.push_back(mus[i]);
+  }
+
+  return leps_unordered;
+}
+
+vector<float> make_lep_charges(vector<float> ele_charges, vector<float> muon_charges) {
+    vector<float> lep_charges;
+    for (int i = 0; i < ele_charges.size(); i++) {
+      lep_charges.push_back(ele_charges[i]);
+    }
+    for (int i = 0; i < muon_charges.size(); i++) {
+      lep_charges.push_back(muon_charges[i]);
+    }
+
+    return lep_charges;
+}
+
+float obtain_lep_id(TString type, int charge) {
+    if(type == "electron"){
+        if(charge > 0) return -11.;
+        else           return 11.;
+    } else { //muon
+        if(charge > 0) return -13.;
+        else           return 13.;
+    }
+}
+
+vector<float> make_els_charges() {
+  vector<float> vEls;
+  if (ele1_pt() > 0) {
+    float charge = (rndm.Rndm() > 0.5) ? -1.0 : 1.0;
+    vEls.push_back(charge);
+    //vEls.push_back(ele1_charge());
+  }
+  if (ele2_pt() > 0) {
+    float charge = (rndm.Rndm() > 0.5) ? -1.0 : 1.0;
+    vEls.push_back(charge);
+    //vEls.push_back(ele2_charge());
+  }
+  return vEls;
+}
+
+vector<float> make_mus_charges() {
+  vector<float> vEls;
+  if (muon1_pt() > 0) {
+    float charge = (rndm.Rndm() > 0.5) ? -1.0 : 1.0;
+    vEls.push_back(charge);
+    //vEls.push_back(muon1_charge());
+  }
+  if (muon2_pt() > 0) {
+    float charge = (rndm.Rndm() > 0.5) ? -1.0 : 1.0;
+    vEls.push_back(charge);
+    //vEls.push_back(muon2_charge());
+  }
+  return vEls;
+}
+//----------------------------------------------------------------------------------------------------//
 
 vector<float> calculate_lepton_charges() {
   vector<float> vCharges;

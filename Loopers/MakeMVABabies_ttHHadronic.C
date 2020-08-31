@@ -2,7 +2,6 @@
 #include "ScanChain_ttHHadronic.h"
 
 void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool fcnc = false, bool blind = false, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-  printf("[check-ywk]\n");
   // Init{{{
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -63,6 +62,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   unique_ptr<TMVA::Reader> tth_ttPP_mva;
   unique_ptr<TMVA::Reader> tth_dipho_mva;
   unique_ptr<TMVA::Reader> tth_std_mva;
+  unique_ptr<TMVA::Reader> reader_tt; //do_meng_cheng_top_reco_mva
+  unique_ptr<TMVA::Reader> reader_st; //do_meng_cheng_top_reco_mva
   //}}}
   //bool do_tth_ttX_mva = false;{{{
   bool do_tth_ttX_mva = false;
@@ -330,6 +331,72 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
     tth_std_mva->BookMVA("BDT", "../MVAs/Hadronic_ttHHadronicLoose_impute_21Feb2019__bdt.xml");
   }
   //}}}
+  //bool do_reader_tt = true;{{{
+  bool do_reader_tt = true;
+  if (do_reader_tt) {
+    reader_tt.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_tt->AddVariable("LeadPho_Pt", &LeadPho_Pt);
+	reader_tt->AddVariable("LeadPho_Eta", &LeadPho_Eta);
+	reader_tt->AddVariable("LeadPho_Phi", &LeadPho_Phi);
+	reader_tt->AddVariable("LeadPho_IDMVA", &LeadPho_IDMVA);
+	reader_tt->AddVariable("SubleadPho_Pt", &SubleadPho_Pt);
+	reader_tt->AddVariable("SubleadPho_Eta", &SubleadPho_Eta);
+	reader_tt->AddVariable("SubleadPho_Phi", &SubleadPho_Phi);
+	reader_tt->AddVariable("SubleadPho_IDMVA", &SubleadPho_IDMVA);
+	reader_tt->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_tt->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_tt->AddVariable("bJet_Phi", &bJet_Phi);
+	reader_tt->AddVariable("bJet_btag", &bJet_btag);
+	reader_tt->AddVariable("M1Jet_Pt", &M1Jet_Pt);
+	reader_tt->AddVariable("M1Jet_Eta", &M1Jet_Eta);
+	reader_tt->AddVariable("M1Jet_Phi", &M1Jet_Phi);
+	reader_tt->AddVariable("M1Jet_btag", &M1Jet_btag);
+	reader_tt->AddVariable("WJet1_Pt", &WJet1_Pt);
+	reader_tt->AddVariable("WJet1_Eta", &WJet1_Eta);
+	reader_tt->AddVariable("WJet1_Phi", &WJet1_Phi);
+	reader_tt->AddVariable("WJet1_btag", &WJet1_btag);
+	reader_tt->AddVariable("WJet2_Pt", &WJet2_Pt);
+	reader_tt->AddVariable("WJet2_Eta", &WJet2_Eta);
+	reader_tt->AddVariable("WJet2_Phi", &WJet2_Phi);
+	reader_tt->AddVariable("WJet2_btag", &WJet2_btag);
+
+	// Book MVA methods
+	reader_tt->BookMVA("TT_had_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVAreco_train/dataset/weights/TThad_ANN_v1.weights.xml");
+  }
+  //}}}
+  //bool do_reader_st = true;{{{
+  bool do_reader_st = true;
+  if (do_reader_st) {
+    reader_st.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_st->AddVariable("LeadPho_Pt", &LeadPho_Pt);
+	reader_st->AddVariable("LeadPho_Eta", &LeadPho_Eta);
+	reader_st->AddVariable("LeadPho_Phi", &LeadPho_Phi);
+	reader_st->AddVariable("LeadPho_IDMVA", &LeadPho_IDMVA);
+	reader_st->AddVariable("SubleadPho_Pt", &SubleadPho_Pt);
+	reader_st->AddVariable("SubleadPho_Eta", &SubleadPho_Eta);
+	reader_st->AddVariable("SubleadPho_Phi", &SubleadPho_Phi);
+	reader_st->AddVariable("SubleadPho_IDMVA", &SubleadPho_IDMVA);
+	reader_st->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_st->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_st->AddVariable("bJet_Phi", &bJet_Phi);
+	reader_st->AddVariable("bJet_btag", &bJet_btag);
+	reader_st->AddVariable("WJet1_Pt", &WJet1_Pt);
+	reader_st->AddVariable("WJet1_Eta", &WJet1_Eta);
+	reader_st->AddVariable("WJet1_Phi", &WJet1_Phi);
+	reader_st->AddVariable("WJet1_btag", &WJet1_btag);
+	reader_st->AddVariable("WJet2_Pt", &WJet2_Pt);
+	reader_st->AddVariable("WJet2_Eta", &WJet2_Eta);
+	reader_st->AddVariable("WJet2_Phi", &WJet2_Phi);
+	reader_st->AddVariable("WJet2_btag", &WJet2_btag);
+
+	// Book MVA methods
+	reader_st->BookMVA("ST_had_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVAreco_train/dataset/weights/SThad_ANN_v1.weights.xml");
+  }
+  //}}}
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
@@ -367,6 +434,12 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       cout << "Skipping this sample: " << currentFileTitle << ", since we are imputing." << endl;
       continue;
     }
+
+    bool is_tt_fcnc = currentFileTitle.Contains("TT_FCNC");
+    bool is_st_fcnc = currentFileTitle.Contains("ST_FCNC");
+
+    if(is_tt_fcnc) cout << "[check] this is tt_fcnc" << endl;
+    if(is_st_fcnc) cout << "[check] this is st_fcnc" << endl;
 
     /*
     // Dumb hacky stuff to use 2017 MC as placeholders for 2018
@@ -573,7 +646,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       top_tag_eta_ = -1;
       top_tag_phi_ = -1;
       //}}}
-      // ***year, parameters{{{
+      // ***year, parameters
       tth_runII_mva_ = tthMVA_RunII();
       year_ = mYear == "2016" ? 2016 : (mYear == "2017" ? 2017 : (mYear == "2018" ? 2018 : -1)); 
 
@@ -631,7 +704,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       jet8_phi_     = njets_ >= 8 ? jets[7].Phi() : -999;
       jet8_energy_  = njets_ >= 8 ? jets[7].E()   : -999;
       //}}}
-
+      // photons, diphoton, helicity angle, top masses{{{
       lead_pT_ = leadPt();
       sublead_pT_ = subleadPt();
       leadptoM_ = lead_ptoM();
@@ -659,9 +732,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       calculate_masses(diphoton, jets, m_ggj_, m_jjj_);
       m_ggj_ = m_ggj_ > 0 ? log(m_ggj_) : -9;
       m_jjj_ = m_jjj_ > 0 ? log(m_jjj_) : -9;
-      //# jets, btag indices
-
-      //#chi-2 related
+      //}}}
+      // chi-2 related{{{
       //printf("[check-ywk] %-3d: jets.size() = %d\n", event, jets.size());
       vector<int> _null_vector_;
       vector<int> indices_bjet = get_bjet_indices(jets, btag_scores);
@@ -672,7 +744,7 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
                                            (is_moreThanTwoJets_and_atLeastOneBjet   ? get_bjj_indices_min_chi2(jets, indices_bjet, true) : _null_vector_);
       vector<int> index_jet_chi2_improved = is_moreThanThreeJets_and_atLeastOneBjet ? get_bjjq_indices_min_chi2_3x3(jets, indices_bjet, diphoton) : _null_vector_;
       
-      //values{{{
+      //values
       TLorentzVector _nothing_;
       TLorentzVector chi2_bjet      = is_moreThanTwoJets_and_atLeastOneBjet   ? jets[index_jet_chi2_modified[0]]                : _nothing_;
       TLorentzVector chi2_wjet1     = is_moreThanTwoJets_and_atLeastOneBjet   ? jets[index_jet_chi2_modified[1]]                : _nothing_;
@@ -687,13 +759,16 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       chi2_tbw_deltaR_dipho_        = is_moreThanTwoJets_and_atLeastOneBjet   ? chi2_tbw.DeltaR(diphoton)                       : -999;
       chi2_qjet_pt_                 = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_qjet.Pt()                                  : -999;
       chi2_qjet_eta_                = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_qjet.Eta()                                 : -999;
-      chi2_qjet_btag_               = is_moreThanThreeJets_and_atLeastOneBjet ? btag_scores[index_jet_chi2_modified[3]]         : -999;
       chi2_qjet_deltaR_dipho_       = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_qjet.DeltaR(diphoton)                      : -999;
       chi2_tqh_ptOverM_             = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_tqh.Pt()/chi2_tqh.M()                      : -999;
       chi2_tqh_eta_                 = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_tqh.Eta()                                  : -999;
       chi2_tqh_deltaR_tbw_          = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(chi2_tbw)                       : -999;
       chi2_tqh_deltaR_dipho_        = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_tqh.DeltaR(diphoton)                       : -999;
 
+      chi2_bjet_btagScores_         = is_moreThanTwoJets_and_atLeastOneBjet   ? btag_scores[index_jet_chi2_modified[0]]         : -999;
+      chi2_wjet1_btagScores_        = is_moreThanTwoJets_and_atLeastOneBjet   ? btag_scores[index_jet_chi2_modified[1]]         : -999;
+      chi2_wjet2_btagScores_        = is_moreThanTwoJets_and_atLeastOneBjet   ? btag_scores[index_jet_chi2_modified[2]]         : -999;
+      chi2_qjet_btagScores_         = is_moreThanThreeJets_and_atLeastOneBjet ? btag_scores[index_jet_chi2_modified[3]]         : -999;
       //printf("[check-ywk] size = %d\n", index_jet_chi2_improved.size());
       //if(is_moreThanThreeJets_and_atLeastOneBjet)
       //{
@@ -723,7 +798,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       chi2_3x3_tqh_eta_             = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tqh.Eta()                              : -999;
       chi2_3x3_tqh_deltaR_tbw_      = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tqh.DeltaR(chi2_3x3_tbw)               : -999;
       chi2_3x3_tqh_deltaR_dipho_    = is_moreThanThreeJets_and_atLeastOneBjet ? chi2_3x3_tqh.DeltaR(diphoton)                   : -999;
-      //}}}
 
       rand_ = cms3.rand();
       super_rand_ = -1; //rand_map->retrieve_rand(cms3.event(), cms3.run(), cms3.lumi());
@@ -731,6 +805,161 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       lead_sigmaEtoE_ = lead_sigmaEoE();
       sublead_sigmaEtoE_ = sublead_sigmaEoE();
       //}}}
+
+      //----- Meng-Cheng's method -----//
+      LeadPho_Pt = lead_pT_;
+      LeadPho_Eta = lead_eta_;
+      LeadPho_Phi = lead_phi_;
+      LeadPho_IDMVA = leadIDMVA_;
+      SubleadPho_Pt = sublead_pT_;
+      SubleadPho_Eta = sublead_eta_;
+      SubleadPho_Phi = sublead_phi_;
+      SubleadPho_IDMVA = subleadIDMVA_;
+
+      // determine jet candidates according to permutations with MVA scores
+      // nested for loops for the MVA score, mc_mva_score_tt_ {{{
+      do_reader_tt = njets_ >= 4;
+      if(do_reader_tt) {
+        int perm = -1;
+        int best_perm = -1;
+        double best_score = -999;
+        vector<int> best_indices = {-1, -1, -1, -1};
+        vector<vector<int>> indices_collector;
+
+        // Start b-jet loop
+        for (int i=0; i<njets_; ++i) {
+        	// Start fcnc jet loop
+        	for (int j=0; j<njets_; ++j) {
+        		if (j == i) continue;
+        		// Start W jet 1 loop
+        		for (int k=0; k<njets_-1; ++k) {
+        			if (k == i || k == j) continue;
+        			// Start W jet 2 loop
+        			for (int l=k+1; l<njets_; ++l) {
+                        if (l == i || l == j) continue;
+                        
+                        bJet_Pt = jets[i].Pt();
+                        bJet_Eta = jets[i].Eta();
+                        bJet_Phi = jets[i].Phi();
+                        bJet_btag = btag_scores[i];
+                        M1Jet_Pt = jets[j].Pt();
+                        M1Jet_Eta = jets[j].Eta();
+                        M1Jet_Phi = jets[j].Phi();
+                        M1Jet_btag = btag_scores[j];
+                        WJet1_Pt = jets[k].Pt();
+                        WJet1_Eta = jets[k].Eta();
+                        WJet1_Phi = jets[k].Phi();
+                        WJet1_btag = btag_scores[k];
+                        WJet2_Pt = jets[l].Pt();
+                        WJet2_Eta = jets[l].Eta();
+                        WJet2_Phi = jets[l].Phi();
+                        WJet2_btag = btag_scores[l];
+                        
+                        vector<int> indices = {i, j, k, l};
+                        indices_collector.push_back(indices);
+                        ++perm;
+        
+        	            double score = reader_tt->EvaluateMVA( "TT_had_MVA" );
+        	            if (score > best_score) {
+        	            	best_score = score;
+        	            	best_perm = perm;
+        	            }
+        	            // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                        bool is_the_last_permutation = (i+1 == njets_) and (j+2 == njets_) and (k+4 == njets_) and (l+3 == njets_);
+        	            if (is_the_last_permutation) {
+                            mc_mva_score_tt_ = best_score;
+                            //best_indices = indices_collector[best_perm];
+                            //
+                            //int bJet_idx  = indices_collector[0];
+                            //int M1Jet_idx = indices_collector[1];
+                            //int WJet1_idx = indices_collector[2];
+                            //int WJet2_idx = indices_collector[3];
+                            //
+                            //bJet_Pt = jets[bJet_idx].Pt();
+                            //bJet_Eta = jets[bJet_idx].Eta();
+                            //bJet_Phi = jets[bJet_idx].Phi();
+                            //bJet_btag = btag_scores[bJet_idx];
+                            //M1Jet_Pt = jets[M1Jet_idx].Pt();
+                            //M1Jet_Eta = jets[M1Jet_idx].Eta();
+                            //M1Jet_Phi = jets[M1Jet_idx].Phi();
+                            //M1Jet_btag = btag_scores[M1Jet_idx];
+                            //WJet1_Pt = jets[WJet1_idx].Pt();
+                            //WJet1_Eta = jets[WJet1_idx].Eta();
+                            //WJet1_Phi = jets[WJet1_idx].Phi();
+                            //WJet1_btag = btag_scores[WJet1_idx];
+                            //WJet2_Pt = jets[WJet2_idx].Pt();
+                            //WJet2_Eta = jets[WJet2_idx].Eta();
+                            //WJet2_Phi = jets[WJet2_idx].Phi();
+                            //WJet2_btag = btag_scores[WJet2_idx];
+                            
+                            best_perm = -1;
+                            best_score = -999;
+        	            }
+        			} // End W jet 2 loop
+        		} // End W jet 1 loop
+        	} // End fcnc jet loop
+        } // End b-jet loop
+      } else {
+            mc_mva_score_tt_ = -999;
+      }
+      //}}}
+      // nested for loops for the MVA score, mc_mva_score_st_ {{{
+      do_reader_st = njets_ >= 3;
+      if(do_reader_st) {
+          int perm = -1;
+          int best_perm = -1;
+          double best_score = -999;
+          vector<int> best_indices = {-1, -1, -1};
+          vector<vector<int>> indices_collector;
+
+          // Start b-jet loop
+          for (int i=0; i<njets_; ++i) {
+              // Start W jet 1 loop
+              for (int k=0; k<njets_-1; ++k) {
+                  if (k == i) continue;
+                  // Start W jet 2 loop
+                  for (int l=k+1; l<njets_; ++l) {
+                      if (l == i) continue;
+                          
+                      bJet_Pt = jets[i].Pt();
+                      bJet_Eta = jets[i].Eta();
+                      bJet_Phi = jets[i].Phi();
+                      bJet_btag = btag_scores[i];
+                      WJet1_Pt = jets[k].Pt();
+                      WJet1_Eta = jets[k].Eta();
+                      WJet1_Phi = jets[k].Phi();
+                      WJet1_btag = btag_scores[k];
+                      WJet2_Pt = jets[l].Pt();
+                      WJet2_Eta = jets[l].Eta();
+                      WJet2_Phi = jets[l].Phi();
+                      WJet2_btag = btag_scores[l];
+                      
+                      vector<int> indices = {i, k, l};
+                      indices_collector.push_back(indices);
+                      ++perm;
+          
+          	          double score = reader_st->EvaluateMVA( "ST_had_MVA" );
+          	          if (score > best_score) {
+          	          	best_score = score;
+          	          	best_perm = perm;
+          	          }
+          	          // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                      bool is_the_last_permutation = (i+1 == njets_) and (k+3 == njets_) and (l+2 == njets_);
+          	          if (is_the_last_permutation) {
+                            mc_mva_score_st_ = best_score;
+                            
+                            best_perm = -1;
+                            best_score = -999;
+          	          }
+                  } // End W jet 2 loop
+              } // End W jet 1 loop
+          } // End b-jet loop
+      } else {
+            mc_mva_score_st_ = -999;
+      }
+      //}}}
+
+
       // evaluation{{{
       if (do_tth_ttX_mva)
         tth_ttX_mva_ = convert_tmva_to_prob(tth_ttX_mva->EvaluateMVA( "BDT" ));
@@ -777,6 +1006,40 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       top_candidates_10_ = top_candidates_[9] > 0 ? log(top_candidates_[9]) : -9;
       top_candidates_11_ = top_candidates_[10] > 0 ? log(top_candidates_[10]) : -9;
       top_candidates_12_ = top_candidates_[11] > 0 ? log(top_candidates_[11]) : -9;
+      //}}}
+
+
+      vector<double> btag_scores_;
+      vector<double> bbtag_scores_;
+      vector<double> ctag_scores_;
+      vector<double> udsgtag_scores_;
+      for(std::size_t i=0; i!=jet_objects.size(); ++i)
+      {
+          btag_scores_.push_back(jet_objects[i][4]);
+          bbtag_scores_.push_back(jet_objects[i][5]);
+          ctag_scores_.push_back(jet_objects[i][6]);
+          udsgtag_scores_.push_back(jet_objects[i][7]);
+      }
+      chi2_bjet_ctagScores_         = is_moreThanTwoJets_and_atLeastOneBjet   ? ctag_scores_[index_jet_chi2_modified[0]]         : -999;
+      chi2_wjet1_ctagScores_        = is_moreThanTwoJets_and_atLeastOneBjet   ? ctag_scores_[index_jet_chi2_modified[1]]         : -999;
+      chi2_wjet2_ctagScores_        = is_moreThanTwoJets_and_atLeastOneBjet   ? ctag_scores_[index_jet_chi2_modified[2]]         : -999;
+      chi2_qjet_ctagScores_         = is_moreThanThreeJets_and_atLeastOneBjet ? ctag_scores_[index_jet_chi2_modified[3]]         : -999;
+
+      chi2_bjet_udsgtagScores_      = is_moreThanTwoJets_and_atLeastOneBjet   ? udsgtag_scores_[index_jet_chi2_modified[0]]      : -999;
+      chi2_wjet1_udsgtagScores_     = is_moreThanTwoJets_and_atLeastOneBjet   ? udsgtag_scores_[index_jet_chi2_modified[1]]      : -999;
+      chi2_wjet2_udsgtagScores_     = is_moreThanTwoJets_and_atLeastOneBjet   ? udsgtag_scores_[index_jet_chi2_modified[2]]      : -999;
+      chi2_qjet_udsgtagScores_      = is_moreThanThreeJets_and_atLeastOneBjet ? udsgtag_scores_[index_jet_chi2_modified[3]]      : -999;
+
+      chi2_bjet_CvsL_  = is_moreThanTwoJets_and_atLeastOneBjet   ? calculate_CvsL(ctag_scores_[index_jet_chi2_modified[0]], udsgtag_scores_[index_jet_chi2_modified[0]]) : -999;
+      chi2_wjet1_CvsL_ = is_moreThanTwoJets_and_atLeastOneBjet   ? calculate_CvsL(ctag_scores_[index_jet_chi2_modified[1]], udsgtag_scores_[index_jet_chi2_modified[1]]) : -999;
+      chi2_wjet2_CvsL_ = is_moreThanTwoJets_and_atLeastOneBjet   ? calculate_CvsL(ctag_scores_[index_jet_chi2_modified[2]], udsgtag_scores_[index_jet_chi2_modified[2]]) : -999;
+      chi2_qjet_CvsL_  = is_moreThanThreeJets_and_atLeastOneBjet ? calculate_CvsL(ctag_scores_[index_jet_chi2_modified[3]], udsgtag_scores_[index_jet_chi2_modified[3]]) : -999;
+
+      chi2_bjet_CvsB_  = is_moreThanTwoJets_and_atLeastOneBjet   ? calculate_CvsB(ctag_scores_[index_jet_chi2_modified[0]], btag_scores_[index_jet_chi2_modified[0]], bbtag_scores_[index_jet_chi2_modified[0]]) : -999;
+      chi2_wjet1_CvsB_ = is_moreThanTwoJets_and_atLeastOneBjet   ? calculate_CvsB(ctag_scores_[index_jet_chi2_modified[1]], btag_scores_[index_jet_chi2_modified[1]], bbtag_scores_[index_jet_chi2_modified[1]]) : -999;
+      chi2_wjet2_CvsB_ = is_moreThanTwoJets_and_atLeastOneBjet   ? calculate_CvsB(ctag_scores_[index_jet_chi2_modified[2]], btag_scores_[index_jet_chi2_modified[2]], bbtag_scores_[index_jet_chi2_modified[2]]) : -999;
+      chi2_qjet_CvsB_  = is_moreThanThreeJets_and_atLeastOneBjet ? calculate_CvsB(ctag_scores_[index_jet_chi2_modified[3]], btag_scores_[index_jet_chi2_modified[3]], bbtag_scores_[index_jet_chi2_modified[3]]) : -999;
+
 
       const float oversample_ggh = 81.;
       const float oversample_tth = 1.;
@@ -795,7 +1058,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
       else
         FillBabyNtuple();
-      //}}}
       //skipped{{{
       /*
       if (deriving_gjet_weights) {
@@ -806,7 +1068,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       }
       */
       //}}}
-      
     }// end of event loop
     // Clean Up{{{
     delete tree;

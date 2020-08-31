@@ -757,7 +757,6 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
     delete hBkg[i];
   delete c;
   //}}}
-  cout << "Hello World!" << endl;
 }
  
 
@@ -944,6 +943,8 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "htthMVA", "tth MVA", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "max b-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd max b-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hMaxCTag", "max c-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hSecondMaxCTag", "2nd max c-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
 
     make_plot(c1, vFiles[i], vNames[i], "hJet1Eta", "Jet1 #eta", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hJet2Eta", "Jet2 #eta", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
@@ -1070,6 +1071,11 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hJet3BTag", "Jet 3 b-tag score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hJet4BTag", "Jet 4 b-tag score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
  
+    make_plot(c1, vFiles[i], vNames[i], "hJet1CTag", "Jet 1 c-tag score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hJet2CTag", "Jet 2 c-tag score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hJet3CTag", "Jet 3 c-tag score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hJet4CTag", "Jet 4 c-tag score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+
     //make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA_coarse", "Hadronic MVA Score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //make_plot(c1, vFiles[i], vNames[i], "hHadronicMVA_fine", "Hadronic MVA Score", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio); 
 
