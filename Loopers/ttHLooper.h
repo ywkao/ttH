@@ -414,18 +414,20 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
     return 20;
   else if (currentFileTitle.Contains("ST_tW") || currentFileTitle.Contains("tZq"))
     return 21;
-  else if (currentFileTitle.Contains("TT_FCNC") && currentFileTitle.Contains("hut") )
+  else if ((currentFileTitle.Contains("TT_FCNC") && currentFileTitle.Contains("hut") ) || (currentFileTitle.Contains("FCNC_private_TT") && currentFileTitle.Contains("HUT") ))
     return 22;
-  else if (currentFileTitle.Contains("TT_FCNC") && currentFileTitle.Contains("hct") )
+  else if ((currentFileTitle.Contains("TT_FCNC") && currentFileTitle.Contains("hct") ) || (currentFileTitle.Contains("FCNC_private_TT") && currentFileTitle.Contains("HCT") ))
     return 23;
-  else if (currentFileTitle.Contains("ST_FCNC") && currentFileTitle.Contains("hut") )
+  else if ((currentFileTitle.Contains("ST_FCNC") && currentFileTitle.Contains("hut") ) || (currentFileTitle.Contains("FCNC_private_ST") && currentFileTitle.Contains("HUT") ))
     return 24;
-  else if (currentFileTitle.Contains("ST_FCNC") && currentFileTitle.Contains("hct") )
+  else if ((currentFileTitle.Contains("ST_FCNC") && currentFileTitle.Contains("hct") ) || (currentFileTitle.Contains("FCNC_private_ST") && currentFileTitle.Contains("HCT") ))
     return 25;
   else if (currentFileTitle.Contains("TTW"))
     return 26;
   else {
-    cout << "File does not fit into one of the background categories." << endl;
+    //cout << "File does not fit into one of the background categories." << endl;
+    cout << "File does not fit into one of the background categories: " << currentFileTitle << endl;
+
     return -1;
   }
 }

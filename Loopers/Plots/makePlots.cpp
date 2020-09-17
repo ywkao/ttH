@@ -997,9 +997,6 @@ int main(int argc, char* argv[])
 
       make_plot(c1, vFiles[i], vNames[i], "hPhotonDeltaR", "#Delta R(#gamma_{1}, #gamma_{2})", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
 
-      make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "Max b-tag", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-      make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd Max b-tag", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-
       make_plot(c1, vFiles[i], vNames[i], "hJet5pT", "Jet5 p_{T} [GeV]", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);     
       make_plot(c1, vFiles[i], vNames[i], "hJet5Eta", "Jet5 #eta", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
 

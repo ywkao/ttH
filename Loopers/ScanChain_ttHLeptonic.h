@@ -24,6 +24,7 @@
 #include "scale1fb/scale1fb_2018_RunII.h"
 #include "MakeMVAOptimizationBabies.h"
 #include "Utils/RandomMap.h"
+#include "ctag_reshaping/src/ctag_reshaping.cpp"
 
 // tmva
 #include "TMVA/Reader.h"
@@ -1041,3 +1042,97 @@ vector<TLorentzVector> make_jets(vector<double> &btag_scores, TString year) {
   return vJets;
 }
 
+vector<vector<double>> make_jets_hadronFlavour_and_discriminants() {
+  vector<vector<double>> vJets_info;
+
+  if (jet_pt1() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour1(), jet_udsgdiscriminant1(), jet_cdiscriminant1(), jet_bdiscriminant1(), jet_bbdiscriminant1()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt2() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour2(), jet_udsgdiscriminant2(), jet_cdiscriminant2(), jet_bdiscriminant2(), jet_bbdiscriminant2()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt3() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour3(), jet_udsgdiscriminant3(), jet_cdiscriminant3(), jet_bdiscriminant3(), jet_bbdiscriminant3()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt4() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour4(), jet_udsgdiscriminant4(), jet_cdiscriminant4(), jet_bdiscriminant4(), jet_bbdiscriminant4()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt5() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour5(), jet_udsgdiscriminant5(), jet_cdiscriminant5(), jet_bdiscriminant5(), jet_bbdiscriminant5()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt6() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour6(), jet_udsgdiscriminant6(), jet_cdiscriminant6(), jet_bdiscriminant6(), jet_bbdiscriminant6()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt7() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour7(), jet_udsgdiscriminant7(), jet_cdiscriminant7(), jet_bdiscriminant7(), jet_bbdiscriminant7()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt8() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour8(), jet_udsgdiscriminant8(), jet_cdiscriminant8(), jet_bdiscriminant8(), jet_bbdiscriminant8()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt9() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour9(), jet_udsgdiscriminant9(), jet_cdiscriminant9(), jet_bdiscriminant9(), jet_bbdiscriminant9()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt10() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour10(), jet_udsgdiscriminant10(), jet_cdiscriminant10(), jet_bdiscriminant10(), jet_bbdiscriminant10()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt11() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour11(), jet_udsgdiscriminant11(), jet_cdiscriminant11(), jet_bdiscriminant11(), jet_bbdiscriminant11()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt12() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour12(), jet_udsgdiscriminant12(), jet_cdiscriminant12(), jet_bdiscriminant12(), jet_bbdiscriminant12()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt13() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour13(), jet_udsgdiscriminant13(), jet_cdiscriminant13(), jet_bdiscriminant13(), jet_bbdiscriminant13()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt14() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour14(), jet_udsgdiscriminant14(), jet_cdiscriminant14(), jet_bdiscriminant14(), jet_bbdiscriminant14()};
+    vJets_info.push_back(jet_info);
+  }
+  if (jet_pt15() > 0) {
+    vector<double> jet_info = {jet_hadronFlavour15(), jet_udsgdiscriminant15(), jet_cdiscriminant15(), jet_bdiscriminant15(), jet_bbdiscriminant15()};
+    vJets_info.push_back(jet_info);
+  }
+  return vJets_info;
+}
+
+double get_ctag_reshaping_weight(retrieve_scale_factor &sf)
+//double get_ctag_reshaping_weight()
+{
+    //std::string root_file_deepJet = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl.root";
+    //retrieve_scale_factor sf(root_file_deepJet);
+
+    double weight_JetCTagWeight = 1.;
+    vector<vector<double>> jets_info = make_jets_hadronFlavour_and_discriminants();
+    for(std::size_t i=0; i!=jets_info.size(); ++i)
+    {
+        double hadronFlavour_ = jets_info[i][0];
+        double udsgtag_ = jets_info[i][1];
+        double ctag_ = jets_info[i][2];
+        double btag_ = jets_info[i][3];
+        double bbtag_ = jets_info[i][4];
+        double cvsl_ = calculate_CvsL(ctag_, udsgtag_);
+        double cvsb_ = calculate_CvsB(ctag_, btag_, bbtag_);
+    
+        TString type_flavour = (hadronFlavour_ == 5.) ? "b" : ((hadronFlavour_ == 4.) ? "c" : "l");
+        TString name = "SF" + type_flavour + "_hist"; // warning: consider nominal value for the moment!!
+        double scale_factor_ = sf.get_scale_factor(name, cvsl_, cvsb_);
+        weight_JetCTagWeight *= scale_factor_;
+        //std::cout << "hadronFlavour = " << hadronFlavour_ << ", ";
+        //std::cout << "string = " << name << ", ";
+        //std::cout << "scale_factor_ = " << scale_factor_ << std::endl;
+    }
+    return weight_JetCTagWeight;
+}

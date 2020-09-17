@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
   TString idx = argc <= 8 ? "" : argv[8];
 
   TChain *ch; 
-  if (ext.Contains("v4.") && !file.Contains("FCNC"))
+  if ((ext.Contains("v4.") && !file.Contains("FCNC")) || ext.Contains("v5."))
     ch = new TChain("tagsDumper/trees/_13TeV_TTHLeptonicTag");
   else
     ch = new TChain("tthLeptonicTagDumper/trees/tth_13TeV_all");  

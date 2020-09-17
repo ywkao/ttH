@@ -21,6 +21,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet14_cdiscriminant_branch) jet14_cdiscriminant_branch->SetAddress(&jet14_cdiscriminant_);
   jet1_udsgdiscriminant_branch = tree->GetBranch("jet1_udsgdiscriminant");
   if (jet1_udsgdiscriminant_branch) jet1_udsgdiscriminant_branch->SetAddress(&jet1_udsgdiscriminant_);
+  jet1_hadronFlavour_branch = tree->GetBranch("jet1_hadronFlavour");
+  if (jet1_hadronFlavour_branch) jet1_hadronFlavour_branch->SetAddress(&jet1_hadronFlavour_);
   nGoodEls_branch = tree->GetBranch("nGoodEls");
   if (nGoodEls_branch) nGoodEls_branch->SetAddress(&nGoodEls_);
   lead_SmallestDr_branch = tree->GetBranch("lead_SmallestDr");
@@ -31,6 +33,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet14_bdiscriminant_branch) jet14_bdiscriminant_branch->SetAddress(&jet14_bdiscriminant_);
   jet9_udsgdiscriminant_branch = tree->GetBranch("jet9_udsgdiscriminant");
   if (jet9_udsgdiscriminant_branch) jet9_udsgdiscriminant_branch->SetAddress(&jet9_udsgdiscriminant_);
+  jet9_hadronFlavour_branch = tree->GetBranch("jet9_hadronFlavour");
+  if (jet9_hadronFlavour_branch) jet9_hadronFlavour_branch->SetAddress(&jet9_hadronFlavour_);
   jet12_cdiscriminant_branch = tree->GetBranch("jet12_cdiscriminant");
   if (jet12_cdiscriminant_branch) jet12_cdiscriminant_branch->SetAddress(&jet12_cdiscriminant_);
   jet11_pt_branch = tree->GetBranch("jet11_pt");
@@ -41,6 +45,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (dnn_score_ttgg_branch) dnn_score_ttgg_branch->SetAddress(&dnn_score_ttgg_);
   jet2_udsgdiscriminant_branch = tree->GetBranch("jet2_udsgdiscriminant");
   if (jet2_udsgdiscriminant_branch) jet2_udsgdiscriminant_branch->SetAddress(&jet2_udsgdiscriminant_);
+  jet2_hadronFlavour_branch = tree->GetBranch("jet2_hadronFlavour");
+  if (jet2_hadronFlavour_branch) jet2_hadronFlavour_branch->SetAddress(&jet2_hadronFlavour_);
   diphoMVARes_branch = tree->GetBranch("diphoMVARes");
   if (diphoMVARes_branch) diphoMVARes_branch->SetAddress(&diphoMVARes_);
   sublead_sigmaEoE_branch = tree->GetBranch("sublead_sigmaEoE");
@@ -91,10 +97,14 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet14_phi_branch) jet14_phi_branch->SetAddress(&jet14_phi_);
   jet8_udsgdiscriminant_branch = tree->GetBranch("jet8_udsgdiscriminant");
   if (jet8_udsgdiscriminant_branch) jet8_udsgdiscriminant_branch->SetAddress(&jet8_udsgdiscriminant_);
+  jet8_hadronFlavour_branch = tree->GetBranch("jet8_hadronFlavour");
+  if (jet8_hadronFlavour_branch) jet8_hadronFlavour_branch->SetAddress(&jet8_hadronFlavour_);
   n_jets_branch = tree->GetBranch("n_jets");
   if (n_jets_branch) n_jets_branch->SetAddress(&n_jets_);
   jet7_udsgdiscriminant_branch = tree->GetBranch("jet7_udsgdiscriminant");
   if (jet7_udsgdiscriminant_branch) jet7_udsgdiscriminant_branch->SetAddress(&jet7_udsgdiscriminant_);
+  jet7_hadronFlavour_branch = tree->GetBranch("jet7_hadronFlavour");
+  if (jet7_hadronFlavour_branch) jet7_hadronFlavour_branch->SetAddress(&jet7_hadronFlavour_);
   lead_PhoGenPt_branch = tree->GetBranch("lead_PhoGenPt");
   if (lead_PhoGenPt_branch) lead_PhoGenPt_branch->SetAddress(&lead_PhoGenPt_);
   sublead_closest_gen_dR_branch = tree->GetBranch("sublead_closest_gen_dR");
@@ -117,6 +127,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet6_bdiscriminant_branch) jet6_bdiscriminant_branch->SetAddress(&jet6_bdiscriminant_);
   jet15_udsgdiscriminant_branch = tree->GetBranch("jet15_udsgdiscriminant");
   if (jet15_udsgdiscriminant_branch) jet15_udsgdiscriminant_branch->SetAddress(&jet15_udsgdiscriminant_);
+  jet15_hadronFlavour_branch = tree->GetBranch("jet15_hadronFlavour");
+  if (jet15_hadronFlavour_branch) jet15_hadronFlavour_branch->SetAddress(&jet15_hadronFlavour_);
   jet12_bdiscriminant_branch = tree->GetBranch("jet12_bdiscriminant");
   if (jet12_bdiscriminant_branch) jet12_bdiscriminant_branch->SetAddress(&jet12_bdiscriminant_);
   jet2_eta_branch = tree->GetBranch("jet2_eta");
@@ -203,8 +215,12 @@ void ttHHadronic::Init(TTree *tree) {
   if (lead_PhoGenPhi_branch) lead_PhoGenPhi_branch->SetAddress(&lead_PhoGenPhi_);
   jet11_udsgdiscriminant_branch = tree->GetBranch("jet11_udsgdiscriminant");
   if (jet11_udsgdiscriminant_branch) jet11_udsgdiscriminant_branch->SetAddress(&jet11_udsgdiscriminant_);
+  jet11_hadronFlavour_branch = tree->GetBranch("jet11_hadronFlavour");
+  if (jet11_hadronFlavour_branch) jet11_hadronFlavour_branch->SetAddress(&jet11_hadronFlavour_);
   jet10_udsgdiscriminant_branch = tree->GetBranch("jet10_udsgdiscriminant");
   if (jet10_udsgdiscriminant_branch) jet10_udsgdiscriminant_branch->SetAddress(&jet10_udsgdiscriminant_);
+  jet10_hadronFlavour_branch = tree->GetBranch("jet10_hadronFlavour");
+  if (jet10_hadronFlavour_branch) jet10_hadronFlavour_branch->SetAddress(&jet10_hadronFlavour_);
   electronVetoSFUp01sigma_branch = tree->GetBranch("electronVetoSFUp01sigma");
   if (electronVetoSFUp01sigma_branch) electronVetoSFUp01sigma_branch->SetAddress(&electronVetoSFUp01sigma_);
   subleadGendeltaR_branch = tree->GetBranch("subleadGendeltaR");
@@ -261,8 +277,12 @@ void ttHHadronic::Init(TTree *tree) {
   if (nGoodTaus_branch) nGoodTaus_branch->SetAddress(&nGoodTaus_);
   jet6_udsgdiscriminant_branch = tree->GetBranch("jet6_udsgdiscriminant");
   if (jet6_udsgdiscriminant_branch) jet6_udsgdiscriminant_branch->SetAddress(&jet6_udsgdiscriminant_);
+  jet6_hadronFlavour_branch = tree->GetBranch("jet6_hadronFlavour");
+  if (jet6_hadronFlavour_branch) jet6_hadronFlavour_branch->SetAddress(&jet6_hadronFlavour_);
   jet4_udsgdiscriminant_branch = tree->GetBranch("jet4_udsgdiscriminant");
   if (jet4_udsgdiscriminant_branch) jet4_udsgdiscriminant_branch->SetAddress(&jet4_udsgdiscriminant_);
+  jet4_hadronFlavour_branch = tree->GetBranch("jet4_hadronFlavour");
+  if (jet4_hadronFlavour_branch) jet4_hadronFlavour_branch->SetAddress(&jet4_hadronFlavour_);
   jet15_energy_branch = tree->GetBranch("jet15_energy");
   if (jet15_energy_branch) jet15_energy_branch->SetAddress(&jet15_energy_);
   bjet2_pt_branch = tree->GetBranch("bjet2_pt");
@@ -309,12 +329,16 @@ void ttHHadronic::Init(TTree *tree) {
   if (leadEta_branch) leadEta_branch->SetAddress(&leadEta_);
   jet12_udsgdiscriminant_branch = tree->GetBranch("jet12_udsgdiscriminant");
   if (jet12_udsgdiscriminant_branch) jet12_udsgdiscriminant_branch->SetAddress(&jet12_udsgdiscriminant_);
+  jet12_hadronFlavour_branch = tree->GetBranch("jet12_hadronFlavour");
+  if (jet12_hadronFlavour_branch) jet12_hadronFlavour_branch->SetAddress(&jet12_hadronFlavour_);
   nb_medium_branch = tree->GetBranch("nb_medium");
   if (nb_medium_branch) nb_medium_branch->SetAddress(&nb_medium_);
   jet8_phi_branch = tree->GetBranch("jet8_phi");
   if (jet8_phi_branch) jet8_phi_branch->SetAddress(&jet8_phi_);
   jet3_udsgdiscriminant_branch = tree->GetBranch("jet3_udsgdiscriminant");
   if (jet3_udsgdiscriminant_branch) jet3_udsgdiscriminant_branch->SetAddress(&jet3_udsgdiscriminant_);
+  jet3_hadronFlavour_branch = tree->GetBranch("jet3_hadronFlavour");
+  if (jet3_hadronFlavour_branch) jet3_hadronFlavour_branch->SetAddress(&jet3_hadronFlavour_);
   jet8_eta_branch = tree->GetBranch("jet8_eta");
   if (jet8_eta_branch) jet8_eta_branch->SetAddress(&jet8_eta_);
   JetBTagCutWeightDown01sigma_branch = tree->GetBranch("JetBTagCutWeightDown01sigma");
@@ -329,6 +353,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (jet1_phi_branch) jet1_phi_branch->SetAddress(&jet1_phi_);
   jet14_udsgdiscriminant_branch = tree->GetBranch("jet14_udsgdiscriminant");
   if (jet14_udsgdiscriminant_branch) jet14_udsgdiscriminant_branch->SetAddress(&jet14_udsgdiscriminant_);
+  jet14_hadronFlavour_branch = tree->GetBranch("jet14_hadronFlavour");
+  if (jet14_hadronFlavour_branch) jet14_hadronFlavour_branch->SetAddress(&jet14_hadronFlavour_);
   jet3_bdiscriminant_branch = tree->GetBranch("jet3_bdiscriminant");
   if (jet3_bdiscriminant_branch) jet3_bdiscriminant_branch->SetAddress(&jet3_bdiscriminant_);
   subleadPhi_branch = tree->GetBranch("subleadPhi");
@@ -347,6 +373,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (dipho_rapidity_branch) dipho_rapidity_branch->SetAddress(&dipho_rapidity_);
   jet13_udsgdiscriminant_branch = tree->GetBranch("jet13_udsgdiscriminant");
   if (jet13_udsgdiscriminant_branch) jet13_udsgdiscriminant_branch->SetAddress(&jet13_udsgdiscriminant_);
+  jet13_hadronFlavour_branch = tree->GetBranch("jet13_hadronFlavour");
+  if (jet13_hadronFlavour_branch) jet13_hadronFlavour_branch->SetAddress(&jet13_hadronFlavour_);
   subleadEnergy_branch = tree->GetBranch("subleadEnergy");
   if (subleadEnergy_branch) subleadEnergy_branch->SetAddress(&subleadEnergy_);
   jet2_energy_branch = tree->GetBranch("jet2_energy");
@@ -403,6 +431,8 @@ void ttHHadronic::Init(TTree *tree) {
   if (topTag_score_branch) topTag_score_branch->SetAddress(&topTag_score_);
   jet5_udsgdiscriminant_branch = tree->GetBranch("jet5_udsgdiscriminant");
   if (jet5_udsgdiscriminant_branch) jet5_udsgdiscriminant_branch->SetAddress(&jet5_udsgdiscriminant_);
+  jet5_hadronFlavour_branch = tree->GetBranch("jet5_hadronFlavour");
+  if (jet5_hadronFlavour_branch) jet5_hadronFlavour_branch->SetAddress(&jet5_hadronFlavour_);
   jet7_pt_branch = tree->GetBranch("jet7_pt");
   if (jet7_pt_branch) jet7_pt_branch->SetAddress(&jet7_pt_);
   jet9_pt_branch = tree->GetBranch("jet9_pt");
@@ -518,16 +548,19 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   sublead_SimpleMomStatus_isLoaded = false;
   jet14_cdiscriminant_isLoaded = false;
   jet1_udsgdiscriminant_isLoaded = false;
+  jet1_hadronFlavour_isLoaded = false;
   nGoodEls_isLoaded = false;
   lead_SmallestDr_isLoaded = false;
   sublead_Mad_isLoaded = false;
   jet14_bdiscriminant_isLoaded = false;
   jet9_udsgdiscriminant_isLoaded = false;
+  jet9_hadronFlavour_isLoaded = false;
   jet12_cdiscriminant_isLoaded = false;
   jet11_pt_isLoaded = false;
   topTag_topMass_isLoaded = false;
   dnn_score_ttgg_isLoaded = false;
   jet2_udsgdiscriminant_isLoaded = false;
+  jet2_hadronFlavour_isLoaded = false;
   diphoMVARes_isLoaded = false;
   sublead_sigmaEoE_isLoaded = false;
   jet9_bdiscriminant_isLoaded = false;
@@ -553,8 +586,10 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet12_eta_isLoaded = false;
   jet14_phi_isLoaded = false;
   jet8_udsgdiscriminant_isLoaded = false;
+  jet8_hadronFlavour_isLoaded = false;
   n_jets_isLoaded = false;
   jet7_udsgdiscriminant_isLoaded = false;
+  jet7_hadronFlavour_isLoaded = false;
   lead_PhoGenPt_isLoaded = false;
   sublead_closest_gen_dR_isLoaded = false;
   lead_Pythia_isLoaded = false;
@@ -566,6 +601,7 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   LooseMvaSFUp01sigma_isLoaded = false;
   jet6_bdiscriminant_isLoaded = false;
   jet15_udsgdiscriminant_isLoaded = false;
+  jet15_hadronFlavour_isLoaded = false;
   jet12_bdiscriminant_isLoaded = false;
   jet2_eta_isLoaded = false;
   lead_MomMomID_isLoaded = false;
@@ -609,7 +645,9 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet4_pt_isLoaded = false;
   lead_PhoGenPhi_isLoaded = false;
   jet11_udsgdiscriminant_isLoaded = false;
+  jet11_hadronFlavour_isLoaded = false;
   jet10_udsgdiscriminant_isLoaded = false;
+  jet10_hadronFlavour_isLoaded = false;
   electronVetoSFUp01sigma_isLoaded = false;
   subleadGendeltaR_isLoaded = false;
   jet3_energy_isLoaded = false;
@@ -638,7 +676,9 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet1_bbdiscriminant_isLoaded = false;
   nGoodTaus_isLoaded = false;
   jet6_udsgdiscriminant_isLoaded = false;
+  jet6_hadronFlavour_isLoaded = false;
   jet4_udsgdiscriminant_isLoaded = false;
+  jet4_hadronFlavour_isLoaded = false;
   jet15_energy_isLoaded = false;
   bjet2_pt_isLoaded = false;
   jet7_bbdiscriminant_isLoaded = false;
@@ -662,9 +702,11 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet7_cdiscriminant_isLoaded = false;
   leadEta_isLoaded = false;
   jet12_udsgdiscriminant_isLoaded = false;
+  jet12_hadronFlavour_isLoaded = false;
   nb_medium_isLoaded = false;
   jet8_phi_isLoaded = false;
   jet3_udsgdiscriminant_isLoaded = false;
+  jet3_hadronFlavour_isLoaded = false;
   jet8_eta_isLoaded = false;
   JetBTagCutWeightDown01sigma_isLoaded = false;
   jet3_eta_isLoaded = false;
@@ -672,6 +714,7 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet1_eta_isLoaded = false;
   jet1_phi_isLoaded = false;
   jet14_udsgdiscriminant_isLoaded = false;
+  jet14_hadronFlavour_isLoaded = false;
   jet3_bdiscriminant_isLoaded = false;
   subleadPhi_isLoaded = false;
   subleadPixelSeed_isLoaded = false;
@@ -681,6 +724,7 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   sublead_SmallestDr_isLoaded = false;
   dipho_rapidity_isLoaded = false;
   jet13_udsgdiscriminant_isLoaded = false;
+  jet13_hadronFlavour_isLoaded = false;
   subleadEnergy_isLoaded = false;
   jet2_energy_isLoaded = false;
   lead_hoe_isLoaded = false;
@@ -709,6 +753,7 @@ void ttHHadronic::GetEntry(unsigned int idx) {
   jet15_bdiscriminant_isLoaded = false;
   topTag_score_isLoaded = false;
   jet5_udsgdiscriminant_isLoaded = false;
+  jet5_hadronFlavour_isLoaded = false;
   jet7_pt_isLoaded = false;
   jet9_pt_isLoaded = false;
   CMS_hgg_mass_isLoaded = false;
@@ -771,16 +816,19 @@ void ttHHadronic::LoadAllBranches() {
   if (sublead_SimpleMomStatus_branch != 0) sublead_SimpleMomStatus();
   if (jet14_cdiscriminant_branch != 0) jet14_cdiscriminant();
   if (jet1_udsgdiscriminant_branch != 0) jet1_udsgdiscriminant();
+  if (jet1_hadronFlavour_branch != 0) jet1_hadronFlavour();
   if (nGoodEls_branch != 0) nGoodEls();
   if (lead_SmallestDr_branch != 0) lead_SmallestDr();
   if (sublead_Mad_branch != 0) sublead_Mad();
   if (jet14_bdiscriminant_branch != 0) jet14_bdiscriminant();
   if (jet9_udsgdiscriminant_branch != 0) jet9_udsgdiscriminant();
+  if (jet9_hadronFlavour_branch != 0) jet9_hadronFlavour();
   if (jet12_cdiscriminant_branch != 0) jet12_cdiscriminant();
   if (jet11_pt_branch != 0) jet11_pt();
   if (topTag_topMass_branch != 0) topTag_topMass();
   if (dnn_score_ttgg_branch != 0) dnn_score_ttgg();
   if (jet2_udsgdiscriminant_branch != 0) jet2_udsgdiscriminant();
+  if (jet2_hadronFlavour_branch != 0) jet2_hadronFlavour();
   if (diphoMVARes_branch != 0) diphoMVARes();
   if (sublead_sigmaEoE_branch != 0) sublead_sigmaEoE();
   if (jet9_bdiscriminant_branch != 0) jet9_bdiscriminant();
@@ -806,8 +854,10 @@ void ttHHadronic::LoadAllBranches() {
   if (jet12_eta_branch != 0) jet12_eta();
   if (jet14_phi_branch != 0) jet14_phi();
   if (jet8_udsgdiscriminant_branch != 0) jet8_udsgdiscriminant();
+  if (jet8_hadronFlavour_branch != 0) jet8_hadronFlavour();
   if (n_jets_branch != 0) n_jets();
   if (jet7_udsgdiscriminant_branch != 0) jet7_udsgdiscriminant();
+  if (jet7_hadronFlavour_branch != 0) jet7_hadronFlavour();
   if (lead_PhoGenPt_branch != 0) lead_PhoGenPt();
   if (sublead_closest_gen_dR_branch != 0) sublead_closest_gen_dR();
   if (lead_Pythia_branch != 0) lead_Pythia();
@@ -819,6 +869,7 @@ void ttHHadronic::LoadAllBranches() {
   if (LooseMvaSFUp01sigma_branch != 0) LooseMvaSFUp01sigma();
   if (jet6_bdiscriminant_branch != 0) jet6_bdiscriminant();
   if (jet15_udsgdiscriminant_branch != 0) jet15_udsgdiscriminant();
+  if (jet15_hadronFlavour_branch != 0) jet15_hadronFlavour();
   if (jet12_bdiscriminant_branch != 0) jet12_bdiscriminant();
   if (jet2_eta_branch != 0) jet2_eta();
   if (lead_MomMomID_branch != 0) lead_MomMomID();
@@ -862,7 +913,9 @@ void ttHHadronic::LoadAllBranches() {
   if (jet4_pt_branch != 0) jet4_pt();
   if (lead_PhoGenPhi_branch != 0) lead_PhoGenPhi();
   if (jet11_udsgdiscriminant_branch != 0) jet11_udsgdiscriminant();
+  if (jet11_hadronFlavour_branch != 0) jet11_hadronFlavour();
   if (jet10_udsgdiscriminant_branch != 0) jet10_udsgdiscriminant();
+  if (jet10_hadronFlavour_branch != 0) jet10_hadronFlavour();
   if (electronVetoSFUp01sigma_branch != 0) electronVetoSFUp01sigma();
   if (subleadGendeltaR_branch != 0) subleadGendeltaR();
   if (jet3_energy_branch != 0) jet3_energy();
@@ -891,7 +944,9 @@ void ttHHadronic::LoadAllBranches() {
   if (jet1_bbdiscriminant_branch != 0) jet1_bbdiscriminant();
   if (nGoodTaus_branch != 0) nGoodTaus();
   if (jet6_udsgdiscriminant_branch != 0) jet6_udsgdiscriminant();
+  if (jet6_hadronFlavour_branch != 0) jet6_hadronFlavour();
   if (jet4_udsgdiscriminant_branch != 0) jet4_udsgdiscriminant();
+  if (jet4_hadronFlavour_branch != 0) jet4_hadronFlavour();
   if (jet15_energy_branch != 0) jet15_energy();
   if (bjet2_pt_branch != 0) bjet2_pt();
   if (jet7_bbdiscriminant_branch != 0) jet7_bbdiscriminant();
@@ -915,9 +970,11 @@ void ttHHadronic::LoadAllBranches() {
   if (jet7_cdiscriminant_branch != 0) jet7_cdiscriminant();
   if (leadEta_branch != 0) leadEta();
   if (jet12_udsgdiscriminant_branch != 0) jet12_udsgdiscriminant();
+  if (jet12_hadronFlavour_branch != 0) jet12_hadronFlavour();
   if (nb_medium_branch != 0) nb_medium();
   if (jet8_phi_branch != 0) jet8_phi();
   if (jet3_udsgdiscriminant_branch != 0) jet3_udsgdiscriminant();
+  if (jet3_hadronFlavour_branch != 0) jet3_hadronFlavour();
   if (jet8_eta_branch != 0) jet8_eta();
   if (JetBTagCutWeightDown01sigma_branch != 0) JetBTagCutWeightDown01sigma();
   if (jet3_eta_branch != 0) jet3_eta();
@@ -925,6 +982,7 @@ void ttHHadronic::LoadAllBranches() {
   if (jet1_eta_branch != 0) jet1_eta();
   if (jet1_phi_branch != 0) jet1_phi();
   if (jet14_udsgdiscriminant_branch != 0) jet14_udsgdiscriminant();
+  if (jet14_hadronFlavour_branch != 0) jet14_hadronFlavour();
   if (jet3_bdiscriminant_branch != 0) jet3_bdiscriminant();
   if (subleadPhi_branch != 0) subleadPhi();
   if (subleadPixelSeed_branch != 0) subleadPixelSeed();
@@ -934,6 +992,7 @@ void ttHHadronic::LoadAllBranches() {
   if (sublead_SmallestDr_branch != 0) sublead_SmallestDr();
   if (dipho_rapidity_branch != 0) dipho_rapidity();
   if (jet13_udsgdiscriminant_branch != 0) jet13_udsgdiscriminant();
+  if (jet13_hadronFlavour_branch != 0) jet13_hadronFlavour();
   if (subleadEnergy_branch != 0) subleadEnergy();
   if (jet2_energy_branch != 0) jet2_energy();
   if (lead_hoe_branch != 0) lead_hoe();
@@ -962,6 +1021,7 @@ void ttHHadronic::LoadAllBranches() {
   if (jet15_bdiscriminant_branch != 0) jet15_bdiscriminant();
   if (topTag_score_branch != 0) topTag_score();
   if (jet5_udsgdiscriminant_branch != 0) jet5_udsgdiscriminant();
+  if (jet5_hadronFlavour_branch != 0) jet5_hadronFlavour();
   if (jet7_pt_branch != 0) jet7_pt();
   if (jet9_pt_branch != 0) jet9_pt();
   if (CMS_hgg_mass_branch != 0) CMS_hgg_mass();
@@ -1118,6 +1178,19 @@ const float &ttHHadronic::jet1_udsgdiscriminant() {
   return jet1_udsgdiscriminant_;
 }
 
+const float &ttHHadronic::jet1_hadronFlavour() {
+  if (not jet1_hadronFlavour_isLoaded) {
+    if (jet1_hadronFlavour_branch != 0) {
+      jet1_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet1_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet1_hadronFlavour_isLoaded = true;
+  }
+  return jet1_hadronFlavour_;
+}
+
 const float &ttHHadronic::nGoodEls() {
   if (not nGoodEls_isLoaded) {
     if (nGoodEls_branch != 0) {
@@ -1183,6 +1256,19 @@ const float &ttHHadronic::jet9_udsgdiscriminant() {
   return jet9_udsgdiscriminant_;
 }
 
+const float &ttHHadronic::jet9_hadronFlavour() {
+  if (not jet9_hadronFlavour_isLoaded) {
+    if (jet9_hadronFlavour_branch != 0) {
+      jet9_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet9_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet9_hadronFlavour_isLoaded = true;
+  }
+  return jet9_hadronFlavour_;
+}
+
 const float &ttHHadronic::jet12_cdiscriminant() {
   if (not jet12_cdiscriminant_isLoaded) {
     if (jet12_cdiscriminant_branch != 0) {
@@ -1246,6 +1332,19 @@ const float &ttHHadronic::jet2_udsgdiscriminant() {
     jet2_udsgdiscriminant_isLoaded = true;
   }
   return jet2_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet2_hadronFlavour() {
+  if (not jet2_hadronFlavour_isLoaded) {
+    if (jet2_hadronFlavour_branch != 0) {
+      jet2_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet2_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet2_hadronFlavour_isLoaded = true;
+  }
+  return jet2_hadronFlavour_;
 }
 
 const float &ttHHadronic::diphoMVARes() {
@@ -1573,6 +1672,19 @@ const float &ttHHadronic::jet8_udsgdiscriminant() {
   return jet8_udsgdiscriminant_;
 }
 
+const float &ttHHadronic::jet8_hadronFlavour() {
+  if (not jet8_hadronFlavour_isLoaded) {
+    if (jet8_hadronFlavour_branch != 0) {
+      jet8_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet8_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet8_hadronFlavour_isLoaded = true;
+  }
+  return jet8_hadronFlavour_;
+}
+
 const float &ttHHadronic::n_jets() {
   if (not n_jets_isLoaded) {
     if (n_jets_branch != 0) {
@@ -1597,6 +1709,19 @@ const float &ttHHadronic::jet7_udsgdiscriminant() {
     jet7_udsgdiscriminant_isLoaded = true;
   }
   return jet7_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet7_hadronFlavour() {
+  if (not jet7_hadronFlavour_isLoaded) {
+    if (jet7_hadronFlavour_branch != 0) {
+      jet7_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet7_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet7_hadronFlavour_isLoaded = true;
+  }
+  return jet7_hadronFlavour_;
 }
 
 const float &ttHHadronic::lead_PhoGenPt() {
@@ -1740,6 +1865,19 @@ const float &ttHHadronic::jet15_udsgdiscriminant() {
     jet15_udsgdiscriminant_isLoaded = true;
   }
   return jet15_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet15_hadronFlavour() {
+  if (not jet15_hadronFlavour_isLoaded) {
+    if (jet15_hadronFlavour_branch != 0) {
+      jet15_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet15_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet15_hadronFlavour_isLoaded = true;
+  }
+  return jet15_hadronFlavour_;
 }
 
 const float &ttHHadronic::jet12_bdiscriminant() {
@@ -2301,6 +2439,19 @@ const float &ttHHadronic::jet11_udsgdiscriminant() {
   return jet11_udsgdiscriminant_;
 }
 
+const float &ttHHadronic::jet11_hadronFlavour() {
+  if (not jet11_hadronFlavour_isLoaded) {
+    if (jet11_hadronFlavour_branch != 0) {
+      jet11_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet11_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet11_hadronFlavour_isLoaded = true;
+  }
+  return jet11_hadronFlavour_;
+}
+
 const float &ttHHadronic::jet10_udsgdiscriminant() {
   if (not jet10_udsgdiscriminant_isLoaded) {
     if (jet10_udsgdiscriminant_branch != 0) {
@@ -2312,6 +2463,19 @@ const float &ttHHadronic::jet10_udsgdiscriminant() {
     jet10_udsgdiscriminant_isLoaded = true;
   }
   return jet10_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet10_hadronFlavour() {
+  if (not jet10_hadronFlavour_isLoaded) {
+    if (jet10_hadronFlavour_branch != 0) {
+      jet10_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet10_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet10_hadronFlavour_isLoaded = true;
+  }
+  return jet10_hadronFlavour_;
 }
 
 const float &ttHHadronic::electronVetoSFUp01sigma() {
@@ -2678,6 +2842,19 @@ const float &ttHHadronic::jet6_udsgdiscriminant() {
   return jet6_udsgdiscriminant_;
 }
 
+const float &ttHHadronic::jet6_hadronFlavour() {
+  if (not jet6_hadronFlavour_isLoaded) {
+    if (jet6_hadronFlavour_branch != 0) {
+      jet6_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet6_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet6_hadronFlavour_isLoaded = true;
+  }
+  return jet6_hadronFlavour_;
+}
+
 const float &ttHHadronic::jet4_udsgdiscriminant() {
   if (not jet4_udsgdiscriminant_isLoaded) {
     if (jet4_udsgdiscriminant_branch != 0) {
@@ -2689,6 +2866,19 @@ const float &ttHHadronic::jet4_udsgdiscriminant() {
     jet4_udsgdiscriminant_isLoaded = true;
   }
   return jet4_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet4_hadronFlavour() {
+  if (not jet4_hadronFlavour_isLoaded) {
+    if (jet4_hadronFlavour_branch != 0) {
+      jet4_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet4_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet4_hadronFlavour_isLoaded = true;
+  }
+  return jet4_hadronFlavour_;
 }
 
 const float &ttHHadronic::jet15_energy() {
@@ -2990,6 +3180,19 @@ const float &ttHHadronic::jet12_udsgdiscriminant() {
   return jet12_udsgdiscriminant_;
 }
 
+const float &ttHHadronic::jet12_hadronFlavour() {
+  if (not jet12_hadronFlavour_isLoaded) {
+    if (jet12_hadronFlavour_branch != 0) {
+      jet12_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet12_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet12_hadronFlavour_isLoaded = true;
+  }
+  return jet12_hadronFlavour_;
+}
+
 const float &ttHHadronic::nb_medium() {
   if (not nb_medium_isLoaded) {
     if (nb_medium_branch != 0) {
@@ -3027,6 +3230,19 @@ const float &ttHHadronic::jet3_udsgdiscriminant() {
     jet3_udsgdiscriminant_isLoaded = true;
   }
   return jet3_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet3_hadronFlavour() {
+  if (not jet3_hadronFlavour_isLoaded) {
+    if (jet3_hadronFlavour_branch != 0) {
+      jet3_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet3_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet3_hadronFlavour_isLoaded = true;
+  }
+  return jet3_hadronFlavour_;
 }
 
 const float &ttHHadronic::jet8_eta() {
@@ -3118,6 +3334,19 @@ const float &ttHHadronic::jet14_udsgdiscriminant() {
     jet14_udsgdiscriminant_isLoaded = true;
   }
   return jet14_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet14_hadronFlavour() {
+  if (not jet14_hadronFlavour_isLoaded) {
+    if (jet14_hadronFlavour_branch != 0) {
+      jet14_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet14_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet14_hadronFlavour_isLoaded = true;
+  }
+  return jet14_hadronFlavour_;
 }
 
 const float &ttHHadronic::jet3_bdiscriminant() {
@@ -3235,6 +3464,19 @@ const float &ttHHadronic::jet13_udsgdiscriminant() {
     jet13_udsgdiscriminant_isLoaded = true;
   }
   return jet13_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet13_hadronFlavour() {
+  if (not jet13_hadronFlavour_isLoaded) {
+    if (jet13_hadronFlavour_branch != 0) {
+      jet13_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet13_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet13_hadronFlavour_isLoaded = true;
+  }
+  return jet13_hadronFlavour_;
 }
 
 const float &ttHHadronic::subleadEnergy() {
@@ -3599,6 +3841,19 @@ const float &ttHHadronic::jet5_udsgdiscriminant() {
     jet5_udsgdiscriminant_isLoaded = true;
   }
   return jet5_udsgdiscriminant_;
+}
+
+const float &ttHHadronic::jet5_hadronFlavour() {
+  if (not jet5_hadronFlavour_isLoaded) {
+    if (jet5_hadronFlavour_branch != 0) {
+      jet5_hadronFlavour_branch->GetEntry(index);
+    } else {
+      printf("branch jet5_hadronFlavour_branch does not exist!\n");
+      exit(1);
+    }
+    jet5_hadronFlavour_isLoaded = true;
+  }
+  return jet5_hadronFlavour_;
 }
 
 const float &ttHHadronic::jet7_pt() {
@@ -4282,16 +4537,19 @@ const float &lead_MomID() { return cms3.lead_MomID(); }
 const float &sublead_SimpleMomStatus() { return cms3.sublead_SimpleMomStatus(); }
 const float &jet14_cdiscriminant() { return cms3.jet14_cdiscriminant(); }
 const float &jet1_udsgdiscriminant() { return cms3.jet1_udsgdiscriminant(); }
+const float &jet1_hadronFlavour() { return cms3.jet1_hadronFlavour(); }
 const float &nGoodEls() { return cms3.nGoodEls(); }
 const float &lead_SmallestDr() { return cms3.lead_SmallestDr(); }
 const float &sublead_Mad() { return cms3.sublead_Mad(); }
 const float &jet14_bdiscriminant() { return cms3.jet14_bdiscriminant(); }
 const float &jet9_udsgdiscriminant() { return cms3.jet9_udsgdiscriminant(); }
+const float &jet9_hadronFlavour() { return cms3.jet9_hadronFlavour(); }
 const float &jet12_cdiscriminant() { return cms3.jet12_cdiscriminant(); }
 const float &jet11_pt() { return cms3.jet11_pt(); }
 const float &topTag_topMass() { return cms3.topTag_topMass(); }
 const float &dnn_score_ttgg() { return cms3.dnn_score_ttgg(); }
 const float &jet2_udsgdiscriminant() { return cms3.jet2_udsgdiscriminant(); }
+const float &jet2_hadronFlavour() { return cms3.jet2_hadronFlavour(); }
 const float &diphoMVARes() { return cms3.diphoMVARes(); }
 const float &sublead_sigmaEoE() { return cms3.sublead_sigmaEoE(); }
 const float &jet9_bdiscriminant() { return cms3.jet9_bdiscriminant(); }
@@ -4317,8 +4575,10 @@ const float &bjet2_csv() { return cms3.bjet2_csv(); }
 const float &jet12_eta() { return cms3.jet12_eta(); }
 const float &jet14_phi() { return cms3.jet14_phi(); }
 const float &jet8_udsgdiscriminant() { return cms3.jet8_udsgdiscriminant(); }
+const float &jet8_hadronFlavour() { return cms3.jet8_hadronFlavour(); }
 const float &n_jets() { return cms3.n_jets(); }
 const float &jet7_udsgdiscriminant() { return cms3.jet7_udsgdiscriminant(); }
+const float &jet7_hadronFlavour() { return cms3.jet7_hadronFlavour(); }
 const float &lead_PhoGenPt() { return cms3.lead_PhoGenPt(); }
 const float &sublead_closest_gen_dR() { return cms3.sublead_closest_gen_dR(); }
 const float &lead_Pythia() { return cms3.lead_Pythia(); }
@@ -4330,6 +4590,7 @@ const float &nGoodMus() { return cms3.nGoodMus(); }
 const float &LooseMvaSFUp01sigma() { return cms3.LooseMvaSFUp01sigma(); }
 const float &jet6_bdiscriminant() { return cms3.jet6_bdiscriminant(); }
 const float &jet15_udsgdiscriminant() { return cms3.jet15_udsgdiscriminant(); }
+const float &jet15_hadronFlavour() { return cms3.jet15_hadronFlavour(); }
 const float &jet12_bdiscriminant() { return cms3.jet12_bdiscriminant(); }
 const float &jet2_eta() { return cms3.jet2_eta(); }
 const float &lead_MomMomID() { return cms3.lead_MomMomID(); }
@@ -4373,7 +4634,9 @@ const float &subleadGenMatch() { return cms3.subleadGenMatch(); }
 const float &jet4_pt() { return cms3.jet4_pt(); }
 const float &lead_PhoGenPhi() { return cms3.lead_PhoGenPhi(); }
 const float &jet11_udsgdiscriminant() { return cms3.jet11_udsgdiscriminant(); }
+const float &jet11_hadronFlavour() { return cms3.jet11_hadronFlavour(); }
 const float &jet10_udsgdiscriminant() { return cms3.jet10_udsgdiscriminant(); }
+const float &jet10_hadronFlavour() { return cms3.jet10_hadronFlavour(); }
 const float &electronVetoSFUp01sigma() { return cms3.electronVetoSFUp01sigma(); }
 const float &subleadGendeltaR() { return cms3.subleadGendeltaR(); }
 const float &jet3_energy() { return cms3.jet3_energy(); }
@@ -4402,7 +4665,9 @@ const float &FracRVNvtxWeightUp01sigma() { return cms3.FracRVNvtxWeightUp01sigma
 const float &jet1_bbdiscriminant() { return cms3.jet1_bbdiscriminant(); }
 const float &nGoodTaus() { return cms3.nGoodTaus(); }
 const float &jet6_udsgdiscriminant() { return cms3.jet6_udsgdiscriminant(); }
+const float &jet6_hadronFlavour() { return cms3.jet6_hadronFlavour(); }
 const float &jet4_udsgdiscriminant() { return cms3.jet4_udsgdiscriminant(); }
+const float &jet4_hadronFlavour() { return cms3.jet4_hadronFlavour(); }
 const float &jet15_energy() { return cms3.jet15_energy(); }
 const float &bjet2_pt() { return cms3.bjet2_pt(); }
 const float &jet7_bbdiscriminant() { return cms3.jet7_bbdiscriminant(); }
@@ -4426,9 +4691,11 @@ const float &jet2_bbdiscriminant() { return cms3.jet2_bbdiscriminant(); }
 const float &jet7_cdiscriminant() { return cms3.jet7_cdiscriminant(); }
 const float &leadEta() { return cms3.leadEta(); }
 const float &jet12_udsgdiscriminant() { return cms3.jet12_udsgdiscriminant(); }
+const float &jet12_hadronFlavour() { return cms3.jet12_hadronFlavour(); }
 const float &nb_medium() { return cms3.nb_medium(); }
 const float &jet8_phi() { return cms3.jet8_phi(); }
 const float &jet3_udsgdiscriminant() { return cms3.jet3_udsgdiscriminant(); }
+const float &jet3_hadronFlavour() { return cms3.jet3_hadronFlavour(); }
 const float &jet8_eta() { return cms3.jet8_eta(); }
 const float &JetBTagCutWeightDown01sigma() { return cms3.JetBTagCutWeightDown01sigma(); }
 const float &jet3_eta() { return cms3.jet3_eta(); }
@@ -4436,6 +4703,7 @@ const float &jet4_bbdiscriminant() { return cms3.jet4_bbdiscriminant(); }
 const float &jet1_eta() { return cms3.jet1_eta(); }
 const float &jet1_phi() { return cms3.jet1_phi(); }
 const float &jet14_udsgdiscriminant() { return cms3.jet14_udsgdiscriminant(); }
+const float &jet14_hadronFlavour() { return cms3.jet14_hadronFlavour(); }
 const float &jet3_bdiscriminant() { return cms3.jet3_bdiscriminant(); }
 const float &subleadPhi() { return cms3.subleadPhi(); }
 const float &subleadPixelSeed() { return cms3.subleadPixelSeed(); }
@@ -4445,6 +4713,7 @@ const float &jet13_phi() { return cms3.jet13_phi(); }
 const float &sublead_SmallestDr() { return cms3.sublead_SmallestDr(); }
 const float &dipho_rapidity() { return cms3.dipho_rapidity(); }
 const float &jet13_udsgdiscriminant() { return cms3.jet13_udsgdiscriminant(); }
+const float &jet13_hadronFlavour() { return cms3.jet13_hadronFlavour(); }
 const float &subleadEnergy() { return cms3.subleadEnergy(); }
 const float &jet2_energy() { return cms3.jet2_energy(); }
 const float &lead_hoe() { return cms3.lead_hoe(); }
@@ -4473,6 +4742,7 @@ const float &subleadPassEVeto() { return cms3.subleadPassEVeto(); }
 const float &jet15_bdiscriminant() { return cms3.jet15_bdiscriminant(); }
 const float &topTag_score() { return cms3.topTag_score(); }
 const float &jet5_udsgdiscriminant() { return cms3.jet5_udsgdiscriminant(); }
+const float &jet5_hadronFlavour() { return cms3.jet5_hadronFlavour(); }
 const float &jet7_pt() { return cms3.jet7_pt(); }
 const float &jet9_pt() { return cms3.jet9_pt(); }
 const float &CMS_hgg_mass() { return cms3.CMS_hgg_mass(); }

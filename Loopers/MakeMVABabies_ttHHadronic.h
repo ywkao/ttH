@@ -170,6 +170,8 @@ class BabyMaker {
     //# Meng-Cheng's method
     float       mc_mva_score_tt_;
     float       mc_mva_score_st_;
+    float       mc_mva_score_tt_v2_;
+    float       mc_mva_score_st_v2_;
 	float       LeadPho_Pt;
 	float       LeadPho_Eta;
 	float       LeadPho_Phi;
@@ -194,6 +196,14 @@ class BabyMaker {
 	float       M1Jet_Eta;
 	float       M1Jet_Phi;
 	float       M1Jet_btag;
+	float       M1;
+	float       M2;
+	float       MW;
+	float       dR_qH;
+	float       dR_bW;
+	float       dR_tt;
+	float       dR_qq;
+	float       dR_tH;
     //# chi-2 related
     float       chi2_tbw_mass_;
     float       chi2_tbw_pt_;
@@ -378,6 +388,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
     //# Meng-Cheng's method
   BabyTree_->Branch("mc_mva_score_tt_"             , &mc_mva_score_tt_        );
   BabyTree_->Branch("mc_mva_score_st_"             , &mc_mva_score_st_        );
+  BabyTree_->Branch("mc_mva_score_tt_v2_"             , &mc_mva_score_tt_v2_        );
+  BabyTree_->Branch("mc_mva_score_st_v2_"             , &mc_mva_score_st_v2_        );
   //#chi-2 related
   BabyTree_->Branch("chi2_tbw_mass_", &chi2_tbw_mass_);
   BabyTree_->Branch("chi2_tbw_pt_", &chi2_tbw_pt_);

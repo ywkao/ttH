@@ -2,6 +2,7 @@
 #include "ScanChain_ttHLeptonic.h"
 
 void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext, TString bkg_options, TString mYear = "", TString idx = "", bool fcnc = false, bool blind = false, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
+    printf("[INFO] BabyMaker::ScanChain\n");
   // Init{{{
     // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -34,6 +35,8 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
   unique_ptr<TMVA::Reader> tth_std_mva;
   unique_ptr<TMVA::Reader> reader_tt; //do_meng_cheng_top_reco_mva
   unique_ptr<TMVA::Reader> reader_st; //do_meng_cheng_top_reco_mva
+  unique_ptr<TMVA::Reader> reader_tt_v2; //do_meng_cheng_top_reco_mva
+  unique_ptr<TMVA::Reader> reader_st_v2; //do_meng_cheng_top_reco_mva
 
   bool do_tth_ttPP_mva = false;
   if (do_tth_ttPP_mva) {
@@ -156,20 +159,61 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 	reader_st->BookMVA("ST_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVAreco_train/dataset/weights/STlep_ANN_v1.weights.xml");
   }
   //}}}
+  //bool do_reader_tt_v2 = true;{{{
+  bool do_reader_tt_v2 = true;
+  if (do_reader_tt_v2) {
+    reader_tt_v2.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_tt_v2->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_tt_v2->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_tt_v2->AddVariable("bJet_btag", &bJet_btag);
+	reader_tt_v2->AddVariable("M1Jet_Pt", &M1Jet_Pt);
+	reader_tt_v2->AddVariable("M1Jet_Eta", &M1Jet_Eta);
+	reader_tt_v2->AddVariable("M1Jet_btag", &M1Jet_btag);
+	reader_tt_v2->AddVariable("lep_ID", &lep_ID);
+	reader_tt_v2->AddVariable("lep_Pt", &lep_Pt);
+	reader_tt_v2->AddVariable("lep_Eta", &lep_Eta);
+	reader_tt_v2->AddVariable("M1", &M1);
+	reader_tt_v2->AddVariable("dR_qH", &dR_qH);
+	reader_tt_v2->AddVariable("dR_lb", &dR_lb);
+	reader_tt_v2->AddVariable("dR_lt", &dR_lt);
+	// Book MVA methods
+	reader_tt_v2->BookMVA("TT_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVArecoV2_train/dataset/weights/TTlep_ANN_v1.weights.xml");
+  }
+  //}}}
+  //bool do_reader_st_v2 = true;{{{
+  bool do_reader_st_v2 = true;
+  if (do_reader_st_v2) {
+    reader_st_v2.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_st_v2->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_st_v2->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_st_v2->AddVariable("bJet_btag", &bJet_btag);
+	reader_st_v2->AddVariable("lep_ID", &lep_ID);
+	reader_st_v2->AddVariable("lep_Pt", &lep_Pt);
+	reader_st_v2->AddVariable("lep_Eta", &lep_Eta);
+	reader_st_v2->AddVariable("dR_lb", &dR_lb);
+	reader_st_v2->AddVariable("dR_lH", &dR_lH);
+	// Book MVA methods
+	reader_st_v2->BookMVA("ST_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVArecoV2_train/dataset/weights/STlep_ANN_v1.weights.xml");
+  }
+  //}}}
 
   // File Loop
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
     // file content, type of sample, year, json{{{
     // Get File Content
     TString currentFileTitle = currentFile->GetTitle();
-    cout << currentFileTitle << endl;
     TFile file(currentFileTitle);
     TTree *tree;
     cout << "currentFileTitle: " << currentFileTitle << endl;
-    if (currentFileTitle.Contains("v4.") && !currentFileTitle.Contains("FCNC")) {
+    if ( (currentFileTitle.Contains("v4.") && !currentFileTitle.Contains("FCNC")) || currentFileTitle.Contains("v5."))
+    {
         cout << "New tree naming convention" << endl;
         tree = (TTree*)file.Get("tagsDumper/trees/_13TeV_TTHLeptonicTag");
-        }
+    }
     else {
         cout << "Old tree naming convention" << endl;
         tree = (TTree*)file.Get("tthLeptonicTagDumper/trees/tth_13TeV_all"); 
@@ -630,9 +674,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
       SubleadPho_Phi = sublead_phi_;
       SubleadPho_IDMVA = subleadIDMVA_;
 
-      //!!!!! LACK LEP ID INFO !!!!!//
+      //!!!!! LACK real lep charge INFO !!!!!//
       // determine jet candidates according to permutations with MVA scores
       int nleps_ = leps.size();
+      TLorentzVector reco_H = diphoton;
       // nested for loops for the MVA score, mc_mva_score_tt_ {{{
       do_reader_tt = (njets_ >= 2) and (nleps_ >= 1);
       if(do_reader_tt) {
@@ -664,7 +709,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 					lep_Pt  = leps_unordered[k].Pt();
 					lep_Eta = leps_unordered[k].Eta();
 					lep_Phi = leps_unordered[k].Phi();
-                    //printf("check: %f\n", lep_ID);
                     
                     vector<int> indices = {i, j, k};
                     indices_collector.push_back(indices);
@@ -687,7 +731,6 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
             mc_mva_score_tt_ = -999;
       }
       //}}}
-      printf("\n");
       // nested for loops for the MVA score, mc_mva_score_st_ {{{
       do_reader_st = (njets_ >= 1) and (nleps_ >= 1);
       if(do_reader_st) {
@@ -709,9 +752,9 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
                   TString type = (k < electrons.size()) ? "electron" : "muon";
 				  lep_ID = obtain_lep_id(type, lep_charges[k]);
-				  lep_Pt  = leps[k].Pt();
-				  lep_Eta = leps[k].Eta();
-				  lep_Phi = leps[k].Phi();
+				  lep_Pt  = leps_unordered[k].Pt();
+				  lep_Eta = leps_unordered[k].Eta();
+				  lep_Phi = leps_unordered[k].Phi();
                   
                   vector<int> indices = {i, k};
                   indices_collector.push_back(indices);
@@ -731,6 +774,117 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
           } // End b-jet loop
       } else {
             mc_mva_score_st_ = -999;
+      }
+      //}}}
+      // nested for loops for the MVA score, mc_mva_score_tt_v2_ {{{
+      do_reader_tt_v2 = (njets_ >= 2) and (nleps_ >= 1);
+      if(do_reader_tt_v2) {
+        int perm = -1;
+        int best_perm = -1;
+        double best_score = -999;
+        vector<int> best_indices = {-1, -1, -1};
+        vector<vector<int>> indices_collector;
+
+        // Start b-jet loop
+        for (int i=0; i<njets_; ++i) {
+        	// Start fcnc jet loop
+        	for (int j=0; j<njets_; ++j) {
+        		if (j == i) continue;
+        		// Start lep loop
+        		for (int k=0; k<nleps_; ++k) {
+
+                    bJet_Pt = jets[i].Pt();
+                    bJet_Eta = jets[i].Eta();
+                    bJet_btag = btag_scores[i];
+                    M1Jet_Pt = jets[j].Pt();
+                    M1Jet_Eta = jets[j].Eta();
+                    M1Jet_btag = btag_scores[j];
+
+                    TString type = (k < electrons.size()) ? "electron" : "muon";
+					lep_ID = obtain_lep_id(type, lep_charges[k]);
+					lep_Pt  = leps_unordered[k].Pt();
+					lep_Eta = leps_unordered[k].Eta();
+                    
+					TLorentzVector reco_lep;
+					reco_lep.SetPtEtaPhiE(leps_unordered[k].Pt(), leps_unordered[k].Eta(), leps_unordered[k].Phi(), leps_unordered[k].Energy());
+					TLorentzVector reco_bJet = jets[i];
+					TLorentzVector reco_M1Jet = jets[j];
+					TLorentzVector reco_M1 = reco_M1Jet + reco_H;
+
+					M1 = reco_M1.M();
+					dR_qH = reco_M1Jet.DeltaR(reco_H);
+					dR_lb = reco_lep.DeltaR(reco_bJet);
+					dR_lt = reco_lep.DeltaR(reco_M1);
+
+                    vector<int> indices = {i, j, k};
+                    indices_collector.push_back(indices);
+                    ++perm;
+        
+        	        double score = reader_tt_v2->EvaluateMVA( "TT_lep_MVA" );
+        	        if (score > best_score) {
+        	        	best_score = score;
+        	        	best_perm = perm;
+        	        }
+        	        // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                    bool is_the_last_permutation = (i+1 == njets_) and (j+2 == njets_) and (k+1 == nleps_);
+        	        if (is_the_last_permutation) {
+                        mc_mva_score_tt_v2_ = best_score;
+        	        }
+    		    } // End lep loop
+        	} // End fcnc jet loop
+        } // End b-jet loop
+      } else {
+            mc_mva_score_tt_v2_ = -999;
+      }
+      //}}}
+      // nested for loops for the MVA score, mc_mva_score_st_v2_ {{{
+      do_reader_st_v2 = (njets_ >= 1) and (nleps_ >= 1);
+      if(do_reader_st_v2) {
+          int perm = -1;
+          int best_perm = -1;
+          double best_score = -999;
+          vector<int> best_indices = {-1, -1};
+          vector<vector<int>> indices_collector;
+
+          // Start b-jet loop
+          for (int i=0; i<njets_; ++i) {
+              // Start W jet 1 loop
+              for (int k=0; k<nleps_; ++k) {
+                      
+                  bJet_Pt = jets[i].Pt();
+                  bJet_Eta = jets[i].Eta();
+                  bJet_btag = btag_scores[i];
+
+                  TString type = (k < electrons.size()) ? "electron" : "muon";
+				  lep_ID = obtain_lep_id(type, lep_charges[k]);
+				  lep_Pt  = leps_unordered[k].Pt();
+				  lep_Eta = leps_unordered[k].Eta();
+                  
+                  TLorentzVector reco_lep;
+       			  reco_lep.SetPtEtaPhiE(leps_unordered[k].Pt(), leps_unordered[k].Eta(), leps_unordered[k].Phi(), leps_unordered[k].Energy());
+                  TLorentzVector reco_bJet = jets[i];
+
+				  dR_lb = reco_lep.DeltaR(reco_bJet);
+				  dR_lH = reco_lep.DeltaR(reco_H);
+
+                  vector<int> indices = {i, k};
+                  indices_collector.push_back(indices);
+                  ++perm;
+      
+      	          double score = reader_st_v2->EvaluateMVA( "ST_lep_MVA" );
+      	          if (score > best_score) {
+      	          	best_score = score;
+      	          	best_perm = perm;
+      	          }
+      	          // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                  bool is_the_last_permutation = (i+1 == njets_) and (k+1 == nleps_);
+      	          if (is_the_last_permutation) {
+                        mc_mva_score_st_v2_ = best_score;
+      	          }
+              } // End lep loop
+          } // End b-jet loop
+      } else {
+            mc_mva_score_st_v2_ = -999;
       }
       //}}}
 

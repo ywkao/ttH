@@ -168,6 +168,8 @@ class BabyMaker {
     //# Meng-Cheng's method
     float       mc_mva_score_tt_;
     float       mc_mva_score_st_;
+    float       mc_mva_score_tt_v2_;
+    float       mc_mva_score_st_v2_;
 	float       LeadPho_Pt;
 	float       LeadPho_Eta;
 	float       LeadPho_Phi;
@@ -188,6 +190,11 @@ class BabyMaker {
 	float       lep_Pt;
 	float       lep_Eta;
 	float       lep_Phi;
+	float       M1;
+	float       dR_qH;
+	float       dR_lb;
+	float       dR_lt;
+	float       dR_lH;
 
     //#quadratic equation related
     float chi2_neutrino_pz_;
@@ -351,6 +358,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
     //# Meng-Cheng's method
   BabyTree_->Branch("mc_mva_score_tt_"             , &mc_mva_score_tt_        );
   BabyTree_->Branch("mc_mva_score_st_"             , &mc_mva_score_st_        );
+  BabyTree_->Branch("mc_mva_score_tt_v2_"             , &mc_mva_score_tt_v2_        );
+  BabyTree_->Branch("mc_mva_score_st_v2_"             , &mc_mva_score_st_v2_        );
   //#quadratic equation related
   BabyTree_->Branch("chi2_neutrino_pz_", &chi2_neutrino_pz_);
   BabyTree_->Branch("chi2_tbw_mass_", &chi2_tbw_mass_);
