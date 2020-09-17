@@ -306,63 +306,62 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
             nEventsChain = nEventsTree;
             nEventsTotal = 0;
    
-//            //--------------------- b-tag reshaping ---------------------//
-//            if (!isData && btag_norm_correction == 1.) {
-//                double integral_no_btag = 0.;
-//                double integral_w_btag =  0.;
-//                //for (unsigned int event = 0; event < nEventsTree; ++event) {
-//                for (unsigned int event = 0; event < 10; ++event) {
-//                    if (fast) tree->LoadTree(event);
-//                    cms3.GetEntry(event);
-//                    ++nEventsTotal;
-//
-//                    ttHHadronic::progress( nEventsTotal, nEventsChain );
-//
-//                    if (!passes_btag_rescale_selection())       continue;
-//
-//                    double weight_no_btag = weight() / weight_JetBTagWeight();
-//                    //double weight_no_btag = weight() / 1.;
-//
-//                    if (!(isnan(weight_no_btag) || isinf(weight_no_btag))) {
-//                        integral_no_btag += weight_no_btag;
-//                        integral_w_btag += weight();
-//                    }
-//                }
-//                btag_norm_correction = integral_no_btag / integral_w_btag;
-//                cout << "btag_normalization_factor: " << btag_norm_correction << endl;
-//            }
-
-            //--------------------- c-tag reshaping ---------------------//
-            nEventsTotal = 0;
-            if (!isData) {
-                double integral_no_ctag = 0.;
-                double integral_w_ctag =  0.;
-                for (unsigned int event = 0; event < 10; ++event) {
+            //--------------------- b-tag reshaping ---------------------//
+            if (!isData && btag_norm_correction == 1.) {
+                double integral_no_btag = 0.;
+                double integral_w_btag =  0.;
                 //for (unsigned int event = 0; event < nEventsTree; ++event) {
+                for (unsigned int event = 0; event < 10; ++event) {
                     if (fast) tree->LoadTree(event);
                     cms3.GetEntry(event);
                     ++nEventsTotal;
+
                     ttHHadronic::progress( nEventsTotal, nEventsChain );
-                    if (!passes_btag_rescale_selection()) continue; // n_jets() < 3 continue
 
-                    /* Note: c-tag has not been applied to the central weight */
-                    double weight_JetCTagWeight = get_ctag_reshaping_weight(sf);
-                    double weight_no_ctag = weight();
-                    double weight_with_ctag = weight() * weight_JetCTagWeight;
+                    if (!passes_btag_rescale_selection())       continue;
 
-                    if (!(isnan(weight_no_ctag) || isinf(weight_no_ctag))) {
-                        integral_no_ctag += weight_no_ctag;
-                        integral_w_ctag += weight_with_ctag;
-                        //std::cout << event << " weight = " << weight() << std::endl;
-                        //std::cout << "weight_JetCTagWeight = " << weight_JetCTagWeight << std::endl;
-                        //std::cout << "weight_no_ctag = " << weight_no_ctag << std::endl;
-                        //std::cout << "weight_with_ctag = " << weight_with_ctag << std::endl;
+                    double weight_no_btag = weight() / weight_JetBTagWeight();
+                    //double weight_no_btag = weight() / 1.;
+
+                    if (!(isnan(weight_no_btag) || isinf(weight_no_btag))) {
+                        integral_no_btag += weight_no_btag;
+                        integral_w_btag += weight();
                     }
                 }
-                ctag_norm_correction = integral_no_ctag / integral_w_ctag;
-                cout << "ctag_normalization_factor: " << ctag_norm_correction << endl;
-              }
-            //--------------------- end of c-tag reshaping ---------------------//
+                btag_norm_correction = integral_no_btag / integral_w_btag;
+                cout << "btag_normalization_factor: " << btag_norm_correction << endl;
+            }
+
+//            //--------------------- c-tag reshaping ---------------------//
+//            nEventsTotal = 0;
+//            if (!isData) {
+//                double integral_no_ctag = 0.;
+//                double integral_w_ctag =  0.;
+//                for (unsigned int event = 0; event < nEventsTree; ++event) {
+//                    if (fast) tree->LoadTree(event);
+//                    cms3.GetEntry(event);
+//                    ++nEventsTotal;
+//                    ttHHadronic::progress( nEventsTotal, nEventsChain );
+//                    if (!passes_btag_rescale_selection()) continue; // n_jets() < 3 continue
+//
+//                    /* Note: c-tag has not been applied to the central weight */
+//                    double weight_JetCTagWeight = get_ctag_reshaping_weight(sf);
+//                    double weight_no_ctag = weight();
+//                    double weight_with_ctag = weight() * weight_JetCTagWeight;
+//
+//                    if (!(isnan(weight_no_ctag) || isinf(weight_no_ctag))) {
+//                        integral_no_ctag += weight_no_ctag;
+//                        integral_w_ctag += weight_with_ctag;
+//                        //std::cout << event << " weight = " << weight() << std::endl;
+//                        //std::cout << "weight_JetCTagWeight = " << weight_JetCTagWeight << std::endl;
+//                        //std::cout << "weight_no_ctag = " << weight_no_ctag << std::endl;
+//                        //std::cout << "weight_with_ctag = " << weight_with_ctag << std::endl;
+//                    }
+//                }
+//                ctag_norm_correction = integral_no_ctag / integral_w_ctag;
+//                cout << "ctag_normalization_factor: " << ctag_norm_correction << endl;
+//              }
+//            //--------------------- end of c-tag reshaping ---------------------//
 
             nEventsTotal = 0;
 
