@@ -178,8 +178,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 	reader_tt_v2->AddVariable("dR_qH", &dR_qH);
 	reader_tt_v2->AddVariable("dR_lb", &dR_lb);
 	reader_tt_v2->AddVariable("dR_lt", &dR_lt);
+	reader_tt_v2->AddVariable("dPhi_bMET", &dPhi_bMET);
+	reader_tt_v2->AddVariable("Met_Pt", &Met_Pt);
 	// Book MVA methods
-	reader_tt_v2->BookMVA("TT_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVArecoV2_train/dataset/weights/TTlep_ANN_v1.weights.xml");
+	reader_tt_v2->BookMVA("TT_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVArecoV3_train/dataset/weights/TTlep_ANN_v1.weights.xml");
   }
   //}}}
   //bool do_reader_st_v2 = true;{{{
@@ -196,8 +198,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 	reader_st_v2->AddVariable("lep_Eta", &lep_Eta);
 	reader_st_v2->AddVariable("dR_lb", &dR_lb);
 	reader_st_v2->AddVariable("dR_lH", &dR_lH);
+	reader_st_v2->AddVariable("dPhi_bMET", &dPhi_bMET);
+	reader_st_v2->AddVariable("Met_Pt", &Met_Pt);
 	// Book MVA methods
-	reader_st_v2->BookMVA("ST_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVArecoV2_train/dataset/weights/STlep_ANN_v1.weights.xml");
+	reader_st_v2->BookMVA("ST_lep_MVA", "/wk_cms2/mc_cheng/public/tqHGG/2017/MVArecoV3_train/dataset/weights/STlep_ANN_v1.weights.xml");
   }
   //}}}
 
@@ -816,6 +820,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 					dR_lb = reco_lep.DeltaR(reco_bJet);
 					dR_lt = reco_lep.DeltaR(reco_M1);
 
+	                dPhi_bMET = fabs( reco_bJet.Phi() - met_phi_ );
+				    if (dPhi_bMET > TMath::Pi()) dPhi_bMET = 2 * TMath::Pi() - dPhi_bMET;
+	                Met_Pt = met_pt;
+
                     vector<int> indices = {i, j, k};
                     indices_collector.push_back(indices);
                     ++perm;
@@ -866,6 +874,10 @@ void BabyMaker::ScanChain(TChain* chain, TString tag, TString year, TString ext,
 
 				  dR_lb = reco_lep.DeltaR(reco_bJet);
 				  dR_lH = reco_lep.DeltaR(reco_H);
+
+	              dPhi_bMET = fabs( reco_bJet.Phi() - met_phi_ );
+				  if (dPhi_bMET > TMath::Pi()) dPhi_bMET = 2 * TMath::Pi() - dPhi_bMET;
+	              Met_Pt = met_pt;
 
                   vector<int> indices = {i, k};
                   indices_collector.push_back(indices);

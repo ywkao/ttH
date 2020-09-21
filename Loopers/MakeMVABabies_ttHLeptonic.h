@@ -195,6 +195,8 @@ class BabyMaker {
 	float       dR_lb;
 	float       dR_lt;
 	float       dR_lH;
+	float       dPhi_bMET;
+	float       Met_Pt;
 
     //#quadratic equation related
     float chi2_neutrino_pz_;
