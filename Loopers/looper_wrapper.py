@@ -456,23 +456,28 @@ if args.ttH_vs_tH:
 
 def full_path(baby):
   #full_path_baby = "/home/users/sjmay/ttH/Loopers/merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
-  full_path_baby = "/wk_cms/ykao/public/samuel/v5p4/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
+  full_path_baby = "/wk_cms/ykao/public/samuel/v5p5/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
   return [full_path_baby]
 
 def little_babies(baby):
   #babies = glob.glob("/home/users/sjmay/ttH/Loopers/merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
-  babies = glob.glob("/wk_cms/ykao/public/samuel/v5p4/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
+  babies = glob.glob("/wk_cms/ykao/public/samuel/v5p5/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
   return babies
 #}}}
 
 def check_file(baby):
   bash_command("ls " + baby)
 
-babies_2017 = [
-        #"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_tauDecays_94X_mc2017_realistic_v14-v1_MINIAODSIM_microAOD_v1.2_29May2020"
-        'TT_FCNC-T2HJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_microAOD_v1.2_29May2020'
-        #'TT_FCNC-T2HJ_aTleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_microAOD_v1.2_29May2020'
-        ]
+#babies_2016 = [
+#        #"FCNC_private_ST_HAD_HCT_2016_microAOD_v1.2_29May2020"
+#        #"ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1"
+#        ]
+
+#babies_2017 = [
+#        #"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_tauDecays_94X_mc2017_realistic_v14-v1_MINIAODSIM_microAOD_v1.2_29May2020"
+#        #'TT_FCNC-T2HJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_microAOD_v1.2_29May2020',
+#        #'TT_FCNC-T2HJ_aTleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_microAOD_v1.2_29May2020'
+#        ]
 
 command_list = []
 idx = 0
@@ -530,7 +535,8 @@ print "after parallel_utils.submit_jobs..."
 if args.babymaker:
   histos = glob.glob("MVABaby_ttH%s_%s_*.root" % (args.channel, args.tag))
 else:
-  histos = glob.glob("%s_%s_histogramsRunII_*.root" % (args.selection, args.tag))
+  histos = glob.glob("%s_%s_histogramsRunII*.root" % (args.selection, args.tag)) # NOTE: for single year
+  #histos = glob.glob("%s_%s_histogramsRunII_%s*.root" % (args.selection, args.tag, args.years)) # NOTE: for single year
 good_histos = []
 for hist in histos:
   size = os.stat(hist).st_size * (1./(1024))
@@ -548,6 +554,7 @@ if args.babymaker:
   master = "MVABaby_ttH%s_%s.root" % (args.channel, args.tag)
 else:
   master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag)
+  #master = "%s_%s_histogramsRunII_%s.root" % (args.selection, args.tag, args.years)
 os.system('/usr/bin/ionice -c2 -n7 hadd -f -k -j 4 %s %s' % (master, target))
 
 # Cleanup

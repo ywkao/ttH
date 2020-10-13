@@ -917,8 +917,7 @@ vector<vector<double>> make_jets_hadronFlavour_and_discriminants() {
   return vJets_info;
 }
 
-double get_ctag_reshaping_weight(retrieve_scale_factor &sf)
-//double get_ctag_reshaping_weight()
+double get_ctag_reshaping_weight(TString mYear, retrieve_scale_factor &sf)
 {
     //std::string root_file_deepJet = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl.root";
     //retrieve_scale_factor sf(root_file_deepJet);
@@ -936,7 +935,9 @@ double get_ctag_reshaping_weight(retrieve_scale_factor &sf)
         double cvsb_ = calculate_CvsB(ctag_, btag_, bbtag_);
     
         TString type_flavour = (hadronFlavour_ == 5.) ? "b" : ((hadronFlavour_ == 4.) ? "c" : "l");
-        TString name = "SF" + type_flavour + "_hist"; // warning: consider nominal value for the moment!!
+        //TString name = (mYear == "2016") ? "SF" + type_flavour + "_hist" + "_central" : "SF" + type_flavour + "_hist";
+        TString name = "SF" + type_flavour + "_hist";
+
         double scale_factor_ = sf.get_scale_factor(name, cvsl_, cvsb_);
         weight_JetCTagWeight *= scale_factor_;
         //std::cout << "hadronFlavour = " << hadronFlavour_ << ", ";
@@ -944,4 +945,43 @@ double get_ctag_reshaping_weight(retrieve_scale_factor &sf)
         //std::cout << "scale_factor_ = " << scale_factor_ << std::endl;
     }
     return weight_JetCTagWeight;
+}
+
+void retrieve_max_discriminants(float &max_btag, float &second_max_btag, float &max_ctag, float &second_max_ctag, float &max_cvsl, float &second_max_cvsl, float &max_cvsb, float &second_max_cvsb)
+{
+    vector<double> btag_scores;
+    vector<double> ctag_scores;
+    vector<double> cvsl_scores;
+    vector<double> cvsb_scores;
+
+    vector<vector<double>> jets_info = make_jets_hadronFlavour_and_discriminants();
+    for(std::size_t i=0; i!=jets_info.size(); ++i)
+    {
+        double hadronFlavour_ = jets_info[i][0];
+        double udsgtag_ = jets_info[i][1];
+        double ctag_ = jets_info[i][2];
+        double btag_ = jets_info[i][3];
+        double bbtag_ = jets_info[i][4];
+        double cvsl_ = calculate_CvsL(ctag_, udsgtag_);
+        double cvsb_ = calculate_CvsB(ctag_, btag_, bbtag_);
+
+        btag_scores.push_back(btag_);
+        ctag_scores.push_back(ctag_);
+        cvsl_scores.push_back(cvsl_);
+        cvsb_scores.push_back(cvsb_);
+    }
+
+    vector<std::pair<int, double>> btag_scores_sorted = sortVector(btag_scores);
+    vector<std::pair<int, double>> ctag_scores_sorted = sortVector(ctag_scores);
+    vector<std::pair<int, double>> cvsl_scores_sorted = sortVector(cvsl_scores);
+    vector<std::pair<int, double>> cvsb_scores_sorted = sortVector(cvsb_scores);
+
+    max_btag        = btag_scores_sorted[0].second;
+    second_max_btag = btag_scores_sorted[1].second;
+    max_ctag        = ctag_scores_sorted[0].second;
+    second_max_ctag = ctag_scores_sorted[1].second;
+    max_cvsl        = cvsl_scores_sorted[0].second;
+    second_max_cvsl = cvsl_scores_sorted[1].second;
+    max_cvsb        = cvsb_scores_sorted[0].second;
+    second_max_cvsb = cvsb_scores_sorted[1].second;
 }

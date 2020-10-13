@@ -2,6 +2,7 @@
 
 int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool doSyst = false, TString l1_prefire = "", TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
   TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + idx + ".root", "RECREATE");
+  //TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + "_" + mYear + idx + ".root", "RECREATE");
   f1->cd();
 
   // Benchmark
@@ -70,6 +71,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   float max1_btag_;
   float max2_ctag_;
   float max1_ctag_;
+  float max1_cvsl_;
+  float max2_cvsl_;
+  float max1_cvsb_;
+  float max2_cvsb_;
   float dipho_delta_R;
   float njets_;
   float nbjets_;
@@ -178,9 +183,14 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
   double w_gamma_yield = 0;
 
   // File Loop
-  bool apply_ctag_reshaping = false;
+  bool apply_ctag_reshaping = true;
   //std::string root_file_deepJet = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl.root";
-  std::string root_file_deepJet = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl-PUIDLoose-PRELIMINARY.root";
+  std::string root_file_deepJet_17 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl-PUIDLoose-PRELIMINARY.root";
+  std::string root_file_deepJet_18 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD102X_2018_pTincl.root"; //2018
+  //std::string root_file_deepJet_16 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepCSV_cTag_SFs_80X_Incl_pt20_BTV_6Mar_Extended.root"; //2016
+  std::string root_file_deepJet_16 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl-PUIDLoose-PRELIMINARY.root"; //2016
+  std::string root_file_deepJet = (mYear == "2016") ? root_file_deepJet_16 : ((mYear == "2017") ? root_file_deepJet_17 : root_file_deepJet_18 );
+
   retrieve_scale_factor sf(root_file_deepJet);
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -294,7 +304,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
             nEventsChain = nEventsTree;
             nEventsTotal = 0;
 
-            /*
             if (!isData && btag_norm_correction == 1.) {
                 double integral_no_btag = 0.;
                 double integral_w_btag =  0.;
@@ -317,7 +326,6 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                 btag_norm_correction = integral_no_btag / integral_w_btag;
                 cout << "btag_normalization_factor: " << btag_norm_correction << endl;
             }
-            */
 
             //--------------------- c-tag reshaping ---------------------//
             nEventsTotal = 0;
@@ -335,7 +343,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                     if (!passes_btag_rescale_selection())       continue; // n_jets() < 3 continue
 
                     /* Note: c-tag has not been applied to the central weight */
-                    double weight_JetCTagWeight = get_ctag_reshaping_weight(sf);
+                    double weight_JetCTagWeight = get_ctag_reshaping_weight(mYear, sf);
                     double weight_no_ctag = weight();
                     double weight_with_ctag = weight() * weight_JetCTagWeight;
 
@@ -385,11 +393,22 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               float evt_weight = 1.;
              
               //--- Apply c-tag reshaping method ---//
-              double weight_JetCTagWeight = get_ctag_reshaping_weight(sf);
-              double weight_no_ctag = weight();
-              double weight_with_ctag = weight() * weight_JetCTagWeight;
-              double weight_decided = (apply_ctag_reshaping) ? weight_with_ctag : weight_no_ctag;
-              if(apply_ctag_reshaping) evt_weight *= ctag_norm_correction;
+              double weight_decided = 1.;
+              if(!isData)
+              {
+                double weight_JetCTagWeight = get_ctag_reshaping_weight(mYear, sf);
+                double weight_no_ctag = weight() / weight_JetBTagWeight(); // revmove default applied b-tag reshaping
+                double weight_with_ctag = weight_no_ctag * weight_JetCTagWeight;
+                weight_decided = (apply_ctag_reshaping) ? weight_with_ctag : weight_no_ctag;
+
+                evt_weight /= btag_norm_correction; // revmove default applied b-tag reshaping
+                if(apply_ctag_reshaping) evt_weight *= ctag_norm_correction;
+              }
+
+              //printf("weight: %.3f\n", weight());
+              //printf("weight without b-tag: %.3f (sf = %.3f)\n", weight_no_ctag, weight_JetBTagWeight());
+              //printf("weight with c-tag   : %.3f (sf = %.3f)\n", weight_with_ctag, weight_JetCTagWeight);
+              //printf("\n");
 
               if (year.Contains("RunII") && !isData) {
             double scale1fb = currentFileTitle.Contains("RunIISummer16MiniAOD") ? scale1fb_2016_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIFall17MiniAOD") ? scale1fb_2017_RunII(currentFileTitle) : ( currentFileTitle.Contains("RunIIAutumn18MiniAOD") ? scale1fb_2018_RunII(currentFileTitle) : 0 ));
@@ -569,21 +588,20 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                 if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
 
               //--------------------- max c-tag ---------------------//
-              vector<vector<float>> jet_objects = make_jet_objects(year, diphoton, false); // don't boost jet p4 to higgs ref. frame
-              vector<double> ctag_scores;
-              vector<std::pair<int, double>> ctag_scores_sorted;
-              for(std::size_t i=0; i!=jet_objects.size(); ++i)
-              {
-                  ctag_scores.push_back(jet_objects[i][6]);
-              }
-              ctag_scores_sorted = sortVector(ctag_scores);
 
-              max2_ctag_ = ctag_scores_sorted[1].second;
-              max1_ctag_ = ctag_scores_sorted[0].second;
+              max1_btag_ = 0.;
+              max2_btag_ = 0.;
+              max1_ctag_ = 0.;
+              max2_ctag_ = 0.;
+              max1_cvsl_ = 0.;
+              max2_cvsl_ = 0.;
+              max1_cvsb_ = 0.;
+              max2_cvsb_ = 0.;
+
+              retrieve_max_discriminants(max1_btag_, max2_btag_, max1_ctag_, max2_ctag_, max1_cvsl_, max2_cvsl_, max1_cvsb_, max2_cvsb_);
+
               //--------------------- end of max c-tag ---------------------//
               
-              max2_btag_ = btag_scores_sorted[1].second;
-              max1_btag_ = btag_scores_sorted[0].second;
               dipho_delta_R = lead_photon.DeltaR(sublead_photon);
               ht_ = get_ht(jets);
               njets_ = n_jets();
@@ -769,7 +787,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxBTag", btag_scores_sorted[1].second, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "MaxCTag", max1_ctag_, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxCTag", max2_ctag_, evt_weight, vId);
-
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MaxCvsL", max1_cvsl_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxCvsL", max2_cvsl_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MaxCvsB", max1_cvsb_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxCvsB", max2_cvsb_, evt_weight, vId);
 
               double lep_pt, lep_eta;
               lep_pt = get_lep_pt(lep_eta);
