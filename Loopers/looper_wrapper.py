@@ -1,5 +1,6 @@
 # imports and parser{{{
 import sys, os
+import subprocess
 import glob
 
 sys.path.append("../Utilities")
@@ -456,12 +457,14 @@ if args.ttH_vs_tH:
 
 def full_path(baby):
   #full_path_baby = "/home/users/sjmay/ttH/Loopers/merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
-  full_path_baby = "/wk_cms/ykao/public/samuel/v5p5/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
+  full_path_baby = "/wk_cms/ykao/public/samuel/v5p7_hadd/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple.root"
   return [full_path_baby]
 
 def little_babies(baby):
   #babies = glob.glob("/home/users/sjmay/ttH/Loopers/merged_babies/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
-  babies = glob.glob("/wk_cms/ykao/public/samuel/v5p5/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
+  #babies = glob.glob("/wk_cms/ykao/public/samuel/v5p4/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
+  #babies = glob.glob("/wk_cms/ykao/public/samuel/v5p7_hadd/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple_*.root")
+  babies = glob.glob("/wk_cms/ykao/public/samuel/v5p7_hadd/" + baby + "_ttH_Babies_RunII" + args.baby_version + "/merged_ntuple*.root")
   return babies
 #}}}
 
@@ -475,9 +478,9 @@ def check_file(baby):
 
 #babies_2017 = [
 #        #"ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_tauDecays_94X_mc2017_realistic_v14-v1_MINIAODSIM_microAOD_v1.2_29May2020"
-#        #'TT_FCNC-T2HJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_microAOD_v1.2_29May2020',
+#        #'TT_FCNC-T2HJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8_TuneCUETP8M1_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_microAOD_v1.2_29May2020'
 #        #'TT_FCNC-T2HJ_aTleptonic_HToaa_eta_hct-MadGraph5-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_microAOD_v1.2_29May2020'
-#        ]
+#]
 
 command_list = []
 idx = 0
@@ -502,14 +505,11 @@ if args.babymaker:
 #}}}
 # Loopers{{{
 else:
-  # 2016{{{
   if "2016" in args.years:
     for baby in babies_2016:
       for little_baby in little_babies(baby):
         command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2016", "_" + str(idx), syst, args.l1_prefire)) 
         idx += 1
-  #}}}
-# 2017{{{
   if "2017" in args.years:
     for baby in babies_2017:
       for little_baby in little_babies(baby):
@@ -517,26 +517,27 @@ else:
         print command_list[idx]
         #print "little_baby: (%d) %s" % (idx, little_baby)
         idx += 1
-#}}}
-  # 2018{{{
   if "2018" in args.years:
     for baby in babies_2018:
       for little_baby in little_babies(baby):
         command_list.append('./ttH%sLooper "%s" "RunII" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s"' % (args.channel, args.selection, args.tag, args.bdt, args.bkg_options, little_baby, "2018", "_" + str(idx), syst, args.l1_prefire))    
         idx += 1
-  #}}}
 #}}}
 print "------------------------------------------------------------"
+print "command_list: ", command_list
 nPar = 12
 parallel_utils.submit_jobs(command_list, nPar)
 print "------------------------------------------------------------"
+
+
 # histograms, hadd, cleanup{{{
 print "after parallel_utils.submit_jobs..."
 if args.babymaker:
   histos = glob.glob("MVABaby_ttH%s_%s_*.root" % (args.channel, args.tag))
 else:
-  histos = glob.glob("%s_%s_histogramsRunII*.root" % (args.selection, args.tag)) # NOTE: for single year
-  #histos = glob.glob("%s_%s_histogramsRunII_%s*.root" % (args.selection, args.tag, args.years)) # NOTE: for single year
+  #histos = glob.glob("%s_%s_histogramsRunII_*.root" % (args.selection, args.tag)) # NOTE: for 16-17-18
+  histos = glob.glob("%s_%s_histogramsRunII_%s_*.root" % (args.selection, args.tag, args.years)) # NOTE: for 16-17-18
+
 good_histos = []
 for hist in histos:
   size = os.stat(hist).st_size * (1./(1024))
@@ -553,8 +554,10 @@ for hist in good_histos:
 if args.babymaker:
   master = "MVABaby_ttH%s_%s.root" % (args.channel, args.tag)
 else:
-  master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag)
-  #master = "%s_%s_histogramsRunII_%s.root" % (args.selection, args.tag, args.years)
+  #master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag) # NOTE: for 16-17-18
+  master = "%s_%s_histogramsRunII_%s.root" % (args.selection, args.tag, args.years)
+
+print master, target
 os.system('/usr/bin/ionice -c2 -n7 hadd -f -k -j 4 %s %s' % (master, target))
 
 # Cleanup

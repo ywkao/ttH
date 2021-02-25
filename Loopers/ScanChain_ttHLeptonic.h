@@ -908,136 +908,106 @@ vector<TLorentzVector> make_jets(vector<double> &btag_scores, TString year) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt1(), jet_eta1(), jet_phi1(), jet_energy1());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant1());
-    else
-      btag_scores.push_back(jet_bdiscriminant1());
+    double btag_score = jet_bdiscriminant1() + jet_bbdiscriminant1();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt2() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt2(), jet_eta2(), jet_phi2(), jet_energy2());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant2());
-    else
-      btag_scores.push_back(jet_bdiscriminant2());
+    double btag_score = jet_bdiscriminant2() + jet_bbdiscriminant2();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt3() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt3(), jet_eta3(), jet_phi3(), jet_energy3());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant3());
-    else
-      btag_scores.push_back(jet_bdiscriminant3());
+    double btag_score = jet_bdiscriminant3() + jet_bbdiscriminant3();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt4() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt4(), jet_eta4(), jet_phi4(), jet_energy4());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant4());
-    else
-      btag_scores.push_back(jet_bdiscriminant4());
+    double btag_score = jet_bdiscriminant4() + jet_bbdiscriminant4();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt5() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt5(), jet_eta5(), jet_phi5(), jet_energy5());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant5());
-    else
-      btag_scores.push_back(jet_bdiscriminant5());
+    double btag_score = jet_bdiscriminant5() + jet_bbdiscriminant5();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt6() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt6(), jet_eta6(), jet_phi6(), jet_energy6());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant6());
-    else
-      btag_scores.push_back(jet_bdiscriminant6());
+    double btag_score = jet_bdiscriminant6() + jet_bbdiscriminant6();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt7() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt7(), jet_eta7(), jet_phi7(), jet_energy7());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant7());
-    else
-      btag_scores.push_back(jet_bdiscriminant7());
+    double btag_score = jet_bdiscriminant7() + jet_bbdiscriminant7();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt8() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt8(), jet_eta8(), jet_phi8(), jet_energy8());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant8());
-    else
-      btag_scores.push_back(jet_bdiscriminant8());
+    double btag_score = jet_bdiscriminant8() + jet_bbdiscriminant8();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt9() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt9(), jet_eta9(), jet_phi9(), jet_energy9());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant9());
-    else
-      btag_scores.push_back(jet_bdiscriminant9());
+    double btag_score = jet_bdiscriminant9() + jet_bbdiscriminant9();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt10() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt10(), jet_eta10(), jet_phi10(), jet_energy10());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant10());
-    else
-      btag_scores.push_back(jet_bdiscriminant10());
+    double btag_score = jet_bdiscriminant10() + jet_bbdiscriminant10();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt11() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt11(), jet_eta11(), jet_phi11(), jet_energy11());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant11());
-    else
-      btag_scores.push_back(jet_bdiscriminant11());
+    double btag_score = jet_bdiscriminant11() + jet_bbdiscriminant11();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt12() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt12(), jet_eta12(), jet_phi12(), jet_energy12());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant12());
-    else
-      btag_scores.push_back(jet_bdiscriminant12());
+    double btag_score = jet_bdiscriminant12() + jet_bbdiscriminant12();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt13() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt13(), jet_eta13(), jet_phi13(), jet_energy13());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant13());
-    else
-      btag_scores.push_back(jet_bdiscriminant13());
+    double btag_score = jet_bdiscriminant13() + jet_bbdiscriminant13();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt14() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt14(), jet_eta14(), jet_phi14(), jet_energy14());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant14());
-    else
-      btag_scores.push_back(jet_bdiscriminant14());
+    double btag_score = jet_bdiscriminant14() + jet_bbdiscriminant14();
+    btag_scores.push_back(btag_score);
   }
   if (jet_pt15() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet_pt15(), jet_eta15(), jet_phi15(), jet_energy15());
     vJets.push_back(jet);
-    if (year == "2016")
-      btag_scores.push_back(jet_bdiscriminant15());
-    else
-      btag_scores.push_back(jet_bdiscriminant15());
+    double btag_score = jet_bdiscriminant15() + jet_bbdiscriminant15();
+    btag_scores.push_back(btag_score);
   }
   return vJets;
 }
@@ -1138,8 +1108,9 @@ double get_ctag_reshaping_weight(TString mYear, retrieve_scale_factor &sf)
     return weight_JetCTagWeight;
 }
 
-void retrieve_max_discriminants(float &max_btag, float &second_max_btag, float &max_ctag, float &second_max_ctag, float &max_cvsl, float &second_max_cvsl, float &max_cvsb, float &second_max_cvsb)
+void retrieve_max_discriminants(float &max_bsum, float &second_max_bsum, float &max_btag, float &second_max_btag, float &max_ctag, float &second_max_ctag, float &max_cvsl, float &second_max_cvsl, float &max_cvsb, float &second_max_cvsb)
 {
+    vector<double> bsum_scores; // prob_b + prob_bb
     vector<double> btag_scores;
     vector<double> ctag_scores;
     vector<double> cvsl_scores;
@@ -1155,18 +1126,23 @@ void retrieve_max_discriminants(float &max_btag, float &second_max_btag, float &
         double bbtag_ = jets_info[i][4];
         double cvsl_ = calculate_CvsL(ctag_, udsgtag_);
         double cvsb_ = calculate_CvsB(ctag_, btag_, bbtag_);
+        double bsum_ = btag_ + bbtag_;
 
+        bsum_scores.push_back(bsum_);
         btag_scores.push_back(btag_);
         ctag_scores.push_back(ctag_);
         cvsl_scores.push_back(cvsl_);
         cvsb_scores.push_back(cvsb_);
     }
 
+    vector<std::pair<int, double>> bsum_scores_sorted = sortVector(bsum_scores);
     vector<std::pair<int, double>> btag_scores_sorted = sortVector(btag_scores);
     vector<std::pair<int, double>> ctag_scores_sorted = sortVector(ctag_scores);
     vector<std::pair<int, double>> cvsl_scores_sorted = sortVector(cvsl_scores);
     vector<std::pair<int, double>> cvsb_scores_sorted = sortVector(cvsb_scores);
 
+    max_bsum        = bsum_scores_sorted[0].second;
+    second_max_bsum = bsum_scores_sorted[1].second;
     max_btag        = btag_scores_sorted[0].second;
     second_max_btag = btag_scores_sorted[1].second;
     max_ctag        = ctag_scores_sorted[0].second;

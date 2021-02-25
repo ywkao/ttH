@@ -4,7 +4,10 @@ ttHLeptonic cms3;
 void ttHLeptonic::Init(TTree *tree) {
 
   tree->SetMakeClass(1);
-
+  dnn_score_fcnc_st_branch = tree->GetBranch("dnn_score_fcnc_st");
+  if (dnn_score_fcnc_st_branch) dnn_score_fcnc_st_branch->SetAddress(&dnn_score_fcnc_st_);
+  dnn_score_fcnc_tt_branch = tree->GetBranch("dnn_score_fcnc_tt");
+  if (dnn_score_fcnc_tt_branch) dnn_score_fcnc_tt_branch->SetAddress(&dnn_score_fcnc_tt_);
   candidate_id_branch = tree->GetBranch("candidate_id");
   if (candidate_id_branch) candidate_id_branch->SetAddress(&candidate_id_);
   weight_branch = tree->GetBranch("weight");
@@ -594,6 +597,8 @@ void ttHLeptonic::Init(TTree *tree) {
 void ttHLeptonic::GetEntry(unsigned int idx) {
   // this only marks branches as not loaded, saving a lot of time
   index = idx;
+  dnn_score_fcnc_tt_isLoaded = false;
+  dnn_score_fcnc_st_isLoaded = false;
   candidate_id_isLoaded = false;
   weight_isLoaded = false;
   jet_pt6_isLoaded = false;
@@ -889,6 +894,8 @@ void ttHLeptonic::GetEntry(unsigned int idx) {
 
 void ttHLeptonic::LoadAllBranches() {
   // load all branches
+  if (dnn_score_fcnc_tt_branch != 0) dnn_score_fcnc_tt();
+  if (dnn_score_fcnc_st_branch != 0) dnn_score_fcnc_st();
   if (candidate_id_branch != 0) candidate_id();
   if (weight_branch != 0) weight();
   if (jet_pt6_branch != 0) jet_pt6();
@@ -1180,6 +1187,32 @@ void ttHLeptonic::LoadAllBranches() {
   if (run_branch != 0) run();
   if (npu_branch != 0) npu();
   if (puweight_branch != 0) puweight();
+}
+
+const float &ttHLeptonic::dnn_score_fcnc_tt() {
+  if (not dnn_score_fcnc_tt_isLoaded) {
+    if (dnn_score_fcnc_tt_branch != 0) {
+      dnn_score_fcnc_tt_branch->GetEntry(index);
+    } else {
+      printf("branch dnn_score_fcnc_tt_branch does not exist!\n");
+      exit(1);
+    }
+    dnn_score_fcnc_tt_isLoaded = true;
+  }
+  return dnn_score_fcnc_tt_;
+}
+
+const float &ttHLeptonic::dnn_score_fcnc_st() {
+  if (not dnn_score_fcnc_st_isLoaded) {
+    if (dnn_score_fcnc_st_branch != 0) {
+      dnn_score_fcnc_st_branch->GetEntry(index);
+    } else {
+      printf("branch dnn_score_fcnc_st_branch does not exist!\n");
+      exit(1);
+    }
+    dnn_score_fcnc_st_isLoaded = true;
+  }
+  return dnn_score_fcnc_st_;
 }
 
 const int &ttHLeptonic::candidate_id() {
@@ -4990,6 +5023,8 @@ namespace tas {
 
 const int &candidate_id() { return cms3.candidate_id(); }
 const float &weight() { return cms3.weight(); }
+const float &dnn_score_fcnc_tt() { return cms3.dnn_score_fcnc_tt(); }
+const float &dnn_score_fcnc_st() { return cms3.dnn_score_fcnc_st(); }
 const float &jet_pt6() { return cms3.jet_pt6(); }
 const float &jet_phi12() { return cms3.jet_phi12(); }
 const float &lead_MomID() { return cms3.lead_MomID(); }

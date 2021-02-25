@@ -1,8 +1,8 @@
 #include "ScanChain_ttHHadronic.h"
 
 int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml_file, TString bkg_options, bool doSyst = false, TString l1_prefire = "", TString mYear = "", TString idx = "", bool blind = true, bool fast = true, int nEvents = -1, string skimFilePrefix = "test") {
-  TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + idx + ".root", "RECREATE");
-  //TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + "_" + mYear + idx + ".root", "RECREATE");
+  //TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + idx + ".root", "RECREATE");
+  TFile* f1 = new TFile(tag + "_" + ext + "_histograms" + year + "_" + mYear + idx + ".root", "RECREATE");
   f1->cd();
 
   printf("Hello World!\n");
@@ -65,10 +65,12 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   float maxIDMVA_;
   float minIDMVA_;
+  float max2_bsum_;
+  float max1_bsum_;
   float max2_btag_;
   float max1_btag_;
-  float max2_ctag_; // for the purpose of storing values only;
-  float max1_ctag_; // for the purpose of storing values only;
+  float max2_ctag_;
+  float max1_ctag_;
   float max2_cvsl_;
   float max1_cvsl_;
   float max2_cvsb_;
@@ -204,14 +206,158 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
   //gjet_mva->BookMVA("BDT", gjet_bdt_file); 
 
+  float bJet_Pt;
+  float bJet_Eta;
+  float bJet_btag;
+  float M1Jet_Pt;
+  float M1Jet_Eta;
+  float M1Jet_btag;
+  float WJet1_Pt;
+  float WJet1_Eta;
+  float WJet1_btag;
+  float WJet2_Pt;
+  float WJet2_Eta;
+  float WJet2_btag;
+  float M1;
+  float M2;
+  float MW;
+  float dR_qH;
+  float dR_bW;
+  float dR_tt;
+  float dR_tH;
+  float dR_qq;
+  
+
+  TString dir_nn;
+
+  unique_ptr<TMVA::Reader> reader_tt_v2; //do_meng_cheng_top_reco_mva
+  unique_ptr<TMVA::Reader> reader_st_v2; //do_meng_cheng_top_reco_mva
+  dir_nn = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/fcncTagger";
+  //bool do_reader_tt_v2 = true;{{{
+  bool do_reader_tt_v2 = true;
+  if (do_reader_tt_v2) {
+    reader_tt_v2.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_tt_v2->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_tt_v2->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_tt_v2->AddVariable("bJet_btag", &bJet_btag);
+	reader_tt_v2->AddVariable("M1Jet_Pt", &M1Jet_Pt);
+	reader_tt_v2->AddVariable("M1Jet_Eta", &M1Jet_Eta);
+	reader_tt_v2->AddVariable("M1Jet_btag", &M1Jet_btag);
+	reader_tt_v2->AddVariable("WJet1_Pt", &WJet1_Pt);
+	reader_tt_v2->AddVariable("WJet1_Eta", &WJet1_Eta);
+	reader_tt_v2->AddVariable("WJet1_btag", &WJet1_btag);
+	reader_tt_v2->AddVariable("WJet2_Pt", &WJet2_Pt);
+	reader_tt_v2->AddVariable("WJet2_Eta", &WJet2_Eta);
+	reader_tt_v2->AddVariable("WJet2_btag", &WJet2_btag);
+	reader_tt_v2->AddVariable("M1", &M1);
+	reader_tt_v2->AddVariable("M2", &M2);
+	reader_tt_v2->AddVariable("MW", &MW);
+	reader_tt_v2->AddVariable("dR_qH", &dR_qH);
+	reader_tt_v2->AddVariable("dR_bW", &dR_bW);
+	reader_tt_v2->AddVariable("dR_tt", &dR_tt);
+	reader_tt_v2->AddVariable("dR_qq", &dR_qq);
+
+	// Book MVA methods
+	reader_tt_v2->BookMVA("TT_had_MVA", dir_nn + "/TThad_ANN_v2.weights.xml");
+  }
+//}}}
+  //bool do_reader_st_v2 = true;{{{
+  bool do_reader_st_v2 = true;
+  if (do_reader_st_v2) {
+    reader_st_v2.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_st_v2->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_st_v2->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_st_v2->AddVariable("bJet_btag", &bJet_btag);
+	reader_st_v2->AddVariable("WJet1_Pt", &WJet1_Pt);
+	reader_st_v2->AddVariable("WJet1_Eta", &WJet1_Eta);
+	reader_st_v2->AddVariable("WJet1_btag", &WJet1_btag);
+	reader_st_v2->AddVariable("WJet2_Pt", &WJet2_Pt);
+	reader_st_v2->AddVariable("WJet2_Eta", &WJet2_Eta);
+	reader_st_v2->AddVariable("WJet2_btag", &WJet2_btag);
+	reader_st_v2->AddVariable("M1", &M1);
+	reader_st_v2->AddVariable("MW", &MW);
+	reader_st_v2->AddVariable("dR_bW", &dR_bW);
+	reader_st_v2->AddVariable("dR_tH", &dR_tH);
+	reader_st_v2->AddVariable("dR_qq", &dR_qq);
+
+	// Book MVA methods
+	reader_st_v2->BookMVA("ST_had_MVA", dir_nn + "/SThad_ANN_v2.weights.xml");
+  }
+//}}}
+
+  unique_ptr<TMVA::Reader> reader_tt_v4; //do_meng_cheng_top_reco_mva
+  unique_ptr<TMVA::Reader> reader_st_v4; //do_meng_cheng_top_reco_mva
+  dir_nn = "/wk_cms2/mc_cheng/public/tqHGG/2017_DeepJet/MVAreco_model/dataset/weights";
+  //bool do_reader_tt_v4 = true;{{{
+  bool do_reader_tt_v4 = true;
+  if (do_reader_tt_v4) {
+    reader_tt_v4.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_tt_v4->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_tt_v4->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_tt_v4->AddVariable("bJet_btag", &bJet_btag);
+	reader_tt_v4->AddVariable("M1Jet_Pt", &M1Jet_Pt);
+	reader_tt_v4->AddVariable("M1Jet_Eta", &M1Jet_Eta);
+	reader_tt_v4->AddVariable("M1Jet_btag", &M1Jet_btag);
+	reader_tt_v4->AddVariable("WJet1_Pt", &WJet1_Pt);
+	reader_tt_v4->AddVariable("WJet1_Eta", &WJet1_Eta);
+	reader_tt_v4->AddVariable("WJet1_btag", &WJet1_btag);
+	reader_tt_v4->AddVariable("WJet2_Pt", &WJet2_Pt);
+	reader_tt_v4->AddVariable("WJet2_Eta", &WJet2_Eta);
+	reader_tt_v4->AddVariable("WJet2_btag", &WJet2_btag);
+	reader_tt_v4->AddVariable("M1", &M1);
+	reader_tt_v4->AddVariable("M2", &M2);
+	reader_tt_v4->AddVariable("MW", &MW);
+	reader_tt_v4->AddVariable("dR_qH", &dR_qH);
+	reader_tt_v4->AddVariable("dR_bW", &dR_bW);
+	reader_tt_v4->AddVariable("dR_tt", &dR_tt);
+	reader_tt_v4->AddVariable("dR_qq", &dR_qq);
+
+	// Book MVA methods
+	reader_tt_v4->BookMVA("TT_had_MVA", dir_nn + "/TThad_ANN.weights.xml");
+  }
+//}}}
+  //bool do_reader_st_v4 = true;{{{
+  bool do_reader_st_v4 = true;
+  if (do_reader_st_v4) {
+    reader_st_v4.reset(new TMVA::Reader( "!Color:Silent" ));
+
+	// Set discriminating variables
+	reader_st_v4->AddVariable("bJet_Pt", &bJet_Pt);
+	reader_st_v4->AddVariable("bJet_Eta", &bJet_Eta);
+	reader_st_v4->AddVariable("bJet_btag", &bJet_btag);
+	reader_st_v4->AddVariable("WJet1_Pt", &WJet1_Pt);
+	reader_st_v4->AddVariable("WJet1_Eta", &WJet1_Eta);
+	reader_st_v4->AddVariable("WJet1_btag", &WJet1_btag);
+	reader_st_v4->AddVariable("WJet2_Pt", &WJet2_Pt);
+	reader_st_v4->AddVariable("WJet2_Eta", &WJet2_Eta);
+	reader_st_v4->AddVariable("WJet2_btag", &WJet2_btag);
+	reader_st_v4->AddVariable("M1", &M1);
+	reader_st_v4->AddVariable("MW", &MW);
+	reader_st_v4->AddVariable("dR_bW", &dR_bW);
+	reader_st_v4->AddVariable("dR_tH", &dR_tH);
+	reader_st_v4->AddVariable("dR_qq", &dR_qq);
+
+	// Book MVA methods
+	reader_st_v4->BookMVA("ST_had_MVA", dir_nn + "/SThad_ANN.weights.xml");
+  }
+//}}}
+
 
   // File Loop
   bool apply_ctag_reshaping = true;
   //std::string root_file_deepJet = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl.root";
-  std::string root_file_deepJet_17 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl-PUIDLoose-PRELIMINARY.root";
+  //std::string root_file_deepJet_17 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl-PUIDLoose-PRELIMINARY.root";
+  std::string root_file_deepJet_17 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl_v2.root";
   std::string root_file_deepJet_18 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD102X_2018_pTincl.root"; //2018
+  std::string root_file_deepJet_16 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2016_pTincl_01Nov20.root"; //2016
   //std::string root_file_deepJet_16 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepCSV_cTag_SFs_80X_Incl_pt20_BTV_6Mar_Extended.root"; //2016
-  std::string root_file_deepJet_16 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl-PUIDLoose-PRELIMINARY.root"; //2016
+  //std::string root_file_deepJet_16 = "/wk_cms2/ykao/CMSSW_9_4_10/src/ttH/Loopers/ctag_reshaping/sfs_rootfiles/DeepJet_ctagSF_MiniAOD94X_2017_pTincl-PUIDLoose-PRELIMINARY.root"; //2016
   std::string root_file_deepJet = (mYear == "2016") ? root_file_deepJet_16 : ((mYear == "2017") ? root_file_deepJet_17 : root_file_deepJet_18 );
 
   retrieve_scale_factor sf(root_file_deepJet);
@@ -374,12 +520,13 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                 }
                 ctag_norm_correction = integral_no_ctag / integral_w_ctag;
                 cout << "ctag_normalization_factor: " << ctag_norm_correction << endl;
-              }
+            }
             //--------------------- end of c-tag reshaping ---------------------//
 
             nEventsTotal = 0;
 
             for (unsigned int event = 0; event < nEventsTree; ++event) {
+            //for (unsigned int event = 0; event < 100; ++event) {
 
               // Get Event Content
               //if (nEventsTotal >= nEventsChain) continue;
@@ -566,6 +713,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
               //--------------------- max c-tag ---------------------//
 
+              max1_bsum_ = 0.;
+              max2_bsum_ = 0.;
               max1_btag_ = 0.;
               max2_btag_ = 0.;
               max1_ctag_ = 0.;
@@ -575,7 +724,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               max1_cvsb_ = 0.;
               max2_cvsb_ = 0.;
 
-              retrieve_max_discriminants(max1_btag_, max2_btag_, max1_ctag_, max2_ctag_, max1_cvsl_, max2_cvsl_, max1_cvsb_, max2_cvsb_);
+              retrieve_max_discriminants(max1_bsum_, max2_bsum_, max1_btag_, max2_btag_, max1_ctag_, max2_ctag_, max1_cvsl_, max2_cvsl_, max1_cvsb_, max2_cvsb_);
 
               //--------------------- end of max c-tag ---------------------//
               
@@ -644,12 +793,312 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
                 continue; //some pu weights are nan/inf and this causes problems for histos 
               }
 
-
               if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId))     continue;
               if (!passes_selection(tag, minIDMVA_, maxIDMVA_, mva_value))	continue;
 
-              // Fill histograms //
+
+              //----- Meng-Cheng's method -----//
+              TLorentzVector reco_H = diphoton;
+              // determine jet candidates according to permutations with MVA scores
+
+              float mc_mva_score_tt_v2_;
+              float mc_mva_score_st_v2_;
+              // nested for loops for the MVA score, mc_mva_score_tt_v2_ {{{
+              do_reader_tt_v2 = njets_ >= 4;
+              if(do_reader_tt_v2) {
+                int perm = -1;
+                int best_perm = -1;
+                double best_score = -999;
+                vector<int> best_indices = {-1, -1, -1, -1};
+                vector<vector<int>> indices_collector;
+
+                // Start b-jet loop
+                for (int i=0; i<njets_; ++i) {
+                	// Start fcnc jet loop
+                	for (int j=0; j<njets_; ++j) {
+                		if (j == i) continue;
+                		// Start W jet 1 loop
+                		for (int k=0; k<njets_-1; ++k) {
+                			if (k == i || k == j) continue;
+                			// Start W jet 2 loop
+                			for (int l=k+1; l<njets_; ++l) {
+                                if (l == i || l == j) continue;
+                                
+                                bJet_Pt = jets[i].Pt();
+                                bJet_Eta = jets[i].Eta();
+                                bJet_btag = btag_scores[i];
+                                M1Jet_Pt = jets[j].Pt();
+                                M1Jet_Eta = jets[j].Eta();
+                                M1Jet_btag = btag_scores[j];
+                                WJet1_Pt = jets[k].Pt();
+                                WJet1_Eta = jets[k].Eta();
+                                WJet1_btag = btag_scores[k];
+                                WJet2_Pt = jets[l].Pt();
+                                WJet2_Eta = jets[l].Eta();
+                                WJet2_btag = btag_scores[l];
+                                
+	            				TLorentzVector reco_bJet = jets[i];
+	            				TLorentzVector reco_M1Jet = jets[j];
+	            				TLorentzVector reco_WJet1 = jets[k];
+	            				TLorentzVector reco_WJet2 = jets[l];
+
+	            				TLorentzVector reco_W = reco_WJet1 + reco_WJet2;
+	            				TLorentzVector reco_M1 = reco_M1Jet + reco_H;
+	            				TLorentzVector reco_M2 = reco_bJet + reco_W;
+
+	            				M1 = reco_M1.M();
+	            				M2 = reco_M2.M();
+	            				MW = reco_W.M();
+	            				dR_qH = reco_M1Jet.DeltaR(reco_H);
+	            				dR_bW = reco_bJet.DeltaR(reco_W);
+	            				dR_tt = reco_M1.DeltaR(reco_M2);
+	            				dR_qq = reco_WJet1.DeltaR(reco_WJet2);
+
+                                vector<int> indices = {i, j, k, l};
+                                indices_collector.push_back(indices);
+                                ++perm;
+                
+                	            double score = reader_tt_v2->EvaluateMVA( "TT_had_MVA" );
+                	            if (score > best_score) {
+                	            	best_score = score;
+                	            	best_perm = perm;
+                	            }
+                	            // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                                bool is_the_last_permutation = (i+1 == njets_) and (j+2 == njets_) and (k+4 == njets_) and (l+3 == njets_);
+                	            if (is_the_last_permutation) {
+                                    mc_mva_score_tt_v2_ = best_score;
+                                    
+                                    best_perm = -1;
+                                    best_score = -999;
+                	            }
+                			} // End W jet 2 loop
+                		} // End W jet 1 loop
+                	} // End fcnc jet loop
+                } // End b-jet loop
+              } else {
+                    mc_mva_score_tt_v2_ = -999;
+              }
+              //}}}
+              // nested for loops for the MVA score, mc_mva_score_st_v2_ {{{
+              do_reader_st_v2 = njets_ >= 3;
+              if(do_reader_st_v2) {
+                  int perm = -1;
+                  int best_perm = -1;
+                  double best_score = -999;
+                  vector<int> best_indices = {-1, -1, -1};
+                  vector<vector<int>> indices_collector;
+
+                  // Start b-jet loop
+                  for (int i=0; i<njets_; ++i) {
+                      // Start W jet 1 loop
+                      for (int k=0; k<njets_-1; ++k) {
+                          if (k == i) continue;
+                          // Start W jet 2 loop
+                          for (int l=k+1; l<njets_; ++l) {
+                              if (l == i) continue;
+                                  
+                              bJet_Pt = jets[i].Pt();
+                              bJet_Eta = jets[i].Eta();
+                              bJet_btag = btag_scores[i];
+                              WJet1_Pt = jets[k].Pt();
+                              WJet1_Eta = jets[k].Eta();
+                              WJet1_btag = btag_scores[k];
+                              WJet2_Pt = jets[l].Pt();
+                              WJet2_Eta = jets[l].Eta();
+                              WJet2_btag = btag_scores[l];
+
+	            			  TLorentzVector reco_bJet = jets[i];
+	            			  TLorentzVector reco_WJet1 = jets[k];
+	            			  TLorentzVector reco_WJet2 = jets[l];
+	            			  TLorentzVector reco_W = reco_WJet1 + reco_WJet2;
+	            			  TLorentzVector reco_M1 = reco_bJet + reco_W;
+
+	            			  M1 = reco_M1.M();
+	            			  MW = reco_W.M();
+	            			  dR_bW = reco_bJet.DeltaR(reco_W);
+	            			  dR_qq = reco_WJet1.DeltaR(reco_WJet2);
+	            			  dR_tH = reco_M1.DeltaR(reco_H);
+                              
+                              vector<int> indices = {i, k, l};
+                              indices_collector.push_back(indices);
+                              ++perm;
+                  
+                  	          double score = reader_st_v2->EvaluateMVA( "ST_had_MVA" );
+                  	          if (score > best_score) {
+                  	          	best_score = score;
+                  	          	best_perm = perm;
+                  	          }
+                  	          // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                              bool is_the_last_permutation = (i+1 == njets_) and (k+3 == njets_) and (l+2 == njets_);
+                  	          if (is_the_last_permutation) {
+                                    mc_mva_score_st_v2_ = best_score;
+                                    
+                                    best_perm = -1;
+                                    best_score = -999;
+                  	          }
+                          } // End W jet 2 loop
+                      } // End W jet 1 loop
+                  } // End b-jet loop
+              } else {
+                    mc_mva_score_st_v2_ = -999;
+              }
+              //}}}
+              //printf("[check] mc_mva_score_tt_v2_ = %.2f\n", mc_mva_score_tt_v2_);
+              //printf("[check] mc_mva_score_st_v2_ = %.2f\n", mc_mva_score_st_v2_);
+
+              float mc_mva_score_tt_v4_;
+              float mc_mva_score_st_v4_;
+              // nested for loops for the MVA score, mc_mva_score_tt_v4_ {{{
+              do_reader_tt_v4 = njets_ >= 4;
+              if(do_reader_tt_v4) {
+                int perm = -1;
+                int best_perm = -1;
+                double best_score = -999;
+                vector<int> best_indices = {-1, -1, -1, -1};
+                vector<vector<int>> indices_collector;
+
+                // Start b-jet loop
+                for (int i=0; i<njets_; ++i) {
+                	// Start fcnc jet loop
+                	for (int j=0; j<njets_; ++j) {
+                		if (j == i) continue;
+                		// Start W jet 1 loop
+                		for (int k=0; k<njets_-1; ++k) {
+                			if (k == i || k == j) continue;
+                			// Start W jet 2 loop
+                			for (int l=k+1; l<njets_; ++l) {
+                                if (l == i || l == j) continue;
+                                
+                                bJet_Pt = jets[i].Pt();
+                                bJet_Eta = jets[i].Eta();
+                                bJet_btag = btag_scores[i];
+                                M1Jet_Pt = jets[j].Pt();
+                                M1Jet_Eta = jets[j].Eta();
+                                M1Jet_btag = btag_scores[j];
+                                WJet1_Pt = jets[k].Pt();
+                                WJet1_Eta = jets[k].Eta();
+                                WJet1_btag = btag_scores[k];
+                                WJet2_Pt = jets[l].Pt();
+                                WJet2_Eta = jets[l].Eta();
+                                WJet2_btag = btag_scores[l];
+                                
+	            				TLorentzVector reco_bJet = jets[i];
+	            				TLorentzVector reco_M1Jet = jets[j];
+	            				TLorentzVector reco_WJet1 = jets[k];
+	            				TLorentzVector reco_WJet2 = jets[l];
+
+	            				TLorentzVector reco_W = reco_WJet1 + reco_WJet2;
+	            				TLorentzVector reco_M1 = reco_M1Jet + reco_H;
+	            				TLorentzVector reco_M2 = reco_bJet + reco_W;
+
+	            				M1 = reco_M1.M();
+	            				M2 = reco_M2.M();
+	            				MW = reco_W.M();
+	            				dR_qH = reco_M1Jet.DeltaR(reco_H);
+	            				dR_bW = reco_bJet.DeltaR(reco_W);
+	            				dR_tt = reco_M1.DeltaR(reco_M2);
+	            				dR_qq = reco_WJet1.DeltaR(reco_WJet2);
+
+                                vector<int> indices = {i, j, k, l};
+                                indices_collector.push_back(indices);
+                                ++perm;
+                
+                	            double score = reader_tt_v4->EvaluateMVA( "TT_had_MVA" );
+                	            if (score > best_score) {
+                	            	best_score = score;
+                	            	best_perm = perm;
+                	            }
+                	            // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                                bool is_the_last_permutation = (i+1 == njets_) and (j+2 == njets_) and (k+4 == njets_) and (l+3 == njets_);
+                	            if (is_the_last_permutation) {
+                                    mc_mva_score_tt_v4_ = best_score;
+                                    
+                                    best_perm = -1;
+                                    best_score = -999;
+                	            }
+                			} // End W jet 2 loop
+                		} // End W jet 1 loop
+                	} // End fcnc jet loop
+                } // End b-jet loop
+              } else {
+                    mc_mva_score_tt_v4_ = -999;
+              }
+              //}}}
+              // nested for loops for the MVA score, mc_mva_score_st_v4_ {{{
+              do_reader_st_v4 = njets_ >= 3;
+              if(do_reader_st_v4) {
+                  int perm = -1;
+                  int best_perm = -1;
+                  double best_score = -999;
+                  vector<int> best_indices = {-1, -1, -1};
+                  vector<vector<int>> indices_collector;
+
+                  // Start b-jet loop
+                  for (int i=0; i<njets_; ++i) {
+                      // Start W jet 1 loop
+                      for (int k=0; k<njets_-1; ++k) {
+                          if (k == i) continue;
+                          // Start W jet 2 loop
+                          for (int l=k+1; l<njets_; ++l) {
+                              if (l == i) continue;
+                                  
+                              bJet_Pt = jets[i].Pt();
+                              bJet_Eta = jets[i].Eta();
+                              bJet_btag = btag_scores[i];
+                              WJet1_Pt = jets[k].Pt();
+                              WJet1_Eta = jets[k].Eta();
+                              WJet1_btag = btag_scores[k];
+                              WJet2_Pt = jets[l].Pt();
+                              WJet2_Eta = jets[l].Eta();
+                              WJet2_btag = btag_scores[l];
+
+	            			  TLorentzVector reco_bJet = jets[i];
+	            			  TLorentzVector reco_WJet1 = jets[k];
+	            			  TLorentzVector reco_WJet2 = jets[l];
+	            			  TLorentzVector reco_W = reco_WJet1 + reco_WJet2;
+	            			  TLorentzVector reco_M1 = reco_bJet + reco_W;
+
+	            			  M1 = reco_M1.M();
+	            			  MW = reco_W.M();
+	            			  dR_bW = reco_bJet.DeltaR(reco_W);
+	            			  dR_qq = reco_WJet1.DeltaR(reco_WJet2);
+	            			  dR_tH = reco_M1.DeltaR(reco_H);
+                              
+                              vector<int> indices = {i, k, l};
+                              indices_collector.push_back(indices);
+                              ++perm;
+                  
+                  	          double score = reader_st_v4->EvaluateMVA( "ST_had_MVA" );
+                  	          if (score > best_score) {
+                  	          	best_score = score;
+                  	          	best_perm = perm;
+                  	          }
+                  	          // In the last iteration (index=NPerm-1), fill the highest score and the corresponding permutation to output.
+                              bool is_the_last_permutation = (i+1 == njets_) and (k+3 == njets_) and (l+2 == njets_);
+                  	          if (is_the_last_permutation) {
+                                    mc_mva_score_st_v4_ = best_score;
+                                    
+                                    best_perm = -1;
+                                    best_score = -999;
+                  	          }
+                          } // End W jet 2 loop
+                      } // End W jet 1 loop
+                  } // End b-jet loop
+              } else {
+                    mc_mva_score_st_v4_ = -999;
+              }
+              //}}}
+              //printf("[check] mc_mva_score_tt_v4_ = %.2f\n", mc_mva_score_tt_v4_);
+              //printf("[check] mc_mva_score_st_v4_ = %.2f\n", mc_mva_score_st_v4_);
+              //----- End of Meng-Cheng's method -----//
+
+
+              //------------------------------ Fill histograms ------------------------------//
               //vProcess[processId]->fill_histogram("h" + syst_ext + "GJet_BDT", gjet_mva_value, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "mc_mva_score_tt_v2", mc_mva_score_tt_v2_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "mc_mva_score_st_v2", mc_mva_score_st_v2_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "mc_mva_score_tt_v4", mc_mva_score_tt_v4_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "mc_mva_score_st_v4", mc_mva_score_st_v4_, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "Mass", mass(), evt_weight, vId);   
               vProcess[processId]->fill_histogram("h" + syst_ext + "Mass_v2", mass(), evt_weight, vId);   
 
@@ -703,6 +1152,8 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               */
 
               vProcess[processId]->fill_histogram("h" + syst_ext + "TopTagger_score", topTag_score(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DNNScore_fcnc_tt", dnn_score_fcnc_tt(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "DNNScore_fcnc_st", dnn_score_fcnc_st(), evt_weight, vId);
               //vProcess[processId]->fill_histogram("h" + syst_ext + "TopTagger_topMass", topTag_topMass(), evt_weight, vId);
               //vProcess[processId]->fill_histogram("h" + syst_ext + "TopTagger_WMass", topTag_WMass(), evt_weight, vId);
 
@@ -959,8 +1410,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               vProcess[processId]->fill_histogram("h" + syst_ext + "MVA_transf", -log(1 - mva_value), evt_weight, vId);
 
               // ttH-Hadronic Specific
-              vProcess[processId]->fill_histogram("h" + syst_ext + "MaxBTag", bjet1_csv(), evt_weight, vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxBTag", bjet2_csv(), evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MaxBTagSum", max1_bsum_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxBTagSum", max2_bsum_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "MaxBTag", max1_btag_, evt_weight, vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxBTag", max2_btag_, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "MaxCTag", max1_ctag_, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "SecondMaxCTag", max2_ctag_, evt_weight, vId);
               vProcess[processId]->fill_histogram("h" + syst_ext + "MaxCvsL", max1_cvsl_, evt_weight, vId);

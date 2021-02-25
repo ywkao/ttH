@@ -762,91 +762,106 @@ vector<TLorentzVector> make_jets(vector<double> &btag_scores, TString year) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet1_pt(), jet1_eta(), jet1_phi(), jet1_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet1_bdiscriminant());
+    double btag_score = jet1_bdiscriminant() + jet1_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet2_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet2_pt(), jet2_eta(), jet2_phi(), jet2_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet2_bdiscriminant());
+    double btag_score = jet2_bdiscriminant() + jet2_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet3_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet3_pt(), jet3_eta(), jet3_phi(), jet3_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet3_bdiscriminant());
+    double btag_score = jet3_bdiscriminant() + jet3_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet4_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet4_pt(), jet4_eta(), jet4_phi(), jet4_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet4_bdiscriminant());
+    double btag_score = jet4_bdiscriminant() + jet4_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet5_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet5_pt(), jet5_eta(), jet5_phi(), jet5_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet5_bdiscriminant());
+    double btag_score = jet5_bdiscriminant() + jet5_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet6_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet6_pt(), jet6_eta(), jet6_phi(), jet6_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet6_bdiscriminant());
+    double btag_score = jet6_bdiscriminant() + jet6_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet7_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet7_pt(), jet7_eta(), jet7_phi(), jet7_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet7_bdiscriminant());
+    double btag_score = jet7_bdiscriminant() + jet7_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet8_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet8_pt(), jet8_eta(), jet8_phi(), jet8_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet8_bdiscriminant());
+    double btag_score = jet8_bdiscriminant() + jet8_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet9_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet9_pt(), jet9_eta(), jet9_phi(), jet9_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet9_bdiscriminant());
+    double btag_score = jet9_bdiscriminant() + jet9_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet10_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet10_pt(), jet10_eta(), jet10_phi(), jet10_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet10_bdiscriminant());
+    double btag_score = jet10_bdiscriminant() + jet10_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet11_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet11_pt(), jet11_eta(), jet11_phi(), jet11_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet11_bdiscriminant());
+    double btag_score = jet11_bdiscriminant() + jet11_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet12_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet12_pt(), jet12_eta(), jet12_phi(), jet12_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet12_bdiscriminant());
+    double btag_score = jet12_bdiscriminant() + jet12_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet13_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet13_pt(), jet13_eta(), jet13_phi(), jet13_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet13_bdiscriminant());
+    double btag_score = jet13_bdiscriminant() + jet13_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet14_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet14_pt(), jet14_eta(), jet14_phi(), jet14_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet14_bdiscriminant());
+    double btag_score = jet14_bdiscriminant() + jet14_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   if (jet15_pt() > 0) {
     TLorentzVector jet;
     jet.SetPtEtaPhiE(jet15_pt(), jet15_eta(), jet15_phi(), jet15_energy());
     vJets.push_back(jet);
-    btag_scores.push_back(jet15_bdiscriminant());
+    double btag_score = jet15_bdiscriminant() + jet15_bbdiscriminant();
+    btag_scores.push_back(btag_score);
   }
   return vJets;
 }
@@ -947,8 +962,9 @@ double get_ctag_reshaping_weight(TString mYear, retrieve_scale_factor &sf)
     return weight_JetCTagWeight;
 }
 
-void retrieve_max_discriminants(float &max_btag, float &second_max_btag, float &max_ctag, float &second_max_ctag, float &max_cvsl, float &second_max_cvsl, float &max_cvsb, float &second_max_cvsb)
+void retrieve_max_discriminants(float &max_bsum, float &second_max_bsum, float &max_btag, float &second_max_btag, float &max_ctag, float &second_max_ctag, float &max_cvsl, float &second_max_cvsl, float &max_cvsb, float &second_max_cvsb)
 {
+    vector<double> bsum_scores; // prob_b + prob_bb
     vector<double> btag_scores;
     vector<double> ctag_scores;
     vector<double> cvsl_scores;
@@ -964,18 +980,23 @@ void retrieve_max_discriminants(float &max_btag, float &second_max_btag, float &
         double bbtag_ = jets_info[i][4];
         double cvsl_ = calculate_CvsL(ctag_, udsgtag_);
         double cvsb_ = calculate_CvsB(ctag_, btag_, bbtag_);
+        double bsum_ = btag_ + bbtag_;
 
+        bsum_scores.push_back(bsum_);
         btag_scores.push_back(btag_);
         ctag_scores.push_back(ctag_);
         cvsl_scores.push_back(cvsl_);
         cvsb_scores.push_back(cvsb_);
     }
 
+    vector<std::pair<int, double>> bsum_scores_sorted = sortVector(bsum_scores);
     vector<std::pair<int, double>> btag_scores_sorted = sortVector(btag_scores);
     vector<std::pair<int, double>> ctag_scores_sorted = sortVector(ctag_scores);
     vector<std::pair<int, double>> cvsl_scores_sorted = sortVector(cvsl_scores);
     vector<std::pair<int, double>> cvsb_scores_sorted = sortVector(cvsb_scores);
 
+    max_bsum        = bsum_scores_sorted[0].second;
+    second_max_bsum = bsum_scores_sorted[1].second;
     max_btag        = btag_scores_sorted[0].second;
     second_max_btag = btag_scores_sorted[1].second;
     max_ctag        = ctag_scores_sorted[0].second;

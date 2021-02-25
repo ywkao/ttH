@@ -168,10 +168,8 @@ class BabyMaker {
     float       top_candidates_11_;
     float       top_candidates_12_;
     //# Meng-Cheng's method
-    float       mc_mva_score_tt_;
-    float       mc_mva_score_st_;
-    float       mc_mva_score_tt_v2_;
-    float       mc_mva_score_st_v2_;
+    float       mc_mva_score_tt_v4_;
+    float       mc_mva_score_st_v4_;
 	float       LeadPho_Pt;
 	float       LeadPho_Eta;
 	float       LeadPho_Phi;
@@ -386,10 +384,8 @@ void BabyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("top_candidates_11_"             , &top_candidates_11_        );
   BabyTree_->Branch("top_candidates_12_"             , &top_candidates_12_        );
     //# Meng-Cheng's method
-  BabyTree_->Branch("mc_mva_score_tt_"             , &mc_mva_score_tt_        );
-  BabyTree_->Branch("mc_mva_score_st_"             , &mc_mva_score_st_        );
-  BabyTree_->Branch("mc_mva_score_tt_v2_"             , &mc_mva_score_tt_v2_        );
-  BabyTree_->Branch("mc_mva_score_st_v2_"             , &mc_mva_score_st_v2_        );
+  BabyTree_->Branch("mc_mva_score_tt_v4_"             , &mc_mva_score_tt_v4_        );
+  BabyTree_->Branch("mc_mva_score_st_v4_"             , &mc_mva_score_st_v4_        );
   //#chi-2 related
   BabyTree_->Branch("chi2_tbw_mass_", &chi2_tbw_mass_);
   BabyTree_->Branch("chi2_tbw_pt_", &chi2_tbw_pt_);

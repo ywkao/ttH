@@ -27,12 +27,26 @@ def batch_rename(tag):
 #  args.backgrounds = args.backgrounds.replace("GammaJets", "QCD_GammaJets_imputed")
 
 #parallel_utils.run('./makePlots "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
+
+parallel_utils.run('./makePlots_NNscore_st_v2 "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
+batch_rename("NNscore_st_v2")
+parallel_utils.run('./makePlots_NNscore_tt_v2 "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
+batch_rename("NNscore_tt_v2")
+parallel_utils.run('./makePlots_NNscore_st_v4 "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
+batch_rename("NNscore_st_v4")
+parallel_utils.run('./makePlots_NNscore_tt_v4 "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
+batch_rename("NNscore_tt_v4")
+
+parallel_utils.run('./makePlots_maxbsum "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
+batch_rename("maxbsum")
+parallel_utils.run('./makePlots_2ndmaxbsum "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
+batch_rename("2ndmaxbsum")
 parallel_utils.run('./makePlots_maxbtag "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
 batch_rename("maxbtag")
-parallel_utils.run('./makePlots_maxctag "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
-batch_rename("maxctag")
 parallel_utils.run('./makePlots_2ndmaxbtag "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
 batch_rename("2ndmaxbtag")
+parallel_utils.run('./makePlots_maxctag "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
+batch_rename("maxctag")
 parallel_utils.run('./makePlots_2ndmaxctag "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
 batch_rename("2ndmaxctag")
 parallel_utils.run('./makePlots_maxcvsl "%s" "%s" "%s" "%s" "%s"' % (args.plot_type, args.input_file, args.plot_labels, args.backgrounds, args.signals))
@@ -46,4 +60,3 @@ batch_rename("2ndmaxcvsb")
 
 #full_bkgs = "DiPhoton|QCD_GammaJets_imputed|GammaJets|QCD|TTGG|TTGJets|TTJets|DY|VG|TGamma|TTV|VV|tV|ggH|VBF|VH|THQ|THW"
 #parallel_utils.run('./makeTables "%s" "%s" "%s" > tables_%s.txt' % (args.input_file, args.signals, full_bkgs, args.input_file.replace(".root", "").replace("../", "")))
-

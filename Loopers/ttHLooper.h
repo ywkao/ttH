@@ -47,6 +47,10 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
 
   for (unsigned int j = 0; j < syst_labels.size(); j++) {
       for (int i = 0; i < v.size(); i++) {
+        v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_tt_v2", 50, -1.0, 1.0);
+        v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_st_v2", 50, -1.0, 1.0);
+        v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_tt_v4", 50, -1.0, 1.0);
+        v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_st_v4", 50, -1.0, 1.0);
         v[i]->add_histogram("h" + syst_labels[j] + "Mass", 50, 0, 250);
         v[i]->add_histogram("h" + syst_labels[j] + "Mass_v2", 50, 0, 250);
         //v[i]->add_histogram("h" + syst_labels[j] + "Mass_PassPtToM", 40, 100, 180);
@@ -177,6 +181,8 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
 
         v[i]->add_histogram("h" + syst_labels[j] + "MVA_transf", 15, 0, 10);        
 
+        v[i]->add_histogram("h" + syst_labels[j] + "MaxBTagSum", 50, 0, 1);
+        v[i]->add_histogram("h" + syst_labels[j] + "SecondMaxBTagSum", 50, 0, 1);  
         v[i]->add_histogram("h" + syst_labels[j] + "MaxBTag", 50, 0, 1);
         v[i]->add_histogram("h" + syst_labels[j] + "SecondMaxBTag", 50, 0, 1);  
         v[i]->add_histogram("h" + syst_labels[j] + "MaxCTag", 50, 0, 1);
@@ -330,6 +336,8 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
         v[i]->add_histogram("h" + syst_labels[j] + "MuonMiniIsolation", 10, 0, 0.25);
 
         v[i]->add_histogram("h" + syst_labels[j] + "TopTagger_score", 20, -1, 1);
+        v[i]->add_histogram("h" + syst_labels[j] + "DNNScore_fcnc_tt", 20, -1, 1);
+        v[i]->add_histogram("h" + syst_labels[j] + "DNNScore_fcnc_st", 20, -1, 1);
         //v[i]->add_histogram("h" + syst_labels[j] + "TopTagger_topMass", 40, 0, 400);
         //v[i]->add_histogram("h" + syst_labels[j] + "TopTagger_WMass", 20, 0, 200);
 

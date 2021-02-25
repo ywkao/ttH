@@ -902,14 +902,20 @@ int main(int argc, char* argv[])
   //}}}
   // Make plots{{{
   for (int i = 0; i < vFiles.size(); i++) {
-    //make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "max b-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    //make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd max b-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    //make_plot(c1, vFiles[i], vNames[i], "hMaxCTag", "max c-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    //make_plot(c1, vFiles[i], vNames[i], "hSecondMaxCTag", "2nd max c-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_tt_v2", "FCNC_NN_tt_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_st_v2", "FCNC_NN_st_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_tt_v4", "FCNC_NN_tt_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_st_v4", "FCNC_NN_st_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hMaxBTagSum", "max b-tag scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTagSum", "2nd max b-tag scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "max b-tag discriminant", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTag", "2nd max b-tag discriminant", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hMaxCTag", "max c-tag discriminant", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hSecondMaxCTag", "2nd max c-tag discriminant", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //make_plot(c1, vFiles[i], vNames[i], "hMaxCvsL", "max CvsL scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //make_plot(c1, vFiles[i], vNames[i], "hSecondMaxCvsL", "2nd max CvsL scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //make_plot(c1, vFiles[i], vNames[i], "hMaxCvsB", "max CvsB scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    make_plot(c1, vFiles[i], vNames[i], "hSecondMaxCvsB", "2nd max CvsB scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    //make_plot(c1, vFiles[i], vNames[i], "hSecondMaxCvsB", "2nd max CvsB scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
 
     //make_plot(c4, vFiles[i], vNames[i] + "MaxBtag.pdf", "hMaxBTag", "max b-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //make_plot(c5, vFiles[i], vNames[i] + "SecondMaxBtag.pdf", "hSecondMaxBTag", "2nd max b-tag response", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
