@@ -35,8 +35,6 @@ def bash_command(command):
     result = os.waitpid(p.pid, 0)
 #}}}
 
-import glob
-
 from subprocess import *
 os.chdir("../")
 do_looping = True
@@ -52,11 +50,8 @@ if do_looping:
     #parallel_utils.run('python looper_wrapper.py --babymaker --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hct_BDT"))
 
     ##--------------- Loopers ---------------##
-    #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2016"' % (args.baby_version, args.tag + "_impute_hut_BDT"))
     #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2016"' % (args.baby_version, args.tag + "_impute_hct_BDT"))
-    #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hut_BDT"))
     #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2017"' % (args.baby_version, args.tag + "_impute_hct_BDT"))
-    #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2018"' % (args.baby_version, args.tag + "_impute_hut_BDT"))
     #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Hadronic" --baby_version "%s" --tag "%s" --selection "ttHHadronic_RunII_MVA_Presel" --bkg_options "impute" --years "2018"' % (args.baby_version, args.tag + "_impute_hct_BDT"))
 
     #parallel_utils.run('python looper_wrapper.py --fcnc --channel "Leptonic" --baby_version "%s" --tag "%s" --selection "ttHLeptonic_RunII_MVA_Presel" --bkg_options "none" --years "2016"' % (args.baby_version, args.tag + "_hut_BDT"))
@@ -80,10 +75,8 @@ if do_looping:
 
     ##--------------- Data-MC Plots ---------------##
     os.chdir("Plots")
-    make_data_mc_plots("ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_impute_hut_BDT_FCNC"), "std", "FCNC Hadronic|Loose MVA Presel.", "TT_FCNC_hut|ST_FCNC_hut", "DiPhoton|QCD_GammaJets_imputed|TTGG|TTGJets|TTJets|VG")
     make_data_mc_plots("ttHHadronic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_impute_hct_BDT_FCNC"), "std", "FCNC Hadronic|Loose MVA Presel.", "TT_FCNC_hct|ST_FCNC_hct", "DiPhoton|QCD_GammaJets_imputed|TTGG|TTGJets|TTJets|VG")
-    make_data_mc_plots("ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_hut_BDT_FCNC"), "std", "FCNC Leptonic|Loose MVA Presel.", "TT_FCNC_hut|ST_FCNC_hut", "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG")
-    make_data_mc_plots("ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_hct_BDT_FCNC"), "std", "FCNC Leptonic|Loose MVA Presel.", "TT_FCNC_hct|ST_FCNC_hct", "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG")
+    #make_data_mc_plots("ttHLeptonic_RunII_MVA_Presel_%s_histogramsRunII.root" % (args.tag + "_hct_BDT_FCNC"), "std", "FCNC Leptonic|Loose MVA Presel.", "TT_FCNC_hct|ST_FCNC_hct", "DiPhoton|GammaJets|TTGG|TTGJets|TTJets|VG")
     #os.chdir("../")
 
 do_mvas = False

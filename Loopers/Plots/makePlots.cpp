@@ -812,7 +812,6 @@ int main(int argc, char* argv[])
   TFile* f = new TFile(file_path);
   vector<TFile*> vFiles = {f};
   string output = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", type + mva_ext + ".pdf").Data();
-  //string output = (file_path.ReplaceAll("../", "")).ReplaceAll(".root", type + mva_ext).Data();
 
   TFile* f_ref; 
   f_ref = nullptr;
@@ -902,10 +901,10 @@ int main(int argc, char* argv[])
   //}}}
   // Make plots{{{
   for (int i = 0; i < vFiles.size(); i++) {
-    //make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_tt_v2", "FCNC_NN_tt_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_tt_v2", "FCNC_NN_tt_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_st_v2", "FCNC_NN_st_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    //make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_tt_v4", "FCNC_NN_tt_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
-    //make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_st_v4", "FCNC_NN_st_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_tt_v4", "FCNC_NN_tt_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hmc_mva_score_st_v4", "FCNC_NN_st_score", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //make_plot(c1, vFiles[i], vNames[i], "hMaxBTagSum", "max b-tag scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //make_plot(c1, vFiles[i], vNames[i], "hSecondMaxBTagSum", "2nd max b-tag scores", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //make_plot(c1, vFiles[i], vNames[i], "hMaxBTag", "max b-tag discriminant", vBkgs, vSigs, 1,type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
