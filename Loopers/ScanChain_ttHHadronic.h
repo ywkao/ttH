@@ -1006,3 +1006,90 @@ void retrieve_max_discriminants(float &max_bsum, float &second_max_bsum, float &
     max_cvsb        = cvsb_scores_sorted[0].second;
     second_max_cvsb = cvsb_scores_sorted[1].second;
 }
+
+TMatrixD get_cov_matrix_2x2(TString json_file)
+{
+    TMatrixD matrix(2,2);
+
+    // give up jsoncpp related...
+    //Json::Value root;
+    //Json::Reader reader;
+    //std::ifstream ifs(json_file.Data());
+    //if(!reader.parse(ifs, root)) printf("fail to parse\n");
+    //else{
+    //    matrix(0,0) = root["covMatrix_00"].asDouble();
+    //    matrix(0,1) = root["covMatrix_01"].asDouble();
+    //    matrix(1,0) = root["covMatrix_10"].asDouble();
+    //    matrix(1,1) = root["covMatrix_11"].asDouble();
+    //}
+
+    matrix(0,0) = 305.14;
+    matrix(0,1) = 282.18;
+    matrix(1,0) = 282.18;
+    matrix(1,1) = 572.63;
+
+    return matrix;
+}
+
+double chi2_calculator_2x2(double w_mass, double t_mass, TString json_file)
+{
+    // load value
+    TVectorD vec_mean_values(2);
+
+    //Json::Value root;
+    //Json::Reader reader;
+    //std::ifstream ifs(json_file.Data());
+
+    //if(!reader.parse(ifs, root)) printf("fail to parse\n");
+    //else{
+    //    vec_mean_values(0) = root["mass_reco_w"].asDouble();
+    //    vec_mean_values(1) = root["mass_reco_top"].asDouble();
+    //}
+
+    vec_mean_values(0) = 85.70;
+    vec_mean_values(1) = 174.81;
+
+    // evaluation
+    TVectorD vec_mass(2);
+    vec_mass(0) = w_mass - vec_mean_values(0);
+    vec_mass(1) = t_mass - vec_mean_values(1);
+
+    TMatrixD matrix = get_cov_matrix_2x2(json_file);
+
+    double chi2_value = matrix.Invert()*vec_mass*vec_mass;
+
+    return chi2_value;
+}
+
+bool get_the_best_bjj_candidate(std::vector<int> &indices_bjj, std::vector<TLorentzVector> jets, TLorentzVector diphoton, std::vector<double> btag_scores, double &min_chi2_value, TString json_file)
+{
+    std::size_t num_jets = jets.size();
+    for(std::size_t i = 0; i < num_jets; ++i ){ // b-jet
+        if (btag_scores[i] < pfDeepCSVJetTags_loose) continue;
+        for(std::size_t j = 0; j < num_jets-1; ++j ){ // w-jet1
+            if(j==i) continue;
+            for(std::size_t k = j+1; k < num_jets; ++k ){ // w-jet2
+                if(k==i) continue;
+
+                TLorentzVector bjet = jets[i];
+                TLorentzVector w_candidate = jets[j] + jets[k];
+                TLorentzVector top_candidate = w_candidate + bjet;
+                TLorentzVector tprime_candidate = top_candidate + diphoton;
+                double w_mass = w_candidate.M();
+                double t_mass = top_candidate.M();
+                double tprime_mass = tprime_candidate.M();
+                //double chi2 = chi2_calculator_3x3(w_mass, t_mass, tprime_mass, json_file);
+                double chi2 = chi2_calculator_2x2(w_mass, t_mass, json_file);
+                if(chi2 < min_chi2_value){
+                    indices_bjj[0] = i;
+                    indices_bjj[1] = j;
+                    indices_bjj[2] = k;
+                    min_chi2_value = chi2;
+                }
+            }
+        }
+    }//end of looping jets
+
+    bool has_resonable_reco = indices_bjj[0] >= 0 && indices_bjj[1] >= 0 && indices_bjj[2] >= 0;
+    return has_resonable_reco;
+}

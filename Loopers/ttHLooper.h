@@ -34,6 +34,16 @@ vector<Process*> generate_processes(TFile* f) {
   v.push_back(new Process(f, "ST_FCNC_hut"));
   v.push_back(new Process(f, "ST_FCNC_hct"));
   v.push_back(new Process(f, "TTW"));
+  v.push_back(new Process(f, "TprimeBToTH_M-600"));
+  v.push_back(new Process(f, "TprimeBToTH_M-625"));
+  v.push_back(new Process(f, "TprimeBToTH_M-650"));
+  v.push_back(new Process(f, "TprimeBToTH_M-675"));
+  v.push_back(new Process(f, "TprimeBToTH_M-700"));
+  v.push_back(new Process(f, "TprimeBToTH_M-800"));
+  v.push_back(new Process(f, "TprimeBToTH_M-900"));
+  v.push_back(new Process(f, "TprimeBToTH_M-1000"));
+  v.push_back(new Process(f, "TprimeBToTH_M-1100"));
+  v.push_back(new Process(f, "TprimeBToTH_M-1200"));
  //v.push_back(new Process
 
   return v;
@@ -47,12 +57,16 @@ void add_variables(vector<Process*> v, TString tag, vector<TString> syst_labels 
 
   for (unsigned int j = 0; j < syst_labels.size(); j++) {
       for (int i = 0; i < v.size(); i++) {
-        v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_tt_v2", 50, -1.0, 1.0);
-        v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_st_v2", 50, -1.0, 1.0);
-        v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_tt_v4", 50, -1.0, 1.0);
-        v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_st_v4", 50, -1.0, 1.0);
+        //v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_tt_v2", 50, -1.0, 1.0);
+        //v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_st_v2", 50, -1.0, 1.0);
+        //v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_tt_v4", 50, -1.0, 1.0);
+        //v[i]->add_histogram("h" + syst_labels[j] + "mc_mva_score_st_v4", 50, -1.0, 1.0);
         v[i]->add_histogram("h" + syst_labels[j] + "Mass", 50, 0, 250);
         v[i]->add_histogram("h" + syst_labels[j] + "Mass_v2", 50, 0, 250);
+        v[i]->add_histogram("h" + syst_labels[j] + "mass_wboson_cov" , 40, 0, 200);
+        v[i]->add_histogram("h" + syst_labels[j] + "mass_top_cov"    , 36, 0, 360);
+        v[i]->add_histogram("h" + syst_labels[j] + "mass_tprime_cov" , 50, 0, 1500);
+        v[i]->add_histogram("h" + syst_labels[j] + "cov_chi2_value"  , 50, 0, 100);
         //v[i]->add_histogram("h" + syst_labels[j] + "Mass_PassPtToM", 40, 100, 180);
         //v[i]->add_histogram("h" + syst_labels[j] + "Mass_FailPtToM", 40, 100, 180);
         //v[i]->add_histogram("h" + syst_labels[j] + "Mass_PassPtToM_AfterBDTCut", 40, 100, 180);
@@ -436,6 +450,26 @@ int categorize_process(TString currentFileTitle, int genPhotonId = -1) {
     return 25;
   else if (currentFileTitle.Contains("TTW"))
     return 26;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-600"))
+    return 27;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-625"))
+    return 28;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-650"))
+    return 29;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-675"))
+    return 30;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-700"))
+    return 31;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-800"))
+    return 32;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-900"))
+    return 33;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-1000"))
+    return 34;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-1100"))
+    return 35;
+  else if (currentFileTitle.Contains("TprimeBToTH_M-1200"))
+    return 36;
   else {
     //cout << "File does not fit into one of the background categories." << endl;
     cout << "File does not fit into one of the background categories: " << currentFileTitle << endl;
