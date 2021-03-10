@@ -394,7 +394,9 @@ babies_2018 = [
 ]
 #}}}
 # fcnc signals{{{
-if args.fcnc:
+add_fcnc_samples = False
+if add_fcnc_samples:
+#if args.fcnc:
     babies_2016 = [
             "FCNC_private_ST_HAD_HCT_2016_microAOD_v1.2_29May2020",
             "FCNC_private_ST_HAD_HUT_2016_microAOD_v1.2_29May2020",
@@ -471,6 +473,32 @@ def little_babies(baby):
 def check_file(baby):
   bash_command("ls " + baby)
 
+
+## check if data events leak to SR
+#babies_2016 = [
+#    "DoubleEG_Run2016B-17Jul2018_ver2-v1",
+#    "DoubleEG_Run2016C-17Jul2018-v1",
+#    "DoubleEG_Run2016D-17Jul2018-v1",
+#    "DoubleEG_Run2016E-17Jul2018-v1",
+#    "DoubleEG_Run2016F-17Jul2018-v1",
+#    "DoubleEG_Run2016G-17Jul2018-v1",
+#    "DoubleEG_Run2016H-17Jul2018-v1"
+#]
+#babies_2017 = [
+#    "DoubleEG_Run2017B-31Mar2018-v1",
+#    "DoubleEG_Run2017C-31Mar2018-v1",
+#    "DoubleEG_Run2017D-31Mar2018-v1",
+#    "DoubleEG_Run2017E-31Mar2018-v1",
+#    "DoubleEG_Run2017F-31Mar2018-v1"
+#]
+#babies_2018 = [
+#    "EGamma_Run2018A-17Sep2018-v2",
+#    "EGamma_Run2018B-17Sep2018-v1",
+#    "EGamma_Run2018C-17Sep2018-v1",
+#    "EGamma_Run2018D-22Jan2019-v2"
+#]
+
+
 #babies_2016 = [
 #        #"FCNC_private_ST_HAD_HCT_2016_microAOD_v1.2_29May2020"
 #        #"ttHJetToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1"
@@ -533,7 +561,7 @@ print "------------------------------------------------------------"
 # histograms, hadd, cleanup{{{
 print "after parallel_utils.submit_jobs..."
 if args.babymaker:
-  histos = glob.glob("MVABaby_ttH%s_%s_*.root" % (args.channel, args.tag))
+  histos = glob.glob("MVABaby_ttH%s_%s_%s_*.root" % (args.channel, args.tag, args.years))
 else:
   #histos = glob.glob("%s_%s_histogramsRunII_*.root" % (args.selection, args.tag)) # NOTE: for 16-17-18
   histos = glob.glob("%s_%s_histogramsRunII_%s_*.root" % (args.selection, args.tag, args.years)) # NOTE: for 16-17-18
@@ -552,7 +580,7 @@ for hist in good_histos:
   target += "%s " % hist
 
 if args.babymaker:
-  master = "MVABaby_ttH%s_%s.root" % (args.channel, args.tag)
+  master = "MVABaby_ttH%s_%s_%s.root" % (args.channel, args.tag, args.years)
 else:
   #master = "%s_%s_histogramsRunII.root" % (args.selection, args.tag) # NOTE: for 16-17-18
   master = "%s_%s_histogramsRunII_%s.root" % (args.selection, args.tag, args.years)

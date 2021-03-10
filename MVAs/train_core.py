@@ -38,6 +38,7 @@ def train_bdt(config, invert=False):
   global_features = utils.load_array(f, 'global')
   global_dnn_features = utils.load_array(f, 'global_dnn')
   label = utils.load_array(f, 'label')
+  print "[check] label: ", label
   multi_label = utils.load_array(f, 'multi_label')
   weights = utils.load_array(f, 'weights')
   mass = utils.load_array(f, 'mass')
@@ -46,14 +47,14 @@ def train_bdt(config, invert=False):
   sublead_sigmaEtoE = utils.load_array(f, 'sublead_sigmaEtoE')
   signal_mass_label = utils.load_array(f, 'signal_mass_label')
   signal_mass_category = utils.load_array(f, 'signal_mass_category')
-  tth_2017_reference_mva = utils.load_array(f, 'tth_2017_reference_mva')
+  #tth_2017_reference_mva = utils.load_array(f, 'tth_2017_reference_mva')
   evt = utils.load_array(f, 'evt')
   run = utils.load_array(f, 'run')
   lumi = utils.load_array(f, 'lumi')
   process_id = utils.load_array(f, 'process_id')
   year = utils.load_array(f, 'year')
   #objects = utils.load_array(f, 'objects')
-  tth_runII_mva = utils.load_array(f, 'tth_runII_mva')
+  #tth_runII_mva = utils.load_array(f, 'tth_runII_mva')
 
   if args.sideband:
     global_features = utils.load_array(f, 'global_data_sideband')
@@ -73,14 +74,14 @@ def train_bdt(config, invert=False):
   njets_validation = utils.load_array(f, 'njets_validation')
   signal_mass_label_validation = utils.load_array(f, 'signal_mass_label_validation')
   signal_mass_category_validation = utils.load_array(f, 'signal_mass_category_validation')
-  tth_2017_reference_mva_validation = utils.load_array(f, 'tth_2017_reference_mva_validation')
+  #tth_2017_reference_mva_validation = utils.load_array(f, 'tth_2017_reference_mva_validation')
   evt_validation = utils.load_array(f, 'evt_validation')
   run_validation = utils.load_array(f, 'run_validation')
   lumi_validation = utils.load_array(f, 'lumi_validation')
   process_id_validation = utils.load_array(f, 'process_id_validation')
   year_validation = utils.load_array(f, 'year_validation')
   #objects_validation = utils.load_array(f, 'objects_validation')
-  tth_runII_mva_validation = utils.load_array(f, 'tth_runII_mva_validation')
+  #tth_runII_mva_validation = utils.load_array(f, 'tth_runII_mva_validation')
 
   global_features_data = utils.load_array(f, 'global_data')
   global_dnn_features_data = utils.load_array(f, 'global_dnn_data')
@@ -91,14 +92,14 @@ def train_bdt(config, invert=False):
   njets_data = utils.load_array(f, 'njets_data')
   signal_mass_label_data = utils.load_array(f, 'signal_mass_label_data')
   signal_mass_category_data = utils.load_array(f, 'signal_mass_category_data')
-  tth_2017_reference_mva_data = utils.load_array(f, 'tth_2017_reference_mva_data')
+  #tth_2017_reference_mva_data = utils.load_array(f, 'tth_2017_reference_mva_data')
   evt_data = utils.load_array(f, 'evt_data')
   run_data = utils.load_array(f, 'run_data')
   lumi_data = utils.load_array(f, 'lumi_data')
   process_id_data = utils.load_array(f, 'process_id_data')
   year_data = utils.load_array(f, 'year_data')
   #objects_data = utils.load_array(f, 'objects_data')
-  tth_runII_mva_data = utils.load_array(f, 'tth_runII_mva_data')
+  #tth_runII_mva_data = utils.load_array(f, 'tth_runII_mva_data')
 
   global_features_final_fit = utils.load_array(f, 'global_final_fit')
   global_dnn_features_final_fit = utils.load_array(f, 'global_dnn_final_fit')
@@ -109,14 +110,14 @@ def train_bdt(config, invert=False):
   njets_final_fit = utils.load_array(f, 'njets_final_fit')
   signal_mass_label_final_fit = utils.load_array(f, 'signal_mass_label_final_fit')
   signal_mass_category_final_fit = utils.load_array(f, 'signal_mass_category_final_fit')
-  tth_2017_reference_mva_final_fit = utils.load_array(f, 'tth_2017_reference_mva_final_fit')
+  #tth_2017_reference_mva_final_fit = utils.load_array(f, 'tth_2017_reference_mva_final_fit')
   evt_final_fit = utils.load_array(f, 'evt_final_fit')
   run_final_fit = utils.load_array(f, 'run_final_fit')
   lumi_final_fit = utils.load_array(f, 'lumi_final_fit')
   process_id_final_fit = utils.load_array(f, 'process_id_final_fit')
   year_final_fit = utils.load_array(f, 'year_final_fit')
   #objects_final_fit = utils.load_array(f, 'objects_final_fit')
-  tth_runII_mva_final_fit = utils.load_array(f, 'tth_runII_mva_final_fit')
+  #tth_runII_mva_final_fit = utils.load_array(f, 'tth_runII_mva_final_fit')
 
   print global_dnn_features.shape, global_dnn_features_validation.shape, global_dnn_features_data.shape, global_dnn_features_final_fit.shape
 
@@ -162,7 +163,7 @@ def train_bdt(config, invert=False):
   sum_neg_weights = utils.sum_of_weights(weights_train, label, 0)
   sum_pos_weights = utils.sum_of_weights(weights_train, label, 1)
 
-  print((sum_pos_weights, sum_neg_weights))
+  print ((sum_pos_weights, sum_neg_weights))
 
   scale_tth = False
   if scale_tth:
@@ -377,9 +378,9 @@ def train_bdt(config, invert=False):
   tree_weight = numpy.concatenate((weights, weights_validation, weights_data, weights_final_fit))
   tree_signal_mass_label = numpy.concatenate((signal_mass_label, signal_mass_label_validation, signal_mass_label_data, numpy.zeros(len(pred_final_fit))))
   tree_signal_mass_category = numpy.concatenate((signal_mass_category, signal_mass_category_validation, signal_mass_category_data, numpy.zeros(len(pred_final_fit))))
-  tree_tth_2017_reference_mva = numpy.concatenate((tth_2017_reference_mva, tth_2017_reference_mva_validation, tth_2017_reference_mva_data, tth_2017_reference_mva_final_fit))
+  #tree_tth_2017_reference_mva = numpy.concatenate((tth_2017_reference_mva, tth_2017_reference_mva_validation, tth_2017_reference_mva_data, tth_2017_reference_mva_final_fit))
   tree_evt = numpy.concatenate((evt, evt_validation, evt_data, evt_final_fit))
-  tree_tth_runII_mva = numpy.concatenate((tth_runII_mva, tth_runII_mva_validation, tth_runII_mva_data, tth_runII_mva_final_fit))
+  #tree_tth_runII_mva = numpy.concatenate((tth_runII_mva, tth_runII_mva_validation, tth_runII_mva_data, tth_runII_mva_final_fit))
   tree_run = numpy.concatenate((run, run_validation, run_data, run_final_fit))
   tree_lumi = numpy.concatenate((lumi, lumi_validation, lumi_data, lumi_final_fit))
   tree_process_id = numpy.concatenate((process_id, process_id_validation, process_id_data, process_id_final_fit))
@@ -402,9 +403,9 @@ def train_bdt(config, invert=False):
   tree_weight = tree_weight.astype(numpy.float64)
   tree_signal_mass_label = tree_signal_mass_label.astype(numpy.int64)
   tree_signal_mass_category = tree_signal_mass_category.astype(numpy.int64)
-  tree_tth_2017_reference_mva = tree_tth_2017_reference_mva.astype(numpy.float64)
+  #tree_tth_2017_reference_mva = tree_tth_2017_reference_mva.astype(numpy.float64)
   tree_evt = tree_evt.astype(numpy.uint64)
-  tree_tth_runII_mva = tree_tth_runII_mva.astype(numpy.float64)
+  #tree_tth_runII_mva = tree_tth_runII_mva.astype(numpy.float64)
   tree_run = tree_run.astype(numpy.uint64)
   tree_lumi = tree_lumi.astype(numpy.uint64)
   tree_process_id = tree_process_id.astype(numpy.int64)
@@ -414,7 +415,8 @@ def train_bdt(config, invert=False):
       tree_dnn_features = tree_dnn_features.astype(numpy.float64)
 #tree_training_feature_names = tree_training_feature_names.astype(numpy.string_)
 
-  dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "signal_mass_category" : tree_signal_mass_category, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features, "tth_runII_mva" : tree_tth_runII_mva}#, "training_feature_names" : tree_training_feature_names}
+  #dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "signal_mass_category" : tree_signal_mass_category, "tth_2017_reference_mva" : tree_tth_2017_reference_mva, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features, "tth_runII_mva" : tree_tth_runII_mva}#, "training_feature_names" : tree_training_feature_names}
+  dict = {"train_id" : tree_train_id, "sample_id" : tree_sample_id, "mass" : tree_mass, "weight" : tree_weight, "signal_mass_label" : tree_signal_mass_label, "signal_mass_category" : tree_signal_mass_category, "process_id" : tree_process_id, "year" : tree_year, "event" : tree_evt, "lumi" : tree_lumi, "run" : tree_run, "global_features" : tree_global_features}#, "training_feature_names" : tree_training_feature_names}
 
   if ".json" in args.reference_mva:
       dict["dnn_global_features"] = tree_dnn_features

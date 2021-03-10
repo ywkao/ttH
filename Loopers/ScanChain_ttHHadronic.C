@@ -364,7 +364,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
 
               // Check golden json
               if (isData) {
-                if (!pass_json(mYear, cms3.run(), cms3.lumi()))            continue;
+                if (!pass_json(mYear, cms3.run(), cms3.lumi())) continue;
               }
 
               // Fill mva baby before any selections
@@ -446,7 +446,10 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               }
 
               // Blinded region
-              if (isData && processId != 18 && blind && mass() > 120 && mass() < 130)  continue;
+              //if (mass() > 120. && mass() < 130.)  continue;
+              if (isData && processId != 18 && blind && mass() > 120. && mass() < 130.)  continue;
+              if (isData && processId != 18 && blind && mass() > 120. && mass() < 130.)
+                  printf("[WARNING] Data events in signal region is used! mass = %.2f, processId = %d\n", mass(), processId);
 
               // Scale bkg weight
               evt_weight *= scale_bkg(currentFileTitle, bkg_options, processId, "Hadronic");
@@ -601,6 +604,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               if (isnan(evt_weight) || isinf(evt_weight) || evt_weight == 0) continue; //some pu weights are nan/inf and this causes problems for histos 
               if (has_std_overlaps(currentFileTitle, lead_Prompt(), sublead_Prompt(), genPhotonId)) continue;
               if (!passes_selection(tag, minIDMVA_, maxIDMVA_, mva_value))	continue;
+              if (leadPt() < mass()/3. || subleadPt() < mass()/4.) continue;
 
 
               //------------------------------ Minimum chi-2 method (cov.) ------------------------------//
@@ -623,6 +627,7 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               double mass_wboson = has_resonable_reco ? cov_wboson.M()     : -1.;
               double mass_top    = has_resonable_reco ? cov_top.M()        : -1.;
               double mass_tprime = has_resonable_reco ? cov_tprime.M()     : -1.;
+              double mass_tprime_tilde = has_resonable_reco ? ( cov_tprime.M() - cov_top.M() - diphoton.M() + 175.5 + 125.0 ) : -1.;
               min_chi2_value_2x2 = has_resonable_reco ? min_chi2_value_2x2 : -1.;
 
 
@@ -639,10 +644,11 @@ int ScanChain(TChain* chain, TString tag, TString year, TString ext, TString xml
               }
 
               // Fill rest of histograms //
-              vProcess[processId]->fill_histogram("h" + syst_ext + "mass_wboson_cov" , mass_wboson        , evt_weight , vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "mass_top_cov"    , mass_top           , evt_weight , vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "mass_tprime_cov" , mass_tprime        , evt_weight , vId);
-              vProcess[processId]->fill_histogram("h" + syst_ext + "cov_chi2_value"  , min_chi2_value_2x2 , evt_weight , vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "mass_wboson_cov"   , mass_wboson        , evt_weight , vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "mass_top_cov"      , mass_top           , evt_weight , vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "mass_tprime_cov"   , mass_tprime        , evt_weight , vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "mass_tprime_tilde" , mass_tprime_tilde  , evt_weight , vId);
+              vProcess[processId]->fill_histogram("h" + syst_ext + "cov_chi2_value"    , min_chi2_value_2x2 , evt_weight , vId);
 
               if (!currentFileTitle.Contains("FCNC")) {
                 vProcess[processId]->fill_histogram("h" + syst_ext + "DNNScore_ttH_vs_dipho", dnn_score_dipho(), evt_weight, vId);
