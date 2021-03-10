@@ -3,7 +3,7 @@ ROOTLIBS = $(shell root-config --libs) -lMinuit -lMLP -lXMLIO -lTMVA -lGenVector
 CC = g++
 CFLAGS = -g -std=c++1y
 
-TARGET = makePlots templatePlots makeTables fit_plots compare_shapes correlation_plots #paperPlot 
+TARGET = makePlots #templatePlots makeTables fit_plots compare_shapes correlation_plots #paperPlot 
 
 all: $(TARGET)
 

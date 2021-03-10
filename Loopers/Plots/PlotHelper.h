@@ -97,6 +97,8 @@ class Comparison
     void skip_signal() { mSkipSignal = true; }
     void skip_cp() { mSkipCP = true; }
 
+    //TCanvas* get_canvas() { return mCanvas; }
+
   private:
     void default_options(TCanvas* c1);
     void set_main_pad(TPad* mainPad, bool log, bool rat = true);
@@ -738,9 +740,9 @@ void Comparison::compute_limits(bool customXRange, bool customYRange)
 	if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
 	if (binContent > maxContent) maxContent = binContent;
         if (mScale != -1) {
-	  binContent = (mHMC->GetBinContent(i)) * mScale;
-	  if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
-	  if (binContent > maxContent) maxContent = binContent;
+	        binContent = (mHMC->GetBinContent(i)) * mScale;
+	        if ((binContent < minContent) && binContent > mVHData[0]->Integral(mXBinRange[0], mXBinRange[1])/(pow(10,6)))  minContent = binContent;
+	        if (binContent > maxContent) maxContent = binContent;
         }
       }
     }
@@ -922,7 +924,7 @@ void Comparison::set_histogram_options(int color1, int color2)
   }
 
 
-  vector<int> vColorsSignal = {kBlack, kRed, kOrange, kMagenta, kMagenta+10}; 
+  vector<int> vColorsSignal = {kBlack, kRed, kOrange+1, kMagenta, kMagenta+10}; 
   for (int i=0; i<mVHSignal.size(); i++) {
     //mVHSignal[i]->SetFillColor(kBlack);
     mVHSignal[i]->SetLineColor(vColorsSignal[i]);
@@ -1235,7 +1237,8 @@ void Comparison::annotate_plot()
     cms->SetTextSize(0.075);
   }
   else {
-    cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Supplementary}}");
+    //cms = new TLatex(0.12, 0.935, "CMS #bf{#it{Supplementary}}");
+    cms = new TLatex(0.12, 0.935, "CMS #bf{#it{work in progress}}");
     cms->SetTextSize(0.05);
   }
   cms->SetNDC();
@@ -1284,8 +1287,10 @@ void Comparison::annotate_plot()
     if (mVHMC.empty())
       l1 = new TLegend(0.6, 0.75, 0.92, 0.89);
     else if (mVLegendLabels.size() > 5) {
-      l1 = new TLegend(0.55, 0.65-(j/2), 0.92, 0.91);
-      l1->SetNColumns(2);
+      //l1 = new TLegend(0.55, 0.65-(j/2), 0.92, 0.91);
+      //l1->SetNColumns(2);
+      l1 = new TLegend(0.37, 0.70-(j/2), 0.92, 0.91);
+      l1->SetNColumns(4);
     }
     else 
       l1 = new TLegend(0.6, 0.75-j, 0.92, 0.89);
@@ -1305,7 +1310,7 @@ void Comparison::annotate_plot()
       l1->AddEntry(mHMC, mVLegendLabels[1], "lep");
     }
     if (mVLegendLabels.size() > 7)
-      l1->SetNColumns(2);
+      l1->SetNColumns(4);
     l1->SetBorderSize(0);
     //if (mDrawMainLegend)
     //  l1->Draw("SAME");

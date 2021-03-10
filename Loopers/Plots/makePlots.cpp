@@ -12,7 +12,14 @@
 // 8: W + Jets
 // 9: TT + Jets
 // }}}
-//std::map<TString, TString> mLabels {{{
+//maps: lumi, labels, colors, latex {{{
+std::map<TString, double> lumi_map = {
+    {"2016", 35.9},
+    {"2017", 41.5},
+    {"2018", 59.76},
+    {"RunII", 137.16},
+    {"", 137.16}
+};
 std::map<TString, TString> mLabels = {
 	{"DY", "Drell-Yan"}, 
 	{"DiPhoton", "#gamma#gamma + Jets"},
@@ -25,79 +32,113 @@ std::map<TString, TString> mLabels = {
 	{"TTGJets", "t#bar{t} + #gamma"},
 	{"VG", "V + #gamma"},
 	{"WJets", "W+Jets"},
-	{"TTJets", "t#bar{t} + jets"}, 
+	{"TTJets", "t#bar{t} + Jets"}, 
 	{"THQ", "tHq"},
 	{"TGamma", "t+#gamma+Jets"},
 	{"QCD_GammaJets_imputed", "(#gamma) + Jets"},
     //{"QCD_GammaJets_imputed", "Multi-jet (+ #gamma)"},
     {"TTZ", "t#bar{t}Z"},
     {"TTW", "t#bar{t}W"},
-        {"VV", "VV"},
-        {"tV", "t + V"},
+    {"VV", "VV"},
+    {"tV", "t + V"},
 	{"ttH", "t#bar{t}H(125)"},
 	{"TT_FCNC_hut", "t#bar{t} FCNC (Hut)"},
 	{"TT_FCNC_hct", "t#bar{t} FCNC (Hct)"},
 	{"ST_FCNC_hut", "t FCNC (Hut)"},
-        {"ST_FCNC_hct", "t FCNC (Hct)"}
+    {"ST_FCNC_hct", "t FCNC (Hct)"},
+    {"TprimeBToTH_M-600" , "T'(600)"},
+    {"TprimeBToTH_M-626" , "T'(626)"},
+    {"TprimeBToTH_M-650" , "T'(650)"},
+    {"TprimeBToTH_M-675" , "T'(675)"},
+    {"TprimeBToTH_M-700" , "T'(700)"},
+    {"TprimeBToTH_M-800" , "T'(800)"},
+    {"TprimeBToTH_M-900" , "T'(900)"},
+    {"TprimeBToTH_M-1000", "T'(1000)"},
+    {"TprimeBToTH_M-1100", "T'(1100)"},
+    {"TprimeBToTH_M-1200", "T'(1200)"}
 };
-//}}}
-//std::map<TString, int> mColors {{{
 std::map<TString, int> mColors = {
-        {"DY", kCyan-7},
-        {"DiPhoton", kBlue - 4},
-        {"GammaJets", kAzure + 1},
+	{"QCD_GammaJets_imputed", kRed+1},
+    {"DiPhoton", kOrange+6},
+    {"TTGG", kGreen-2},
+    {"TTGJets", kGreen-7},
+    {"TTJets", kSpring+10},
+    {"VG", kViolet-9},
+    //----------//
+	//{"QCD_GammaJets_imputed", kCyan-9},
+    //{"DiPhoton", kBlue - 4},
+    //{"TTGG", kGreen-2},
+    //{"TTGJets", kGreen-7},
+    //{"TTJets", kSpring+10},
+    //{"VG", kViolet-9},
+    //----------//
+	//{"QCD_GammaJets_imputed", kRed-9},
+    //{"DiPhoton", kBlue - 4},
+    //{"TTGG", kOrange+1},
+    //{"TTGJets", kOrange+2},
+    //{"TTJets", kOrange+3},
+    //{"VG", kBlue-9},
+    //----------//
+    {"DY", kCyan-7},
+    {"GammaJets", kAzure + 1},
 	{"GammaJets_Madgraph", kRed},
-        {"QCD", kCyan-7},
-        {"TTGG", kGreen-2},
-        {"TTGJets", kGreen-7},
-        {"VG", kViolet-9},
-        {"WJets", kBlue+2},
-        {"TTJets", kSpring+10},
+    {"QCD", kCyan-7},
+    {"WJets", kBlue+2},
 	{"TGamma", kYellow-9},
-	//{"QCD_GammaJets_imputed", kGray},
-	{"QCD_GammaJets_imputed", kCyan-9},
 	{"TTZ", kAzure+1},
     {"TTW", kRed},
 	{"tV", kPink-6},
 	{"VV", kPink+6},
     {"ttH", kCyan-9}
+    // Sam's color sheme
+    //{"DY", kCyan-7},
+    //{"DiPhoton", kBlue - 4},
+    //{"GammaJets", kAzure + 1},
+	//{"GammaJets_Madgraph", kRed},
+    //{"QCD", kCyan-7},
+    //{"TTGG", kGreen-2},
+    //{"TTGJets", kGreen-7},
+    //{"VG", kViolet-9},
+    //{"WJets", kBlue+2},
+    //{"TTJets", kSpring+10},
+	//{"TGamma", kYellow-9},
+	//{"QCD_GammaJets_imputed", kCyan-9},
+	//{"TTZ", kAzure+1},
+    //{"TTW", kRed},
+	//{"tV", kPink-6},
+	//{"VV", kPink+6},
+    //{"ttH", kCyan-9}
 };
-//}}}
-//std::map<TString, TString> mLatex {{{
 std::map<TString, TString> mLatex = {
-        {"DY", "Drell-Yan"},
-        {"DiPhoton", "$\\gamma\\gamma$ + Jets"},
-        {"GammaJets", "$\\gamma$ + Jets"},
-	{"GammaJets_Madgraph", "$\\gamma$ + Jets (Madgraph)"},
-        {"QCD", "QCD"},
-        {"TTGG", "$t\\bar{t}+\\gamma\\gamma$"},
-        {"TTGJets", "$t\\bar{t}+\\gamma$ + Jets"},
-        {"VG", "V + $\\gamma$"},
-        {"WJets", "W + Jets"},
-        {"TTJets", "$t\\bar{t}$ + Jets"},
-        {"TGamma", "$t + \\gamma$"},
-	{"QCD_GammaJets_imputed", "($\\gamma$) + Jets (Data Sideband)"},
-	{"TTZ", "$t\\bar{t}+Z$"},
+    {"DY", "Drell-Yan"},
+    {"DiPhoton", "$\\gamma\\gamma$ + Jets"},
+    {"GammaJets", "$\\gamma$ + Jets"},
+    {"GammaJets_Madgraph", "$\\gamma$ + Jets (Madgraph)"},
+    {"QCD", "QCD"},
+    {"TTGG", "$t\\bar{t}+\\gamma\\gamma$"},
+    {"TTGJets", "$t\\bar{t}+\\gamma$ + Jets"},
+    {"VG", "V + $\\gamma$"},
+    {"WJets", "W + Jets"},
+    {"TTJets", "$t\\bar{t}$ + Jets"},
+    {"TGamma", "$t + \\gamma$"},
+    {"QCD_GammaJets_imputed", "($\\gamma$) + Jets (Data Sideband)"},
+    {"TTZ", "$t\\bar{t}+Z$"},
     {"TTW", "$t\\bar{t}+W$"},
-        {"VV", "$VV$"},
-        {"tV", "$tV$"},
-	{"ttH", "$t\\bar{t}H$"},
-	{"TT_FCNC_hut", "$t\\bar{t}$ FCNC (Hut)"},
-        {"TT_FCNC_hct", "$t\\bar{t}$ FCNC (Hct)"},
-        {"ST_FCNC_hut", "$t$ FCNC (Hut)"},
-        {"ST_FCNC_hct", "$t$ FCNC (Hct)"}
+    {"VV", "$VV$"},
+    {"tV", "$tV$"},
+    {"ttH", "$t\\bar{t}H$"},
+    {"TT_FCNC_hut", "$t\\bar{t}$ FCNC (Hut)"},
+    {"TT_FCNC_hct", "$t\\bar{t}$ FCNC (Hct)"},
+    {"ST_FCNC_hut", "$t$ FCNC (Hut)"},
+    {"ST_FCNC_hct", "$t$ FCNC (Hct)"}
 };
 //}}}
-const int nGenPhotonCats = 3;
-const int nGenLeptonCats = 6;
-//std::map<int, TString> mPhotons {{{
+//maps: photons, leptons, latex {{{
 std::map<int, TString> mPhotons = {
 	{0, "(F/F)"},
 	{1, "(F/P)"},
 	{2, "(P/P)"}
 };
-//}}}
-//std::map<int, TString> mLeptons {{{
 std::map<int, TString> mLeptons = {
 	{0, "(Had.)"},
 	{1, "(e)"},
@@ -106,8 +147,6 @@ std::map<int, TString> mLeptons = {
 	{4, "(ee)"},
 	{5, "(#mu#mu)"}
 };
-//}}}
-//std::map<int, TString> mLeptonsLatex {{{
 std::map<int, TString> mLeptonsLatex = {
         {0, "Hadronic"},
         {1, "$e$"},
@@ -174,34 +213,30 @@ const std::vector<TString> syst_ext = {
     "electronVetoSF",
 };
 //}}}
+const int nGenPhotonCats = 3;
+const int nGenLeptonCats = 6;
 
 void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, TString x_label, vector<TString> vBkgs, vector<TString> vSigs, int idx, TString type = "std", TString year = "2016", bool loose_mva_cut = false, TFile* file_ref = nullptr, vector<TString> vExtraInfo = {}, int yearIdx = -1, bool doSyst = false, bool doRatio = true) {
+  // init{{{
   TString my_output_name = "THQHadronicTag_" + hist_name + ".png";
   my_output_name = my_output_name.ReplaceAll("_h", "_");
-  // setup{{{
   TString extension = loose_mva_cut ? "MVACategories_1" : "";
   extension = yearIdx == -1 ? "" : (yearIdx == 0 ? "Year_0" : (yearIdx == 1 ? "Year_1" : (yearIdx == 2 ? "Year_2" : "")));
 
-  //cout << hist_name + "_Data" + extension << endl;
-
   TH1D* hData = (TH1D*)file->Get(hist_name + "_Data" + extension);
+  //Remove the display of 69 events in signal region...
+  if (hist_name == "hMass") hData->SetBinContent(49,0.);
+  if (hist_name == "hMass") hData->SetBinContent(50,0.);
+  if (hist_name == "hMass") hData->SetBinContent(51,0.);
+  if (hist_name == "hMass") hData->SetBinContent(52,0.);
+
   TH1D* hData_ref;
   if (file_ref != nullptr) {
     hData_ref = (TH1D*)file_ref->Get(hist_name + "_Data" + extension);
     //hData_ref->Scale(45.966/41.5); 
   }
 
-  /*
-  TH1D* hSig_TTH = (TH1D*)file->Get(hist_name + "_ttH" + extension);
-  TH1D* hSig_THQ = (TH1D*)file->Get(hist_name + "_THQ" + extension);
-  TH1D* hSig_THW = (TH1D*)file->Get(hist_name + "_THW" + extension);
-  TH1D* hSig_FCNC_hut = (TH1D*)file->Get(hist_name + "_FCNC_hut" + extension);
-  TH1D* hSig_FCNC_hct = (TH1D*)file->Get(hist_name + "_FCNC_hct" + extension);
-  vector<TH1D*> hSig;// = {hSig_TTH, hSig_THQ, hSig_THW};
-  hSig = {hSig_TTH, hSig_FCNC_hut, hSig_FCNC_hct};
-  */
   vector<TH1D*> hSig;
-
   vector<TH1D*> hBkg;
   vector<TH1D*> hBkgSystUp;
   vector<TH1D*> hBkgSystDown;
@@ -213,9 +248,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 
   TString output = output_name;
   //}}}
-  //if (type.Contains("std")) {{{
   if (type.Contains("std")) {
-    if (vSigs.size() == 0) { 
+    // push back sig samples{{{
+    if (vSigs.size() == 0) {
       vLegendLabels = {year + "Data", "ttH (M125)", "FCNC_hut", "FCNC_hct"};
       TH1D* hSig_TTH = (TH1D*)file->Get(hist_name + "_ttH" + extension);
       TH1D* hSig_THQ = (TH1D*)file->Get(hist_name + "_THQ" + extension);
@@ -230,9 +265,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
 	    vLegendLabels.push_back(mLabels.find(vSigs[i])->second);
         hSig.push_back((TH1D*)file->Get(hist_name + "_" + vSigs[i] + extension));
       }
-            
     }
-
+    //}}}
+    // push back bkg samples {{{
     for (int i = 0; i < vBkgs.size(); i++) {
       if (vBkgs[i] != "Other" && vBkgs[i] != "Other2") {
         hBkg.push_back((TH1D*)file->Get(hist_name + "_" + vBkgs[i] + extension));
@@ -266,8 +301,8 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         vColors.push_back(kGreen+1);
       }
     }
- 
-    // Get systs
+    //}}}
+    // Get systs {{{
     vector<TString> syst_bkgs;
     for (unsigned int i = 0; i < vBkgs.size(); i++) {
       if (vBkgs[i] == "Other") {
@@ -325,16 +360,9 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
         //delete hSystUp;
         //delete hSystDown;
       }
-      /*
-      // Insert dummy systematics
-      for (int j = 0; j < hBkgSystUp[i]->GetSize(); j++) {
-        hBkgSystUp[i]->SetBinContent(j, hBkgSystUp[i]->GetBinContent(j) * 1.0000001);
-        hBkgSystDown[i]->SetBinContent(j, hBkgSystDown[i]->GetBinContent(j) * 0.9999999);
-      } 
-      */
     }
-
-    // print latex table
+    //}}}
+    // print latex table {{{
     if (hist_name == "hNVtx") {
       int n_bins = hData->GetSize()-2;
       double yield_data = hData->Integral(0, n_bins+1);
@@ -360,23 +388,10 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       cout << "Data & " << yield_data << " & " << yield_data/yield_bkg << " \\\\ \\hline" << endl;
       cout << "\\end{tabular} \\end{center}" << endl;
     }
-  }
   //}}}
-  // lumi{{{
-  //TString output = output_name;
-  std::map<TString, double> lumi_map = {
-	{"2016", 35.9},
-	{"2017", 41.5},
-	{"2018", 59.76},
-	{"RunII", 137.16},
-    {"", 137.16}
-  };
-
+  } // end of std
+  
   double lumi = lumi_map[year];
-  //printf("[check] Lumi is %.2f, my_output_name = %s\n", lumi, my_output_name.Data());
-  //double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9))); 
-  //}}}
-  //if (type.Contains("std")) {{{
   if (type.Contains("std")) {
     if (type.Contains("shape")) {
       hSig[0]->Scale(1./hSig[0]->Integral(0, hSig[0]->GetNbinsX()+1));
@@ -393,91 +408,31 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
       c->set_y_label("Fraction of events");
     }
     else {
-      if (file_ref == nullptr && !doSyst) {
-        c = new Comparison(c1, {hData}, hSig, hBkg);
-      }
-      else if (file_ref == nullptr && doSyst)
-        c = new Comparison(c1, {hData}, hSig, hBkg, hBkgSystUp, hBkgSystDown);
-      else {
-        c = new Comparison(c1, {hData}, hSig, {hData_ref});
-        //c = new Comparison(c1, {hData, hData_ref}, hSig, hBkg);
-      }
+      //manual apply cross section
+      hSig[0]->Scale(0.07393); //600
+      hSig[1]->Scale(0.03817); //900
+      //hSig[1]->Scale(0.03063); //1000
+      hSig[2]->Scale(0.01989); //1200
+      if (file_ref == nullptr && !doSyst) c = new Comparison(c1, {hData}, hSig, hBkg);
+      else if (file_ref == nullptr && doSyst) c = new Comparison(c1, {hData}, hSig, hBkg, hBkgSystUp, hBkgSystDown);
+      else c = new Comparison(c1, {hData}, hSig, {hData_ref}); //c = new Comparison(c1, {hData, hData_ref}, hSig, hBkg);
       c->set_data_drawOpt("E");
       c->set_rat_label("#frac{Data}{MC}");
       c->set_y_label("Events");
       if (hist_name.Contains("tthMVA_RunII") && !output.Contains("ttZ"))
           c->set_stack_order({6,5,4,3,2,1,0});
-      //else if (hist_name.Contains("tthMVA_RunII"))
-      //    c->set_stack_order({3,2,1,0});
-      //if (hist_name.Contains("tthMVA_RunII") && output.Contains("Hadronic"))
-      //    c->set_stack_order({5,4,3,1,2,0});
-      //else if (hist_name.Contains("tthMVA_RunII") && output.Contains("Leptonic"))
-      //    c->set_stack_order({6,1,4,5,0,3,2});
-    }
-    if (hist_name.Contains("htthMVA_RunII_transf") && !output.Contains("ttZ")) {
-        vector<double> vlines;
-        vector<double> cp_lines;
-        if (output.Contains("Leptonic")) {
-            vlines = { 0.8997816, 0.95635754, 0.9725133, 0.9870608 }; 
-            cp_lines = { 0.9597816 };
-            c->set_y_lim_range({0.333, 2*pow(10,5)});
-        }
-        else if (output.Contains("Hadronic")) {
-            vlines = { 0.986025, 0.9948537, 0.9983046, 0.9990729 }; 
-            c->set_y_lim_range({0.5, pow(10,6)});
-            cp_lines = { 0.99722563 };
-        }
-        for (unsigned int i = 0; i < vlines.size(); i++) {
-            vlines[i] = -log(1-vlines[i]);
-        }
-        for (unsigned int i = 0; i < cp_lines.size(); i++)
-            cp_lines[i] = -log(1-cp_lines[i]);
-        c->give_vlines(vlines);
-        c->give_vlines_dotted(cp_lines);
-        c->give_vshade({0.,vlines[0]});
-        c->add_paper_info(output.Contains("Hadronic") ? "Had" : "Lep");
-        c->skip_cp(); // uncomment to remove cp lines
     }
 
-    else if (hist_name.Contains("htthMVA_RunII_transf") && hist_name.Contains("ttZ")) {
-        vector<double> vlines;
-        if (output.Contains("Leptonic")) {
-            vlines = { 0.8997816, 0.95635754, 0.9725133, 0.9870608 };
-        }
-        else if (output.Contains("Hadronic")) {
-            vlines = { 0.986025, 0.9948537, 0.9983046, 0.9990729 };
-        }
-        for (unsigned int i = 0; i < vlines.size(); i++) {
-            vlines[i] = -log(1-vlines[i]);
-        }
-        c->give_vshade({0.,vlines[0]});
-        c->skip_signal();
-    }
+    //c->set_x_bin_range({2,8});
+    //c->set_y_lim_range({0.5, pow(10,3)});
+    //c->set_stack_order({2,1,0});
 
-    if (hist_name.Contains("htthMVA_RunII_transf_ttZ") && output.Contains("Leptonic")) {
-        c->set_x_bin_range({2,8});
-        c->set_y_lim_range({0.5, pow(10,3)});
-        c->set_stack_order({2,1,0});
-    }
-    else if (hist_name.Contains("htthMVA_RunII_transf_ttZ_") && output.Contains("Hadronic") && !(hist_name.Contains("v3") || hist_name.Contains("v4"))) {
-        c->set_x_bin_range({3,14});
-        c->set_y_lim_range({0.5, pow(10,4)});
-        c->set_stack_order({2,1,0});
-    }
-
-    if (!doRatio)
-        c->set_no_ratio();
     c->set_lumi(lumi);
-    //c->set_log_rat();
     c->set_rat_lim_range({0.0, 2.0});
-    //if (hist_name.Contains("SigmaEOverE") || hist_name.Contains("DiphotonMassResolution")) {
-    //  c->set_no_log();
-    //}
-    if (type.Contains("linear"))
-      c->set_no_log();
+    if (!doRatio) c->set_no_ratio();
+    if (type.Contains("linear")) c->set_no_log();
 
-  }
-  //}}}
+  } // end of std
   // set hist{{{
   if (type.Contains("std") && type.Contains("shape"))
       vLegendLabels.erase(vLegendLabels.begin());
@@ -488,63 +443,44 @@ void make_plot(TCanvas* c1, TFile* file, string output_name, TString hist_name, 
   c->set_legend_labels(vLegendLabels);
   c->set_colors(vColors);
 
-  //c->set_filename(output_name);
   c->set_filename(my_output_name.Data());
   c->set_x_label(x_label);
   //c->set_y_label("Events");
-  //double lumi = year == "All" ? 77.4 : (year == "2018" ? 45.996 : ((year == "2017" ? 41.5 : 35.9)));
-  //c->set_lumi(lumi);
 
   if ((hist_name == "hNJets" || hist_name == "hNbLoose") && !output.Contains("GJet_Reweight")) {
     if (output.Contains("ttHHadronic_2017_Presel")) {
       c->set_no_log();
       c->set_y_lim_range({0.0, 90000});
     }
-    //else if (output.Contains("Leptonic"))
-    //  c->set_y_lim_range({0.01, pow(10,4)});
     //else if (output.Contains("Hadronic"))
     //  c->set_y_lim_range({0.01, pow(10,4)});
   }
 
-  //if (hist_name.Contains("IDMVA"))
-  //  c->set_no_log();
+  //if (hist_name.Contains("IDMVA")) c->set_no_log();
+  if (hist_name == "hDiphotonMassResolution") c->set_x_bin_range({1, 100});
+  if (hist_name.Contains("LeadPToM") || hist_name.Contains("SubleadPToM")) c->set_x_bin_range({1,10});
+  if (hist_name == "hMass" && (type == "std" || type == "std_linear")) c->set_verbose();
+  //if (hist_name == "hMass" && (type == "std" || type == "std_linear")) c->set_x_bin_range({21,37}); // nbins = 50
+  if (hist_name == "hMass" && (type == "std" || type == "std_linear")) c->set_x_bin_range({41,72}); // nbins = 100
+  if (hist_name == "hMass" && (type == "std" || type == "std_linear")) c->set_no_flow();
+  if (hist_name.Contains("SigmaIEtaIEta")) c->set_x_bin_range({1,50});
 
-  if (hist_name == "hDiphotonMassResolution")
-    c->set_x_bin_range({1, 100});
+  if (hist_name.Contains("htthMVA_RunII_transf_ttZ")) c->set_lower_lim(0.1);
+  if (hist_name.Contains("hMass"))                    c->set_y_lim_range( {1e-2, 1e+7} );
+  if (hist_name.Contains("Eta"))                      c->set_y_lim_range( {1e-1, 1e+7} );
+  if (hist_name.Contains("Phi"))                      c->set_y_lim_range( {1e-1, 1e+6} );
+  if (hist_name.Contains("Rapidity"))                 c->set_y_lim_range( {1, 1e+7}    );
+  if (hist_name.Contains("mass"))                     c->set_y_lim_range( {1e-1, 1e+7} );
+  if (hist_name.Contains("IDMVA"))                    c->set_y_lim_range( {1, 1e+7}    );
+  if (hist_name.Contains("PtOverMass"))               c->set_y_lim_range( {1e-1, 1e+7} );
+  if (hist_name.Contains("hmass_tprime_tilde"))       c->set_x_bin_range( {1, 50} );
 
-  if (hist_name.Contains("LeadPToM") || hist_name.Contains("SubleadPToM"))
-    c->set_x_bin_range({1,10});
+  for (int i = 0; i < vExtraInfo.size(); i++) c->give_info(vExtraInfo[i]);
+  if (type == "individual_shape") c->plot(idx, false); else c->plot(idx);
 
-  if (hist_name == "hMass") {
-   if (!(output_name == "ttHLeptonic_ttbarCR_plotsgenPhoton.pdf" || output_name == "ttHLeptonic_ttbarCR_plotsstd.pdf") ) {
-    c->set_no_underflow();
-    //c->set_x_bin_range({21,50});
-    }
-    if (type == "std" || type == "std_linear")
-      c->set_verbose();
-  }
-
-  if (hist_name.Contains("SigmaIEtaIEta"))      c->set_x_bin_range({1,50});
-
-  if (hist_name.Contains("htthMVA_RunII_transf_ttZ"))
-      c->set_lower_lim(0.1);
-
-  for (int i = 0; i < vExtraInfo.size(); i++)
-    c->give_info(vExtraInfo[i]);
-
-
-  if (type == "individual_shape")
-    c->plot(idx, false);
-  else
-    c->plot(idx);
   delete hData;
-  if (type != "individual_shape") {
-    //delete hSig;
-    for (int i = 0; i < hSig.size(); i++)
-      delete hSig[i];
-  }
-  for (int i = 0; i < hBkg.size(); i++)
-    delete hBkg[i];
+  if (type != "individual_shape") { for (int i = 0; i < hSig.size(); i++) delete hSig[i]; }
+  for (int i = 0; i < hBkg.size(); i++) delete hBkg[i];
   delete c;
   //}}}
 }
@@ -729,6 +665,7 @@ int main(int argc, char* argv[])
     make_plot(c1, vFiles[i], vNames[i], "hmass_wboson_cov", "W boson mass [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hmass_top_cov", "top quark mass [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hmass_tprime_cov", "T' quark mass [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
+    make_plot(c1, vFiles[i], vNames[i], "hmass_tprime_tilde", "#tildeT' quark mass [GeV]", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     make_plot(c1, vFiles[i], vNames[i], "hcov_chi2_value", "Minimum #chi^{2} value", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
     //others{{{
     //make_plot(c1, vFiles[i], vNames[i], "hMaxBTagSum", "max b-tag scores", vBkgs, vSigs, 1, type, year, loose_mva_cut, f_ref, vInfo, yearIdx, doSyst, doRatio);
